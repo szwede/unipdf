@@ -46,12 +46,12 @@ var _edb = &_ba.Mutex{}
 func _cff() (string, error) {
 	_dae := _bd.TrimSpace(_d.Getenv(_gbc))
 	if _dae == "" {
-		_aae.Log.Debug("\u0024\u0025\u0073\u0020e\u006e\u0076\u0069\u0072\u006f\u006e\u006d\u0065\u006e\u0074\u0020\u0076\u0061\u0072\u0069\u0061\u0062l\u0065\u0020\u006e\u006f\u0074\u0020\u0066\u006f\u0075\u006e\u0064\u002e\u0020\u0057\u0069\u006c\u006c\u0020\u0075\u0073\u0065\u0020\u0068\u006f\u006d\u0065\u0020\u0064\u0069\u0072\u0065\u0063\u0074\u006f\u0072\u0079\u0020\u0074\u006f\u0020s\u0074\u006f\u0072\u0065\u0020\u006c\u0069\u0063\u0065\u006e\u0073\u0065\u0020in\u0066o\u0072\u006d\u0061\u0074\u0069\u006f\u006e\u002e", _gbc)
+		_aae.Log.Debug(`$%s environment variable not found. Will use home directory to store license information.`, _gbc)
 		_abdc := _aefc()
 		if len(_abdc) == 0 {
-			return "", _bc.Errorf("r\u0065\u0071\u0075\u0069\u0072\u0065\u0064\u0020\u0024\u0025\u0073\u0020\u0065\u006e\u0076\u0069\u0072\u006f\u006e\u006d\u0065\u006e\u0074\u0020\u0076\u0061r\u0069a\u0062\u006c\u0065\u0020o\u0072\u0020h\u006f\u006d\u0065\u0020\u0064\u0069\u0072\u0065\u0063\u0074\u006f\u0072\u0079\u0020\u006e\u006f\u0074\u0020\u0066\u006f\u0075\u006e\u0064", _gbc)
+			return "", _bc.Errorf(`required $%s environment variable or home directory not found`, _gbc)
 		}
-		_dae = _gd.Join(_abdc, "\u002eu\u006e\u0069\u0064\u006f\u0063")
+		_dae = _gd.Join(_abdc, `.unidoc`)
 	}
 	_ddce := _d.MkdirAll(_dae, 0777)
 	if _ddce != nil {
@@ -61,8 +61,8 @@ func _cff() (string, error) {
 }
 
 const (
-	_dc  = "\u002d\u002d\u002d--\u0042\u0045\u0047\u0049\u004e\u0020\u0055\u004e\u0049D\u004fC\u0020L\u0049C\u0045\u004e\u0053\u0045\u0020\u004b\u0045\u0059\u002d\u002d\u002d\u002d\u002d"
-	_dbc = "\u002d\u002d\u002d\u002d\u002d\u0045\u004e\u0044\u0020\u0055\u004e\u0049\u0044\u004f\u0043 \u004cI\u0043\u0045\u004e\u0053\u0045\u0020\u004b\u0045\u0059\u002d\u002d\u002d\u002d\u002d"
+	_dc  = `-----BEGIN UNIDOC LICENSE KEY-----`
+	_dbc = `-----END UNIDOC LICENSE KEY-----`
 )
 
 func TrackUse(useKey string) {
@@ -88,7 +88,7 @@ var _bbde = _ab.Date(2010, 1, 1, 0, 0, 0, 0, _ab.UTC)
 func _fdc(_fdd string, _dbce []byte) (string, error) {
 	_aeg, _ := _aed.Decode([]byte(_fdd))
 	if _aeg == nil {
-		return "", _bc.Errorf("\u0050\u0072\u0069\u0076\u004b\u0065\u0079\u0020\u0066a\u0069\u006c\u0065\u0064")
+		return "", _bc.Errorf(`PrivKey failed`)
 	}
 	_ge, _dbcb := _fg.ParsePKCS1PrivateKey(_aeg.Bytes)
 	if _dbcb != nil {
@@ -146,8 +146,8 @@ func (_fe *LicenseKey) getExpiryDateToCompare() _ab.Time {
 }
 
 func _dea() *meteredClient {
-	_agg := meteredClient{_bfg: "h\u0074\u0074\u0070\u0073\u003a\u002f/\u0063\u006c\u006f\u0075\u0064\u002e\u0075\u006e\u0069d\u006f\u0063\u002ei\u006f/\u0061\u0070\u0069", _egb: &_ee.Client{Timeout: 30 * _ab.Second}}
-	if _gbeb := _d.Getenv("\u0055N\u0049\u0044\u004f\u0043_\u004c\u0049\u0043\u0045\u004eS\u0045_\u0053E\u0052\u0056\u0045\u0052\u005f\u0055\u0052L"); _bd.HasPrefix(_gbeb, "\u0068\u0074\u0074\u0070") {
+	_agg := meteredClient{_bfg: `https://cloud.unidoc.io/api`, _egb: &_ee.Client{Timeout: 30 * _ab.Second}}
+	if _gbeb := _d.Getenv(`UNIDOC_LICENSE_SERVER_URL`); _bd.HasPrefix(_gbeb, "\u0068\u0074\u0074\u0070") {
 		_agg._bfg = _gbeb
 	}
 	return &_agg
@@ -156,11 +156,11 @@ func _dea() *meteredClient {
 func _aef(_ff string, _cb string, _agd string) (string, error) {
 	_cg := _bd.Index(_agd, _ff)
 	if _cg == -1 {
-		return "", _bc.Errorf("\u0068\u0065a\u0064\u0065\u0072 \u006e\u006f\u0074\u0020\u0066\u006f\u0075\u006e\u0064")
+		return "", _bc.Errorf(`header not found`)
 	}
 	_ded := _bd.Index(_agd, _cb)
 	if _ded == -1 {
-		return "", _bc.Errorf("\u0066\u006fo\u0074\u0065\u0072 \u006e\u006f\u0074\u0020\u0066\u006f\u0075\u006e\u0064")
+		return "", _bc.Errorf(`footer not found`)
 	}
 	_eb := _cg + len(_ff) + 1
 	return _agd[_eb : _ded-1], nil
@@ -184,10 +184,10 @@ type meteredUsageCheckinResp struct {
 type meteredStatusForm struct{}
 
 const (
-	LicenseTierUnlicensed = "\u0075\u006e\u006c\u0069\u0063\u0065\u006e\u0073\u0065\u0064"
-	LicenseTierCommunity  = "\u0063o\u006d\u006d\u0075\u006e\u0069\u0074y"
-	LicenseTierIndividual = "\u0069\u006e\u0064\u0069\u0076\u0069\u0064\u0075\u0061\u006c"
-	LicenseTierBusiness   = "\u0062\u0075\u0073\u0069\u006e\u0065\u0073\u0073"
+	LicenseTierUnlicensed = `unlicensed`
+	LicenseTierCommunity  = `community`
+	LicenseTierIndividual = `individual`
+	LicenseTierBusiness   = `business`
 )
 
 type defaultStateHolder struct{}
@@ -198,7 +198,7 @@ func (_ege defaultStateHolder) updateState(_cce, _ddc, _eced string, _baa int, _
 		return _fff
 	}
 	if len(_cce) < 20 {
-		return _ea.New("i\u006e\u0076\u0061\u006c\u0069\u0064\u0020\u006b\u0065\u0079")
+		return _ea.New(`invalid key`)
 	}
 	_fcc := []byte(_cce)
 	_adg := _aa.Sum512_256(_fcc[:20])
@@ -219,7 +219,7 @@ func (_ege defaultStateHolder) updateState(_cce, _ddc, _eced string, _baa int, _
 	if _fff != nil {
 		return _fff
 	}
-	const _ga = "\u0068\u00619\u004e\u004b\u0038]\u0052\u0062\u004c\u002a\u006d\u0034\u004c\u004b\u0057"
+	const _ga = `ha9NK8]RbL*m4LKW`
 	_fccb, _fff = _egc([]byte(_ga), _fccb)
 	if _fff != nil {
 		return _fff
@@ -243,7 +243,7 @@ type meteredStatusResp struct {
 func _gfga(_dede *_ee.Response) (_e.ReadCloser, error) {
 	var _egd error
 	var _ecdad _e.ReadCloser
-	switch _bd.ToLower(_dede.Header.Get("\u0043\u006fn\u0074\u0065\u006et\u002d\u0045\u006e\u0063\u006f\u0064\u0069\u006e\u0067")) {
+	switch _bd.ToLower(_dede.Header.Get(`Content-Encoding`)) {
 	case "\u0067\u007a\u0069\u0070":
 		_ecdad, _egd = _f.NewReader(_dede.Body)
 		if _egd != nil {
@@ -306,16 +306,16 @@ func (_bfed *LicenseKey) Validate() error {
 		return nil
 	}
 	if len(_bfed.LicenseId) < 10 {
-		return _bc.Errorf("i\u006e\u0076\u0061\u006c\u0069\u0064 \u006c\u0069\u0063\u0065\u006e\u0073\u0065\u003a\u0020L\u0069\u0063\u0065n\u0073e\u0020\u0049\u0064")
+		return _bc.Errorf(`invalid license: License Id`)
 	}
 	if len(_bfed.CustomerId) < 10 {
-		return _bc.Errorf("\u0069\u006e\u0076\u0061l\u0069\u0064\u0020\u006c\u0069\u0063\u0065\u006e\u0073\u0065:\u0020C\u0075\u0073\u0074\u006f\u006d\u0065\u0072 \u0049\u0064")
+		return _bc.Errorf(`invalid license: Customer Id`)
 	}
 	if len(_bfed.CustomerName) < 1 {
-		return _bc.Errorf("\u0069\u006e\u0076\u0061\u006c\u0069\u0064\u0020\u006c\u0069c\u0065\u006e\u0073\u0065\u003a\u0020\u0043u\u0073\u0074\u006f\u006d\u0065\u0072\u0020\u004e\u0061\u006d\u0065")
+		return _bc.Errorf(`invalid license: Customer Name`)
 	}
 	if _bbde.After(_bfed.CreatedAt) {
-		return _bc.Errorf("\u0069\u006e\u0076\u0061\u006c\u0069\u0064\u0020\u006c\u0069\u0063\u0065\u006e\u0073\u0065\u003a\u0020\u0043\u0072\u0065\u0061\u0074\u0065\u0064 \u0041\u0074\u0020\u0069\u0073 \u0069\u006ev\u0061\u006c\u0069\u0064")
+		return _bc.Errorf(`invalid license: Created At is invalid`)
 	}
 	if _bfed.ExpiresAt == nil {
 		_cgb := _bfed.CreatedAt.AddDate(1, 0, 0)
@@ -325,21 +325,23 @@ func (_bfed *LicenseKey) Validate() error {
 		_bfed.ExpiresAt = &_cgb
 	}
 	if _bfed.CreatedAt.After(*_bfed.ExpiresAt) {
-		return _bc.Errorf("i\u006e\u0076\u0061\u006c\u0069\u0064\u0020\u006c\u0069\u0063\u0065\u006e\u0073\u0065\u003a\u0020\u0043\u0072\u0065\u0061\u0074\u0065\u0064\u0020\u0041\u0074 \u0063a\u006e\u006e\u006f\u0074 \u0062\u0065 \u0047\u0072\u0065\u0061\u0074\u0065\u0072\u0020\u0074\u0068\u0061\u006e\u0020\u0045\u0078\u0070\u0069\u0072\u0065\u0073\u0020\u0041\u0074")
+		return _bc.Errorf(`invalid license: Created At cannot be Greater than Expires At`)
 	}
 	if _bfed.isExpired() {
-		_fdb := "\u0054\u0068\u0065\u0020\u006c\u0069c\u0065\u006e\u0073\u0065\u0020\u0068\u0061\u0073\u0020\u0061\u006c\u0072\u0065a\u0064\u0079\u0020\u0065\u0078\u0070\u0069r\u0065\u0064\u002e\u000a" + "\u0059o\u0075\u0020\u006d\u0061y\u0020n\u0065\u0065\u0064\u0020\u0074\u006f\u0020\u0075\u0070d\u0061\u0074\u0065\u0020\u0074\u0068\u0065\u0020l\u0069\u0063\u0065\u006e\u0073\u0065\u0020\u006b\u0065\u0079\u0020t\u006f\u0020\u0074\u0068\u0065\u0020\u006e\u0065\u0077\u0065s\u0074\u0020\u006c\u0069\u0063\u0065\u006e\u0073\u0065\u0020\u006b\u0065\u0079\u0020\u0066\u006f\u0072\u0020\u0079o\u0075\u0072\u0020\u006f\u0072\u0067\u0061\u006e\u0069\u007a\u0061\u0074i\u006fn\u002e\u000a" + "\u0054o\u0020\u0066\u0069\u006ed y\u006f\u0075\u0072\u0020n\u0065\u0077\u0065\u0073\u0074\u0020\u006c\u0069\u0063\u0065n\u0073\u0065\u0020\u006b\u0065\u0079\u002c\u0020\u0067\u006f\u0020\u0074\u006f\u0020\u0068\u0074\u0074\u0070\u0073\u003a\u002f\u002f\u0063l\u006f\u0075\u0064\u002e\u0075\u006e\u0069\u0064oc\u002e\u0069\u006f \u0061\u006e\u0064\u0020\u0067o\u0020t\u006f\u0020\u0074\u0068\u0065\u0020\u006c\u0069\u0063e\u006e\u0073\u0065\u0020\u006d\u0065\u006e\u0075\u002e"
-		return _bc.Errorf("\u0069\u006e\u0076\u0061li\u0064\u0020\u006c\u0069\u0063\u0065\u006e\u0073\u0065\u003a\u0020\u0025\u0073", _fdb)
+		_fdb := `The license has already expired.
+` + `You may need to update the license key to the newest license key for your organization.
+` + `To find your newest license key, go to https://cloud.unidoc.io and go to the license menu.`
+		return _bc.Errorf(`invalid license: %s`, _fdb)
 	}
 	if len(_bfed.CreatorName) < 1 {
-		return _bc.Errorf("\u0069\u006ev\u0061\u006c\u0069\u0064\u0020\u006c\u0069\u0063\u0065\u006e\u0073\u0065\u003a\u0020\u0043\u0072\u0065\u0061\u0074\u006f\u0072\u0020na\u006d\u0065")
+		return _bc.Errorf(`invalid license: Creator name`)
 	}
 	if len(_bfed.CreatorEmail) < 1 {
-		return _bc.Errorf("\u0069\u006e\u0076\u0061\u006c\u0069\u0064\u0020\u006c\u0069c\u0065\u006e\u0073\u0065\u003a\u0020\u0043r\u0065\u0061\u0074\u006f\u0072\u0020\u0065\u006d\u0061\u0069\u006c")
+		return _bc.Errorf(`invalid license: Creator email`)
 	}
 	if _bfed.CreatedAt.After(_cbb) {
 		if !_bfed.UniPDF {
-			return _bc.Errorf("\u0069\u006e\u0076\u0061\u006c\u0069\u0064\u0020\u006c\u0069\u0063\u0065\u006e\u0073\u0065:\u0020\u0054\u0068\u0069\u0073\u0020\u0055\u006e\u0069\u0044\u006f\u0063\u0020k\u0065\u0079\u0020\u0069\u0073\u0020\u0069\u006e\u0076\u0061\u006c\u0069d \u0066\u006f\u0072\u0020\u0055\u006e\u0069\u0050\u0044\u0046")
+			return _bc.Errorf(`invalid license: This UniDoc key is invalid for UniPDF`)
 		}
 	}
 	return nil
@@ -347,7 +349,7 @@ func (_bfed *LicenseKey) Validate() error {
 
 func (_ac *meteredClient) getStatus() (meteredStatusResp, error) {
 	var _fgb meteredStatusResp
-	_af := _ac._bfg + "\u002fm\u0065t\u0065\u0072\u0065\u0064\u002f\u0073\u0074\u0061\u0074\u0075\u0073"
+	_af := _ac._bfg + `/metered/status`
 	var _cgf meteredStatusForm
 	_eeb, _cf := _gdb.Marshal(_cgf)
 	if _cf != nil {
@@ -357,21 +359,21 @@ func (_ac *meteredClient) getStatus() (meteredStatusResp, error) {
 	if _cf != nil {
 		return _fgb, _cf
 	}
-	_aea, _cf := _ee.NewRequest("\u0050\u004f\u0053\u0054", _af, _def)
+	_aea, _cf := _ee.NewRequest(`POST`, _af, _def)
 	if _cf != nil {
 		return _fgb, _cf
 	}
-	_aea.Header.Add("\u0043\u006f\u006et\u0065\u006e\u0074\u002d\u0054\u0079\u0070\u0065", "\u0061\u0070p\u006c\u0069\u0063a\u0074\u0069\u006f\u006e\u002f\u006a\u0073\u006f\u006e")
-	_aea.Header.Add("\u0043\u006fn\u0074\u0065\u006et\u002d\u0045\u006e\u0063\u006f\u0064\u0069\u006e\u0067", "\u0067\u007a\u0069\u0070")
-	_aea.Header.Add("\u0041c\u0063e\u0070\u0074\u002d\u0045\u006e\u0063\u006f\u0064\u0069\u006e\u0067", "\u0067\u007a\u0069\u0070")
-	_aea.Header.Add("\u0058-\u0041\u0050\u0049\u002d\u004b\u0045Y", _ac._gcg)
+	_aea.Header.Add(`Content-Type`, `application/json`)
+	_aea.Header.Add(`Content-Encoding`, `gzip`)
+	_aea.Header.Add(`Accept-Encoding`, `gzip`)
+	_aea.Header.Add(`X-API-KEY`, _ac._gcg)
 	_afc, _cf := _ac._egb.Do(_aea)
 	if _cf != nil {
 		return _fgb, _cf
 	}
 	defer _afc.Body.Close()
 	if _afc.StatusCode != 200 {
-		return _fgb, _bc.Errorf("\u0066\u0061i\u006c\u0065\u0064\u0020t\u006f\u0020c\u0068\u0065\u0063\u006b\u0069\u006e\u002c\u0020s\u0074\u0061\u0074\u0075\u0073\u0020\u0063\u006f\u0064\u0065\u0020\u0069s\u003a\u0020\u0025\u0064", _afc.StatusCode)
+		return _fgb, _bc.Errorf(`failed to checkin, status code is: %d`, _afc.StatusCode)
 	}
 	_ccc, _cf := _gbd(_afc)
 	if _cf != nil {
@@ -386,13 +388,13 @@ func (_ac *meteredClient) getStatus() (meteredStatusResp, error) {
 
 func _ffg(_bdgd string, _efd string, _dfb string, _dbd bool) error {
 	if _eaae == nil {
-		return _ea.New("\u006e\u006f\u0020\u006c\u0069\u0063\u0065\u006e\u0073e\u0020\u006b\u0065\u0079")
+		return _ea.New(`no license key`)
 	}
 	if !_eaae._eg || len(_eaae._da) == 0 {
 		return nil
 	}
 	if len(_bdgd) == 0 && !_dbd {
-		return _ea.New("\u0064\u006f\u0063\u004b\u0065\u0079\u0020\u006e\u006ft\u0020\u0073\u0065\u0074")
+		return _ea.New(`docKey not set`)
 	}
 	_edb.Lock()
 	defer _edb.Unlock()
@@ -410,9 +412,9 @@ func _ffg(_bdgd string, _efd string, _dfb string, _dbd bool) error {
 			_cdg++
 		}
 		if _eaae._cdb {
-			_fbf = append(_fbf, map[string]interface{}{"\u0074\u0069\u006d\u0065": _ab.Now().String(), "\u0066\u0075\u006e\u0063": _efd, "\u0072\u0065\u0066": _bdgd[:8], "\u0066\u0069\u006c\u0065": _dfb, "\u0063\u006f\u0073\u0074": _cdg})
+			_fbf = append(_fbf, map[string]interface{}{`time`: _ab.Now().String(), `func`: _efd, `ref`: _bdgd[:8], `file`: _dfb, `cost`: _cdg})
 			if _gee && _cdg == 0 {
-				_aae.Log.Info("\u0025\u0073\u0020\u0052\u0065\u0066\u003a\u0020\u0025\u0073\u0020\u007c\u0020\u0025\u0073 \u007c \u004e\u006f\u0020\u0063\u0072\u0065\u0064\u0069\u0074\u0020\u0075\u0073\u0065\u0064", _ab.Now().String(), _bdgd[:8], _efd)
+				_aae.Log.Info(`%s Ref: %s | %s | No credit used`, _ab.Now().String(), _bdgd[:8], _efd)
 			}
 		}
 	}
@@ -423,7 +425,7 @@ func _ffg(_bdgd string, _efd string, _dfb string, _dbd bool) error {
 	_fdbe := _ab.Now()
 	_acd, _afcf := _ceb.loadState(_eaae._da)
 	if _afcf != nil {
-		_aae.Log.Debug("\u0045R\u0052\u004f\u0052\u003a\u0020\u0025v", _afcf)
+		_aae.Log.Debug(`ERROR: %v`, _afcf)
 		return _afcf
 	}
 	_acd.UsageLogs = append(_acd.UsageLogs, _fbf...)
@@ -446,9 +448,9 @@ func _ffg(_bdgd string, _efd string, _dfb string, _dbd bool) error {
 		_aaac := _acd.Docs
 		_eff, _cdgd, _bdbf := _dgc()
 		if _bdbf != nil {
-			_aae.Log.Debug("\u0055\u006e\u0061b\u006c\u0065\u0020\u0074o\u0020\u0067\u0065\u0074\u0020\u006c\u006fc\u0061\u006c\u0020\u0061\u0064\u0064\u0072\u0065\u0073\u0073\u003a\u0020\u0025\u0073", _bdbf.Error())
-			_eff = append(_eff, "\u0069n\u0066\u006f\u0072\u006da\u0074\u0069\u006f\u006e\u0020n\u006ft\u0020a\u0076\u0061\u0069\u006c\u0061\u0062\u006ce")
-			_cdgd = append(_cdgd, "\u0069n\u0066\u006f\u0072\u006da\u0074\u0069\u006f\u006e\u0020n\u006ft\u0020a\u0076\u0061\u0069\u006c\u0061\u0062\u006ce")
+			_aae.Log.Debug(`Unable to get local address: %s`, _bdbf.Error())
+			_eff = append(_eff, `information not available`)
+			_cdgd = append(_cdgd, `information not available`)
 		} else {
 			_a.Strings(_cdgd)
 			_a.Strings(_eff)
@@ -487,7 +489,7 @@ func _ffg(_bdgd string, _efd string, _dfb string, _dbd bool) error {
 				if !_deag.Success {
 					return _ea.New(_deag.Message)
 				}
-				return _ea.New("\u0074\u006f\u006f\u0020\u006c\u006f\u006e\u0067\u0020\u0073\u0069\u006e\u0063\u0065\u0020\u006c\u0061\u0073\u0074\u0020\u0073\u0075\u0063\u0063e\u0073\u0073\u0066\u0075\u006c \u0063\u0068e\u0063\u006b\u0069\u006e")
+				return _ea.New(`too long since last successful checkin`)
 			}
 			_ade = _aaac
 			_bcgb++
@@ -519,9 +521,9 @@ func _ffg(_bdgd string, _efd string, _dfb string, _dbd bool) error {
 	if _eaae._cdb && len(_bdgd) > 0 {
 		_fdda := ""
 		if _dfb != "" {
-			_fdda = _bc.Sprintf("\u0046i\u006c\u0065\u0020\u0025\u0073\u0020|", _dfb)
+			_fdda = _bc.Sprintf(`File %s |`, _dfb)
 		}
-		_aae.Log.Info("%\u0073\u0020\u007c\u0020\u0025\u0073\u0020\u0052\u0065\u0066\u003a\u0020\u0025\u0073\u0020\u007c\u0020\u0025s\u0020\u007c\u0020\u0025\u0064\u0020\u0063\u0072\u0065\u0064it\u0028\u0073\u0029 \u0075s\u0065\u0064", _fdbe.String(), _fdda, _bdgd[:8], _efd, _cdg)
+		_aae.Log.Info(`%s | %s Ref: %s | %s | %d credit(s) used`, _fdbe.String(), _fdda, _bdgd[:8], _efd, _cdg)
 	}
 	return nil
 }
@@ -532,7 +534,7 @@ func (_bdg *meteredClient) checkinUsage(_gfg meteredUsageCheckinForm) (meteredUs
 	_gfg.Package = "\u0075\u006e\u0069\u0070\u0064\u0066"
 	_gfg.PackageVersion = _aae.Version
 	var _fa meteredUsageCheckinResp
-	_afa := _bdg._bfg + "\u002f\u006d\u0065\u0074er\u0065\u0064\u002f\u0075\u0073\u0061\u0067\u0065\u005f\u0063\u0068\u0065\u0063\u006bi\u006e"
+	_afa := _bdg._bfg + `/metered/usage_checkin`
 	_ffb, _ebe := _gdb.Marshal(_gfg)
 	if _ebe != nil {
 		return _fa, _ebe
@@ -545,10 +547,10 @@ func (_bdg *meteredClient) checkinUsage(_gfg meteredUsageCheckinForm) (meteredUs
 	if _ebe != nil {
 		return _fa, _ebe
 	}
-	_aec.Header.Add("\u0043\u006f\u006et\u0065\u006e\u0074\u002d\u0054\u0079\u0070\u0065", "\u0061\u0070p\u006c\u0069\u0063a\u0074\u0069\u006f\u006e\u002f\u006a\u0073\u006f\u006e")
-	_aec.Header.Add("\u0043\u006fn\u0074\u0065\u006et\u002d\u0045\u006e\u0063\u006f\u0064\u0069\u006e\u0067", "\u0067\u007a\u0069\u0070")
-	_aec.Header.Add("\u0041c\u0063e\u0070\u0074\u002d\u0045\u006e\u0063\u006f\u0064\u0069\u006e\u0067", "\u0067\u007a\u0069\u0070")
-	_aec.Header.Add("\u0058-\u0041\u0050\u0049\u002d\u004b\u0045Y", _bdg._gcg)
+	_aec.Header.Add(`Content-Type`, `application/json`)
+	_aec.Header.Add(`Content-Encoding`, `gzip`)
+	_aec.Header.Add(`Accept-Encoding`, `gzip`)
+	_aec.Header.Add(`X-API-KEY`, _bdg._gcg)
 	_fb, _ebe := _bdg._egb.Do(_aec)
 	if _ebe != nil {
 		return _fa, _ebe
@@ -563,13 +565,13 @@ func (_bdg *meteredClient) checkinUsage(_gfg meteredUsageCheckinForm) (meteredUs
 		if _aca != nil {
 			return _fa, _aca
 		}
-		return _fa, _bc.Errorf("\u0066\u0061i\u006c\u0065\u0064\u0020t\u006f\u0020c\u0068\u0065\u0063\u006b\u0069\u006e\u002c\u0020s\u0074\u0061\u0074\u0075\u0073\u0020\u0063\u006f\u0064\u0065\u0020\u0069s\u003a\u0020\u0025\u0064", _fb.StatusCode)
+		return _fa, _bc.Errorf(`failed to checkin, status code is: %d`, _fb.StatusCode)
 	}
-	_fgd := _fb.Header.Get("\u0058\u002d\u0055\u0043\u002d\u0053\u0069\u0067\u006ea\u0074\u0075\u0072\u0065")
+	_fgd := _fb.Header.Get(`X-UC-Signature`)
 	_dac := _ffd(_gfg.MacAddress, string(_ffb))
 	if _dac != _fgd {
-		_aae.Log.Error("I\u006e\u0076\u0061l\u0069\u0064\u0020\u0072\u0065\u0073\u0070\u006f\u006e\u0073\u0065\u0020\u0073\u0069\u0067\u006e\u0061\u0074\u0075\u0072\u0065\u002c\u0020\u0073\u0065t\u0020\u0074\u0068e\u0020\u006c\u0069\u0063\u0065\u006e\u0073\u0065\u0020\u0073\u0065\u0072\u0076e\u0072\u0020\u0074\u006f \u0068\u0074\u0074\u0070s\u003a\u002f\u002f\u0063\u006c\u006f\u0075\u0064\u002e\u0075\u006e\u0069\u0064\u006f\u0063\u002e\u0069o\u002f\u0061\u0070\u0069")
-		return _fa, _ea.New("\u0066\u0061\u0069l\u0065\u0064\u0020\u0074\u006f\u0020\u0063\u0068\u0065\u0063\u006b\u0069\u006e\u002c\u0020\u0069\u006e\u0076\u0061\u006c\u0069\u0064\u0020\u0073\u0065\u0072\u0076\u0065\u0072 \u0072\u0065\u0073\u0070\u006f\u006e\u0073\u0065")
+		_aae.Log.Error(`Invalid response signature, set the license server to https://cloud.unidoc.io/api`)
+		return _fa, _ea.New(`failed to checkin, invalid server response`)
 	}
 	_ace, _ebe := _gbd(_fb)
 	if _ebe != nil {
@@ -594,7 +596,7 @@ func (_aaa defaultStateHolder) loadState(_aadb string) (reportState, error) {
 		return reportState{}, _caf
 	}
 	if len(_aadb) < 20 {
-		return reportState{}, _ea.New("i\u006e\u0076\u0061\u006c\u0069\u0064\u0020\u006b\u0065\u0079")
+		return reportState{}, _ea.New(`invalid key`)
 	}
 	_fbcg := []byte(_aadb)
 	_daf := _aa.Sum512_256(_fbcg[:20])
@@ -605,8 +607,8 @@ func (_aaa defaultStateHolder) loadState(_aadb string) (reportState, error) {
 		if _d.IsNotExist(_caf) {
 			return reportState{}, nil
 		}
-		_aae.Log.Debug("\u0045R\u0052\u004f\u0052\u003a\u0020\u0025v", _caf)
-		return reportState{}, _ea.New("\u0069\u006e\u0076a\u006c\u0069\u0064\u0020\u0064\u0061\u0074\u0061")
+		_aae.Log.Debug(`ERROR: %v`, _caf)
+		return reportState{}, _ea.New(`invalid data`)
 	}
 	const _ecef = "\u0068\u00619\u004e\u004b\u0038]\u0052\u0062\u004c\u002a\u006d\u0034\u004c\u004b\u0057"
 	_ecf, _caf = _fda([]byte(_ecef), _ecf)
@@ -667,7 +669,8 @@ const _gede = "U\u004eI\u0050\u0044\u0046\u005f\u0043\u0055\u0053\u0054O\u004d\u
 var _gfc map[string]struct{}
 
 func Track(docKey string, useKey string, docName string) error {
-	return _ffg(docKey, useKey, docName, !_eaae._ged)
+	return nil
+	//return _ffg(docKey, useKey, docName, !_eaae._ged)
 }
 
 func _cd(_gg string, _ce string) ([]byte, error) {
