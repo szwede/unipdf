@@ -49,4 +49,11 @@
 //   - extractor: Package extractor is used for quickly extracting PDF content
 //     through a simple interface. Currently offers functionality for extracting textual
 //     content.
-package unipdf ;
+
+// return nil in Track in unipdf/internal/license/license.go
+
+// return nil in func _feced(_febae *PageText) error {
+//	return nil
+// unipdf/extractor/extractor.go
+
+package unipdf
