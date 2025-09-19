@@ -13,9 +13,9 @@ package arithmetic
 
 import (
 	_g "bytes"
-	_ac "github.com/szwede/unipdf/v4/common"
-	_e "github.com/szwede/unipdf/v4/internal/jbig2/bitmap"
-	_eg "github.com/szwede/unipdf/v4/internal/jbig2/errors"
+	_ac "github.com/szwede/unipdf/common"
+	_e "github.com/szwede/unipdf/internal/jbig2/bitmap"
+	_eg "github.com/szwede/unipdf/internal/jbig2/errors"
 	_aa "io"
 )
 

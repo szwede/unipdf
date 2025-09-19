@@ -29,7 +29,7 @@ import (
 	_aed "encoding/pem"
 	_ea "errors"
 	_bc "fmt"
-	_aae "github.com/szwede/unipdf/v4/common"
+	_aae "github.com/szwede/unipdf/common"
 	_e "io"
 	_fd "net"
 	_ee "net/http"

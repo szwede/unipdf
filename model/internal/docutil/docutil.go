@@ -14,8 +14,8 @@ package docutil
 import (
 	_c "errors"
 	_f "fmt"
-	_b "github.com/szwede/unipdf/v4/common"
-	_d "github.com/szwede/unipdf/v4/core"
+	_b "github.com/szwede/unipdf/common"
+	_d "github.com/szwede/unipdf/core"
 )
 
 func (_af *Catalog) SetMetadata(data []byte) error {

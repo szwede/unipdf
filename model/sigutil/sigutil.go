@@ -19,7 +19,7 @@ import (
 	_a "encoding/pem"
 	_c "errors"
 	_cb "fmt"
-	_ac "github.com/szwede/unipdf/v4/common"
+	_ac "github.com/szwede/unipdf/common"
 	_acb "github.com/unidoc/timestamp"
 	_cd "golang.org/x/crypto/ocsp"
 	_d "io"

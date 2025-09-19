@@ -12,7 +12,7 @@
 // Package license helps manage commercial licenses and check if they are valid for the version of unipdf used.
 package license
 
-import _gc "github.com/szwede/unipdf/v4/internal/license"
+import _gc "github.com/szwede/unipdf/internal/license"
 
 // SetLicenseKey sets and validates the license key.
 func SetLicenseKey(content string, customerName string) error {

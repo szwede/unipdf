@@ -13,7 +13,7 @@ package pdfaid
 
 import (
 	_f "fmt"
-	_g "github.com/szwede/unipdf/v4/model/xmputil/pdfaextension"
+	_g "github.com/szwede/unipdf/model/xmputil/pdfaextension"
 	_e "github.com/trimmer-io/go-xmp/xmp"
 )
 

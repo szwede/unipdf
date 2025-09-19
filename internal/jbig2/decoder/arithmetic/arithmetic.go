@@ -13,9 +13,9 @@ package arithmetic
 
 import (
 	_g "fmt"
-	_af "github.com/szwede/unipdf/v4/common"
-	_gd "github.com/szwede/unipdf/v4/internal/bitwise"
-	_c "github.com/szwede/unipdf/v4/internal/jbig2/internal"
+	_af "github.com/szwede/unipdf/common"
+	_gd "github.com/szwede/unipdf/internal/bitwise"
+	_c "github.com/szwede/unipdf/internal/jbig2/internal"
 	_b "io"
 	_ac "strings"
 )

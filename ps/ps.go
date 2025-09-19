@@ -21,8 +21,8 @@ import (
 	_g "bytes"
 	_f "errors"
 	_ga "fmt"
-	_ce "github.com/szwede/unipdf/v4/common"
-	_e "github.com/szwede/unipdf/v4/core"
+	_ce "github.com/szwede/unipdf/common"
+	_e "github.com/szwede/unipdf/core"
 	_b "io"
 	_ba "math"
 )

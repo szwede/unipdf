@@ -14,7 +14,7 @@ package mdp
 import (
 	_g "errors"
 	_eg "fmt"
-	_ed "github.com/szwede/unipdf/v4/core"
+	_ed "github.com/szwede/unipdf/core"
 )
 
 func (_aeg *defaultDiffPolicy) compareFields(_dg int, _fb, _ea []_ed.PdfObject) error {

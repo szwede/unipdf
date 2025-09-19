@@ -23,7 +23,7 @@ import (
 	_fd "encoding/binary"
 	_cf "errors"
 	_e "fmt"
-	_bf "github.com/szwede/unipdf/v4/common"
+	_bf "github.com/szwede/unipdf/common"
 	_b "hash"
 	_c "io"
 	_ad "math"

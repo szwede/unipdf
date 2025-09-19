@@ -12,10 +12,10 @@
 package classer
 
 import (
-	_ca "github.com/szwede/unipdf/v4/common"
-	_g "github.com/szwede/unipdf/v4/internal/jbig2/basic"
-	_a "github.com/szwede/unipdf/v4/internal/jbig2/bitmap"
-	_e "github.com/szwede/unipdf/v4/internal/jbig2/errors"
+	_ca "github.com/szwede/unipdf/common"
+	_g "github.com/szwede/unipdf/internal/jbig2/basic"
+	_a "github.com/szwede/unipdf/internal/jbig2/bitmap"
+	_e "github.com/szwede/unipdf/internal/jbig2/errors"
 	_d "image"
 	_f "math"
 )

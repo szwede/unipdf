@@ -15,8 +15,8 @@ import (
 	_b "encoding/binary"
 	_e "errors"
 	_d "fmt"
-	_bf "github.com/szwede/unipdf/v4/common"
-	_eg "github.com/szwede/unipdf/v4/internal/jbig2/errors"
+	_bf "github.com/szwede/unipdf/common"
+	_eg "github.com/szwede/unipdf/internal/jbig2/errors"
 	_f "io"
 )
 

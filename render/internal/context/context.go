@@ -13,11 +13,11 @@ package context
 
 import (
 	_d "errors"
-	_a "github.com/szwede/unipdf/v4/core"
-	_gd "github.com/szwede/unipdf/v4/internal/cmap"
-	_cg "github.com/szwede/unipdf/v4/internal/textencoding"
-	_df "github.com/szwede/unipdf/v4/internal/transform"
-	_ga "github.com/szwede/unipdf/v4/model"
+	_a "github.com/szwede/unipdf/core"
+	_gd "github.com/szwede/unipdf/internal/cmap"
+	_cg "github.com/szwede/unipdf/internal/textencoding"
+	_df "github.com/szwede/unipdf/internal/transform"
+	_ga "github.com/szwede/unipdf/model"
 	_cf "github.com/unidoc/freetype/truetype"
 	_cc "golang.org/x/image/font"
 	_c "image"

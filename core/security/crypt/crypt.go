@@ -18,8 +18,8 @@ import (
 	_a "crypto/rand"
 	_c "crypto/rc4"
 	_b "fmt"
-	_g "github.com/szwede/unipdf/v4/common"
-	_ec "github.com/szwede/unipdf/v4/core/security"
+	_g "github.com/szwede/unipdf/common"
+	_ec "github.com/szwede/unipdf/core/security"
 	_bg "io"
 )
 

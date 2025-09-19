@@ -14,9 +14,9 @@ package mmr
 import (
 	_f "errors"
 	_e "fmt"
-	_g "github.com/szwede/unipdf/v4/common"
-	_ag "github.com/szwede/unipdf/v4/internal/bitwise"
-	_b "github.com/szwede/unipdf/v4/internal/jbig2/bitmap"
+	_g "github.com/szwede/unipdf/common"
+	_ag "github.com/szwede/unipdf/internal/bitwise"
+	_b "github.com/szwede/unipdf/internal/jbig2/bitmap"
 	_a "io"
 )
 
