@@ -17,7 +17,7 @@ import (
 	_a "encoding/hex"
 	_dg "errors"
 	_de "fmt"
-	_g "github.com/szwede/unipdf/model"
+	_g "github.com/szwede/unipdf/v4/model"
 	_e "io"
 	_be "io/ioutil"
 	_db "os"

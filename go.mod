@@ -1,4 +1,4 @@
-module github.com/szwede/unipdf
+module github.com/szwede/unipdf/v4
 
 go 1.23.0
 

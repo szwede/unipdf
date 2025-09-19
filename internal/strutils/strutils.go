@@ -13,7 +13,7 @@ package strutils
 
 import (
 	_f "bytes"
-	_g "github.com/szwede/unipdf/common"
+	_g "github.com/szwede/unipdf/v4/common"
 	_ff "unicode/utf16"
 )
 

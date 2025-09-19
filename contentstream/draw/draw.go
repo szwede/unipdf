@@ -18,11 +18,11 @@ package draw
 
 import (
 	_fa "fmt"
-	_f "github.com/szwede/unipdf/contentstream"
-	_e "github.com/szwede/unipdf/core"
-	_b "github.com/szwede/unipdf/internal/precision"
-	_c "github.com/szwede/unipdf/internal/transform"
-	_cc "github.com/szwede/unipdf/model"
+	_f "github.com/szwede/unipdf/v4/contentstream"
+	_e "github.com/szwede/unipdf/v4/core"
+	_b "github.com/szwede/unipdf/v4/internal/precision"
+	_c "github.com/szwede/unipdf/v4/internal/transform"
+	_cc "github.com/szwede/unipdf/v4/model"
 	_fd "math"
 )
 

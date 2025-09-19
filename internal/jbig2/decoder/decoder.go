@@ -12,10 +12,10 @@
 package decoder
 
 import (
-	_g "github.com/szwede/unipdf/internal/bitwise"
-	_gc "github.com/szwede/unipdf/internal/jbig2/bitmap"
-	_ga "github.com/szwede/unipdf/internal/jbig2/document"
-	_c "github.com/szwede/unipdf/internal/jbig2/errors"
+	_g "github.com/szwede/unipdf/v4/internal/bitwise"
+	_gc "github.com/szwede/unipdf/v4/internal/jbig2/bitmap"
+	_ga "github.com/szwede/unipdf/v4/internal/jbig2/document"
+	_c "github.com/szwede/unipdf/v4/internal/jbig2/errors"
 	_d "image"
 )
 

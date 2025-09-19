@@ -14,9 +14,9 @@ package fjson
 
 import (
 	_be "encoding/json"
-	_d "github.com/szwede/unipdf/common"
-	_ee "github.com/szwede/unipdf/core"
-	_e "github.com/szwede/unipdf/model"
+	_d "github.com/szwede/unipdf/v4/common"
+	_ee "github.com/szwede/unipdf/v4/core"
+	_e "github.com/szwede/unipdf/v4/model"
 	_a "io"
 	_g "os"
 )

@@ -14,8 +14,8 @@ package huffman
 import (
 	_fe "errors"
 	_ga "fmt"
-	_b "github.com/szwede/unipdf/internal/bitwise"
-	_g "github.com/szwede/unipdf/internal/jbig2/internal"
+	_b "github.com/szwede/unipdf/v4/internal/bitwise"
+	_g "github.com/szwede/unipdf/v4/internal/jbig2/internal"
 	_cg "math"
 	_f "strings"
 )

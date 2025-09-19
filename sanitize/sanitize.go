@@ -12,8 +12,8 @@
 package sanitize
 
 import (
-	_d "github.com/szwede/unipdf/common"
-	_f "github.com/szwede/unipdf/core"
+	_d "github.com/szwede/unipdf/v4/common"
+	_f "github.com/szwede/unipdf/v4/core"
 )
 
 // SanitizationOpts specifies the objects to be removed during sanitization.

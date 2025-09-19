@@ -12,11 +12,11 @@
 package jbig2
 
 import (
-	_b "github.com/szwede/unipdf/internal/bitwise"
-	_c "github.com/szwede/unipdf/internal/jbig2/decoder"
-	_gb "github.com/szwede/unipdf/internal/jbig2/document"
-	_cb "github.com/szwede/unipdf/internal/jbig2/document/segments"
-	_g "github.com/szwede/unipdf/internal/jbig2/errors"
+	_b "github.com/szwede/unipdf/v4/internal/bitwise"
+	_c "github.com/szwede/unipdf/v4/internal/jbig2/decoder"
+	_gb "github.com/szwede/unipdf/v4/internal/jbig2/document"
+	_cb "github.com/szwede/unipdf/v4/internal/jbig2/document/segments"
+	_g "github.com/szwede/unipdf/v4/internal/jbig2/errors"
 	_ag "sort"
 )
 

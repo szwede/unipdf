@@ -13,7 +13,7 @@ package ccittfax
 
 import (
 	_f "errors"
-	_b "github.com/szwede/unipdf/internal/bitwise"
+	_b "github.com/szwede/unipdf/v4/internal/bitwise"
 	_ec "io"
 	_fa "math"
 )

@@ -13,12 +13,12 @@ package pdfutil
 
 import (
 	_a "errors"
-	_c "github.com/szwede/unipdf/common"
-	_d "github.com/szwede/unipdf/contentstream"
-	_g "github.com/szwede/unipdf/contentstream/draw"
-	_gb "github.com/szwede/unipdf/core"
-	_b "github.com/szwede/unipdf/model"
-	_dc "github.com/szwede/unipdf/ps"
+	_c "github.com/szwede/unipdf/v4/common"
+	_d "github.com/szwede/unipdf/v4/contentstream"
+	_g "github.com/szwede/unipdf/v4/contentstream/draw"
+	_gb "github.com/szwede/unipdf/v4/core"
+	_b "github.com/szwede/unipdf/v4/model"
+	_dc "github.com/szwede/unipdf/v4/ps"
 )
 
 // NormalizePage performs the following operations on the passed in page:

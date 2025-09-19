@@ -11,7 +11,7 @@
 
 package basic
 
-import _f "github.com/szwede/unipdf/internal/jbig2/errors"
+import _f "github.com/szwede/unipdf/v4/internal/jbig2/errors"
 
 func Min(x, y int) int {
 	if x < y {

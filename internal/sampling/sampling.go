@@ -12,8 +12,8 @@
 package sampling
 
 import (
-	_b "github.com/szwede/unipdf/internal/bitwise"
-	_f "github.com/szwede/unipdf/internal/imageutil"
+	_b "github.com/szwede/unipdf/v4/internal/bitwise"
+	_f "github.com/szwede/unipdf/v4/internal/imageutil"
 	_e "io"
 )
 
