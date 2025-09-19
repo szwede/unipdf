@@ -9,19 +9,250 @@
 // Use of this source code is governed by the UniDoc End User License Agreement
 // terms that can be accessed at https://unidoc.io/eula/
 
-package sampling ;import (_b "github.com/unidoc/unipdf/v4/internal/bitwise";_f "github.com/unidoc/unipdf/v4/internal/imageutil";_e "io";);func ResampleUint32 (data []uint32 ,bitsPerInputSample int ,bitsPerOutputSample int )[]uint32 {var _gb []uint32 ;_gedb :=bitsPerOutputSample ;
-var _eef uint32 ;var _fe uint32 ;_cg :=0;_gag :=0;_ce :=0;for _ce < len (data ){if _cg > 0{_cd :=_cg ;if _gedb < _cd {_cd =_gedb ;};_eef =(_eef <<uint (_cd ))|(_fe >>uint (bitsPerInputSample -_cd ));_cg -=_cd ;if _cg > 0{_fe =_fe <<uint (_cd );}else {_fe =0;
-};_gedb -=_cd ;if _gedb ==0{_gb =append (_gb ,_eef );_gedb =bitsPerOutputSample ;_eef =0;_gag ++;};}else {_egb :=data [_ce ];_ce ++;_gae :=bitsPerInputSample ;if _gedb < _gae {_gae =_gedb ;};_cg =bitsPerInputSample -_gae ;_eef =(_eef <<uint (_gae ))|(_egb >>uint (_cg ));
-if _gae < bitsPerInputSample {_fe =_egb <<uint (_gae );};_gedb -=_gae ;if _gedb ==0{_gb =append (_gb ,_eef );_gedb =bitsPerOutputSample ;_eef =0;_gag ++;};};};for _cg >=bitsPerOutputSample {_fee :=_cg ;if _gedb < _fee {_fee =_gedb ;};_eef =(_eef <<uint (_fee ))|(_fe >>uint (bitsPerInputSample -_fee ));
-_cg -=_fee ;if _cg > 0{_fe =_fe <<uint (_fee );}else {_fe =0;};_gedb -=_fee ;if _gedb ==0{_gb =append (_gb ,_eef );_gedb =bitsPerOutputSample ;_eef =0;_gag ++;};};if _gedb > 0&&_gedb < bitsPerOutputSample {_eef <<=uint (_gedb );_gb =append (_gb ,_eef );
-};return _gb ;};type Reader struct{_gg _f .ImageBase ;_bd *_b .Reader ;_a ,_fc ,_ee int ;_ge bool ;};func (_ga *Reader )ReadSamples (samples []uint32 )(_bb error ){for _ed :=0;_ed < len (samples );_ed ++{samples [_ed ],_bb =_ga .ReadSample ();if _bb !=nil {return _bb ;
-};};return nil ;};type SampleWriter interface{WriteSample (_eee uint32 )error ;WriteSamples (_bed []uint32 )error ;};func (_de *Writer )WriteSample (sample uint32 )error {if _ ,_ff :=_de ._ad .WriteBits (uint64 (sample ),_de ._fa .BitsPerComponent );_ff !=nil {return _ff ;
-};_de ._ef --;if _de ._ef ==0{_de ._ef =_de ._fa .ColorComponents ;_de ._bf ++;};if _de ._bf ==_de ._fa .Width {if _de ._fb {_de ._ad .FinishByte ();};_de ._bf =0;};return nil ;};func NewWriter (img _f .ImageBase )*Writer {return &Writer {_ad :_b .NewWriterMSB (img .Data ),_fa :img ,_ef :img .ColorComponents ,_fb :img .BytesPerLine *8!=img .ColorComponents *img .BitsPerComponent *img .Width };
-};func NewReader (img _f .ImageBase )*Reader {return &Reader {_bd :_b .NewReader (img .Data ),_gg :img ,_ee :img .ColorComponents ,_ge :img .BytesPerLine *8!=img .ColorComponents *img .BitsPerComponent *img .Width };};func (_c *Reader )ReadSample ()(uint32 ,error ){if _c ._fc ==_c ._gg .Height {return 0,_e .EOF ;
-};_bdd ,_gc :=_c ._bd .ReadBits (byte (_c ._gg .BitsPerComponent ));if _gc !=nil {return 0,_gc ;};_c ._ee --;if _c ._ee ==0{_c ._ee =_c ._gg .ColorComponents ;_c ._a ++;};if _c ._a ==_c ._gg .Width {if _c ._ge {_c ._bd .ConsumeRemainingBits ();};_c ._a =0;
-_c ._fc ++;};return uint32 (_bdd ),nil ;};func (_fbe *Writer )WriteSamples (samples []uint32 )error {for _da :=0;_da < len (samples );_da ++{if _gd :=_fbe .WriteSample (samples [_da ]);_gd !=nil {return _gd ;};};return nil ;};type SampleReader interface{ReadSample ()(uint32 ,error );
-ReadSamples (_gf []uint32 )error ;};type Writer struct{_fa _f .ImageBase ;_ad *_b .Writer ;_bf ,_ef int ;_fb bool ;};func ResampleBytes (data []byte ,bitsPerSample int )[]uint32 {var _d []uint32 ;_eg :=bitsPerSample ;var _eb uint32 ;var _be byte ;_ged :=0;
-_cf :=0;_dc :=0;for _dc < len (data ){if _ged > 0{_fd :=_ged ;if _eg < _fd {_fd =_eg ;};_eb =(_eb <<uint (_fd ))|uint32 (_be >>uint (8-_fd ));_ged -=_fd ;if _ged > 0{_be =_be <<uint (_fd );}else {_be =0;};_eg -=_fd ;if _eg ==0{_d =append (_d ,_eb );_eg =bitsPerSample ;
-_eb =0;_cf ++;};}else {_fg :=data [_dc ];_dc ++;_egd :=8;if _eg < _egd {_egd =_eg ;};_ged =8-_egd ;_eb =(_eb <<uint (_egd ))|uint32 (_fg >>uint (_ged ));if _egd < 8{_be =_fg <<uint (_egd );};_eg -=_egd ;if _eg ==0{_d =append (_d ,_eb );_eg =bitsPerSample ;
-_eb =0;_cf ++;};};};for _ged >=bitsPerSample {_dg :=_ged ;if _eg < _dg {_dg =_eg ;};_eb =(_eb <<uint (_dg ))|uint32 (_be >>uint (8-_dg ));_ged -=_dg ;if _ged > 0{_be =_be <<uint (_dg );}else {_be =0;};_eg -=_dg ;if _eg ==0{_d =append (_d ,_eb );_eg =bitsPerSample ;
-_eb =0;_cf ++;};};return _d ;};
+package sampling
+
+import (
+	_b "github.com/szwede/unipdf/v4/internal/bitwise"
+	_f "github.com/szwede/unipdf/v4/internal/imageutil"
+	_e "io"
+)
+
+func ResampleUint32(data []uint32, bitsPerInputSample int, bitsPerOutputSample int) []uint32 {
+	var _gb []uint32
+	_gedb := bitsPerOutputSample
+	var _eef uint32
+	var _fe uint32
+	_cg := 0
+	_gag := 0
+	_ce := 0
+	for _ce < len(data) {
+		if _cg > 0 {
+			_cd := _cg
+			if _gedb < _cd {
+				_cd = _gedb
+			}
+			_eef = (_eef << uint(_cd)) | (_fe >> uint(bitsPerInputSample-_cd))
+			_cg -= _cd
+			if _cg > 0 {
+				_fe = _fe << uint(_cd)
+			} else {
+				_fe = 0
+			}
+			_gedb -= _cd
+			if _gedb == 0 {
+				_gb = append(_gb, _eef)
+				_gedb = bitsPerOutputSample
+				_eef = 0
+				_gag++
+			}
+		} else {
+			_egb := data[_ce]
+			_ce++
+			_gae := bitsPerInputSample
+			if _gedb < _gae {
+				_gae = _gedb
+			}
+			_cg = bitsPerInputSample - _gae
+			_eef = (_eef << uint(_gae)) | (_egb >> uint(_cg))
+			if _gae < bitsPerInputSample {
+				_fe = _egb << uint(_gae)
+			}
+			_gedb -= _gae
+			if _gedb == 0 {
+				_gb = append(_gb, _eef)
+				_gedb = bitsPerOutputSample
+				_eef = 0
+				_gag++
+			}
+		}
+	}
+	for _cg >= bitsPerOutputSample {
+		_fee := _cg
+		if _gedb < _fee {
+			_fee = _gedb
+		}
+		_eef = (_eef << uint(_fee)) | (_fe >> uint(bitsPerInputSample-_fee))
+		_cg -= _fee
+		if _cg > 0 {
+			_fe = _fe << uint(_fee)
+		} else {
+			_fe = 0
+		}
+		_gedb -= _fee
+		if _gedb == 0 {
+			_gb = append(_gb, _eef)
+			_gedb = bitsPerOutputSample
+			_eef = 0
+			_gag++
+		}
+	}
+	if _gedb > 0 && _gedb < bitsPerOutputSample {
+		_eef <<= uint(_gedb)
+		_gb = append(_gb, _eef)
+	}
+	return _gb
+}
+
+type Reader struct {
+	_gg          _f.ImageBase
+	_bd          *_b.Reader
+	_a, _fc, _ee int
+	_ge          bool
+}
+
+func (_ga *Reader) ReadSamples(samples []uint32) (_bb error) {
+	for _ed := 0; _ed < len(samples); _ed++ {
+		samples[_ed], _bb = _ga.ReadSample()
+		if _bb != nil {
+			return _bb
+		}
+	}
+	return nil
+}
+
+type SampleWriter interface {
+	WriteSample(_eee uint32) error
+	WriteSamples(_bed []uint32) error
+}
+
+func (_de *Writer) WriteSample(sample uint32) error {
+	if _, _ff := _de._ad.WriteBits(uint64(sample), _de._fa.BitsPerComponent); _ff != nil {
+		return _ff
+	}
+	_de._ef--
+	if _de._ef == 0 {
+		_de._ef = _de._fa.ColorComponents
+		_de._bf++
+	}
+	if _de._bf == _de._fa.Width {
+		if _de._fb {
+			_de._ad.FinishByte()
+		}
+		_de._bf = 0
+	}
+	return nil
+}
+
+func NewWriter(img _f.ImageBase) *Writer {
+	return &Writer{_ad: _b.NewWriterMSB(img.Data), _fa: img, _ef: img.ColorComponents, _fb: img.BytesPerLine*8 != img.ColorComponents*img.BitsPerComponent*img.Width}
+}
+
+func NewReader(img _f.ImageBase) *Reader {
+	return &Reader{_bd: _b.NewReader(img.Data), _gg: img, _ee: img.ColorComponents, _ge: img.BytesPerLine*8 != img.ColorComponents*img.BitsPerComponent*img.Width}
+}
+
+func (_c *Reader) ReadSample() (uint32, error) {
+	if _c._fc == _c._gg.Height {
+		return 0, _e.EOF
+	}
+	_bdd, _gc := _c._bd.ReadBits(byte(_c._gg.BitsPerComponent))
+	if _gc != nil {
+		return 0, _gc
+	}
+	_c._ee--
+	if _c._ee == 0 {
+		_c._ee = _c._gg.ColorComponents
+		_c._a++
+	}
+	if _c._a == _c._gg.Width {
+		if _c._ge {
+			_c._bd.ConsumeRemainingBits()
+		}
+		_c._a = 0
+		_c._fc++
+	}
+	return uint32(_bdd), nil
+}
+
+func (_fbe *Writer) WriteSamples(samples []uint32) error {
+	for _da := 0; _da < len(samples); _da++ {
+		if _gd := _fbe.WriteSample(samples[_da]); _gd != nil {
+			return _gd
+		}
+	}
+	return nil
+}
+
+type SampleReader interface {
+	ReadSample() (uint32, error)
+	ReadSamples(_gf []uint32) error
+}
+
+type Writer struct {
+	_fa      _f.ImageBase
+	_ad      *_b.Writer
+	_bf, _ef int
+	_fb      bool
+}
+
+func ResampleBytes(data []byte, bitsPerSample int) []uint32 {
+	var _d []uint32
+	_eg := bitsPerSample
+	var _eb uint32
+	var _be byte
+	_ged := 0
+	_cf := 0
+	_dc := 0
+	for _dc < len(data) {
+		if _ged > 0 {
+			_fd := _ged
+			if _eg < _fd {
+				_fd = _eg
+			}
+			_eb = (_eb << uint(_fd)) | uint32(_be>>uint(8-_fd))
+			_ged -= _fd
+			if _ged > 0 {
+				_be = _be << uint(_fd)
+			} else {
+				_be = 0
+			}
+			_eg -= _fd
+			if _eg == 0 {
+				_d = append(_d, _eb)
+				_eg = bitsPerSample
+				_eb = 0
+				_cf++
+			}
+		} else {
+			_fg := data[_dc]
+			_dc++
+			_egd := 8
+			if _eg < _egd {
+				_egd = _eg
+			}
+			_ged = 8 - _egd
+			_eb = (_eb << uint(_egd)) | uint32(_fg>>uint(_ged))
+			if _egd < 8 {
+				_be = _fg << uint(_egd)
+			}
+			_eg -= _egd
+			if _eg == 0 {
+				_d = append(_d, _eb)
+				_eg = bitsPerSample
+				_eb = 0
+				_cf++
+			}
+		}
+	}
+	for _ged >= bitsPerSample {
+		_dg := _ged
+		if _eg < _dg {
+			_dg = _eg
+		}
+		_eb = (_eb << uint(_dg)) | uint32(_be>>uint(8-_dg))
+		_ged -= _dg
+		if _ged > 0 {
+			_be = _be << uint(_dg)
+		} else {
+			_be = 0
+		}
+		_eg -= _dg
+		if _eg == 0 {
+			_d = append(_d, _eb)
+			_eg = bitsPerSample
+			_eb = 0
+			_cf++
+		}
+	}
+	return _d
+}

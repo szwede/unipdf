@@ -1,4 +1,4 @@
-module github.com/szwede/unipdf/v4
+module github.com/szwede/unipdf
 
 go 1.23.0
 
@@ -13,7 +13,6 @@ require (
 	github.com/unidoc/pkcs7 v0.3.0
 	github.com/unidoc/timestamp v0.0.0-20200412005513-91597fd3793a
 	github.com/unidoc/unichart v0.5.1
-	github.com/unidoc/unipdf/v4 v4.3.0
 	github.com/unidoc/unitype v0.5.1
 	golang.org/x/crypto v0.41.0
 	golang.org/x/image v0.30.0

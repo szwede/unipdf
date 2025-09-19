@@ -9,32 +9,287 @@
 // Use of this source code is governed by the UniDoc End User License Agreement
 // terms that can be accessed at https://unidoc.io/eula/
 
-package testutils ;import (_b "crypto/md5";_fc "encoding/hex";_ga "errors";_g "fmt";_ea "github.com/unidoc/unipdf/v4/common";_bc "github.com/unidoc/unipdf/v4/core";_c "image";_af "image/png";_d "io";_eg "os";_ae "os/exec";_aa "path/filepath";_e "strings";
-_f "testing";);func ParseIndirectObjects (rawpdf string )(map[int64 ]_bc .PdfObject ,error ){_ed :=_bc .NewParserFromString (rawpdf );_beg :=map[int64 ]_bc .PdfObject {};for {_gcd ,_bac :=_ed .ParseIndirectObject ();if _bac !=nil {if _bac ==_d .EOF {break ;
-};return nil ,_bac ;};switch _de :=_gcd .(type ){case *_bc .PdfIndirectObject :_beg [_de .ObjectNumber ]=_gcd ;case *_bc .PdfObjectStream :_beg [_de .ObjectNumber ]=_gcd ;};};for _ ,_bed :=range _beg {_cag (_bed ,_beg );};return _beg ,nil ;};func CopyFile (src ,dst string )error {_ad ,_fg :=_eg .Open (src );
-if _fg !=nil {return _fg ;};defer _ad .Close ();_ca ,_fg :=_eg .Create (dst );if _fg !=nil {return _fg ;};defer _ca .Close ();_ ,_fg =_d .Copy (_ca ,_ad );return _fg ;};func ComparePNGFiles (file1 ,file2 string )(bool ,error ){_gf ,_aec :=HashFile (file1 );
-if _aec !=nil {return false ,_aec ;};_dg ,_aec :=HashFile (file2 );if _aec !=nil {return false ,_aec ;};if _gf ==_dg {return true ,nil ;};_egde ,_aec :=ReadPNG (file1 );if _aec !=nil {return false ,_aec ;};_ag ,_aec :=ReadPNG (file2 );if _aec !=nil {return false ,_aec ;
-};if _egde .Bounds ()!=_ag .Bounds (){return false ,nil ;};return CompareImages (_egde ,_ag );};func ReadPNG (file string )(_c .Image ,error ){_dc ,_fgc :=_eg .Open (file );if _fgc !=nil {return nil ,_fgc ;};defer _dc .Close ();return _af .Decode (_dc );
-};var (ErrRenderNotSupported =_ga .New ("\u0072\u0065\u006e\u0064\u0065r\u0069\u006e\u0067\u0020\u0050\u0044\u0046\u0020\u0066\u0069\u006c\u0065\u0073 \u0069\u0073\u0020\u006e\u006f\u0074\u0020\u0073\u0075\u0070\u0070\u006f\u0072\u0074\u0065\u0064\u0020\u006f\u006e\u0020\u0074\u0068\u0069\u0073\u0020\u0073\u0079\u0073\u0074\u0065m");
-);func RenderPDFToPNGs (pdfPath string ,dpi int ,outpathTpl string )error {if dpi <=0{dpi =100;};if _ ,_eac :=_ae .LookPath ("\u0067\u0073");_eac !=nil {return ErrRenderNotSupported ;};return _ae .Command ("\u0067\u0073","\u002d\u0073\u0044\u0045\u0056\u0049\u0043\u0045\u003d\u0070\u006e\u0067a\u006c\u0070\u0068\u0061","\u002d\u006f",outpathTpl ,_g .Sprintf ("\u002d\u0072\u0025\u0064",dpi ),pdfPath ).Run ();
-};func _cag (_bcd _bc .PdfObject ,_fgab map[int64 ]_bc .PdfObject )error {switch _egc :=_bcd .(type ){case *_bc .PdfIndirectObject :_gfe :=_egc ;_cag (_gfe .PdfObject ,_fgab );case *_bc .PdfObjectDictionary :_afg :=_egc ;for _ ,_gdc :=range _afg .Keys (){_df :=_afg .Get (_gdc );
-if _ge ,_bdf :=_df .(*_bc .PdfObjectReference );_bdf {_gbg ,_ecg :=_fgab [_ge .ObjectNumber ];if !_ecg {return _ga .New ("r\u0065\u0066\u0065\u0072\u0065\u006ec\u0065\u0020\u0074\u006f\u0020\u006f\u0075\u0074\u0073i\u0064\u0065\u0020o\u0062j\u0065\u0063\u0074");
-};_afg .Set (_gdc ,_gbg );}else {_cag (_df ,_fgab );};};case *_bc .PdfObjectArray :_gaf :=_egc ;for _aae ,_dee :=range _gaf .Elements (){if _cfc ,_gbb :=_dee .(*_bc .PdfObjectReference );_gbb {_fdg ,_fad :=_fgab [_cfc .ObjectNumber ];if !_fad {return _ga .New ("r\u0065\u0066\u0065\u0072\u0065\u006ec\u0065\u0020\u0074\u006f\u0020\u006f\u0075\u0074\u0073i\u0064\u0065\u0020o\u0062j\u0065\u0063\u0074");
-};_gaf .Set (_aae ,_fdg );}else {_cag (_dee ,_fgab );};};};return nil ;};func CompareImages (img1 ,img2 _c .Image )(bool ,error ){_cf :=img1 .Bounds ();_bb :=0;for _db :=0;_db < _cf .Size ().X ;_db ++{for _gb :=0;_gb < _cf .Size ().Y ;_gb ++{_aab ,_ff ,_ee ,_ :=img1 .At (_db ,_gb ).RGBA ();
-_fb ,_be ,_da ,_ :=img2 .At (_db ,_gb ).RGBA ();if _aab !=_fb ||_ff !=_be ||_ee !=_da {_bb ++;};};};_ffd :=float64 (_bb )/float64 (_cf .Dx ()*_cf .Dy ());if _ffd > 0.0001{_g .Printf ("\u0064\u0069\u0066f \u0066\u0072\u0061\u0063\u0074\u0069\u006f\u006e\u003a\u0020\u0025\u0076\u0020\u0028\u0025\u0064\u0029\u000a",_ffd ,_bb );
-return false ,nil ;};return true ,nil ;};func HashFile (file string )(string ,error ){_cc ,_egd :=_eg .Open (file );if _egd !=nil {return "",_egd ;};defer _cc .Close ();_ec :=_b .New ();if _ ,_egd =_d .Copy (_ec ,_cc );_egd !=nil {return "",_egd ;};return _fc .EncodeToString (_ec .Sum (nil )),nil ;
-};func RunRenderTest (t *_f .T ,pdfPath ,outputDir ,baselineRenderPath string ,saveBaseline bool ){_dbd :=_e .TrimSuffix (_aa .Base (pdfPath ),_aa .Ext (pdfPath ));t .Run ("\u0072\u0065\u006e\u0064\u0065\u0072",func (_eaa *_f .T ){_bf :=_aa .Join (outputDir ,_dbd );
-_eef :=_bf +"\u002d%\u0064\u002e\u0070\u006e\u0067";if _fae :=RenderPDFToPNGs (pdfPath ,0,_eef );_fae !=nil {_eaa .Skip (_fae );};for _cfa :=1;true ;_cfa ++{_fd :=_g .Sprintf ("\u0025s\u002d\u0025\u0064\u002e\u0070\u006eg",_bf ,_cfa );_fga :=_aa .Join (baselineRenderPath ,_g .Sprintf ("\u0025\u0073\u002d\u0025\u0064\u005f\u0065\u0078\u0070\u002e\u0070\u006e\u0067",_dbd ,_cfa ));
-if _ ,_ef :=_eg .Stat (_fd );_ef !=nil {break ;};_eaa .Logf ("\u0025\u0073",_fga );if saveBaseline {_eaa .Logf ("\u0043\u006fp\u0079\u0069\u006eg\u0020\u0025\u0073\u0020\u002d\u003e\u0020\u0025\u0073",_fd ,_fga );_ccc :=CopyFile (_fd ,_fga );if _ccc !=nil {_eaa .Fatalf ("\u0045\u0052\u0052OR\u0020\u0063\u006f\u0070\u0079\u0069\u006e\u0067\u0020\u0074\u006f\u0020\u0025\u0073\u003a\u0020\u0025\u0076",_fga ,_ccc );
-};continue ;};_eaa .Run (_g .Sprintf ("\u0070\u0061\u0067\u0065\u0025\u0064",_cfa ),func (_gc *_f .T ){_gc .Logf ("\u0043o\u006dp\u0061\u0072\u0069\u006e\u0067 \u0025\u0073 \u0076\u0073\u0020\u0025\u0073",_fd ,_fga );_bd ,_cb :=ComparePNGFiles (_fd ,_fga );
-if _eg .IsNotExist (_cb ){_gc .Fatal ("\u0069m\u0061g\u0065\u0020\u0066\u0069\u006ce\u0020\u006di\u0073\u0073\u0069\u006e\u0067");}else if !_bd {_gc .Fatal ("\u0077\u0072\u006f\u006eg \u0070\u0061\u0067\u0065\u0020\u0072\u0065\u006e\u0064\u0065\u0072\u0065\u0064");
-};});};});};func CompareDictionariesDeep (d1 ,d2 *_bc .PdfObjectDictionary )bool {if len (d1 .Keys ())!=len (d2 .Keys ()){_ea .Log .Debug ("\u0044\u0069\u0063\u0074\u0020\u0065\u006e\u0074\u0072\u0069\u0065\u0073\u0020\u006d\u0069s\u006da\u0074\u0063\u0068\u0020\u0028\u0025\u0064\u0020\u0021\u003d\u0020\u0025\u0064\u0029",len (d1 .Keys ()),len (d2 .Keys ()));
-_ea .Log .Debug ("\u0057\u0061s\u0020\u0027\u0025s\u0027\u0020\u0076\u0073\u0020\u0027\u0025\u0073\u0027",d1 .Write (),d2 .Write ());return false ;};for _ ,_eb :=range d1 .Keys (){if _eb =="\u0050\u0061\u0072\u0065\u006e\u0074"{continue ;};_cg :=_bc .TraceToDirectObject (d1 .Get (_eb ));
-_dfc :=_bc .TraceToDirectObject (d2 .Get (_eb ));if _cg ==nil {_ea .Log .Debug ("\u00761\u0020\u0069\u0073\u0020\u006e\u0069l");return false ;};if _dfc ==nil {_ea .Log .Debug ("\u00762\u0020\u0069\u0073\u0020\u006e\u0069l");return false ;};switch _dad :=_cg .(type ){case *_bc .PdfObjectDictionary :_gbd ,_bg :=_dfc .(*_bc .PdfObjectDictionary );
-if !_bg {_ea .Log .Debug ("\u0054\u0079\u0070\u0065 m\u0069\u0073\u006d\u0061\u0074\u0063\u0068\u0020\u0025\u0054\u0020\u0076\u0073\u0020%\u0054",_cg ,_dfc );return false ;};if !CompareDictionariesDeep (_dad ,_gbd ){return false ;};continue ;case *_bc .PdfObjectArray :_gae ,_bee :=_dfc .(*_bc .PdfObjectArray );
-if !_bee {_ea .Log .Debug ("\u00762\u0020n\u006f\u0074\u0020\u0061\u006e\u0020\u0061\u0072\u0072\u0061\u0079");return false ;};if _dad .Len ()!=_gae .Len (){_ea .Log .Debug ("\u0061\u0072\u0072\u0061\u0079\u0020\u006c\u0065\u006e\u0067\u0074\u0068\u0020\u006d\u0069s\u006da\u0074\u0063\u0068\u0020\u0028\u0025\u0064\u0020\u0021\u003d\u0020\u0025\u0064\u0029",_dad .Len (),_gae .Len ());
-return false ;};for _aee :=0;_aee < _dad .Len ();_aee ++{_fadf :=_bc .TraceToDirectObject (_dad .Get (_aee ));_edg :=_bc .TraceToDirectObject (_gae .Get (_aee ));if _daf ,_ffdc :=_fadf .(*_bc .PdfObjectDictionary );_ffdc {_ab ,_dab :=_edg .(*_bc .PdfObjectDictionary );
-if !_dab {return false ;};if !CompareDictionariesDeep (_daf ,_ab ){return false ;};}else {_dge :=_fadf .Write ();_dfd :=_edg .Write ();if string (_dge )!=string (_dfd ){_ea .Log .Debug ("M\u0069\u0073\u006d\u0061tc\u0068 \u0027\u0025\u0073\u0027\u0020!\u003d\u0020\u0027\u0025\u0073\u0027",_dge ,_dfd );
-return false ;};};};continue ;};if _cg .String ()!=_dfc .String (){_ea .Log .Debug ("\u006b\u0065y\u003d\u0025\u0073\u0020\u004d\u0069\u0073\u006d\u0061\u0074\u0063\u0068\u0021\u0020\u0027\u0025\u0073\u0027\u0020\u0021\u003d\u0020'%\u0073\u0027",_eb ,_cg .String (),_dfc .String ());
-_ea .Log .Debug ("\u0046o\u0072 \u0027\u0025\u0054\u0027\u0020\u002d\u0020\u0027\u0025\u0054\u0027",_cg ,_dfc );_ea .Log .Debug ("\u0046\u006f\u0072\u0020\u0027\u0025\u002b\u0076\u0027\u0020\u002d\u0020'\u0025\u002b\u0076\u0027",_cg ,_dfc );return false ;
-};};return true ;};
+package testutils
+
+import (
+	_b "crypto/md5"
+	_fc "encoding/hex"
+	_ga "errors"
+	_g "fmt"
+	_ea "github.com/szwede/unipdf/v4/common"
+	_bc "github.com/szwede/unipdf/v4/core"
+	_c "image"
+	_af "image/png"
+	_d "io"
+	_eg "os"
+	_ae "os/exec"
+	_aa "path/filepath"
+	_e "strings"
+	_f "testing"
+)
+
+func ParseIndirectObjects(rawpdf string) (map[int64]_bc.PdfObject, error) {
+	_ed := _bc.NewParserFromString(rawpdf)
+	_beg := map[int64]_bc.PdfObject{}
+	for {
+		_gcd, _bac := _ed.ParseIndirectObject()
+		if _bac != nil {
+			if _bac == _d.EOF {
+				break
+			}
+			return nil, _bac
+		}
+		switch _de := _gcd.(type) {
+		case *_bc.PdfIndirectObject:
+			_beg[_de.ObjectNumber] = _gcd
+		case *_bc.PdfObjectStream:
+			_beg[_de.ObjectNumber] = _gcd
+		}
+	}
+	for _, _bed := range _beg {
+		_cag(_bed, _beg)
+	}
+	return _beg, nil
+}
+
+func CopyFile(src, dst string) error {
+	_ad, _fg := _eg.Open(src)
+	if _fg != nil {
+		return _fg
+	}
+	defer _ad.Close()
+	_ca, _fg := _eg.Create(dst)
+	if _fg != nil {
+		return _fg
+	}
+	defer _ca.Close()
+	_, _fg = _d.Copy(_ca, _ad)
+	return _fg
+}
+
+func ComparePNGFiles(file1, file2 string) (bool, error) {
+	_gf, _aec := HashFile(file1)
+	if _aec != nil {
+		return false, _aec
+	}
+	_dg, _aec := HashFile(file2)
+	if _aec != nil {
+		return false, _aec
+	}
+	if _gf == _dg {
+		return true, nil
+	}
+	_egde, _aec := ReadPNG(file1)
+	if _aec != nil {
+		return false, _aec
+	}
+	_ag, _aec := ReadPNG(file2)
+	if _aec != nil {
+		return false, _aec
+	}
+	if _egde.Bounds() != _ag.Bounds() {
+		return false, nil
+	}
+	return CompareImages(_egde, _ag)
+}
+
+func ReadPNG(file string) (_c.Image, error) {
+	_dc, _fgc := _eg.Open(file)
+	if _fgc != nil {
+		return nil, _fgc
+	}
+	defer _dc.Close()
+	return _af.Decode(_dc)
+}
+
+var (
+	ErrRenderNotSupported = _ga.New("\u0072\u0065\u006e\u0064\u0065r\u0069\u006e\u0067\u0020\u0050\u0044\u0046\u0020\u0066\u0069\u006c\u0065\u0073 \u0069\u0073\u0020\u006e\u006f\u0074\u0020\u0073\u0075\u0070\u0070\u006f\u0072\u0074\u0065\u0064\u0020\u006f\u006e\u0020\u0074\u0068\u0069\u0073\u0020\u0073\u0079\u0073\u0074\u0065m")
+)
+
+func RenderPDFToPNGs(pdfPath string, dpi int, outpathTpl string) error {
+	if dpi <= 0 {
+		dpi = 100
+	}
+	if _, _eac := _ae.LookPath("\u0067\u0073"); _eac != nil {
+		return ErrRenderNotSupported
+	}
+	return _ae.Command("\u0067\u0073", "\u002d\u0073\u0044\u0045\u0056\u0049\u0043\u0045\u003d\u0070\u006e\u0067a\u006c\u0070\u0068\u0061", "\u002d\u006f", outpathTpl, _g.Sprintf("\u002d\u0072\u0025\u0064", dpi), pdfPath).Run()
+}
+
+func _cag(_bcd _bc.PdfObject, _fgab map[int64]_bc.PdfObject) error {
+	switch _egc := _bcd.(type) {
+	case *_bc.PdfIndirectObject:
+		_gfe := _egc
+		_cag(_gfe.PdfObject, _fgab)
+	case *_bc.PdfObjectDictionary:
+		_afg := _egc
+		for _, _gdc := range _afg.Keys() {
+			_df := _afg.Get(_gdc)
+			if _ge, _bdf := _df.(*_bc.PdfObjectReference); _bdf {
+				_gbg, _ecg := _fgab[_ge.ObjectNumber]
+				if !_ecg {
+					return _ga.New("r\u0065\u0066\u0065\u0072\u0065\u006ec\u0065\u0020\u0074\u006f\u0020\u006f\u0075\u0074\u0073i\u0064\u0065\u0020o\u0062j\u0065\u0063\u0074")
+				}
+				_afg.Set(_gdc, _gbg)
+			} else {
+				_cag(_df, _fgab)
+			}
+		}
+	case *_bc.PdfObjectArray:
+		_gaf := _egc
+		for _aae, _dee := range _gaf.Elements() {
+			if _cfc, _gbb := _dee.(*_bc.PdfObjectReference); _gbb {
+				_fdg, _fad := _fgab[_cfc.ObjectNumber]
+				if !_fad {
+					return _ga.New("r\u0065\u0066\u0065\u0072\u0065\u006ec\u0065\u0020\u0074\u006f\u0020\u006f\u0075\u0074\u0073i\u0064\u0065\u0020o\u0062j\u0065\u0063\u0074")
+				}
+				_gaf.Set(_aae, _fdg)
+			} else {
+				_cag(_dee, _fgab)
+			}
+		}
+	}
+	return nil
+}
+
+func CompareImages(img1, img2 _c.Image) (bool, error) {
+	_cf := img1.Bounds()
+	_bb := 0
+	for _db := 0; _db < _cf.Size().X; _db++ {
+		for _gb := 0; _gb < _cf.Size().Y; _gb++ {
+			_aab, _ff, _ee, _ := img1.At(_db, _gb).RGBA()
+			_fb, _be, _da, _ := img2.At(_db, _gb).RGBA()
+			if _aab != _fb || _ff != _be || _ee != _da {
+				_bb++
+			}
+		}
+	}
+	_ffd := float64(_bb) / float64(_cf.Dx()*_cf.Dy())
+	if _ffd > 0.0001 {
+		_g.Printf("\u0064\u0069\u0066f \u0066\u0072\u0061\u0063\u0074\u0069\u006f\u006e\u003a\u0020\u0025\u0076\u0020\u0028\u0025\u0064\u0029\u000a", _ffd, _bb)
+		return false, nil
+	}
+	return true, nil
+}
+
+func HashFile(file string) (string, error) {
+	_cc, _egd := _eg.Open(file)
+	if _egd != nil {
+		return "", _egd
+	}
+	defer _cc.Close()
+	_ec := _b.New()
+	if _, _egd = _d.Copy(_ec, _cc); _egd != nil {
+		return "", _egd
+	}
+	return _fc.EncodeToString(_ec.Sum(nil)), nil
+}
+
+func RunRenderTest(t *_f.T, pdfPath, outputDir, baselineRenderPath string, saveBaseline bool) {
+	_dbd := _e.TrimSuffix(_aa.Base(pdfPath), _aa.Ext(pdfPath))
+	t.Run("\u0072\u0065\u006e\u0064\u0065\u0072", func(_eaa *_f.T) {
+		_bf := _aa.Join(outputDir, _dbd)
+		_eef := _bf + "\u002d%\u0064\u002e\u0070\u006e\u0067"
+		if _fae := RenderPDFToPNGs(pdfPath, 0, _eef); _fae != nil {
+			_eaa.Skip(_fae)
+		}
+		for _cfa := 1; true; _cfa++ {
+			_fd := _g.Sprintf("\u0025s\u002d\u0025\u0064\u002e\u0070\u006eg", _bf, _cfa)
+			_fga := _aa.Join(baselineRenderPath, _g.Sprintf("\u0025\u0073\u002d\u0025\u0064\u005f\u0065\u0078\u0070\u002e\u0070\u006e\u0067", _dbd, _cfa))
+			if _, _ef := _eg.Stat(_fd); _ef != nil {
+				break
+			}
+			_eaa.Logf("\u0025\u0073", _fga)
+			if saveBaseline {
+				_eaa.Logf("\u0043\u006fp\u0079\u0069\u006eg\u0020\u0025\u0073\u0020\u002d\u003e\u0020\u0025\u0073", _fd, _fga)
+				_ccc := CopyFile(_fd, _fga)
+				if _ccc != nil {
+					_eaa.Fatalf("\u0045\u0052\u0052OR\u0020\u0063\u006f\u0070\u0079\u0069\u006e\u0067\u0020\u0074\u006f\u0020\u0025\u0073\u003a\u0020\u0025\u0076", _fga, _ccc)
+				}
+				continue
+			}
+			_eaa.Run(_g.Sprintf("\u0070\u0061\u0067\u0065\u0025\u0064", _cfa), func(_gc *_f.T) {
+				_gc.Logf("\u0043o\u006dp\u0061\u0072\u0069\u006e\u0067 \u0025\u0073 \u0076\u0073\u0020\u0025\u0073", _fd, _fga)
+				_bd, _cb := ComparePNGFiles(_fd, _fga)
+				if _eg.IsNotExist(_cb) {
+					_gc.Fatal("\u0069m\u0061g\u0065\u0020\u0066\u0069\u006ce\u0020\u006di\u0073\u0073\u0069\u006e\u0067")
+				} else if !_bd {
+					_gc.Fatal("\u0077\u0072\u006f\u006eg \u0070\u0061\u0067\u0065\u0020\u0072\u0065\u006e\u0064\u0065\u0072\u0065\u0064")
+				}
+			})
+		}
+	})
+}
+
+func CompareDictionariesDeep(d1, d2 *_bc.PdfObjectDictionary) bool {
+	if len(d1.Keys()) != len(d2.Keys()) {
+		_ea.Log.Debug("\u0044\u0069\u0063\u0074\u0020\u0065\u006e\u0074\u0072\u0069\u0065\u0073\u0020\u006d\u0069s\u006da\u0074\u0063\u0068\u0020\u0028\u0025\u0064\u0020\u0021\u003d\u0020\u0025\u0064\u0029", len(d1.Keys()), len(d2.Keys()))
+		_ea.Log.Debug("\u0057\u0061s\u0020\u0027\u0025s\u0027\u0020\u0076\u0073\u0020\u0027\u0025\u0073\u0027", d1.Write(), d2.Write())
+		return false
+	}
+	for _, _eb := range d1.Keys() {
+		if _eb == "\u0050\u0061\u0072\u0065\u006e\u0074" {
+			continue
+		}
+		_cg := _bc.TraceToDirectObject(d1.Get(_eb))
+		_dfc := _bc.TraceToDirectObject(d2.Get(_eb))
+		if _cg == nil {
+			_ea.Log.Debug("\u00761\u0020\u0069\u0073\u0020\u006e\u0069l")
+			return false
+		}
+		if _dfc == nil {
+			_ea.Log.Debug("\u00762\u0020\u0069\u0073\u0020\u006e\u0069l")
+			return false
+		}
+		switch _dad := _cg.(type) {
+		case *_bc.PdfObjectDictionary:
+			_gbd, _bg := _dfc.(*_bc.PdfObjectDictionary)
+			if !_bg {
+				_ea.Log.Debug("\u0054\u0079\u0070\u0065 m\u0069\u0073\u006d\u0061\u0074\u0063\u0068\u0020\u0025\u0054\u0020\u0076\u0073\u0020%\u0054", _cg, _dfc)
+				return false
+			}
+			if !CompareDictionariesDeep(_dad, _gbd) {
+				return false
+			}
+			continue
+		case *_bc.PdfObjectArray:
+			_gae, _bee := _dfc.(*_bc.PdfObjectArray)
+			if !_bee {
+				_ea.Log.Debug("\u00762\u0020n\u006f\u0074\u0020\u0061\u006e\u0020\u0061\u0072\u0072\u0061\u0079")
+				return false
+			}
+			if _dad.Len() != _gae.Len() {
+				_ea.Log.Debug("\u0061\u0072\u0072\u0061\u0079\u0020\u006c\u0065\u006e\u0067\u0074\u0068\u0020\u006d\u0069s\u006da\u0074\u0063\u0068\u0020\u0028\u0025\u0064\u0020\u0021\u003d\u0020\u0025\u0064\u0029", _dad.Len(), _gae.Len())
+				return false
+			}
+			for _aee := 0; _aee < _dad.Len(); _aee++ {
+				_fadf := _bc.TraceToDirectObject(_dad.Get(_aee))
+				_edg := _bc.TraceToDirectObject(_gae.Get(_aee))
+				if _daf, _ffdc := _fadf.(*_bc.PdfObjectDictionary); _ffdc {
+					_ab, _dab := _edg.(*_bc.PdfObjectDictionary)
+					if !_dab {
+						return false
+					}
+					if !CompareDictionariesDeep(_daf, _ab) {
+						return false
+					}
+				} else {
+					_dge := _fadf.Write()
+					_dfd := _edg.Write()
+					if string(_dge) != string(_dfd) {
+						_ea.Log.Debug("M\u0069\u0073\u006d\u0061tc\u0068 \u0027\u0025\u0073\u0027\u0020!\u003d\u0020\u0027\u0025\u0073\u0027", _dge, _dfd)
+						return false
+					}
+				}
+			}
+			continue
+		}
+		if _cg.String() != _dfc.String() {
+			_ea.Log.Debug("\u006b\u0065y\u003d\u0025\u0073\u0020\u004d\u0069\u0073\u006d\u0061\u0074\u0063\u0068\u0021\u0020\u0027\u0025\u0073\u0027\u0020\u0021\u003d\u0020'%\u0073\u0027", _eb, _cg.String(), _dfc.String())
+			_ea.Log.Debug("\u0046o\u0072 \u0027\u0025\u0054\u0027\u0020\u002d\u0020\u0027\u0025\u0054\u0027", _cg, _dfc)
+			_ea.Log.Debug("\u0046\u006f\u0072\u0020\u0027\u0025\u002b\u0076\u0027\u0020\u002d\u0020'\u0025\u002b\u0076\u0027", _cg, _dfc)
+			return false
+		}
+	}
+	return true
+}

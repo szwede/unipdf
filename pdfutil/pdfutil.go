@@ -9,8 +9,17 @@
 // Use of this source code is governed by the UniDoc End User License Agreement
 // terms that can be accessed at https://unidoc.io/eula/
 
-package pdfutil ;import (_a "errors";_c "github.com/unidoc/unipdf/v4/common";_d "github.com/unidoc/unipdf/v4/contentstream";_g "github.com/unidoc/unipdf/v4/contentstream/draw";_gb "github.com/unidoc/unipdf/v4/core";_b "github.com/unidoc/unipdf/v4/model";
-_dc "github.com/unidoc/unipdf/v4/ps";);
+package pdfutil
+
+import (
+	_a "errors"
+	_c "github.com/szwede/unipdf/v4/common"
+	_d "github.com/szwede/unipdf/v4/contentstream"
+	_g "github.com/szwede/unipdf/v4/contentstream/draw"
+	_gb "github.com/szwede/unipdf/v4/core"
+	_b "github.com/szwede/unipdf/v4/model"
+	_dc "github.com/szwede/unipdf/v4/ps"
+)
 
 // NormalizePage performs the following operations on the passed in page:
 //   - Normalize the page rotation.
@@ -28,62 +37,524 @@ _dc "github.com/unidoc/unipdf/v4/ps";);
 // PDF viewer.
 // NOTE: This function does not normalize annotations, outlines other parts
 // that are not part of the basic geometry and page content streams.
-func NormalizePage (page *_b .PdfPage )error {_cfgea ,_bad :=page .GetMediaBox ();if _bad !=nil {return _bad ;};_fbc ,_bad :=page .GetRotate ();if _bad !=nil {_c .Log .Debug ("\u0045\u0052R\u004f\u0052\u003a\u0020\u0025\u0073\u0020\u002d\u0020\u0069\u0067\u006e\u006f\u0072\u0069\u006e\u0067\u0020\u0061\u006e\u0064\u0020\u0061\u0073\u0073\u0075\u006d\u0069\u006e\u0067\u0020\u006e\u006f\u0020\u0072\u006f\u0074\u0061\u0074\u0069\u006f\u006e\u000a",_bad .Error ());
-};_eaf :=_fbc %360!=0&&_fbc %90==0;_cfgea .Normalize ();_deag ,_ca ,_faa ,_gd :=_cfgea .Llx ,_cfgea .Lly ,_cfgea .Width (),_cfgea .Height ();_cga :=_deag !=0||_ca !=0;if !_eaf &&!_cga {return nil ;};_daga :=func (_ccde ,_fef ,_aabf float64 )_g .BoundingBox {return _g .Path {Points :[]_g .Point {_g .NewPoint (0,0).Rotate (_aabf ),_g .NewPoint (_ccde ,0).Rotate (_aabf ),_g .NewPoint (0,_fef ).Rotate (_aabf ),_g .NewPoint (_ccde ,_fef ).Rotate (_aabf )}}.GetBoundingBox ();
-};_bfbc :=_d .NewContentCreator ();var _gda float64 ;if _eaf {_gda =-float64 (_fbc );_ac :=_daga (_faa ,_gd ,_gda );_bfbc .Translate ((_ac .Width -_faa )/2+_faa /2,(_ac .Height -_gd )/2+_gd /2);_bfbc .RotateDeg (_gda );_bfbc .Translate (-_faa /2,-_gd /2);
-_faa ,_gd =_ac .Width ,_ac .Height ;};if _cga {_bfbc .Translate (-_deag ,-_ca );};_ffd :=_bfbc .Operations ();_dgae ,_bad :=_gb .MakeStream (_ffd .Bytes (),_gb .NewFlateEncoder ());if _bad !=nil {return _bad ;};_ab :=_gb .MakeArray (_dgae );_ab .Append (page .GetContentStreamObjs ()...);
-*_cfgea =_b .PdfRectangle {Urx :_faa ,Ury :_gd };if _ggc :=page .CropBox ;_ggc !=nil {_ggc .Normalize ();_beg ,_efg ,_afd ,_abc :=_ggc .Llx -_deag ,_ggc .Lly -_ca ,_ggc .Width (),_ggc .Height ();if _eaf {_gba :=_daga (_afd ,_abc ,_gda );_afd ,_abc =_gba .Width ,_gba .Height ;
-};*_ggc =_b .PdfRectangle {Llx :_beg ,Lly :_efg ,Urx :_beg +_afd ,Ury :_efg +_abc };};_c .Log .Debug ("\u0052\u006f\u0074\u0061\u0074\u0065\u003d\u0025\u0066\u00b0\u0020\u004f\u0070\u0073\u003d%\u0071 \u004d\u0065\u0064\u0069\u0061\u0042\u006f\u0078\u003d\u0025\u002e\u0032\u0066",_gda ,_ffd ,_cfgea );
-page .Contents =_ab ;page .Rotate =nil ;return nil ;};func _edd (_bdff *_b .PdfShading )(*_b .PdfShading ,error ){_ec :=_bdff .ColorSpace ;if _ec .GetNumComponents ()==1{return _bdff ,nil ;}else if _ec .GetNumComponents ()==3{_afc :=&_b .PdfFunctionType4 {};
-_afc .Domain =[]float64 {0,1,0,1,0,1};_afc .Range =[]float64 {0,1};_gfg :=_dc .NewPSProgram ();_gfg .Append (_dc .MakeReal (0.11));_gfg .Append (_dc .MakeOperand ("\u006d\u0075\u006c"));_gfg .Append (_dc .MakeOperand ("\u0065\u0078\u0063\u0068"));_gfg .Append (_dc .MakeReal (0.59));
-_gfg .Append (_dc .MakeOperand ("\u006d\u0075\u006c"));_gfg .Append (_dc .MakeOperand ("\u0061\u0064\u0064"));_gfg .Append (_dc .MakeOperand ("\u0065\u0078\u0063\u0068"));_gfg .Append (_dc .MakeReal (0.3));_gfg .Append (_dc .MakeOperand ("\u006d\u0075\u006c"));
-_gfg .Append (_dc .MakeOperand ("\u0061\u0064\u0064"));_afc .Program =_gfg ;_edge :=_b .NewPdfColorspaceDeviceN ();_edge .AlternateSpace =_b .NewPdfColorspaceDeviceGray ();_edge .ColorantNames =_gb .MakeArray (_gb .MakeName ("\u0052"),_gb .MakeName ("\u0047"),_gb .MakeName ("\u0042"));
-_edge .TintTransform =_afc ;_bdff .ColorSpace =_edge ;return _bdff ,nil ;}else if _ec .GetNumComponents ()==4{_aefg :=&_b .PdfFunctionType4 {};_aefg .Domain =[]float64 {0,1,0,1,0,1,0,1};_aefg .Range =[]float64 {0,1};_ff :=_dc .NewPSProgram ();_ff .Append (_dc .MakeOperand ("\u0065\u0078\u0063\u0068"));
-_ff .Append (_dc .MakeReal (0.11));_ff .Append (_dc .MakeOperand ("\u006d\u0075\u006c"));_ff .Append (_dc .MakeOperand ("\u0061\u0064\u0064"));_ff .Append (_dc .MakeOperand ("\u0065\u0078\u0063\u0068"));_ff .Append (_dc .MakeReal (0.59));_ff .Append (_dc .MakeOperand ("\u006d\u0075\u006c"));
-_ff .Append (_dc .MakeOperand ("\u0061\u0064\u0064"));_ff .Append (_dc .MakeOperand ("\u0065\u0078\u0063\u0068"));_ff .Append (_dc .MakeReal (0.30));_ff .Append (_dc .MakeOperand ("\u006d\u0075\u006c"));_ff .Append (_dc .MakeOperand ("\u0061\u0064\u0064"));
-_ff .Append (_dc .MakeOperand ("\u0064\u0075\u0070"));_ff .Append (_dc .MakeReal (1.0));_ff .Append (_dc .MakeOperand ("\u0067\u0065"));_bdca :=_dc .NewPSProgram ();_bdca .Append (_dc .MakeOperand ("\u0070\u006f\u0070"));_bdca .Append (_dc .MakeReal (1.0));
-_ff .Append (_bdca );_ff .Append (_dc .MakeOperand ("\u0069\u0066"));_aefg .Program =_ff ;_dfg :=_b .NewPdfColorspaceDeviceN ();_dfg .AlternateSpace =_b .NewPdfColorspaceDeviceGray ();_dfg .ColorantNames =_gb .MakeArray (_gb .MakeName ("\u0043"),_gb .MakeName ("\u004d"),_gb .MakeName ("\u0059"),_gb .MakeName ("\u004b"));
-_dfg .TintTransform =_aefg ;_bdff .ColorSpace =_dfg ;return _bdff ,nil ;}else {return nil ,_a .New ("\u0055\u006e\u0073\u0075\u0070\u0070\u006fr\u0074\u0065\u0064 \u0070\u0061\u0074t\u0065\u0072n\u0020\u0063\u006f\u006c\u006f\u0072s\u0070ac\u0065\u0020\u0066\u006f\u0072\u0020\u0067\u0072\u0061\u0079\u0073\u0063\u0061\u006c\u0065\u0020\u0063\u006f\u006e\u0076\u0065\u0072\u0073\u0069\u006f\u006e");
-};};func _gfb (_gbb *_b .PdfPattern )(*_b .PdfPattern ,error ){if _gbb .IsTiling (){_bdd :=_gbb .GetAsTilingPattern ();if _bdd .IsColored (){_afg ,_ddf :=_bdd .GetContentStream ();if _ddf !=nil {return nil ,_ddf ;};_daf ,_ddf :=_af (string (_afg ),_bdd .Resources );
-if _ddf !=nil {return nil ,_ddf ;};_ddf =_bdd .SetContentStream (_daf ,nil );if _ddf !=nil {return nil ,_ddf ;};_ =_bdd .ToPdfObject ();};}else if _gbb .IsShading (){_fcff :=_gbb .GetAsShadingPattern ();_dga ,_eea :=_edd (_fcff .Shading );if _eea !=nil {return nil ,_eea ;
-};_fcff .Shading =_dga ;_ =_fcff .ToPdfObject ();};return _gbb ,nil ;};func _gg (_de _b .PdfColorspace )bool {_ ,_cd :=_de .(*_b .PdfColorspaceSpecialPattern );return _cd };
+func NormalizePage(page *_b.PdfPage) error {
+	_cfgea, _bad := page.GetMediaBox()
+	if _bad != nil {
+		return _bad
+	}
+	_fbc, _bad := page.GetRotate()
+	if _bad != nil {
+		_c.Log.Debug("\u0045\u0052R\u004f\u0052\u003a\u0020\u0025\u0073\u0020\u002d\u0020\u0069\u0067\u006e\u006f\u0072\u0069\u006e\u0067\u0020\u0061\u006e\u0064\u0020\u0061\u0073\u0073\u0075\u006d\u0069\u006e\u0067\u0020\u006e\u006f\u0020\u0072\u006f\u0074\u0061\u0074\u0069\u006f\u006e\u000a", _bad.Error())
+	}
+	_eaf := _fbc%360 != 0 && _fbc%90 == 0
+	_cfgea.Normalize()
+	_deag, _ca, _faa, _gd := _cfgea.Llx, _cfgea.Lly, _cfgea.Width(), _cfgea.Height()
+	_cga := _deag != 0 || _ca != 0
+	if !_eaf && !_cga {
+		return nil
+	}
+	_daga := func(_ccde, _fef, _aabf float64) _g.BoundingBox {
+		return _g.Path{Points: []_g.Point{_g.NewPoint(0, 0).Rotate(_aabf), _g.NewPoint(_ccde, 0).Rotate(_aabf), _g.NewPoint(0, _fef).Rotate(_aabf), _g.NewPoint(_ccde, _fef).Rotate(_aabf)}}.GetBoundingBox()
+	}
+	_bfbc := _d.NewContentCreator()
+	var _gda float64
+	if _eaf {
+		_gda = -float64(_fbc)
+		_ac := _daga(_faa, _gd, _gda)
+		_bfbc.Translate((_ac.Width-_faa)/2+_faa/2, (_ac.Height-_gd)/2+_gd/2)
+		_bfbc.RotateDeg(_gda)
+		_bfbc.Translate(-_faa/2, -_gd/2)
+		_faa, _gd = _ac.Width, _ac.Height
+	}
+	if _cga {
+		_bfbc.Translate(-_deag, -_ca)
+	}
+	_ffd := _bfbc.Operations()
+	_dgae, _bad := _gb.MakeStream(_ffd.Bytes(), _gb.NewFlateEncoder())
+	if _bad != nil {
+		return _bad
+	}
+	_ab := _gb.MakeArray(_dgae)
+	_ab.Append(page.GetContentStreamObjs()...)
+	*_cfgea = _b.PdfRectangle{Urx: _faa, Ury: _gd}
+	if _ggc := page.CropBox; _ggc != nil {
+		_ggc.Normalize()
+		_beg, _efg, _afd, _abc := _ggc.Llx-_deag, _ggc.Lly-_ca, _ggc.Width(), _ggc.Height()
+		if _eaf {
+			_gba := _daga(_afd, _abc, _gda)
+			_afd, _abc = _gba.Width, _gba.Height
+		}
+		*_ggc = _b.PdfRectangle{Llx: _beg, Lly: _efg, Urx: _beg + _afd, Ury: _efg + _abc}
+	}
+	_c.Log.Debug("\u0052\u006f\u0074\u0061\u0074\u0065\u003d\u0025\u0066\u00b0\u0020\u004f\u0070\u0073\u003d%\u0071 \u004d\u0065\u0064\u0069\u0061\u0042\u006f\u0078\u003d\u0025\u002e\u0032\u0066", _gda, _ffd, _cfgea)
+	page.Contents = _ab
+	page.Rotate = nil
+	return nil
+}
+
+func _edd(_bdff *_b.PdfShading) (*_b.PdfShading, error) {
+	_ec := _bdff.ColorSpace
+	if _ec.GetNumComponents() == 1 {
+		return _bdff, nil
+	} else if _ec.GetNumComponents() == 3 {
+		_afc := &_b.PdfFunctionType4{}
+		_afc.Domain = []float64{0, 1, 0, 1, 0, 1}
+		_afc.Range = []float64{0, 1}
+		_gfg := _dc.NewPSProgram()
+		_gfg.Append(_dc.MakeReal(0.11))
+		_gfg.Append(_dc.MakeOperand("\u006d\u0075\u006c"))
+		_gfg.Append(_dc.MakeOperand("\u0065\u0078\u0063\u0068"))
+		_gfg.Append(_dc.MakeReal(0.59))
+		_gfg.Append(_dc.MakeOperand("\u006d\u0075\u006c"))
+		_gfg.Append(_dc.MakeOperand("\u0061\u0064\u0064"))
+		_gfg.Append(_dc.MakeOperand("\u0065\u0078\u0063\u0068"))
+		_gfg.Append(_dc.MakeReal(0.3))
+		_gfg.Append(_dc.MakeOperand("\u006d\u0075\u006c"))
+		_gfg.Append(_dc.MakeOperand("\u0061\u0064\u0064"))
+		_afc.Program = _gfg
+		_edge := _b.NewPdfColorspaceDeviceN()
+		_edge.AlternateSpace = _b.NewPdfColorspaceDeviceGray()
+		_edge.ColorantNames = _gb.MakeArray(_gb.MakeName("\u0052"), _gb.MakeName("\u0047"), _gb.MakeName("\u0042"))
+		_edge.TintTransform = _afc
+		_bdff.ColorSpace = _edge
+		return _bdff, nil
+	} else if _ec.GetNumComponents() == 4 {
+		_aefg := &_b.PdfFunctionType4{}
+		_aefg.Domain = []float64{0, 1, 0, 1, 0, 1, 0, 1}
+		_aefg.Range = []float64{0, 1}
+		_ff := _dc.NewPSProgram()
+		_ff.Append(_dc.MakeOperand("\u0065\u0078\u0063\u0068"))
+		_ff.Append(_dc.MakeReal(0.11))
+		_ff.Append(_dc.MakeOperand("\u006d\u0075\u006c"))
+		_ff.Append(_dc.MakeOperand("\u0061\u0064\u0064"))
+		_ff.Append(_dc.MakeOperand("\u0065\u0078\u0063\u0068"))
+		_ff.Append(_dc.MakeReal(0.59))
+		_ff.Append(_dc.MakeOperand("\u006d\u0075\u006c"))
+		_ff.Append(_dc.MakeOperand("\u0061\u0064\u0064"))
+		_ff.Append(_dc.MakeOperand("\u0065\u0078\u0063\u0068"))
+		_ff.Append(_dc.MakeReal(0.30))
+		_ff.Append(_dc.MakeOperand("\u006d\u0075\u006c"))
+		_ff.Append(_dc.MakeOperand("\u0061\u0064\u0064"))
+		_ff.Append(_dc.MakeOperand("\u0064\u0075\u0070"))
+		_ff.Append(_dc.MakeReal(1.0))
+		_ff.Append(_dc.MakeOperand("\u0067\u0065"))
+		_bdca := _dc.NewPSProgram()
+		_bdca.Append(_dc.MakeOperand("\u0070\u006f\u0070"))
+		_bdca.Append(_dc.MakeReal(1.0))
+		_ff.Append(_bdca)
+		_ff.Append(_dc.MakeOperand("\u0069\u0066"))
+		_aefg.Program = _ff
+		_dfg := _b.NewPdfColorspaceDeviceN()
+		_dfg.AlternateSpace = _b.NewPdfColorspaceDeviceGray()
+		_dfg.ColorantNames = _gb.MakeArray(_gb.MakeName("\u0043"), _gb.MakeName("\u004d"), _gb.MakeName("\u0059"), _gb.MakeName("\u004b"))
+		_dfg.TintTransform = _aefg
+		_bdff.ColorSpace = _dfg
+		return _bdff, nil
+	} else {
+		return nil, _a.New("\u0055\u006e\u0073\u0075\u0070\u0070\u006fr\u0074\u0065\u0064 \u0070\u0061\u0074t\u0065\u0072n\u0020\u0063\u006f\u006c\u006f\u0072s\u0070ac\u0065\u0020\u0066\u006f\u0072\u0020\u0067\u0072\u0061\u0079\u0073\u0063\u0061\u006c\u0065\u0020\u0063\u006f\u006e\u0076\u0065\u0072\u0073\u0069\u006f\u006e")
+	}
+}
+
+func _gfb(_gbb *_b.PdfPattern) (*_b.PdfPattern, error) {
+	if _gbb.IsTiling() {
+		_bdd := _gbb.GetAsTilingPattern()
+		if _bdd.IsColored() {
+			_afg, _ddf := _bdd.GetContentStream()
+			if _ddf != nil {
+				return nil, _ddf
+			}
+			_daf, _ddf := _af(string(_afg), _bdd.Resources)
+			if _ddf != nil {
+				return nil, _ddf
+			}
+			_ddf = _bdd.SetContentStream(_daf, nil)
+			if _ddf != nil {
+				return nil, _ddf
+			}
+			_ = _bdd.ToPdfObject()
+		}
+	} else if _gbb.IsShading() {
+		_fcff := _gbb.GetAsShadingPattern()
+		_dga, _eea := _edd(_fcff.Shading)
+		if _eea != nil {
+			return nil, _eea
+		}
+		_fcff.Shading = _dga
+		_ = _fcff.ToPdfObject()
+	}
+	return _gbb, nil
+}
+
+func _gg(_de _b.PdfColorspace) bool { _, _cd := _de.(*_b.PdfColorspaceSpecialPattern); return _cd }
 
 // ConvertPageToGrayscale() replaces color objects on the page with grayscale ones.  Also references XObject Images and Forms
 // to convert those to grayscale.
-func ConvertPageToGrayscale (page *_b .PdfPage )error {_df ,_bb :=page .GetAllContentStreams ();if _bb !=nil {return _bb ;};_e ,_bb :=_af (_df ,page .Resources );if _bb !=nil {return _bb ;};_bb =page .SetContentStreams ([]string {string (_e )},_gb .NewFlateEncoder ());
-if _bb !=nil {return _bb ;};return nil ;};func _af (_cf string ,_ag *_b .PdfPageResources )([]byte ,error ){_bd :=_d .NewContentStreamParser (_cf );_dee ,_db :=_bd .Parse ();if _db !=nil {return nil ,_db ;};_dd :=&_d .ContentStreamOperations {};_gf :=map[_gb .PdfObjectName ]bool {};
-_cfc :=map[_gb .PdfObjectName ]bool {};_aa :=_d .NewContentStreamProcessor (*_dee );_aa .AddHandler (_d .HandlerConditionEnumAllOperands ,"",func (_fc *_d .ContentStreamOperation ,_bbf _d .GraphicsState ,_cfd *_b .PdfPageResources )error {_dbd :=_fc .Operand ;
-switch _dbd {case "\u0043\u0053":if _gg (_bbf .ColorspaceStroking ){_ggd :=_fc .Params [0].(*_gb .PdfObjectName );if *_ggd !="\u0050a\u0074\u0074\u0065\u0072\u006e"{_gc ,_ba :=_cfd .GetColorspaceByName (*_ggd );if !_ba {return _a .New ("\u0043\u006f\u006c\u006frs\u0070\u0061\u0063\u0065\u0020\u006e\u006f\u0074\u0020\u0064\u0065\u0066\u0069\u006ee\u0064");
-};_ce ,_ba :=_gc .(*_b .PdfColorspaceSpecialPattern );if !_ba {return _a .New ("\u0054\u0079\u0070\u0065\u0020\u0065\u0072\u0072\u006f\u0072");};if _ce .UnderlyingCS !=nil {_ce .UnderlyingCS =_b .NewPdfColorspaceDeviceGray ();};_db =_cfd .SetColorspaceByName (*_ggd ,_ce );
-if _db !=nil {return _db ;};};*_dd =append (*_dd ,_fc );return nil ;};_bc :=_d .ContentStreamOperation {};_bc .Operand =_dbd ;_bc .Params =[]_gb .PdfObject {_gb .MakeName ("\u0044\u0065\u0076\u0069\u0063\u0065\u0047\u0072\u0061\u0079")};*_dd =append (*_dd ,&_bc );
-return nil ;case "\u0063\u0073":if _gg (_bbf .ColorspaceNonStroking ){_gbf :=_fc .Params [0].(*_gb .PdfObjectName );if *_gbf !="\u0050a\u0074\u0074\u0065\u0072\u006e"{_gce ,_bg :=_cfd .GetColorspaceByName (*_gbf );if !_bg {return _a .New ("\u0043\u006f\u006c\u006frs\u0070\u0061\u0063\u0065\u0020\u006e\u006f\u0074\u0020\u0064\u0065\u0066\u0069\u006ee\u0064");
-};_gfd ,_bg :=_gce .(*_b .PdfColorspaceSpecialPattern );if !_bg {return _a .New ("\u0054\u0079\u0070\u0065\u0020\u0065\u0072\u0072\u006f\u0072");};if _gfd .UnderlyingCS !=nil {_gfd .UnderlyingCS =_b .NewPdfColorspaceDeviceGray ();};if _ad :=_cfd .SetColorspaceByName (*_gbf ,_gfd );
-_ad !=nil {return _ad ;};};*_dd =append (*_dd ,_fc );return nil ;};_ee :=_d .ContentStreamOperation {};_ee .Operand =_dbd ;_ee .Params =[]_gb .PdfObject {_gb .MakeName ("\u0044\u0065\u0076\u0069\u0063\u0065\u0047\u0072\u0061\u0079")};*_dd =append (*_dd ,&_ee );
-return nil ;case "\u0053\u0043","\u0053\u0043\u004e":if _gg (_bbf .ColorspaceStroking ){_bga :=_d .ContentStreamOperation {};_bga .Operand =_dbd ;_bga .Params =[]_gb .PdfObject {};_ef ,_cb :=_bbf .ColorStroking .(*_b .PdfColorPattern );if !_cb {return _a .New ("I\u006e\u0076\u0061\u006c\u0069\u0064 \u0073\u0074\u0072\u006f\u006b\u0069\u006e\u0067\u0020c\u006f\u006c\u006fr\u0020t\u0079\u0070\u0065");
-};if _ef .Color !=nil {_fcf ,_cdd :=_bbf .ColorspaceStroking .ColorToRGB (_ef .Color );if _cdd !=nil {return _cdd ;};_dbb :=_fcf .(*_b .PdfColorDeviceRGB );_bac :=_dbb .ToGray ();_bga .Params =append (_bga .Params ,_gb .MakeFloat (_bac .Val ()));};if _ ,_cc :=_gf [_ef .PatternName ];
-_cc {_bga .Params =append (_bga .Params ,_gb .MakeName (string (_ef .PatternName )));*_dd =append (*_dd ,&_bga );return nil ;};_gf [_ef .PatternName ]=true ;_bgf ,_cfg :=_cfd .GetPatternByName (_ef .PatternName );if !_cfg {return _a .New ("\u0055\u006e\u0064\u0065fi\u006e\u0065\u0064\u0020\u0070\u0061\u0074\u0074\u0065\u0072\u006e\u0020\u006e\u0061m\u0065");
-};_dff ,_cde :=_gfb (_bgf );if _cde !=nil {return _cde ;};_cde =_cfd .SetPatternByName (_ef .PatternName ,_dff .ToPdfObject ());if _cde !=nil {return _cde ;};_bga .Params =append (_bga .Params ,_gb .MakeName (string (_ef .PatternName )));*_dd =append (*_dd ,&_bga );
-}else {_eg ,_afe :=_bbf .ColorspaceStroking .ColorToRGB (_bbf .ColorStroking );if _afe !=nil {return _afe ;};_da :=_eg .(*_b .PdfColorDeviceRGB );_fg :=_da .ToGray ();_bfb :=_d .ContentStreamOperation {};_bfb .Operand =_dbd ;_bfb .Params =[]_gb .PdfObject {_gb .MakeFloat (_fg .Val ())};
-*_dd =append (*_dd ,&_bfb );};return nil ;case "\u0073\u0063","\u0073\u0063\u006e":if _gg (_bbf .ColorspaceNonStroking ){_cfge :=_d .ContentStreamOperation {};_cfge .Operand =_dbd ;_cfge .Params =[]_gb .PdfObject {};_ae ,_ccb :=_bbf .ColorNonStroking .(*_b .PdfColorPattern );
-if !_ccb {return _a .New ("I\u006e\u0076\u0061\u006c\u0069\u0064 \u0073\u0074\u0072\u006f\u006b\u0069\u006e\u0067\u0020c\u006f\u006c\u006fr\u0020t\u0079\u0070\u0065");};if _ae .Color !=nil {_aag ,_bcc :=_bbf .ColorspaceNonStroking .ColorToRGB (_ae .Color );
-if _bcc !=nil {return _bcc ;};_be :=_aag .(*_b .PdfColorDeviceRGB );_aab :=_be .ToGray ();_cfge .Params =append (_cfge .Params ,_gb .MakeFloat (_aab .Val ()));};if _ ,_bfc :=_gf [_ae .PatternName ];_bfc {_cfge .Params =append (_cfge .Params ,_gb .MakeName (string (_ae .PatternName )));
-*_dd =append (*_dd ,&_cfge );return nil ;};_gf [_ae .PatternName ]=true ;_ed ,_cddd :=_cfd .GetPatternByName (_ae .PatternName );if !_cddd {return _a .New ("\u0055\u006e\u0064\u0065fi\u006e\u0065\u0064\u0020\u0070\u0061\u0074\u0074\u0065\u0072\u006e\u0020\u006e\u0061m\u0065");
-};_ea ,_bfa :=_gfb (_ed );if _bfa !=nil {return _bfa ;};_bfa =_cfd .SetPatternByName (_ae .PatternName ,_ea .ToPdfObject ());if _bfa !=nil {return _bfa ;};_cfge .Params =append (_cfge .Params ,_gb .MakeName (string (_ae .PatternName )));*_dd =append (*_dd ,&_cfge );
-}else {_dfb ,_aee :=_bbf .ColorspaceNonStroking .ColorToRGB (_bbf .ColorNonStroking );if _aee !=nil {return _aee ;};_dbg :=_dfb .(*_b .PdfColorDeviceRGB );_fd :=_dbg .ToGray ();_gcg :=_d .ContentStreamOperation {};_gcg .Operand =_dbd ;_gcg .Params =[]_gb .PdfObject {_gb .MakeFloat (_fd .Val ())};
-*_dd =append (*_dd ,&_gcg );};return nil ;case "\u0052\u0047","\u004b":_aec ,_cce :=_bbf .ColorspaceStroking .ColorToRGB (_bbf .ColorStroking );if _cce !=nil {return _cce ;};_aef :=_aec .(*_b .PdfColorDeviceRGB );_dcd :=_aef .ToGray ();_bgfd :=_d .ContentStreamOperation {};
-_bgfd .Operand ="\u0047";_bgfd .Params =[]_gb .PdfObject {_gb .MakeFloat (_dcd .Val ())};*_dd =append (*_dd ,&_bgfd );return nil ;case "\u0072\u0067","\u006b":_bge ,_ede :=_bbf .ColorspaceNonStroking .ColorToRGB (_bbf .ColorNonStroking );if _ede !=nil {return _ede ;
-};_ggf :=_bge .(*_b .PdfColorDeviceRGB );_bff :=_ggf .ToGray ();_fdc :=_d .ContentStreamOperation {};_fdc .Operand ="\u0067";_fdc .Params =[]_gb .PdfObject {_gb .MakeFloat (_bff .Val ())};*_dd =append (*_dd ,&_fdc );return nil ;case "\u0073\u0068":if len (_fc .Params )!=1{return _a .New ("\u0050\u0061\u0072\u0061\u006d\u0073 \u0074\u006f\u0020\u0073\u0068\u0020\u006f\u0070\u0065\u0072\u0061\u0074\u006fr\u0020\u0073\u0068\u006f\u0075\u006c\u0064 \u0062\u0065\u0020\u0031");
-};_aeee ,_edea :=_fc .Params [0].(*_gb .PdfObjectName );if !_edea {return _a .New ("\u0073\u0068 \u0070\u0061\u0072\u0061\u006d\u0065\u0074\u0065\u0072\u0020\u0073\u0068\u006f\u0075\u006c\u0064\u0020\u0062\u0065\u0020\u0061\u0020na\u006d\u0065");};if _ ,_bcb :=_cfc [*_aeee ];
-_bcb {*_dd =append (*_dd ,_fc );return nil ;};_cfc [*_aeee ]=true ;_eae ,_bbfb :=_cfd .GetShadingByName (*_aeee );if !_bbfb {return _a .New ("\u0053\u0068\u0061\u0064\u0069\u006e\u0067\u0020\u006e\u006f\u0074\u0020\u0064\u0065\u0066i\u006ee\u0064\u0020\u0069\u006e\u0020\u0072\u0065\u0073\u006f\u0075\u0072\u0063\u0065\u0073");
-};_deb ,_ccd :=_edd (_eae );if _ccd !=nil {return _ccd ;};_ccd =_cfd .SetShadingByName (*_aeee ,_deb .GetContext ().ToPdfObject ());if _ccd !=nil {return _ccd ;};};*_dd =append (*_dd ,_fc );return nil ;});_aa .AddHandler (_d .HandlerConditionEnumOperand ,"\u0042\u0049",func (_ded *_d .ContentStreamOperation ,_dbbb _d .GraphicsState ,_bbg *_b .PdfPageResources )error {if len (_ded .Params )!=1{return _a .New ("\u0069\u006e\u0076\u0061l\u0069\u0064\u0020\u006e\u0075\u006d\u0062\u0065\u0072\u0020o\u0066 \u0070\u0061\u0072\u0061\u006d\u0065\u0074e\u0072\u0073");
-};_bdc ,_edg :=_ded .Params [0].(*_d .ContentStreamInlineImage );if !_edg {return _a .New ("\u0049\u006e\u0076\u0061\u006c\u0069\u0064\u0020\u0069\u006el\u0069\u006e\u0065\u0020\u0069\u006d\u0061g\u0065\u0020\u0070\u0061\u0072\u0061\u006d\u0065\u0074\u0065\u0072");
-};_dba ,_eda :=_bdc .ToImage (_bbg );if _eda !=nil {return _eda ;};_efd ,_eda :=_bdc .GetColorSpace (_bbg );if _eda !=nil {return _eda ;};_gbfb ,_eda :=_efd .ImageToRGB (*_dba );if _eda !=nil {return _eda ;};_fb :=_b .NewPdfColorspaceDeviceRGB ();_bda ,_eda :=_fb .ImageToGray (_gbfb );
-if _eda !=nil {return _eda ;};_adf ,_eda :=_bdc .GetEncoder ();if _eda !=nil {return _eda ;};if _bcd ,_cg :=_adf .(*_gb .DCTEncoder );_cg {_bcd .ColorComponents =1;};_aeeb ,_eda :=_d .NewInlineImageFromImage (_bda ,_adf );if _eda !=nil {if _eda ==_gb .ErrUnsupportedEncodingParameters {_adf =_gb .NewFlateEncoder ();
-};_aeeb ,_eda =_d .NewInlineImageFromImage (_bda ,_adf );if _eda !=nil {return _eda ;};};_gga :=_d .ContentStreamOperation {};_gga .Operand ="\u0042\u0049";_gga .Params =[]_gb .PdfObject {_aeeb };*_dd =append (*_dd ,&_gga );return nil ;});_afee :=map[string ]bool {};
-_aa .AddHandler (_d .HandlerConditionEnumOperand ,"\u0044\u006f",func (_fe *_d .ContentStreamOperation ,_fgb _d .GraphicsState ,_ge *_b .PdfPageResources )error {if len (_fe .Params )< 1{return _a .New ("\u0045\u0052\u0052\u004f\u0052\u003a\u0020\u0049\u006e\u0076\u0061\u006c\u0069\u0064\u0020\u006e\u0075\u006d\u0062\u0065r\u0020\u006f\u0066\u0020\u0070\u0061\u0072\u0061\u006ds\u0020\u0066\u006f\u0072\u0020\u0044\u006f\u0020\u006f\u0062\u006a\u0065\u0063t\u003a\u0020\u0052\u0061\u006e\u0067e\u0020\u0063\u0068e\u0063\u006b");
-};_baa :=_fe .Params [0].(*_gb .PdfObjectName );_ ,_dcc :=_afee [string (*_baa )];if _dcc {return nil ;};_afee [string (*_baa )]=true ;_ ,_ddd :=_ge .GetXObjectByName (*_baa );if _ddd ==_b .XObjectTypeImage {_dg ,_cgg :=_ge .GetXObjectImageByName (*_baa );
-if _cgg !=nil {return _cgg ;};_cbc ,_cgg :=_dg .ToImage ();if _cgg !=nil {return _cgg ;};_eef ,_cgg :=_dg .ColorSpace .ImageToRGB (*_cbc );if _cgg !=nil {return _cgg ;};_bdf :=_b .NewPdfColorspaceDeviceRGB ();_cgb ,_cgg :=_bdf .ImageToGray (_eef );if _cgg !=nil {return _cgg ;
-};_cec :=_dg .Filter ;if _dea ,_ggb :=_cec .(*_gb .DCTEncoder );_ggb {_dea .ColorComponents =1;};_adc ,_cgg :=_b .NewXObjectImageFromImage (&_cgb ,nil ,_cec );if _cgg !=nil {if _cgg ==_gb .ErrUnsupportedEncodingParameters {_cec =_gb .NewFlateEncoder ();
-};_adc ,_cgg =_b .NewXObjectImageFromImage (&_cgb ,nil ,_cec );if _cgg !=nil {return _cgg ;};};_cgg =_ge .SetXObjectImageByName (*_baa ,_adc );if _cgg !=nil {return _cgg ;};}else if _ddd ==_b .XObjectTypeForm {_fa ,_cbe :=_ge .GetXObjectFormByName (*_baa );
-if _cbe !=nil {return _cbe ;};_egc ,_cbe :=_fa .GetContentStream ();if _cbe !=nil {return _cbe ;};_ga :=_fa .Resources ;if _ga ==nil {_ga =_ge ;};_faf ,_cbe :=_af (string (_egc ),_ga );if _cbe !=nil {return _cbe ;};_cbe =_fa .SetContentStream (_faf ,nil );
-if _cbe !=nil {return _cbe ;};_cbe =_ge .SetXObjectFormByName (*_baa ,_fa );if _cbe !=nil {return _cbe ;};};return nil ;});_db =_aa .Process (_ag );if _db !=nil {return nil ,_db ;};return _dd .Bytes (),nil ;};
+func ConvertPageToGrayscale(page *_b.PdfPage) error {
+	_df, _bb := page.GetAllContentStreams()
+	if _bb != nil {
+		return _bb
+	}
+	_e, _bb := _af(_df, page.Resources)
+	if _bb != nil {
+		return _bb
+	}
+	_bb = page.SetContentStreams([]string{string(_e)}, _gb.NewFlateEncoder())
+	if _bb != nil {
+		return _bb
+	}
+	return nil
+}
+
+func _af(_cf string, _ag *_b.PdfPageResources) ([]byte, error) {
+	_bd := _d.NewContentStreamParser(_cf)
+	_dee, _db := _bd.Parse()
+	if _db != nil {
+		return nil, _db
+	}
+	_dd := &_d.ContentStreamOperations{}
+	_gf := map[_gb.PdfObjectName]bool{}
+	_cfc := map[_gb.PdfObjectName]bool{}
+	_aa := _d.NewContentStreamProcessor(*_dee)
+	_aa.AddHandler(_d.HandlerConditionEnumAllOperands, "", func(_fc *_d.ContentStreamOperation, _bbf _d.GraphicsState, _cfd *_b.PdfPageResources) error {
+		_dbd := _fc.Operand
+		switch _dbd {
+		case "\u0043\u0053":
+			if _gg(_bbf.ColorspaceStroking) {
+				_ggd := _fc.Params[0].(*_gb.PdfObjectName)
+				if *_ggd != "\u0050a\u0074\u0074\u0065\u0072\u006e" {
+					_gc, _ba := _cfd.GetColorspaceByName(*_ggd)
+					if !_ba {
+						return _a.New("\u0043\u006f\u006c\u006frs\u0070\u0061\u0063\u0065\u0020\u006e\u006f\u0074\u0020\u0064\u0065\u0066\u0069\u006ee\u0064")
+					}
+					_ce, _ba := _gc.(*_b.PdfColorspaceSpecialPattern)
+					if !_ba {
+						return _a.New("\u0054\u0079\u0070\u0065\u0020\u0065\u0072\u0072\u006f\u0072")
+					}
+					if _ce.UnderlyingCS != nil {
+						_ce.UnderlyingCS = _b.NewPdfColorspaceDeviceGray()
+					}
+					_db = _cfd.SetColorspaceByName(*_ggd, _ce)
+					if _db != nil {
+						return _db
+					}
+				}
+				*_dd = append(*_dd, _fc)
+				return nil
+			}
+			_bc := _d.ContentStreamOperation{}
+			_bc.Operand = _dbd
+			_bc.Params = []_gb.PdfObject{_gb.MakeName("\u0044\u0065\u0076\u0069\u0063\u0065\u0047\u0072\u0061\u0079")}
+			*_dd = append(*_dd, &_bc)
+			return nil
+		case "\u0063\u0073":
+			if _gg(_bbf.ColorspaceNonStroking) {
+				_gbf := _fc.Params[0].(*_gb.PdfObjectName)
+				if *_gbf != "\u0050a\u0074\u0074\u0065\u0072\u006e" {
+					_gce, _bg := _cfd.GetColorspaceByName(*_gbf)
+					if !_bg {
+						return _a.New("\u0043\u006f\u006c\u006frs\u0070\u0061\u0063\u0065\u0020\u006e\u006f\u0074\u0020\u0064\u0065\u0066\u0069\u006ee\u0064")
+					}
+					_gfd, _bg := _gce.(*_b.PdfColorspaceSpecialPattern)
+					if !_bg {
+						return _a.New("\u0054\u0079\u0070\u0065\u0020\u0065\u0072\u0072\u006f\u0072")
+					}
+					if _gfd.UnderlyingCS != nil {
+						_gfd.UnderlyingCS = _b.NewPdfColorspaceDeviceGray()
+					}
+					if _ad := _cfd.SetColorspaceByName(*_gbf, _gfd); _ad != nil {
+						return _ad
+					}
+				}
+				*_dd = append(*_dd, _fc)
+				return nil
+			}
+			_ee := _d.ContentStreamOperation{}
+			_ee.Operand = _dbd
+			_ee.Params = []_gb.PdfObject{_gb.MakeName("\u0044\u0065\u0076\u0069\u0063\u0065\u0047\u0072\u0061\u0079")}
+			*_dd = append(*_dd, &_ee)
+			return nil
+		case "\u0053\u0043", "\u0053\u0043\u004e":
+			if _gg(_bbf.ColorspaceStroking) {
+				_bga := _d.ContentStreamOperation{}
+				_bga.Operand = _dbd
+				_bga.Params = []_gb.PdfObject{}
+				_ef, _cb := _bbf.ColorStroking.(*_b.PdfColorPattern)
+				if !_cb {
+					return _a.New("I\u006e\u0076\u0061\u006c\u0069\u0064 \u0073\u0074\u0072\u006f\u006b\u0069\u006e\u0067\u0020c\u006f\u006c\u006fr\u0020t\u0079\u0070\u0065")
+				}
+				if _ef.Color != nil {
+					_fcf, _cdd := _bbf.ColorspaceStroking.ColorToRGB(_ef.Color)
+					if _cdd != nil {
+						return _cdd
+					}
+					_dbb := _fcf.(*_b.PdfColorDeviceRGB)
+					_bac := _dbb.ToGray()
+					_bga.Params = append(_bga.Params, _gb.MakeFloat(_bac.Val()))
+				}
+				if _, _cc := _gf[_ef.PatternName]; _cc {
+					_bga.Params = append(_bga.Params, _gb.MakeName(string(_ef.PatternName)))
+					*_dd = append(*_dd, &_bga)
+					return nil
+				}
+				_gf[_ef.PatternName] = true
+				_bgf, _cfg := _cfd.GetPatternByName(_ef.PatternName)
+				if !_cfg {
+					return _a.New("\u0055\u006e\u0064\u0065fi\u006e\u0065\u0064\u0020\u0070\u0061\u0074\u0074\u0065\u0072\u006e\u0020\u006e\u0061m\u0065")
+				}
+				_dff, _cde := _gfb(_bgf)
+				if _cde != nil {
+					return _cde
+				}
+				_cde = _cfd.SetPatternByName(_ef.PatternName, _dff.ToPdfObject())
+				if _cde != nil {
+					return _cde
+				}
+				_bga.Params = append(_bga.Params, _gb.MakeName(string(_ef.PatternName)))
+				*_dd = append(*_dd, &_bga)
+			} else {
+				_eg, _afe := _bbf.ColorspaceStroking.ColorToRGB(_bbf.ColorStroking)
+				if _afe != nil {
+					return _afe
+				}
+				_da := _eg.(*_b.PdfColorDeviceRGB)
+				_fg := _da.ToGray()
+				_bfb := _d.ContentStreamOperation{}
+				_bfb.Operand = _dbd
+				_bfb.Params = []_gb.PdfObject{_gb.MakeFloat(_fg.Val())}
+				*_dd = append(*_dd, &_bfb)
+			}
+			return nil
+		case "\u0073\u0063", "\u0073\u0063\u006e":
+			if _gg(_bbf.ColorspaceNonStroking) {
+				_cfge := _d.ContentStreamOperation{}
+				_cfge.Operand = _dbd
+				_cfge.Params = []_gb.PdfObject{}
+				_ae, _ccb := _bbf.ColorNonStroking.(*_b.PdfColorPattern)
+				if !_ccb {
+					return _a.New("I\u006e\u0076\u0061\u006c\u0069\u0064 \u0073\u0074\u0072\u006f\u006b\u0069\u006e\u0067\u0020c\u006f\u006c\u006fr\u0020t\u0079\u0070\u0065")
+				}
+				if _ae.Color != nil {
+					_aag, _bcc := _bbf.ColorspaceNonStroking.ColorToRGB(_ae.Color)
+					if _bcc != nil {
+						return _bcc
+					}
+					_be := _aag.(*_b.PdfColorDeviceRGB)
+					_aab := _be.ToGray()
+					_cfge.Params = append(_cfge.Params, _gb.MakeFloat(_aab.Val()))
+				}
+				if _, _bfc := _gf[_ae.PatternName]; _bfc {
+					_cfge.Params = append(_cfge.Params, _gb.MakeName(string(_ae.PatternName)))
+					*_dd = append(*_dd, &_cfge)
+					return nil
+				}
+				_gf[_ae.PatternName] = true
+				_ed, _cddd := _cfd.GetPatternByName(_ae.PatternName)
+				if !_cddd {
+					return _a.New("\u0055\u006e\u0064\u0065fi\u006e\u0065\u0064\u0020\u0070\u0061\u0074\u0074\u0065\u0072\u006e\u0020\u006e\u0061m\u0065")
+				}
+				_ea, _bfa := _gfb(_ed)
+				if _bfa != nil {
+					return _bfa
+				}
+				_bfa = _cfd.SetPatternByName(_ae.PatternName, _ea.ToPdfObject())
+				if _bfa != nil {
+					return _bfa
+				}
+				_cfge.Params = append(_cfge.Params, _gb.MakeName(string(_ae.PatternName)))
+				*_dd = append(*_dd, &_cfge)
+			} else {
+				_dfb, _aee := _bbf.ColorspaceNonStroking.ColorToRGB(_bbf.ColorNonStroking)
+				if _aee != nil {
+					return _aee
+				}
+				_dbg := _dfb.(*_b.PdfColorDeviceRGB)
+				_fd := _dbg.ToGray()
+				_gcg := _d.ContentStreamOperation{}
+				_gcg.Operand = _dbd
+				_gcg.Params = []_gb.PdfObject{_gb.MakeFloat(_fd.Val())}
+				*_dd = append(*_dd, &_gcg)
+			}
+			return nil
+		case "\u0052\u0047", "\u004b":
+			_aec, _cce := _bbf.ColorspaceStroking.ColorToRGB(_bbf.ColorStroking)
+			if _cce != nil {
+				return _cce
+			}
+			_aef := _aec.(*_b.PdfColorDeviceRGB)
+			_dcd := _aef.ToGray()
+			_bgfd := _d.ContentStreamOperation{}
+			_bgfd.Operand = "\u0047"
+			_bgfd.Params = []_gb.PdfObject{_gb.MakeFloat(_dcd.Val())}
+			*_dd = append(*_dd, &_bgfd)
+			return nil
+		case "\u0072\u0067", "\u006b":
+			_bge, _ede := _bbf.ColorspaceNonStroking.ColorToRGB(_bbf.ColorNonStroking)
+			if _ede != nil {
+				return _ede
+			}
+			_ggf := _bge.(*_b.PdfColorDeviceRGB)
+			_bff := _ggf.ToGray()
+			_fdc := _d.ContentStreamOperation{}
+			_fdc.Operand = "\u0067"
+			_fdc.Params = []_gb.PdfObject{_gb.MakeFloat(_bff.Val())}
+			*_dd = append(*_dd, &_fdc)
+			return nil
+		case "\u0073\u0068":
+			if len(_fc.Params) != 1 {
+				return _a.New("\u0050\u0061\u0072\u0061\u006d\u0073 \u0074\u006f\u0020\u0073\u0068\u0020\u006f\u0070\u0065\u0072\u0061\u0074\u006fr\u0020\u0073\u0068\u006f\u0075\u006c\u0064 \u0062\u0065\u0020\u0031")
+			}
+			_aeee, _edea := _fc.Params[0].(*_gb.PdfObjectName)
+			if !_edea {
+				return _a.New("\u0073\u0068 \u0070\u0061\u0072\u0061\u006d\u0065\u0074\u0065\u0072\u0020\u0073\u0068\u006f\u0075\u006c\u0064\u0020\u0062\u0065\u0020\u0061\u0020na\u006d\u0065")
+			}
+			if _, _bcb := _cfc[*_aeee]; _bcb {
+				*_dd = append(*_dd, _fc)
+				return nil
+			}
+			_cfc[*_aeee] = true
+			_eae, _bbfb := _cfd.GetShadingByName(*_aeee)
+			if !_bbfb {
+				return _a.New("\u0053\u0068\u0061\u0064\u0069\u006e\u0067\u0020\u006e\u006f\u0074\u0020\u0064\u0065\u0066i\u006ee\u0064\u0020\u0069\u006e\u0020\u0072\u0065\u0073\u006f\u0075\u0072\u0063\u0065\u0073")
+			}
+			_deb, _ccd := _edd(_eae)
+			if _ccd != nil {
+				return _ccd
+			}
+			_ccd = _cfd.SetShadingByName(*_aeee, _deb.GetContext().ToPdfObject())
+			if _ccd != nil {
+				return _ccd
+			}
+		}
+		*_dd = append(*_dd, _fc)
+		return nil
+	})
+	_aa.AddHandler(_d.HandlerConditionEnumOperand, "\u0042\u0049", func(_ded *_d.ContentStreamOperation, _dbbb _d.GraphicsState, _bbg *_b.PdfPageResources) error {
+		if len(_ded.Params) != 1 {
+			return _a.New("\u0069\u006e\u0076\u0061l\u0069\u0064\u0020\u006e\u0075\u006d\u0062\u0065\u0072\u0020o\u0066 \u0070\u0061\u0072\u0061\u006d\u0065\u0074e\u0072\u0073")
+		}
+		_bdc, _edg := _ded.Params[0].(*_d.ContentStreamInlineImage)
+		if !_edg {
+			return _a.New("\u0049\u006e\u0076\u0061\u006c\u0069\u0064\u0020\u0069\u006el\u0069\u006e\u0065\u0020\u0069\u006d\u0061g\u0065\u0020\u0070\u0061\u0072\u0061\u006d\u0065\u0074\u0065\u0072")
+		}
+		_dba, _eda := _bdc.ToImage(_bbg)
+		if _eda != nil {
+			return _eda
+		}
+		_efd, _eda := _bdc.GetColorSpace(_bbg)
+		if _eda != nil {
+			return _eda
+		}
+		_gbfb, _eda := _efd.ImageToRGB(*_dba)
+		if _eda != nil {
+			return _eda
+		}
+		_fb := _b.NewPdfColorspaceDeviceRGB()
+		_bda, _eda := _fb.ImageToGray(_gbfb)
+		if _eda != nil {
+			return _eda
+		}
+		_adf, _eda := _bdc.GetEncoder()
+		if _eda != nil {
+			return _eda
+		}
+		if _bcd, _cg := _adf.(*_gb.DCTEncoder); _cg {
+			_bcd.ColorComponents = 1
+		}
+		_aeeb, _eda := _d.NewInlineImageFromImage(_bda, _adf)
+		if _eda != nil {
+			if _eda == _gb.ErrUnsupportedEncodingParameters {
+				_adf = _gb.NewFlateEncoder()
+			}
+			_aeeb, _eda = _d.NewInlineImageFromImage(_bda, _adf)
+			if _eda != nil {
+				return _eda
+			}
+		}
+		_gga := _d.ContentStreamOperation{}
+		_gga.Operand = "\u0042\u0049"
+		_gga.Params = []_gb.PdfObject{_aeeb}
+		*_dd = append(*_dd, &_gga)
+		return nil
+	})
+	_afee := map[string]bool{}
+	_aa.AddHandler(_d.HandlerConditionEnumOperand, "\u0044\u006f", func(_fe *_d.ContentStreamOperation, _fgb _d.GraphicsState, _ge *_b.PdfPageResources) error {
+		if len(_fe.Params) < 1 {
+			return _a.New("\u0045\u0052\u0052\u004f\u0052\u003a\u0020\u0049\u006e\u0076\u0061\u006c\u0069\u0064\u0020\u006e\u0075\u006d\u0062\u0065r\u0020\u006f\u0066\u0020\u0070\u0061\u0072\u0061\u006ds\u0020\u0066\u006f\u0072\u0020\u0044\u006f\u0020\u006f\u0062\u006a\u0065\u0063t\u003a\u0020\u0052\u0061\u006e\u0067e\u0020\u0063\u0068e\u0063\u006b")
+		}
+		_baa := _fe.Params[0].(*_gb.PdfObjectName)
+		_, _dcc := _afee[string(*_baa)]
+		if _dcc {
+			return nil
+		}
+		_afee[string(*_baa)] = true
+		_, _ddd := _ge.GetXObjectByName(*_baa)
+		if _ddd == _b.XObjectTypeImage {
+			_dg, _cgg := _ge.GetXObjectImageByName(*_baa)
+			if _cgg != nil {
+				return _cgg
+			}
+			_cbc, _cgg := _dg.ToImage()
+			if _cgg != nil {
+				return _cgg
+			}
+			_eef, _cgg := _dg.ColorSpace.ImageToRGB(*_cbc)
+			if _cgg != nil {
+				return _cgg
+			}
+			_bdf := _b.NewPdfColorspaceDeviceRGB()
+			_cgb, _cgg := _bdf.ImageToGray(_eef)
+			if _cgg != nil {
+				return _cgg
+			}
+			_cec := _dg.Filter
+			if _dea, _ggb := _cec.(*_gb.DCTEncoder); _ggb {
+				_dea.ColorComponents = 1
+			}
+			_adc, _cgg := _b.NewXObjectImageFromImage(&_cgb, nil, _cec)
+			if _cgg != nil {
+				if _cgg == _gb.ErrUnsupportedEncodingParameters {
+					_cec = _gb.NewFlateEncoder()
+				}
+				_adc, _cgg = _b.NewXObjectImageFromImage(&_cgb, nil, _cec)
+				if _cgg != nil {
+					return _cgg
+				}
+			}
+			_cgg = _ge.SetXObjectImageByName(*_baa, _adc)
+			if _cgg != nil {
+				return _cgg
+			}
+		} else if _ddd == _b.XObjectTypeForm {
+			_fa, _cbe := _ge.GetXObjectFormByName(*_baa)
+			if _cbe != nil {
+				return _cbe
+			}
+			_egc, _cbe := _fa.GetContentStream()
+			if _cbe != nil {
+				return _cbe
+			}
+			_ga := _fa.Resources
+			if _ga == nil {
+				_ga = _ge
+			}
+			_faf, _cbe := _af(string(_egc), _ga)
+			if _cbe != nil {
+				return _cbe
+			}
+			_cbe = _fa.SetContentStream(_faf, nil)
+			if _cbe != nil {
+				return _cbe
+			}
+			_cbe = _ge.SetXObjectFormByName(*_baa, _fa)
+			if _cbe != nil {
+				return _cbe
+			}
+		}
+		return nil
+	})
+	_db = _aa.Process(_ag)
+	if _db != nil {
+		return nil, _db
+	}
+	return _dd.Bytes(), nil
+}

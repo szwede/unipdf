@@ -9,653 +9,6143 @@
 // Use of this source code is governed by the UniDoc End User License Agreement
 // terms that can be accessed at https://unidoc.io/eula/
 
-package bitmap ;import (_ag "encoding/binary";_d "github.com/stretchr/testify/require";_dc "github.com/unidoc/unipdf/v4/common";_f "github.com/unidoc/unipdf/v4/internal/bitwise";_cf "github.com/unidoc/unipdf/v4/internal/imageutil";_ge "github.com/unidoc/unipdf/v4/internal/jbig2/basic";
-_a "github.com/unidoc/unipdf/v4/internal/jbig2/errors";_bf "image";_ad "math";_df "sort";_b "strings";_c "testing";);type Bitmaps struct{Values []*Bitmap ;Boxes []*_bf .Rectangle ;};func Copy (d ,s *Bitmap )(*Bitmap ,error ){return _fedg (d ,s )};func _gaaf (_afge *_ge .Stack )(_ecbc *fillSegment ,_aaff error ){const _cabg ="\u0070\u006f\u0070\u0046\u0069\u006c\u006c\u0053\u0065g\u006d\u0065\u006e\u0074";
-if _afge ==nil {return nil ,_a .Error (_cabg ,"\u006ei\u006c \u0073\u0074\u0061\u0063\u006b \u0070\u0072o\u0076\u0069\u0064\u0065\u0064");};if _afge .Aux ==nil {return nil ,_a .Error (_cabg ,"a\u0075x\u0053\u0074\u0061\u0063\u006b\u0020\u006e\u006ft\u0020\u0064\u0065\u0066in\u0065\u0064");
-};_gefb ,_abcb :=_afge .Pop ();if !_abcb {return nil ,nil ;};_acbd ,_abcb :=_gefb .(*fillSegment );if !_abcb {return nil ,_a .Error (_cabg ,"\u0073\u0074\u0061ck\u0020\u0064\u006f\u0065\u0073\u006e\u0027\u0074\u0020c\u006fn\u0074a\u0069n\u0020\u002a\u0066\u0069\u006c\u006c\u0053\u0065\u0067\u006d\u0065\u006e\u0074");
-};_ecbc =&fillSegment {_acbd ._cdac ,_acbd ._afgf ,_acbd ._decd +_acbd ._fadf ,_acbd ._fadf };_afge .Aux .Push (_acbd );return _ecbc ,nil ;};type Selection struct{Height ,Width int ;Cx ,Cy int ;Name string ;Data [][]SelectionValue ;};type BitmapsArray struct{Values []*Bitmaps ;
-Boxes []*_bf .Rectangle ;};func (_bage *Bitmap )setEightBytes (_dfef int ,_bebc uint64 )error {_ddc :=_bage .RowStride -(_dfef %_bage .RowStride );if _bage .RowStride !=_bage .Width >>3{_ddc --;};if _ddc >=8{return _bage .setEightFullBytes (_dfef ,_bebc );
-};return _bage .setEightPartlyBytes (_dfef ,_ddc ,_bebc );};func _adc (_bcf *Bitmap ,_ega ...int )(_bag *Bitmap ,_fde error ){const _daad ="\u0072\u0065\u0064uc\u0065\u0052\u0061\u006e\u006b\u0042\u0069\u006e\u0061\u0072\u0079\u0043\u0061\u0073\u0063\u0061\u0064\u0065";
-if _bcf ==nil {return nil ,_a .Error (_daad ,"\u0073o\u0075\u0072\u0063\u0065 \u0062\u0069\u0074\u006d\u0061p\u0020n\u006ft\u0020\u0064\u0065\u0066\u0069\u006e\u0065d");};if len (_ega )==0||len (_ega )> 4{return nil ,_a .Error (_daad ,"t\u0068\u0065\u0072\u0065\u0020\u006d\u0075\u0073\u0074 \u0062\u0065\u0020\u0061\u0074\u0020\u006cea\u0073\u0074\u0020\u006fn\u0065\u0020\u0061\u006e\u0064\u0020\u0061\u0074\u0020mo\u0073\u0074 \u0034\u0020\u006c\u0065\u0076\u0065\u006c\u0073");
-};if _ega [0]<=0{_dc .Log .Debug ("\u006c\u0065\u0076\u0065\u006c\u0031\u0020\u003c\u003d\u0020\u0030 \u002d\u0020\u006e\u006f\u0020\u0072\u0065\u0064\u0075\u0063t\u0069\u006f\u006e");_bag ,_fde =_fedg (nil ,_bcf );if _fde !=nil {return nil ,_a .Wrap (_fde ,_daad ,"l\u0065\u0076\u0065\u006c\u0031\u0020\u003c\u003d\u0020\u0030");
-};return _bag ,nil ;};_fcd :=_bg ();_bag =_bcf ;for _fef ,_fcb :=range _ega {if _fcb <=0{break ;};_bag ,_fde =_ggb (_bag ,_fcb ,_fcd );if _fde !=nil {return nil ,_a .Wrapf (_fde ,_daad ,"\u006c\u0065\u0076\u0065\u006c\u0025\u0064\u0020\u0072\u0065\u0064\u0075c\u0074\u0069\u006f\u006e",_fef );
-};};return _bag ,nil ;};func (_fcdc *Bitmap )setBit (_efed int ){_fcdc .Data [(_efed >>3)]|=0x80>>uint (_efed &7)};const (PixSrc RasterOperator =0xc;PixDst RasterOperator =0xa;PixNotSrc RasterOperator =0x3;PixNotDst RasterOperator =0x5;PixClr RasterOperator =0x0;
-PixSet RasterOperator =0xf;PixSrcOrDst RasterOperator =0xe;PixSrcAndDst RasterOperator =0x8;PixSrcXorDst RasterOperator =0x6;PixNotSrcOrDst RasterOperator =0xb;PixNotSrcAndDst RasterOperator =0x2;PixSrcOrNotDst RasterOperator =0xd;PixSrcAndNotDst RasterOperator =0x4;
-PixNotPixSrcOrDst RasterOperator =0x1;PixNotPixSrcAndDst RasterOperator =0x7;PixNotPixSrcXorDst RasterOperator =0x9;PixPaint =PixSrcOrDst ;PixSubtract =PixNotSrcAndDst ;PixMask =PixSrcAndDst ;);func (_ccbe *Bitmap )GetBitOffset (x int )int {return x &0x07};
-func (_bgab *Bitmap )GetComponents (components Component ,maxWidth ,maxHeight int )(_debdg *Bitmaps ,_cdgf *Boxes ,_geba error ){const _ceg ="B\u0069t\u006d\u0061\u0070\u002e\u0047\u0065\u0074\u0043o\u006d\u0070\u006f\u006een\u0074\u0073";if _bgab ==nil {return nil ,nil ,_a .Error (_ceg ,"\u0073\u006f\u0075\u0072\u0063\u0065\u0020\u0042\u0069\u0074\u006da\u0070\u0020\u006e\u006f\u0074\u0020\u0064\u0065\u0066\u0069n\u0065\u0064\u002e");
-};switch components {case ComponentConn ,ComponentCharacters ,ComponentWords :default:return nil ,nil ,_a .Error (_ceg ,"\u0069\u006e\u0076\u0061l\u0069\u0064\u0020\u0063\u006f\u006d\u0070\u006f\u006e\u0065n\u0074s\u0020\u0070\u0061\u0072\u0061\u006d\u0065t\u0065\u0072");
-};if _bgab .Zero (){_cdgf =&Boxes {};_debdg =&Bitmaps {};return _debdg ,_cdgf ,nil ;};switch components {case ComponentConn :_debdg =&Bitmaps {};if _cdgf ,_geba =_bgab .ConnComponents (_debdg ,8);_geba !=nil {return nil ,nil ,_a .Wrap (_geba ,_ceg ,"\u006e\u006f \u0070\u0072\u0065p\u0072\u006f\u0063\u0065\u0073\u0073\u0069\u006e\u0067");
-};case ComponentCharacters :_bcbd ,_adcd :=MorphSequence (_bgab ,MorphProcess {Operation :MopClosing ,Arguments :[]int {1,6}});if _adcd !=nil {return nil ,nil ,_a .Wrap (_adcd ,_ceg ,"\u0063h\u0061\u0072\u0061\u0063\u0074\u0065\u0072\u0073\u0020\u0070\u0072e\u0070\u0072\u006f\u0063\u0065\u0073\u0073\u0069\u006e\u0067");
-};if _dc .Log .IsLogLevel (_dc .LogLevelTrace ){_dc .Log .Trace ("\u0043o\u006d\u0070o\u006e\u0065\u006e\u0074C\u0068\u0061\u0072a\u0063\u0074\u0065\u0072\u0073\u0020\u0062\u0069\u0074ma\u0070\u0020\u0061f\u0074\u0065r\u0020\u0063\u006c\u006f\u0073\u0069n\u0067\u003a \u0025\u0073",_bcbd .String ());
-};_cga :=&Bitmaps {};_cdgf ,_adcd =_bcbd .ConnComponents (_cga ,8);if _adcd !=nil {return nil ,nil ,_a .Wrap (_adcd ,_ceg ,"\u0063h\u0061\u0072\u0061\u0063\u0074\u0065\u0072\u0073\u0020\u0070\u0072e\u0070\u0072\u006f\u0063\u0065\u0073\u0073\u0069\u006e\u0067");
-};if _dc .Log .IsLogLevel (_dc .LogLevelTrace ){_dc .Log .Trace ("\u0043\u006f\u006d\u0070\u006f\u006ee\u006e\u0074\u0043\u0068\u0061\u0072\u0061\u0063\u0074\u0065\u0072\u0073\u0020\u0062\u0069\u0074\u006d\u0061\u0070\u0020a\u0066\u0074\u0065\u0072\u0020\u0063\u006f\u006e\u006e\u0065\u0063\u0074\u0069\u0076i\u0074y\u003a\u0020\u0025\u0073",_cga .String ());
-};if _debdg ,_adcd =_cga .ClipToBitmap (_bgab );_adcd !=nil {return nil ,nil ,_a .Wrap (_adcd ,_ceg ,"\u0063h\u0061\u0072\u0061\u0063\u0074\u0065\u0072\u0073\u0020\u0070\u0072e\u0070\u0072\u006f\u0063\u0065\u0073\u0073\u0069\u006e\u0067");};case ComponentWords :_bcfbf :=1;
-var _degc *Bitmap ;switch {case _bgab .XResolution <=200:_degc =_bgab ;case _bgab .XResolution <=400:_bcfbf =2;_degc ,_geba =_adc (_bgab ,1,0,0,0);if _geba !=nil {return nil ,nil ,_a .Wrap (_geba ,_ceg ,"w\u006f\u0072\u0064\u0020\u0070\u0072e\u0070\u0072\u006f\u0063\u0065\u0073\u0073\u0020\u002d \u0078\u0072\u0065s\u003c=\u0034\u0030\u0030");
-};default:_bcfbf =4;_degc ,_geba =_adc (_bgab ,1,1,0,0);if _geba !=nil {return nil ,nil ,_a .Wrap (_geba ,_ceg ,"\u0077\u006f\u0072\u0064 \u0070\u0072\u0065\u0070\u0072\u006f\u0063\u0065\u0073\u0073 \u002d \u0078\u0072\u0065\u0073\u0020\u003e\u00204\u0030\u0030");
-};};_bccd ,_ ,_dba :=_aaa (_degc );if _dba !=nil {return nil ,nil ,_a .Wrap (_dba ,_ceg ,"\u0077o\u0072d\u0020\u0070\u0072\u0065\u0070\u0072\u006f\u0063\u0065\u0073\u0073");};_ebe ,_dba :=_fceb (_bccd ,_bcfbf );if _dba !=nil {return nil ,nil ,_a .Wrap (_dba ,_ceg ,"\u0077o\u0072d\u0020\u0070\u0072\u0065\u0070\u0072\u006f\u0063\u0065\u0073\u0073");
-};_efdg :=&Bitmaps {};if _cdgf ,_dba =_ebe .ConnComponents (_efdg ,4);_dba !=nil {return nil ,nil ,_a .Wrap (_dba ,_ceg ,"\u0077\u006f\u0072\u0064\u0020\u0070r\u0065\u0070\u0072\u006f\u0063\u0065\u0073\u0073\u002c\u0020\u0063\u006f\u006en\u0065\u0063\u0074\u0020\u0065\u0078\u0070a\u006e\u0064\u0065\u0064");
-};if _debdg ,_dba =_efdg .ClipToBitmap (_bgab );_dba !=nil {return nil ,nil ,_a .Wrap (_dba ,_ceg ,"\u0077o\u0072d\u0020\u0070\u0072\u0065\u0070\u0072\u006f\u0063\u0065\u0073\u0073");};};_debdg ,_geba =_debdg .SelectBySize (maxWidth ,maxHeight ,LocSelectIfBoth ,SizeSelectIfLTE );
-if _geba !=nil {return nil ,nil ,_a .Wrap (_geba ,_ceg ,"");};_cdgf ,_geba =_cdgf .SelectBySize (maxWidth ,maxHeight ,LocSelectIfBoth ,SizeSelectIfLTE );if _geba !=nil {return nil ,nil ,_a .Wrap (_geba ,_ceg ,"");};return _debdg ,_cdgf ,nil ;};func (_bcdba *Bitmaps )makeSizeIndicator (_eeed ,_bdgde int ,_aacac LocationFilter ,_fdabb SizeComparison )(_eacba *_ge .NumSlice ,_gefc error ){const _bcec ="\u0042i\u0074\u006d\u0061\u0070s\u002e\u006d\u0061\u006b\u0065S\u0069z\u0065I\u006e\u0064\u0069\u0063\u0061\u0074\u006fr";
-if _bcdba ==nil {return nil ,_a .Error (_bcec ,"\u0062\u0069\u0074ma\u0070\u0073\u0020\u0027\u0062\u0027\u0020\u006e\u006f\u0074\u0020\u0064\u0065\u0066\u0069\u006e\u0065\u0064");};switch _aacac {case LocSelectWidth ,LocSelectHeight ,LocSelectIfEither ,LocSelectIfBoth :default:return nil ,_a .Errorf (_bcec ,"\u0070\u0072\u006f\u0076\u0069d\u0065\u0064\u0020\u0069\u006e\u0076\u0061\u006c\u0069\u0064\u0020\u006c\u006fc\u0061\u0074\u0069\u006f\u006e\u0020\u0066\u0069\u006c\u0074\u0065\u0072\u0020\u0074\u0079\u0070\u0065\u003a\u0020\u0025\u0064",_aacac );
-};switch _fdabb {case SizeSelectIfLT ,SizeSelectIfGT ,SizeSelectIfLTE ,SizeSelectIfGTE ,SizeSelectIfEQ :default:return nil ,_a .Errorf (_bcec ,"\u0069\u006e\u0076\u0061li\u0064\u0020\u0072\u0065\u006c\u0061\u0074\u0069\u006f\u006e\u003a\u0020\u0027\u0025d\u0027",_fdabb );
-};_eacba =&_ge .NumSlice {};var (_cddfe ,_afaf ,_faef int ;_ccdgg *Bitmap ;);for _ ,_ccdgg =range _bcdba .Values {_cddfe =0;_afaf ,_faef =_ccdgg .Width ,_ccdgg .Height ;switch _aacac {case LocSelectWidth :if (_fdabb ==SizeSelectIfLT &&_afaf < _eeed )||(_fdabb ==SizeSelectIfGT &&_afaf > _eeed )||(_fdabb ==SizeSelectIfLTE &&_afaf <=_eeed )||(_fdabb ==SizeSelectIfGTE &&_afaf >=_eeed )||(_fdabb ==SizeSelectIfEQ &&_afaf ==_eeed ){_cddfe =1;
-};case LocSelectHeight :if (_fdabb ==SizeSelectIfLT &&_faef < _bdgde )||(_fdabb ==SizeSelectIfGT &&_faef > _bdgde )||(_fdabb ==SizeSelectIfLTE &&_faef <=_bdgde )||(_fdabb ==SizeSelectIfGTE &&_faef >=_bdgde )||(_fdabb ==SizeSelectIfEQ &&_faef ==_bdgde ){_cddfe =1;
-};case LocSelectIfEither :if (_fdabb ==SizeSelectIfLT &&(_afaf < _eeed ||_faef < _bdgde ))||(_fdabb ==SizeSelectIfGT &&(_afaf > _eeed ||_faef > _bdgde ))||(_fdabb ==SizeSelectIfLTE &&(_afaf <=_eeed ||_faef <=_bdgde ))||(_fdabb ==SizeSelectIfGTE &&(_afaf >=_eeed ||_faef >=_bdgde ))||(_fdabb ==SizeSelectIfEQ &&(_afaf ==_eeed ||_faef ==_bdgde )){_cddfe =1;
-};case LocSelectIfBoth :if (_fdabb ==SizeSelectIfLT &&(_afaf < _eeed &&_faef < _bdgde ))||(_fdabb ==SizeSelectIfGT &&(_afaf > _eeed &&_faef > _bdgde ))||(_fdabb ==SizeSelectIfLTE &&(_afaf <=_eeed &&_faef <=_bdgde ))||(_fdabb ==SizeSelectIfGTE &&(_afaf >=_eeed &&_faef >=_bdgde ))||(_fdabb ==SizeSelectIfEQ &&(_afaf ==_eeed &&_faef ==_bdgde )){_cddfe =1;
-};};_eacba .AddInt (_cddfe );};return _eacba ,nil ;};func _bc (_gfd ,_fa *Bitmap )(_bca error ){const _be ="\u0065\u0078\u0070\u0061nd\u0042\u0069\u006e\u0061\u0072\u0079\u0046\u0061\u0063\u0074\u006f\u0072\u0034";_eeg :=_fa .RowStride ;_eg :=_gfd .RowStride ;
-_bcaf :=_fa .RowStride *4-_gfd .RowStride ;var (_cc ,_ec byte ;_de uint32 ;_fgf ,_af ,_bdg ,_cd ,_dbg ,_ab ,_cg int ;);for _bdg =0;_bdg < _fa .Height ;_bdg ++{_fgf =_bdg *_eeg ;_af =4*_bdg *_eg ;for _cd =0;_cd < _eeg ;_cd ++{_cc =_fa .Data [_fgf +_cd ];
-_de =_gbb [_cc ];_ab =_af +_cd *4;if _bcaf !=0&&(_cd +1)*4> _gfd .RowStride {for _dbg =_bcaf ;_dbg > 0;_dbg --{_ec =byte ((_de >>uint (_dbg *8))&0xff);_cg =_ab +(_bcaf -_dbg );if _bca =_gfd .SetByte (_cg ,_ec );_bca !=nil {return _a .Wrapf (_bca ,_be ,"D\u0069\u0066\u0066\u0065\u0072\u0065n\u0074\u0020\u0072\u006f\u0077\u0073\u0074\u0072\u0069d\u0065\u0073\u002e \u004b:\u0020\u0025\u0064",_dbg );
-};};}else if _bca =_gfd .setFourBytes (_ab ,_de );_bca !=nil {return _a .Wrap (_bca ,_be ,"");};if _bca =_gfd .setFourBytes (_af +_cd *4,_gbb [_fa .Data [_fgf +_cd ]]);_bca !=nil {return _a .Wrap (_bca ,_be ,"");};};for _dbg =1;_dbg < 4;_dbg ++{for _cd =0;
-_cd < _eg ;_cd ++{if _bca =_gfd .SetByte (_af +_dbg *_eg +_cd ,_gfd .Data [_af +_cd ]);_bca !=nil {return _a .Wrapf (_bca ,_be ,"\u0063\u006f\u0070\u0079\u0020\u0027\u0071\u0075\u0061\u0064\u0072\u0061\u0062l\u0065\u0027\u0020\u006c\u0069\u006ee\u003a\u0020\u0027\u0025\u0064\u0027\u002c\u0020\u0062\u0079\u0074\u0065\u003a \u0027\u0025\u0064\u0027",_dbg ,_cd );
-};};};};return nil ;};func (_fbdd *Points )AddPoint (x ,y float32 ){*_fbdd =append (*_fbdd ,Point {x ,y })};func (_ecgc *Bitmap )AddBorderGeneral (left ,right ,top ,bot int ,val int )(*Bitmap ,error ){return _ecgc .addBorderGeneral (left ,right ,top ,bot ,val );
-};func (_ffb *Bitmap )Zero ()bool {_eeea :=_ffb .Width /8;_dfgc :=_ffb .Width &7;var _ccf byte ;if _dfgc !=0{_ccf =byte (0xff<<uint (8-_dfgc ));};var _gdd ,_ggee ,_egfg int ;for _ggee =0;_ggee < _ffb .Height ;_ggee ++{_gdd =_ffb .RowStride *_ggee ;for _egfg =0;
-_egfg < _eeea ;_egfg ,_gdd =_egfg +1,_gdd +1{if _ffb .Data [_gdd ]!=0{return false ;};};if _dfgc > 0{if _ffb .Data [_gdd ]&_ccf !=0{return false ;};};};return true ;};type SizeSelection int ;func init (){for _gdf :=0;_gdf < 256;_gdf ++{_becg [_gdf ]=uint8 (_gdf &0x1)+(uint8 (_gdf >>1)&0x1)+(uint8 (_gdf >>2)&0x1)+(uint8 (_gdf >>3)&0x1)+(uint8 (_gdf >>4)&0x1)+(uint8 (_gdf >>5)&0x1)+(uint8 (_gdf >>6)&0x1)+(uint8 (_gdf >>7)&0x1);
-};};func (_fadc *Bitmaps )AddBox (box *_bf .Rectangle ){_fadc .Boxes =append (_fadc .Boxes ,box )};func (_aagf *Bitmap )addPadBits ()(_gddb error ){const _cbdc ="\u0062\u0069\u0074\u006d\u0061\u0070\u002e\u0061\u0064\u0064\u0050\u0061d\u0042\u0069\u0074\u0073";
-_bgf :=_aagf .Width %8;if _bgf ==0{return nil ;};_gga :=_aagf .Width /8;_dgd :=_f .NewReader (_aagf .Data );_fefc :=make ([]byte ,_aagf .Height *_aagf .RowStride );_dae :=_f .NewWriterMSB (_fefc );_cce :=make ([]byte ,_gga );var (_abc int ;_efec uint64 ;
-);for _abc =0;_abc < _aagf .Height ;_abc ++{if _ ,_gddb =_dgd .Read (_cce );_gddb !=nil {return _a .Wrap (_gddb ,_cbdc ,"\u0066u\u006c\u006c\u0020\u0062\u0079\u0074e");};if _ ,_gddb =_dae .Write (_cce );_gddb !=nil {return _a .Wrap (_gddb ,_cbdc ,"\u0066\u0075\u006c\u006c\u0020\u0062\u0079\u0074\u0065\u0073");
-};if _efec ,_gddb =_dgd .ReadBits (byte (_bgf ));_gddb !=nil {return _a .Wrap (_gddb ,_cbdc ,"\u0073\u006b\u0069\u0070\u0070\u0069\u006e\u0067\u0020\u0062\u0069\u0074\u0073");};if _gddb =_dae .WriteByte (byte (_efec )<<uint (8-_bgf ));_gddb !=nil {return _a .Wrap (_gddb ,_cbdc ,"\u006ca\u0073\u0074\u0020\u0062\u0079\u0074e");
-};};_aagf .Data =_dae .Data ();return nil ;};func (_gebe *ClassedPoints )ySortFunction ()func (_egaf int ,_dfcg int )bool {return func (_ace ,_fdgag int )bool {return _gebe .YAtIndex (_ace )< _gebe .YAtIndex (_fdgag )};};func (_ebd *Bitmap )ClipRectangle (box *_bf .Rectangle )(_dfc *Bitmap ,_ebgd *_bf .Rectangle ,_dbcd error ){const _edg ="\u0043\u006c\u0069\u0070\u0052\u0065\u0063\u0074\u0061\u006e\u0067\u006c\u0065";
-if box ==nil {return nil ,nil ,_a .Error (_edg ,"\u0062o\u0078 \u0069\u0073\u0020\u006e\u006ft\u0020\u0064e\u0066\u0069\u006e\u0065\u0064");};_dgb ,_eaff :=_ebd .Width ,_ebd .Height ;_def :=_bf .Rect (0,0,_dgb ,_eaff );if !box .Overlaps (_def ){return nil ,nil ,_a .Error (_edg ,"b\u006f\u0078\u0020\u0064oe\u0073n\u0027\u0074\u0020\u006f\u0076e\u0072\u006c\u0061\u0070\u0020\u0062");
-};_eef :=box .Intersect (_def );_gbc ,_cdef :=_eef .Min .X ,_eef .Min .Y ;_dcbb ,_gab :=_eef .Dx (),_eef .Dy ();_dfc =New (_dcbb ,_gab );_dfc .Text =_ebd .Text ;if _dbcd =_dfc .RasterOperation (0,0,_dcbb ,_gab ,PixSrc ,_ebd ,_gbc ,_cdef );_dbcd !=nil {return nil ,nil ,_a .Wrap (_dbcd ,_edg ,"\u0050\u0069\u0078\u0053\u0072\u0063\u0020\u0074\u006f\u0020\u0063\u006ci\u0070\u0070\u0065\u0064");
-};_ebgd =&_eef ;return _dfc ,_ebgd ,nil ;};func (_gag *Bitmap )thresholdPixelSum (_bbb int )bool {var (_bfgb int ;_dgef uint8 ;_eag byte ;_bcb int ;);_dfcf :=_gag .RowStride ;_aeb :=uint (_gag .Width &0x07);if _aeb !=0{_dgef =uint8 ((0xff<<(8-_aeb ))&0xff);
-_dfcf --;};for _gbaa :=0;_gbaa < _gag .Height ;_gbaa ++{for _bcb =0;_bcb < _dfcf ;_bcb ++{_eag =_gag .Data [_gbaa *_gag .RowStride +_bcb ];_bfgb +=int (_becg [_eag ]);};if _aeb !=0{_eag =_gag .Data [_gbaa *_gag .RowStride +_bcb ]&_dgef ;_bfgb +=int (_becg [_eag ]);
-};if _bfgb > _bbb {return true ;};};return false ;};func (_ggc *Bitmap )GetByte (index int )(byte ,error ){if index > len (_ggc .Data )-1||index < 0{return 0,_a .Errorf ("\u0047e\u0074\u0042\u0079\u0074\u0065","\u0069\u006e\u0064\u0065x:\u0020\u0025\u0064\u0020\u006f\u0075\u0074\u0020\u006f\u0066\u0020\u0072\u0061\u006eg\u0065",index );
-};return _ggc .Data [index ],nil ;};func (_caf *Bitmap )removeBorderGeneral (_gaf ,_ffcc ,_ccef ,_bagfe int )(*Bitmap ,error ){const _agbg ="\u0072\u0065\u006d\u006fve\u0042\u006f\u0072\u0064\u0065\u0072\u0047\u0065\u006e\u0065\u0072\u0061\u006c";if _gaf < 0||_ffcc < 0||_ccef < 0||_bagfe < 0{return nil ,_a .Error (_agbg ,"\u006e\u0065g\u0061\u0074\u0069\u0076\u0065\u0020\u0062\u0072\u006f\u0064\u0065\u0072\u0020\u0072\u0065\u006d\u006f\u0076\u0065\u0020\u0076\u0061lu\u0065\u0073");
-};_fdga ,_geb :=_caf .Width ,_caf .Height ;_daaa :=_fdga -_gaf -_ffcc ;_eddg :=_geb -_ccef -_bagfe ;if _daaa <=0{return nil ,_a .Errorf (_agbg ,"w\u0069\u0064\u0074\u0068: \u0025d\u0020\u006d\u0075\u0073\u0074 \u0062\u0065\u0020\u003e\u0020\u0030",_daaa );
-};if _eddg <=0{return nil ,_a .Errorf (_agbg ,"\u0068\u0065\u0069\u0067ht\u003a\u0020\u0025\u0064\u0020\u006d\u0075\u0073\u0074\u0020\u0062\u0065\u0020\u003e \u0030",_eddg );};_acd :=New (_daaa ,_eddg );_acd .Color =_caf .Color ;_cddb :=_acd .RasterOperation (0,0,_daaa ,_eddg ,PixSrc ,_caf ,_gaf ,_ccef );
-if _cddb !=nil {return nil ,_a .Wrap (_cddb ,_agbg ,"");};return _acd ,nil ;};func New (width ,height int )*Bitmap {_dgg :=_dad (width ,height );_dgg .Data =make ([]byte ,height *_dgg .RowStride );return _dgg ;};func _fad (_edgd ,_dcbd *Bitmap ,_cafc ,_cea ,_abeb ,_cccg ,_gcfa ,_fae ,_ddgc ,_dffb int ,_bcdd CombinationOperator )error {var _cee int ;
-_bgdd :=func (){_cee ++;_abeb +=_dcbd .RowStride ;_cccg +=_edgd .RowStride ;_gcfa +=_edgd .RowStride };for _cee =_cafc ;_cee < _cea ;_bgdd (){var _fcae uint16 ;_agdc :=_abeb ;for _cfgc :=_cccg ;_cfgc <=_gcfa ;_cfgc ++{_ffbb ,_aecb :=_dcbd .GetByte (_agdc );
-if _aecb !=nil {return _aecb ;};_cafgb ,_aecb :=_edgd .GetByte (_cfgc );if _aecb !=nil {return _aecb ;};_fcae =(_fcae |uint16 (_cafgb ))<<uint (_dffb );_cafgb =byte (_fcae >>8);if _cfgc ==_gcfa {_cafgb =_ffed (uint (_fae ),_cafgb );};if _aecb =_dcbd .SetByte (_agdc ,_ccecc (_ffbb ,_cafgb ,_bcdd ));
-_aecb !=nil {return _aecb ;};_agdc ++;_fcae <<=uint (_ddgc );};};return nil ;};func (_dbgf *Bitmap )setEightFullBytes (_gdgg int ,_dbgfc uint64 )error {if _gdgg +7> len (_dbgf .Data )-1{return _a .Error ("\u0073\u0065\u0074\u0045\u0069\u0067\u0068\u0074\u0042\u0079\u0074\u0065\u0073","\u0069n\u0064e\u0078\u0020\u006f\u0075\u0074 \u006f\u0066 \u0072\u0061\u006e\u0067\u0065");
-};_dbgf .Data [_gdgg ]=byte ((_dbgfc &0xff00000000000000)>>56);_dbgf .Data [_gdgg +1]=byte ((_dbgfc &0xff000000000000)>>48);_dbgf .Data [_gdgg +2]=byte ((_dbgfc &0xff0000000000)>>40);_dbgf .Data [_gdgg +3]=byte ((_dbgfc &0xff00000000)>>32);_dbgf .Data [_gdgg +4]=byte ((_dbgfc &0xff000000)>>24);
-_dbgf .Data [_gdgg +5]=byte ((_dbgfc &0xff0000)>>16);_dbgf .Data [_gdgg +6]=byte ((_dbgfc &0xff00)>>8);_dbgf .Data [_gdgg +7]=byte (_dbgfc &0xff);return nil ;};func _bdd (_bddc ,_ebgfe *Bitmap ,_fdgg ,_bafc ,_ccad uint ,_fdab ,_egbf int ,_fgdbd bool ,_fcc ,_aee int )error {for _dfdc :=_fdab ;
-_dfdc < _egbf ;_dfdc ++{if _fcc +1< len (_bddc .Data ){_fbf :=_dfdc +1==_egbf ;_gfeb ,_eggg :=_bddc .GetByte (_fcc );if _eggg !=nil {return _eggg ;};_fcc ++;_gfeb <<=_fdgg ;_gabdf ,_eggg :=_bddc .GetByte (_fcc );if _eggg !=nil {return _eggg ;};_gabdf >>=_bafc ;
-_gcgf :=_gfeb |_gabdf ;if _fbf &&!_fgdbd {_gcgf =_ffed (_ccad ,_gcgf );};_eggg =_ebgfe .SetByte (_aee ,_gcgf );if _eggg !=nil {return _eggg ;};_aee ++;if _fbf &&_fgdbd {_edcc ,_dabf :=_bddc .GetByte (_fcc );if _dabf !=nil {return _dabf ;};_edcc <<=_fdgg ;
-_gcgf =_ffed (_ccad ,_edcc );if _dabf =_ebgfe .SetByte (_aee ,_gcgf );_dabf !=nil {return _dabf ;};};continue ;};_affc ,_fabbd :=_bddc .GetByte (_fcc );if _fabbd !=nil {_dc .Log .Debug ("G\u0065\u0074\u0074\u0069\u006e\u0067 \u0074\u0068\u0065\u0020\u0076\u0061l\u0075\u0065\u0020\u0061\u0074\u003a\u0020%\u0064\u0020\u0066\u0061\u0069\u006c\u0065\u0064\u003a\u0020%\u0073",_fcc ,_fabbd );
-return _fabbd ;};_affc <<=_fdgg ;_fcc ++;_fabbd =_ebgfe .SetByte (_aee ,_affc );if _fabbd !=nil {return _fabbd ;};_aee ++;};return nil ;};func (_edcf Points )GetGeometry (i int )(_gfdf ,_bddfg float32 ,_abfg error ){if i > len (_edcf )-1{return 0,0,_a .Errorf ("\u0050\u006f\u0069\u006e\u0074\u0073\u002e\u0047\u0065\u0074","\u0069n\u0064\u0065\u0078\u003a\u0020\u0027\u0025\u0064\u0027\u0020\u006fu\u0074\u0020\u006f\u0066\u0020\u0072\u0061\u006e\u0067\u0065",i );
-};_cbec :=_edcf [i ];return _cbec .X ,_cbec .Y ,nil ;};func Blit (src *Bitmap ,dst *Bitmap ,x ,y int ,op CombinationOperator )error {var _gccc ,_cdgd int ;_aad :=src .RowStride -1;if x < 0{_cdgd =-x ;x =0;}else if x +src .Width > dst .Width {_aad -=src .Width +x -dst .Width ;
-};if y < 0{_gccc =-y ;y =0;_cdgd +=src .RowStride ;_aad +=src .RowStride ;}else if y +src .Height > dst .Height {_gccc =src .Height +y -dst .Height ;};var (_bbef int ;_agce error ;);_dece :=x &0x07;_eeca :=8-_dece ;_aab :=src .Width &0x07;_cafg :=_eeca -_aab ;
-_cbff :=_eeca &0x07!=0;_aadf :=src .Width <=((_aad -_cdgd )<<3)+_eeca ;_gcdb :=dst .GetByteIndex (x ,y );_beca :=_gccc +dst .Height ;if src .Height > _beca {_bbef =_beca ;}else {_bbef =src .Height ;};switch {case !_cbff :_agce =_ggdc (src ,dst ,_gccc ,_bbef ,_gcdb ,_cdgd ,_aad ,op );
-case _aadf :_agce =_fad (src ,dst ,_gccc ,_bbef ,_gcdb ,_cdgd ,_aad ,_cafg ,_dece ,_eeca ,op );default:_agce =_fdgab (src ,dst ,_gccc ,_bbef ,_gcdb ,_cdgd ,_aad ,_cafg ,_dece ,_eeca ,op ,_aab );};return _agce ;};func (_abad *Bitmap )ConnComponents (bms *Bitmaps ,connectivity int )(_cdgdd *Boxes ,_cbfe error ){const _eecb ="B\u0069\u0074\u006d\u0061p.\u0043o\u006e\u006e\u0043\u006f\u006dp\u006f\u006e\u0065\u006e\u0074\u0073";
-if _abad ==nil {return nil ,_a .Error (_eecb ,"\u0070r\u006f\u0076\u0069\u0064e\u0064\u0020\u0065\u006d\u0070t\u0079 \u0027b\u0027\u0020\u0062\u0069\u0074\u006d\u0061p");};if connectivity !=4&&connectivity !=8{return nil ,_a .Error (_eecb ,"\u0063\u006f\u006ene\u0063\u0074\u0069\u0076\u0069\u0074\u0079\u0020\u006e\u006f\u0074\u0020\u0034\u0020\u006f\u0072\u0020\u0038");
-};if bms ==nil {if _cdgdd ,_cbfe =_abad .connComponentsBB (connectivity );_cbfe !=nil {return nil ,_a .Wrap (_cbfe ,_eecb ,"");};}else {if _cdgdd ,_cbfe =_abad .connComponentsBitmapsBB (bms ,connectivity );_cbfe !=nil {return nil ,_a .Wrap (_cbfe ,_eecb ,"");
-};};return _cdgdd ,nil ;};func (_fgbg *Boxes )selectWithIndicator (_abd *_ge .NumSlice )(_deba *Boxes ,_bfgc error ){const _ada ="\u0042o\u0078\u0065\u0073\u002es\u0065\u006c\u0065\u0063\u0074W\u0069t\u0068I\u006e\u0064\u0069\u0063\u0061\u0074\u006fr";
-if _fgbg ==nil {return nil ,_a .Error (_ada ,"b\u006f\u0078\u0065\u0073 '\u0062'\u0020\u006e\u006f\u0074\u0020d\u0065\u0066\u0069\u006e\u0065\u0064");};if _abd ==nil {return nil ,_a .Error (_ada ,"\u0027\u006ea\u0027\u0020\u006eo\u0074\u0020\u0064\u0065\u0066\u0069\u006e\u0065\u0064");
-};if len (*_abd )!=len (*_fgbg ){return nil ,_a .Error (_ada ,"\u0062\u006f\u0078\u0065\u0073\u0020\u0027\u0062\u0027\u0020\u0068\u0061\u0073\u0020\u0064\u0069\u0066\u0066\u0065\u0072\u0065\u006e\u0074\u0020s\u0069\u007a\u0065\u0020\u0074h\u0061\u006e \u0027\u006e\u0061\u0027");
-};var _cbc ,_agg int ;for _dea :=0;_dea < len (*_abd );_dea ++{if _cbc ,_bfgc =_abd .GetInt (_dea );_bfgc !=nil {return nil ,_a .Wrap (_bfgc ,_ada ,"\u0063\u0068\u0065\u0063\u006b\u0069\u006e\u0067\u0020c\u006f\u0075\u006e\u0074");};if _cbc ==1{_agg ++;
-};};if _agg ==len (*_fgbg ){return _fgbg ,nil ;};_gccf :=Boxes {};for _dacb :=0;_dacb < len (*_abd );_dacb ++{_cbc =int ((*_abd )[_dacb ]);if _cbc ==0{continue ;};_gccf =append (_gccf ,(*_fgbg )[_dacb ]);};_deba =&_gccf ;return _deba ,nil ;};func (_fbdc *Bitmap )clipRectangle (_cbdf ,_ebda *_bf .Rectangle )(_cdff *Bitmap ,_abg error ){const _aegb ="\u0063\u006c\u0069\u0070\u0052\u0065\u0063\u0074\u0061\u006e\u0067\u006c\u0065";
-if _cbdf ==nil {return nil ,_a .Error (_aegb ,"\u0070r\u006fv\u0069\u0064\u0065\u0064\u0020n\u0069\u006c \u0027\u0062\u006f\u0078\u0027");};_egad ,_eedg :=_fbdc .Width ,_fbdc .Height ;_dee ,_abg :=ClipBoxToRectangle (_cbdf ,_egad ,_eedg );if _abg !=nil {_dc .Log .Warning ("\u0027\u0062ox\u0027\u0020\u0064o\u0065\u0073\u006e\u0027t o\u0076er\u006c\u0061\u0070\u0020\u0062\u0069\u0074ma\u0070\u0020\u0027\u0062\u0027\u003a\u0020%\u0076",_abg );
-return nil ,nil ;};_fgdb ,_aecc :=_dee .Min .X ,_dee .Min .Y ;_geg ,_fede :=_dee .Max .X -_dee .Min .X ,_dee .Max .Y -_dee .Min .Y ;_cdff =New (_geg ,_fede );_cdff .Text =_fbdc .Text ;if _abg =_cdff .RasterOperation (0,0,_geg ,_fede ,PixSrc ,_fbdc ,_fgdb ,_aecc );
-_abg !=nil {return nil ,_a .Wrap (_abg ,_aegb ,"");};if _ebda !=nil {*_ebda =*_dee ;};return _cdff ,nil ;};func (_aebd *byWidth )Less (i ,j int )bool {return _aebd .Values [i ].Width < _aebd .Values [j ].Width };func _efaa (_ffea ,_bfeb *Bitmap ,_ebgc ,_eeab int )(_fdda error ){const _ddafe ="\u0073e\u0065d\u0066\u0069\u006c\u006c\u0042i\u006e\u0061r\u0079\u004c\u006f\u0077\u0038";
-var (_dbbf ,_fgde ,_edbg ,_cfc int ;_eedda ,_fddae ,_cegd ,_cbdab ,_abgc ,_agcb ,_efbb ,_aadbd byte ;);for _dbbf =0;_dbbf < _ebgc ;_dbbf ++{_edbg =_dbbf *_ffea .RowStride ;_cfc =_dbbf *_bfeb .RowStride ;for _fgde =0;_fgde < _eeab ;_fgde ++{if _eedda ,_fdda =_ffea .GetByte (_edbg +_fgde );
-_fdda !=nil {return _a .Wrap (_fdda ,_ddafe ,"\u0067e\u0074 \u0073\u006f\u0075\u0072\u0063\u0065\u0020\u0062\u0079\u0074\u0065");};if _fddae ,_fdda =_bfeb .GetByte (_cfc +_fgde );_fdda !=nil {return _a .Wrap (_fdda ,_ddafe ,"\u0067\u0065\u0074\u0020\u006d\u0061\u0073\u006b\u0020\u0062\u0079\u0074\u0065");
-};if _dbbf > 0{if _cegd ,_fdda =_ffea .GetByte (_edbg -_ffea .RowStride +_fgde );_fdda !=nil {return _a .Wrap (_fdda ,_ddafe ,"\u0069\u0020\u003e\u0020\u0030\u0020\u0062\u0079\u0074\u0065");};_eedda |=_cegd |(_cegd <<1)|(_cegd >>1);if _fgde > 0{if _aadbd ,_fdda =_ffea .GetByte (_edbg -_ffea .RowStride +_fgde -1);
-_fdda !=nil {return _a .Wrap (_fdda ,_ddafe ,"\u0069\u0020\u003e\u00200 \u0026\u0026\u0020\u006a\u0020\u003e\u0020\u0030\u0020\u0062\u0079\u0074\u0065");};_eedda |=_aadbd <<7;};if _fgde < _eeab -1{if _aadbd ,_fdda =_ffea .GetByte (_edbg -_ffea .RowStride +_fgde +1);
-_fdda !=nil {return _a .Wrap (_fdda ,_ddafe ,"\u006a\u0020<\u0020\u0077\u0070l\u0020\u002d\u0020\u0031\u0020\u0062\u0079\u0074\u0065");};_eedda |=_aadbd >>7;};};if _fgde > 0{if _cbdab ,_fdda =_ffea .GetByte (_edbg +_fgde -1);_fdda !=nil {return _a .Wrap (_fdda ,_ddafe ,"\u006a\u0020\u003e \u0030");
-};_eedda |=_cbdab <<7;};_eedda &=_fddae ;if _eedda ==0||^_eedda ==0{if _fdda =_ffea .SetByte (_edbg +_fgde ,_eedda );_fdda !=nil {return _a .Wrap (_fdda ,_ddafe ,"\u0073e\u0074t\u0069\u006e\u0067\u0020\u0065m\u0070\u0074y\u0020\u0062\u0079\u0074\u0065");
-};};for {_efbb =_eedda ;_eedda =(_eedda |(_eedda >>1)|(_eedda <<1))&_fddae ;if (_eedda ^_efbb )==0{if _fdda =_ffea .SetByte (_edbg +_fgde ,_eedda );_fdda !=nil {return _a .Wrap (_fdda ,_ddafe ,"\u0073\u0065\u0074\u0074\u0069\u006e\u0067\u0020\u0070\u0072\u0065\u0076 \u0062\u0079\u0074\u0065");
-};break ;};};};};for _dbbf =_ebgc -1;_dbbf >=0;_dbbf --{_edbg =_dbbf *_ffea .RowStride ;_cfc =_dbbf *_bfeb .RowStride ;for _fgde =_eeab -1;_fgde >=0;_fgde --{if _eedda ,_fdda =_ffea .GetByte (_edbg +_fgde );_fdda !=nil {return _a .Wrap (_fdda ,_ddafe ,"\u0072\u0065\u0076er\u0073\u0065\u0020\u0067\u0065\u0074\u0020\u0073\u006f\u0075\u0072\u0063\u0065\u0020\u0062\u0079\u0074\u0065");
-};if _fddae ,_fdda =_bfeb .GetByte (_cfc +_fgde );_fdda !=nil {return _a .Wrap (_fdda ,_ddafe ,"r\u0065\u0076\u0065\u0072se\u0020g\u0065\u0074\u0020\u006d\u0061s\u006b\u0020\u0062\u0079\u0074\u0065");};if _dbbf < _ebgc -1{if _abgc ,_fdda =_ffea .GetByte (_edbg +_ffea .RowStride +_fgde );
-_fdda !=nil {return _a .Wrap (_fdda ,_ddafe ,"\u0069\u0020\u003c\u0020h\u0020\u002d\u0020\u0031\u0020\u002d\u003e\u0020\u0067\u0065t\u0020s\u006f\u0075\u0072\u0063\u0065\u0020\u0062y\u0074\u0065");};_eedda |=_abgc |(_abgc <<1)|_abgc >>1;if _fgde > 0{if _aadbd ,_fdda =_ffea .GetByte (_edbg +_ffea .RowStride +_fgde -1);
-_fdda !=nil {return _a .Wrap (_fdda ,_ddafe ,"\u0069\u0020\u003c h\u002d\u0031\u0020\u0026\u0020\u006a\u0020\u003e\u00200\u0020-\u003e \u0067e\u0074\u0020\u0073\u006f\u0075\u0072\u0063\u0065\u0020\u0062\u0079\u0074\u0065");};_eedda |=_aadbd <<7;};if _fgde < _eeab -1{if _aadbd ,_fdda =_ffea .GetByte (_edbg +_ffea .RowStride +_fgde +1);
-_fdda !=nil {return _a .Wrap (_fdda ,_ddafe ,"\u0069\u0020\u003c\u0020\u0068\u002d\u0031\u0020\u0026\u0026\u0020\u006a\u0020\u003c\u0077\u0070\u006c\u002d\u0031\u0020\u002d\u003e\u0020\u0067e\u0074\u0020\u0073\u006f\u0075r\u0063\u0065 \u0062\u0079\u0074\u0065");
-};_eedda |=_aadbd >>7;};};if _fgde < _eeab -1{if _agcb ,_fdda =_ffea .GetByte (_edbg +_fgde +1);_fdda !=nil {return _a .Wrap (_fdda ,_ddafe ,"\u006a\u0020<\u0020\u0077\u0070\u006c\u0020\u002d\u0031\u0020\u002d\u003e\u0020\u0067\u0065\u0074\u0020\u0073\u006f\u0075\u0072\u0063\u0065\u0020by\u0074\u0065");
-};_eedda |=_agcb >>7;};_eedda &=_fddae ;if _eedda ==0||(^_eedda )==0{if _fdda =_ffea .SetByte (_edbg +_fgde ,_eedda );_fdda !=nil {return _a .Wrap (_fdda ,_ddafe ,"\u0073e\u0074 \u006d\u0061\u0073\u006b\u0065\u0064\u0020\u0062\u0079\u0074\u0065");};};for {_efbb =_eedda ;
-_eedda =(_eedda |(_eedda >>1)|(_eedda <<1))&_fddae ;if (_eedda ^_efbb )==0{if _fdda =_ffea .SetByte (_edbg +_fgde ,_eedda );_fdda !=nil {return _a .Wrap (_fdda ,_ddafe ,"r\u0065\u0076\u0065\u0072se\u0020s\u0065\u0074\u0020\u0070\u0072e\u0076\u0020\u0062\u0079\u0074\u0065");
-};break ;};};};};return nil ;};func _ece (_gbad *Bitmap ,_cbdd ,_gbff ,_fece ,_gebef int ,_cgeb RasterOperator ,_fdeba *Bitmap ,_gdea ,_dgbc int )error {const _cacgg ="\u0072a\u0073t\u0065\u0072\u004f\u0070\u0065\u0072\u0061\u0074\u0069\u006f\u006e";if _gbad ==nil {return _a .Error (_cacgg ,"\u006e\u0069\u006c\u0020\u0027\u0064\u0065\u0073\u0074\u0027\u0020\u0042i\u0074\u006d\u0061\u0070");
-};if _cgeb ==PixDst {return nil ;};switch _cgeb {case PixClr ,PixSet ,PixNotDst :_daadf (_gbad ,_cbdd ,_gbff ,_fece ,_gebef ,_cgeb );return nil ;};if _fdeba ==nil {_dc .Log .Debug ("\u0052a\u0073\u0074e\u0072\u004f\u0070\u0065r\u0061\u0074\u0069o\u006e\u0020\u0073\u006f\u0075\u0072\u0063\u0065\u0020bi\u0074\u006d\u0061p\u0020\u0069s\u0020\u006e\u006f\u0074\u0020\u0064e\u0066\u0069n\u0065\u0064");
-return _a .Error (_cacgg ,"\u006e\u0069l\u0020\u0027\u0073r\u0063\u0027\u0020\u0062\u0069\u0074\u006d\u0061\u0070");};if _gcca :=_gbed (_gbad ,_cbdd ,_gbff ,_fece ,_gebef ,_cgeb ,_fdeba ,_gdea ,_dgbc );_gcca !=nil {return _a .Wrap (_gcca ,_cacgg ,"");};
-return nil ;};func _da (_eea *Bitmap ,_ccb int )(*Bitmap ,error ){const _dbc ="\u0065x\u0070a\u006e\u0064\u0042\u0069\u006ea\u0072\u0079P\u006f\u0077\u0065\u0072\u0032";if _eea ==nil {return nil ,_a .Error (_dbc ,"\u0073o\u0075r\u0063\u0065\u0020\u006e\u006ft\u0020\u0064e\u0066\u0069\u006e\u0065\u0064");
-};if _ccb ==1{return _fedg (nil ,_eea );};if _ccb !=2&&_ccb !=4&&_ccb !=8{return nil ,_a .Error (_dbc ,"\u0066\u0061\u0063t\u006f\u0072\u0020\u006du\u0073\u0074\u0020\u0062\u0065\u0020\u0069n\u0020\u007b\u0032\u002c\u0034\u002c\u0038\u007d\u0020\u0072\u0061\u006e\u0067\u0065");
-};_gb :=_ccb *_eea .Width ;_edd :=_ccb *_eea .Height ;_cfd :=New (_gb ,_edd );var _ef error ;switch _ccb {case 2:_ef =_bb (_cfd ,_eea );case 4:_ef =_bc (_cfd ,_eea );case 8:_ef =_ea (_cfd ,_eea );};if _ef !=nil {return nil ,_a .Wrap (_ef ,_dbc ,"");};return _cfd ,nil ;
-};func (_fade *ClassedPoints )SortByY (){_fade ._ggfg =_fade .ySortFunction ();_df .Sort (_fade )};func (_fdaa *Boxes )Add (box *_bf .Rectangle )error {if _fdaa ==nil {return _a .Error ("\u0042o\u0078\u0065\u0073\u002e\u0041\u0064d","\u0027\u0042\u006f\u0078es\u0027\u0020\u006e\u006f\u0074\u0020\u0064\u0065\u0066\u0069\u006e\u0065\u0064");
-};*_fdaa =append (*_fdaa ,box );return nil ;};func _bad (_caaa ,_abf *Bitmap ,_ int ,_ae []byte ,_egac int )(_gfe error ){const _gec ="\u0072\u0065\u0064uc\u0065\u0052\u0061\u006e\u006b\u0042\u0069\u006e\u0061\u0072\u0079\u0032\u004c\u0065\u0076\u0065\u006c\u0032";
-var (_afb ,_bfge ,_abe ,_gcb ,_gce ,_bab ,_dfd ,_egf int ;_gac ,_fdb ,_afaa ,_egg uint32 ;_gbg ,_gfc byte ;_bbd uint16 ;);_efce :=make ([]byte ,4);_eae :=make ([]byte ,4);for _abe =0;_abe < _caaa .Height -1;_abe ,_gcb =_abe +2,_gcb +1{_afb =_abe *_caaa .RowStride ;
-_bfge =_gcb *_abf .RowStride ;for _gce ,_bab =0,0;_gce < _egac ;_gce ,_bab =_gce +4,_bab +1{for _dfd =0;_dfd < 4;_dfd ++{_egf =_afb +_gce +_dfd ;if _egf <=len (_caaa .Data )-1&&_egf < _afb +_caaa .RowStride {_efce [_dfd ]=_caaa .Data [_egf ];}else {_efce [_dfd ]=0x00;
-};_egf =_afb +_caaa .RowStride +_gce +_dfd ;if _egf <=len (_caaa .Data )-1&&_egf < _afb +(2*_caaa .RowStride ){_eae [_dfd ]=_caaa .Data [_egf ];}else {_eae [_dfd ]=0x00;};};_gac =_ag .BigEndian .Uint32 (_efce );_fdb =_ag .BigEndian .Uint32 (_eae );_afaa =_gac &_fdb ;
-_afaa |=_afaa <<1;_egg =_gac |_fdb ;_egg &=_egg <<1;_fdb =_afaa |_egg ;_fdb &=0xaaaaaaaa;_gac =_fdb |(_fdb <<7);_gbg =byte (_gac >>24);_gfc =byte ((_gac >>8)&0xff);_egf =_bfge +_bab ;if _egf +1==len (_abf .Data )-1||_egf +1>=_bfge +_abf .RowStride {if _gfe =_abf .SetByte (_egf ,_ae [_gbg ]);
-_gfe !=nil {return _a .Wrapf (_gfe ,_gec ,"\u0069n\u0064\u0065\u0078\u003a\u0020\u0025d",_egf );};}else {_bbd =(uint16 (_ae [_gbg ])<<8)|uint16 (_ae [_gfc ]);if _gfe =_abf .setTwoBytes (_egf ,_bbd );_gfe !=nil {return _a .Wrapf (_gfe ,_gec ,"s\u0065\u0074\u0074\u0069\u006e\u0067 \u0074\u0077\u006f\u0020\u0062\u0079t\u0065\u0073\u0020\u0066\u0061\u0069\u006ce\u0064\u002c\u0020\u0069\u006e\u0064\u0065\u0078\u003a\u0020%\u0064",_egf );
-};_bab ++;};};};return nil ;};func _afgg ()[]int {_dega :=make ([]int ,256);for _afcd :=0;_afcd <=0xff;_afcd ++{_fdcf :=byte (_afcd );_dega [_fdcf ]=int (_fdcf &0x1)+(int (_fdcf >>1)&0x1)+(int (_fdcf >>2)&0x1)+(int (_fdcf >>3)&0x1)+(int (_fdcf >>4)&0x1)+(int (_fdcf >>5)&0x1)+(int (_fdcf >>6)&0x1)+(int (_fdcf >>7)&0x1);
-};return _dega ;};func (_gabd *Bitmap )setPadBits (_dgf int ){_eec :=8-_gabd .Width %8;if _eec ==8{return ;};_abffa :=_gabd .Width /8;_ebc :=_beeb [_eec ];if _dgf ==0{_ebc ^=_ebc ;};var _bfgdc int ;for _fabb :=0;_fabb < _gabd .Height ;_fabb ++{_bfgdc =_fabb *_gabd .RowStride +_abffa ;
-if _dgf ==0{_gabd .Data [_bfgdc ]&=_ebc ;}else {_gabd .Data [_bfgdc ]|=_ebc ;};};};type CombinationOperator int ;func TstImageBitmap ()*Bitmap {return _bceg .Copy ()};func (_addd *Bitmap )countPixels ()int {var (_dcf int ;_fcac uint8 ;_adf byte ;_gaca int ;
-);_gcea :=_addd .RowStride ;_gcd :=uint (_addd .Width &0x07);if _gcd !=0{_fcac =uint8 ((0xff<<(8-_gcd ))&0xff);_gcea --;};for _efecf :=0;_efecf < _addd .Height ;_efecf ++{for _gaca =0;_gaca < _gcea ;_gaca ++{_adf =_addd .Data [_efecf *_addd .RowStride +_gaca ];
-_dcf +=int (_becg [_adf ]);};if _gcd !=0{_dcf +=int (_becg [_addd .Data [_efecf *_addd .RowStride +_gaca ]&_fcac ]);};};return _dcf ;};func (_fed *Bitmap )SetPadBits (value int ){_fed .setPadBits (value )};func _gbae (_adef ,_dcaf *Bitmap ,_baeb *Selection )(*Bitmap ,error ){const _dabcd ="c\u006c\u006f\u0073\u0065\u0042\u0069\u0074\u006d\u0061\u0070";
-var _gdcf error ;if _adef ,_gdcf =_ebac (_adef ,_dcaf ,_baeb );_gdcf !=nil {return nil ,_gdcf ;};_eabf ,_gdcf :=_acga (nil ,_dcaf ,_baeb );if _gdcf !=nil {return nil ,_a .Wrap (_gdcf ,_dabcd ,"");};if _ ,_gdcf =_bfcc (_adef ,_eabf ,_baeb );_gdcf !=nil {return nil ,_a .Wrap (_gdcf ,_dabcd ,"");
-};return _adef ,nil ;};func (_afee *Bitmap )createTemplate ()*Bitmap {return &Bitmap {Width :_afee .Width ,Height :_afee .Height ,RowStride :_afee .RowStride ,Color :_afee .Color ,Text :_afee .Text ,BitmapNumber :_afee .BitmapNumber ,Special :_afee .Special ,Data :make ([]byte ,len (_afee .Data ))};
-};type shift int ;func TstDSymbol (t *_c .T ,scale ...int )*Bitmap {_aadg ,_bcega :=NewWithData (4,5,[]byte {0xf0,0x90,0x90,0x90,0xE0});_d .NoError (t ,_bcega );return TstGetScaledSymbol (t ,_aadg ,scale ...);};func (_efef Points )GetIntX (i int )(int ,error ){if i >=len (_efef ){return 0,_a .Errorf ("\u0050\u006f\u0069\u006e\u0074\u0073\u002e\u0047\u0065t\u0049\u006e\u0074\u0058","\u0069n\u0064\u0065\u0078\u003a\u0020\u0027\u0025\u0064\u0027\u0020\u006fu\u0074\u0020\u006f\u0066\u0020\u0072\u0061\u006e\u0067\u0065",i );
-};return int (_efef [i ].X ),nil ;};func _eaad (_ecf ,_fbgd *Bitmap ,_fcaeb ,_aaca int )(*Bitmap ,error ){const _ffcg ="\u0063\u006c\u006f\u0073\u0065\u0042\u0072\u0069\u0063\u006b";if _fbgd ==nil {return nil ,_a .Error (_ffcg ,"\u0073o\u0075r\u0063\u0065\u0020\u006e\u006ft\u0020\u0064e\u0066\u0069\u006e\u0065\u0064");
-};if _fcaeb < 1||_aaca < 1{return nil ,_a .Error (_ffcg ,"\u0068S\u0069\u007a\u0065\u0020\u0061\u006e\u0064\u0020\u0076\u0053\u0069z\u0065\u0020\u006e\u006f\u0074\u0020\u003e\u003d\u0020\u0031");};if _fcaeb ==1&&_aaca ==1{return _fbgd .Copy (),nil ;};if _fcaeb ==1||_aaca ==1{_baegf :=SelCreateBrick (_aaca ,_fcaeb ,_aaca /2,_fcaeb /2,SelHit );
-var _dbad error ;_ecf ,_dbad =_gbae (_ecf ,_fbgd ,_baegf );if _dbad !=nil {return nil ,_a .Wrap (_dbad ,_ffcg ,"\u0068S\u0069\u007a\u0065\u0020\u003d\u003d\u0020\u0031\u0020\u007c\u007c \u0076\u0053\u0069\u007a\u0065\u0020\u003d\u003d\u0020\u0031");};return _ecf ,nil ;
-};_cdc :=SelCreateBrick (1,_fcaeb ,0,_fcaeb /2,SelHit );_gdffa :=SelCreateBrick (_aaca ,1,_aaca /2,0,SelHit );_edb ,_ebaf :=_acga (nil ,_fbgd ,_cdc );if _ebaf !=nil {return nil ,_a .Wrap (_ebaf ,_ffcg ,"\u0031\u0073\u0074\u0020\u0064\u0069\u006c\u0061\u0074\u0065");
-};if _ecf ,_ebaf =_acga (_ecf ,_edb ,_gdffa );_ebaf !=nil {return nil ,_a .Wrap (_ebaf ,_ffcg ,"\u0032\u006e\u0064\u0020\u0064\u0069\u006c\u0061\u0074\u0065");};if _ ,_ebaf =_bfcc (_edb ,_ecf ,_cdc );_ebaf !=nil {return nil ,_a .Wrap (_ebaf ,_ffcg ,"\u0031s\u0074\u0020\u0065\u0072\u006f\u0064e");
-};if _ ,_ebaf =_bfcc (_ecf ,_edb ,_gdffa );_ebaf !=nil {return nil ,_a .Wrap (_ebaf ,_ffcg ,"\u0032n\u0064\u0020\u0065\u0072\u006f\u0064e");};return _ecf ,nil ;};func _ea (_egd ,_dcc *Bitmap )(_ecg error ){const _gg ="\u0065\u0078\u0070\u0061nd\u0042\u0069\u006e\u0061\u0072\u0079\u0046\u0061\u0063\u0074\u006f\u0072\u0038";
-_caa :=_dcc .RowStride ;_ege :=_egd .RowStride ;var _afa ,_ed ,_bdb ,_ff ,_dbgg int ;for _bdb =0;_bdb < _dcc .Height ;_bdb ++{_afa =_bdb *_caa ;_ed =8*_bdb *_ege ;for _ff =0;_ff < _caa ;_ff ++{if _ecg =_egd .setEightBytes (_ed +_ff *8,_ceba [_dcc .Data [_afa +_ff ]]);
-_ecg !=nil {return _a .Wrap (_ecg ,_gg ,"");};};for _dbgg =1;_dbgg < 8;_dbgg ++{for _ff =0;_ff < _ege ;_ff ++{if _ecg =_egd .SetByte (_ed +_dbgg *_ege +_ff ,_egd .Data [_ed +_ff ]);_ecg !=nil {return _a .Wrap (_ecg ,_gg ,"");};};};};return nil ;};type Boxes []*_bf .Rectangle ;
-func (_gedd *Bitmap )And (s *Bitmap )(_bbeb *Bitmap ,_gba error ){const _dbb ="\u0042\u0069\u0074\u006d\u0061\u0070\u002e\u0041\u006e\u0064";if _gedd ==nil {return nil ,_a .Error (_dbb ,"\u0027b\u0069t\u006d\u0061\u0070\u0020\u0027b\u0027\u0020i\u0073\u0020\u006e\u0069\u006c");
-};if s ==nil {return nil ,_a .Error (_dbb ,"\u0062\u0069\u0074\u006d\u0061\u0070\u0020\u0027\u0073\u0027\u0020\u0069s\u0020\u006e\u0069\u006c");};if !_gedd .SizesEqual (s ){_dc .Log .Debug ("\u0025\u0073\u0020-\u0020\u0042\u0069\u0074\u006d\u0061\u0070\u0020\u0027\u0073\u0027\u0020\u0069\u0073\u0020\u006e\u006f\u0074\u0020\u0065\u0071\u0075\u0061\u006c\u0020\u0073\u0069\u007a\u0065 \u0077\u0069\u0074\u0068\u0020\u0027\u0062\u0027",_dbb );
-};if _bbeb ,_gba =_fedg (_bbeb ,_gedd );_gba !=nil {return nil ,_a .Wrap (_gba ,_dbb ,"\u0063\u0061\u006e't\u0020\u0063\u0072\u0065\u0061\u0074\u0065\u0020\u0027\u0064\u0027\u0020\u0062\u0069\u0074\u006d\u0061\u0070");};if _gba =_bbeb .RasterOperation (0,0,_bbeb .Width ,_bbeb .Height ,PixSrcAndDst ,s ,0,0);
-_gba !=nil {return nil ,_a .Wrap (_gba ,_dbb ,"");};return _bbeb ,nil ;};var _dbcb =[]byte {0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x3E,0x78,0x27,0xC2,0x27,0x91,0x00,0x22,0x48,0x21,0x03,0x24,0x91,0x00,0x22,0x48,0x21,0x02,0xA4,0x95,0x00,0x22,0x48,0x21,0x02,0x64,0x9B,0x00,0x3C,0x78,0x21,0x02,0x27,0x91,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x7F,0xF8,0x00,0x00,0x00,0x00,0x00,0x7F,0xF8,0x00,0x00,0x00,0x00,0x00,0x63,0x18,0x00,0x00,0x00,0x00,0x00,0x63,0x18,0x00,0x00,0x00,0x00,0x00,0x63,0x18,0x00,0x00,0x00,0x00,0x00,0x7F,0xF8,0x00,0x00,0x00,0x00,0x00,0x15,0x50,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00};
-func _bfcce ()[]int {_dcab :=make ([]int ,256);_dcab [0]=0;_dcab [1]=7;var _acge int ;for _acge =2;_acge < 4;_acge ++{_dcab [_acge ]=_dcab [_acge -2]+6;};for _acge =4;_acge < 8;_acge ++{_dcab [_acge ]=_dcab [_acge -4]+5;};for _acge =8;_acge < 16;_acge ++{_dcab [_acge ]=_dcab [_acge -8]+4;
-};for _acge =16;_acge < 32;_acge ++{_dcab [_acge ]=_dcab [_acge -16]+3;};for _acge =32;_acge < 64;_acge ++{_dcab [_acge ]=_dcab [_acge -32]+2;};for _acge =64;_acge < 128;_acge ++{_dcab [_acge ]=_dcab [_acge -64]+1;};for _acge =128;_acge < 256;_acge ++{_dcab [_acge ]=_dcab [_acge -128];
-};return _dcab ;};func _gbed (_edbf *Bitmap ,_dacg ,_bbec int ,_bcae ,_eade int ,_bedb RasterOperator ,_fdce *Bitmap ,_baed ,_dceb int )error {var _bdedb ,_ccbec ,_cgdaf ,_acdf int ;if _dacg < 0{_baed -=_dacg ;_bcae +=_dacg ;_dacg =0;};if _baed < 0{_dacg -=_baed ;
-_bcae +=_baed ;_baed =0;};_bdedb =_dacg +_bcae -_edbf .Width ;if _bdedb > 0{_bcae -=_bdedb ;};_ccbec =_baed +_bcae -_fdce .Width ;if _ccbec > 0{_bcae -=_ccbec ;};if _bbec < 0{_dceb -=_bbec ;_eade +=_bbec ;_bbec =0;};if _dceb < 0{_bbec -=_dceb ;_eade +=_dceb ;
-_dceb =0;};_cgdaf =_bbec +_eade -_edbf .Height ;if _cgdaf > 0{_eade -=_cgdaf ;};_acdf =_dceb +_eade -_fdce .Height ;if _acdf > 0{_eade -=_acdf ;};if _bcae <=0||_eade <=0{return nil ;};var _bdee error ;switch {case _dacg &7==0&&_baed &7==0:_bdee =_gccd (_edbf ,_dacg ,_bbec ,_bcae ,_eade ,_bedb ,_fdce ,_baed ,_dceb );
-case _dacg &7==_baed &7:_bdee =_dead (_edbf ,_dacg ,_bbec ,_bcae ,_eade ,_bedb ,_fdce ,_baed ,_dceb );default:_bdee =_gfde (_edbf ,_dacg ,_bbec ,_bcae ,_eade ,_bedb ,_fdce ,_baed ,_dceb );};if _bdee !=nil {return _a .Wrap (_bdee ,"r\u0061\u0073\u0074\u0065\u0072\u004f\u0070\u004c\u006f\u0077","");
-};return nil ;};func (_gfgf *Bitmaps )GetBitmap (i int )(*Bitmap ,error ){const _bedc ="\u0047e\u0074\u0042\u0069\u0074\u006d\u0061p";if _gfgf ==nil {return nil ,_a .Error (_bedc ,"p\u0072o\u0076\u0069\u0064\u0065\u0064\u0020\u006e\u0069l\u0020\u0042\u0069\u0074ma\u0070\u0073");
-};if i > len (_gfgf .Values )-1{return nil ,_a .Errorf (_bedc ,"\u0069n\u0064\u0065\u0078\u003a\u0020\u0027\u0025\u0064\u0027\u0020\u006fu\u0074\u0020\u006f\u0066\u0020\u0072\u0061\u006e\u0067\u0065",i );};return _gfgf .Values [i ],nil ;};func TstESymbol (t *_c .T ,scale ...int )*Bitmap {_fbdg ,_eeaba :=NewWithData (4,5,[]byte {0xF0,0x80,0xE0,0x80,0xF0});
-_d .NoError (t ,_eeaba );return TstGetScaledSymbol (t ,_fbdg ,scale ...);};type RasterOperator int ;const (_ LocationFilter =iota ;LocSelectWidth ;LocSelectHeight ;LocSelectXVal ;LocSelectYVal ;LocSelectIfEither ;LocSelectIfBoth ;);func _bfbb (_eacf *Bitmap ,_fdgb *Bitmap ,_feba *Selection ,_fdeb **Bitmap )(*Bitmap ,error ){const _acbac ="\u0070\u0072\u006f\u0063\u0065\u0073\u0073\u004d\u006f\u0072\u0070\u0068A\u0072\u0067\u0073\u0031";
-if _fdgb ==nil {return nil ,_a .Error (_acbac ,"\u004d\u006f\u0072\u0070\u0068\u0041\u0072\u0067\u0073\u0031\u0020'\u0073\u0027\u0020\u006e\u006f\u0074\u0020\u0064\u0065\u0066i\u006e\u0065\u0064");};if _feba ==nil {return nil ,_a .Error (_acbac ,"\u004d\u006f\u0072\u0068p\u0041\u0072\u0067\u0073\u0031\u0020\u0027\u0073\u0065\u006c'\u0020n\u006f\u0074\u0020\u0064\u0065\u0066\u0069n\u0065\u0064");
-};_abgf ,_cccd :=_feba .Height ,_feba .Width ;if _abgf ==0||_cccd ==0{return nil ,_a .Error (_acbac ,"\u0073\u0065\u006c\u0065ct\u0069\u006f\u006e\u0020\u006f\u0066\u0020\u0073\u0069\u007a\u0065\u0020\u0030");};if _eacf ==nil {_eacf =_fdgb .createTemplate ();
-*_fdeb =_fdgb ;return _eacf ,nil ;};_eacf .Width =_fdgb .Width ;_eacf .Height =_fdgb .Height ;_eacf .RowStride =_fdgb .RowStride ;_eacf .Color =_fdgb .Color ;_eacf .Data =make ([]byte ,_fdgb .RowStride *_fdgb .Height );if _eacf ==_fdgb {*_fdeb =_fdgb .Copy ();
-}else {*_fdeb =_fdgb ;};return _eacf ,nil ;};func (_bcab *Bitmap )setEightPartlyBytes (_cbe ,_gfga int ,_fdee uint64 )(_ecdg error ){var (_ccfe byte ;_ffaf int ;);const _bge ="\u0073\u0065\u0074\u0045ig\u0068\u0074\u0050\u0061\u0072\u0074\u006c\u0079\u0042\u0079\u0074\u0065\u0073";
-for _ceb :=1;_ceb <=_gfga ;_ceb ++{_ffaf =64-_ceb *8;_ccfe =byte (_fdee >>uint (_ffaf )&0xff);_dc .Log .Trace ("\u0074\u0065\u006d\u0070\u003a\u0020\u0025\u0030\u0038\u0062\u002c\u0020\u0069\u006e\u0064\u0065\u0078\u003a %\u0064,\u0020\u0069\u0064\u0078\u003a\u0020\u0025\u0064\u002c\u0020\u0066\u0075l\u006c\u0042\u0079\u0074\u0065\u0073\u004e\u0075\u006d\u0062\u0065\u0072\u003a\u0020\u0025\u0064\u002c \u0073\u0068\u0069\u0066\u0074\u003a\u0020\u0025\u0064",_ccfe ,_cbe ,_cbe +_ceb -1,_gfga ,_ffaf );
-if _ecdg =_bcab .SetByte (_cbe +_ceb -1,_ccfe );_ecdg !=nil {return _a .Wrap (_ecdg ,_bge ,"\u0066\u0075\u006c\u006c\u0042\u0079\u0074\u0065");};};_gfb :=_bcab .RowStride *8-_bcab .Width ;if _gfb ==0{return nil ;};_ffaf -=8;_ccfe =byte (_fdee >>uint (_ffaf )&0xff)<<uint (_gfb );
-if _ecdg =_bcab .SetByte (_cbe +_gfga ,_ccfe );_ecdg !=nil {return _a .Wrap (_ecdg ,_bge ,"\u0070\u0061\u0064\u0064\u0065\u0064");};return nil ;};func _ga (_ffc ,_ged *Bitmap ,_ int ,_bee []byte ,_cb int )(_bbg error ){const _dge ="\u0072\u0065\u0064uc\u0065\u0052\u0061\u006e\u006b\u0042\u0069\u006e\u0061\u0072\u0079\u0032\u004c\u0065\u0076\u0065\u006c\u0031";
-var (_dgc ,_ffd ,_bbed ,_dga ,_agc ,_baf ,_dff ,_cdgb int ;_bcc ,_efc uint32 ;_bec ,_eegd byte ;_cdf uint16 ;);_dgee :=make ([]byte ,4);_dda :=make ([]byte ,4);for _bbed =0;_bbed < _ffc .Height -1;_bbed ,_dga =_bbed +2,_dga +1{_dgc =_bbed *_ffc .RowStride ;
-_ffd =_dga *_ged .RowStride ;for _agc ,_baf =0,0;_agc < _cb ;_agc ,_baf =_agc +4,_baf +1{for _dff =0;_dff < 4;_dff ++{_cdgb =_dgc +_agc +_dff ;if _cdgb <=len (_ffc .Data )-1&&_cdgb < _dgc +_ffc .RowStride {_dgee [_dff ]=_ffc .Data [_cdgb ];}else {_dgee [_dff ]=0x00;
-};_cdgb =_dgc +_ffc .RowStride +_agc +_dff ;if _cdgb <=len (_ffc .Data )-1&&_cdgb < _dgc +(2*_ffc .RowStride ){_dda [_dff ]=_ffc .Data [_cdgb ];}else {_dda [_dff ]=0x00;};};_bcc =_ag .BigEndian .Uint32 (_dgee );_efc =_ag .BigEndian .Uint32 (_dda );_efc |=_bcc ;
-_efc |=_efc <<1;_efc &=0xaaaaaaaa;_bcc =_efc |(_efc <<7);_bec =byte (_bcc >>24);_eegd =byte ((_bcc >>8)&0xff);_cdgb =_ffd +_baf ;if _cdgb +1==len (_ged .Data )-1||_cdgb +1>=_ffd +_ged .RowStride {_ged .Data [_cdgb ]=_bee [_bec ];}else {_cdf =(uint16 (_bee [_bec ])<<8)|uint16 (_bee [_eegd ]);
-if _bbg =_ged .setTwoBytes (_cdgb ,_cdf );_bbg !=nil {return _a .Wrapf (_bbg ,_dge ,"s\u0065\u0074\u0074\u0069\u006e\u0067 \u0074\u0077\u006f\u0020\u0062\u0079t\u0065\u0073\u0020\u0066\u0061\u0069\u006ce\u0064\u002c\u0020\u0069\u006e\u0064\u0065\u0078\u003a\u0020%\u0064",_cdgb );
-};_baf ++;};};};return nil ;};const (CmbOpOr CombinationOperator =iota ;CmbOpAnd ;CmbOpXor ;CmbOpXNor ;CmbOpReplace ;CmbOpNot ;);const (Vanilla Color =iota ;Chocolate ;);func NewWithUnpaddedData (width ,height int ,data []byte )(*Bitmap ,error ){const _egbg ="\u004e\u0065\u0077\u0057it\u0068\u0055\u006e\u0070\u0061\u0064\u0064\u0065\u0064\u0044\u0061\u0074\u0061";
-_aeg :=_dad (width ,height );_aeg .Data =data ;if _egc :=((width *height )+7)>>3;len (data )< _egc {return nil ,_a .Errorf (_egbg ,"\u0069\u006e\u0076\u0061\u006c\u0069\u0064\u0020\u0064a\u0074\u0061\u0020\u006c\u0065\u006e\u0067\u0074\u0068\u003a\u0020\u0027\u0025\u0064\u0027\u002e\u0020\u0054\u0068\u0065\u0020\u0064\u0061t\u0061\u0020s\u0068\u006fu\u006c\u0064\u0020\u0063\u006f\u006e\u0074\u0061\u0069\u006e\u0020\u0061\u0074 l\u0065\u0061\u0073\u0074\u003a\u0020\u0027\u0025\u0064'\u0020\u0062\u0079\u0074\u0065\u0073",len (data ),_egc );
-};if _efe :=_aeg .addPadBits ();_efe !=nil {return nil ,_a .Wrap (_efe ,_egbg ,"");};return _aeg ,nil ;};func _fdgab (_dfcag ,_eabb *Bitmap ,_fbb ,_bfbg ,_eeec ,_edac ,_fgfga ,_bcfe ,_cddg ,_gfgc int ,_gbf CombinationOperator ,_caec int )error {var _eagd int ;
-_ffaa :=func (){_eagd ++;_eeec +=_eabb .RowStride ;_edac +=_dfcag .RowStride ;_fgfga +=_dfcag .RowStride };for _eagd =_fbb ;_eagd < _bfbg ;_ffaa (){var _gdcd uint16 ;_dabg :=_eeec ;for _ebf :=_edac ;_ebf <=_fgfga ;_ebf ++{_efb ,_eddbf :=_eabb .GetByte (_dabg );
-if _eddbf !=nil {return _eddbf ;};_bceaf ,_eddbf :=_dfcag .GetByte (_ebf );if _eddbf !=nil {return _eddbf ;};_gdcd =(_gdcd |(uint16 (_bceaf )&0xff))<<uint (_gfgc );_bceaf =byte (_gdcd >>8);if _eddbf =_eabb .SetByte (_dabg ,_ccecc (_efb ,_bceaf ,_gbf ));
-_eddbf !=nil {return _eddbf ;};_dabg ++;_gdcd <<=uint (_cddg );if _ebf ==_fgfga {_bceaf =byte (_gdcd >>(8-uint8 (_gfgc )));if _caec !=0{_bceaf =_ffed (uint (8+_bcfe ),_bceaf );};_efb ,_eddbf =_eabb .GetByte (_dabg );if _eddbf !=nil {return _eddbf ;};if _eddbf =_eabb .SetByte (_dabg ,_ccecc (_efb ,_bceaf ,_gbf ));
-_eddbf !=nil {return _eddbf ;};};};};return nil ;};func (_begb *Bitmap )ToImage ()_bf .Image {_ggecg ,_afbg :=_cf .NewImage (_begb .Width ,_begb .Height ,1,1,_begb .Data ,nil ,nil );if _afbg !=nil {_dc .Log .Error ("\u0043\u006f\u006e\u0076\u0065\u0072\u0074\u0069\u006e\u0067\u0020j\u0062\u0069\u0067\u0032\u002e\u0042\u0069\u0074m\u0061p\u0020\u0074\u006f\u0020\u0069\u006d\u0061\u0067\u0065\u0075\u0074\u0069\u006c\u002e\u0049\u006d\u0061\u0067e\u0020\u0066\u0061\u0069\u006c\u0065\u0064\u003a\u0020\u0025\u0076",_afbg );
-};return _ggecg ;};func (_fagca *Bitmap )RasterOperation (dx ,dy ,dw ,dh int ,op RasterOperator ,src *Bitmap ,sx ,sy int )error {return _ece (_fagca ,dx ,dy ,dw ,dh ,op ,src ,sx ,sy );};const (MopDilation MorphOperation =iota ;MopErosion ;MopOpening ;MopClosing ;
-MopRankBinaryReduction ;MopReplicativeBinaryExpansion ;MopAddBorder ;);func _defa (_ebfd *Bitmap ,_gcbdc ...MorphProcess )(_dfcef *Bitmap ,_faed error ){const _fcebg ="\u006d\u006f\u0072\u0070\u0068\u0053\u0065\u0071\u0075\u0065\u006e\u0063\u0065";if _ebfd ==nil {return nil ,_a .Error (_fcebg ,"\u006d\u006f\u0072\u0070\u0068\u0053\u0065\u0071\u0075\u0065\u006e\u0063\u0065 \u0073\u006f\u0075\u0072\u0063\u0065 \u0062\u0069\u0074\u006d\u0061\u0070\u0020\u006e\u006f\u0074\u0020\u0064\u0065f\u0069\u006e\u0065\u0064");
-};if len (_gcbdc )==0{return nil ,_a .Error (_fcebg ,"m\u006f\u0072\u0070\u0068\u0053\u0065q\u0075\u0065\u006e\u0063\u0065\u002c \u0073\u0065\u0071\u0075\u0065\u006e\u0063e\u0020\u006e\u006f\u0074\u0020\u0064\u0065\u0066\u0069\u006ee\u0064");};if _faed =_aegcc (_gcbdc ...);
-_faed !=nil {return nil ,_a .Wrap (_faed ,_fcebg ,"");};var _adeeg ,_ffde ,_cgae int ;_dfcef =_ebfd .Copy ();for _ ,_cdge :=range _gcbdc {switch _cdge .Operation {case MopDilation :_adeeg ,_ffde =_cdge .getWidthHeight ();_dfcef ,_faed =DilateBrick (nil ,_dfcef ,_adeeg ,_ffde );
-if _faed !=nil {return nil ,_a .Wrap (_faed ,_fcebg ,"");};case MopErosion :_adeeg ,_ffde =_cdge .getWidthHeight ();_dfcef ,_faed =_dfdg (nil ,_dfcef ,_adeeg ,_ffde );if _faed !=nil {return nil ,_a .Wrap (_faed ,_fcebg ,"");};case MopOpening :_adeeg ,_ffde =_cdge .getWidthHeight ();
-_dfcef ,_faed =_dage (nil ,_dfcef ,_adeeg ,_ffde );if _faed !=nil {return nil ,_a .Wrap (_faed ,_fcebg ,"");};case MopClosing :_adeeg ,_ffde =_cdge .getWidthHeight ();_dfcef ,_faed =_cgad (nil ,_dfcef ,_adeeg ,_ffde );if _faed !=nil {return nil ,_a .Wrap (_faed ,_fcebg ,"");
-};case MopRankBinaryReduction :_dfcef ,_faed =_adc (_dfcef ,_cdge .Arguments ...);if _faed !=nil {return nil ,_a .Wrap (_faed ,_fcebg ,"");};case MopReplicativeBinaryExpansion :_dfcef ,_faed =_fceb (_dfcef ,_cdge .Arguments [0]);if _faed !=nil {return nil ,_a .Wrap (_faed ,_fcebg ,"");
-};case MopAddBorder :_cgae =_cdge .Arguments [0];_dfcef ,_faed =_dfcef .AddBorder (_cgae ,0);if _faed !=nil {return nil ,_a .Wrap (_faed ,_fcebg ,"");};default:return nil ,_a .Error (_fcebg ,"i\u006e\u0076\u0061\u006c\u0069\u0064\u0020\u006d\u006fr\u0070\u0068\u004f\u0070\u0065\u0072\u0061ti\u006f\u006e\u0020\u0070r\u006f\u0076\u0069\u0064\u0065\u0064\u0020\u0074\u006f t\u0068\u0065 \u0073\u0065\u0071\u0075\u0065\u006e\u0063\u0065");
-};};if _cgae > 0{_dfcef ,_faed =_dfcef .RemoveBorder (_cgae );if _faed !=nil {return nil ,_a .Wrap (_faed ,_fcebg ,"\u0062\u006f\u0072\u0064\u0065\u0072\u0020\u003e\u0020\u0030");};};return _dfcef ,nil ;};func TstTSymbol (t *_c .T ,scale ...int )*Bitmap {_fcgd ,_gbadd :=NewWithData (5,5,[]byte {0xF8,0x20,0x20,0x20,0x20});
-_d .NoError (t ,_gbadd );return TstGetScaledSymbol (t ,_fcgd ,scale ...);};func NewWithData (width ,height int ,data []byte )(*Bitmap ,error ){const _becd ="N\u0065\u0077\u0057\u0069\u0074\u0068\u0044\u0061\u0074\u0061";_age :=_dad (width ,height );_age .Data =data ;
-if len (data )< height *_age .RowStride {return nil ,_a .Errorf (_becd ,"\u0069\u006e\u0076\u0061\u006c\u0069\u0064\u0020\u0064\u0061\u0074\u0061\u0020l\u0065\u006e\u0067\u0074\u0068\u003a \u0025\u0064\u0020\u002d\u0020\u0073\u0068\u006f\u0075\u006c\u0064\u0020\u0062e\u003a\u0020\u0025\u0064",len (data ),height *_age .RowStride );
-};return _age ,nil ;};func (_cacd *byHeight )Swap (i ,j int ){_cacd .Values [i ],_cacd .Values [j ]=_cacd .Values [j ],_cacd .Values [i ];if _cacd .Boxes !=nil {_cacd .Boxes [i ],_cacd .Boxes [j ]=_cacd .Boxes [j ],_cacd .Boxes [i ];};};func (_dfga *Bitmap )connComponentsBB (_cbgc int )(_fagc *Boxes ,_gcbf error ){const _edfgc ="\u0042\u0069\u0074ma\u0070\u002e\u0063\u006f\u006e\u006e\u0043\u006f\u006d\u0070\u006f\u006e\u0065\u006e\u0074\u0073\u0042\u0042";
-if _cbgc !=4&&_cbgc !=8{return nil ,_a .Error (_edfgc ,"\u0063\u006f\u006e\u006e\u0065\u0063t\u0069\u0076\u0069\u0074\u0079\u0020\u006d\u0075\u0073\u0074\u0020\u0062\u0065 \u0061\u0020\u0027\u0034\u0027\u0020\u006fr\u0020\u0027\u0038\u0027");};if _dfga .Zero (){return &Boxes {},nil ;
-};_dfga .setPadBits (0);_fbcf ,_gcbf :=_fedg (nil ,_dfga );if _gcbf !=nil {return nil ,_a .Wrap (_gcbf ,_edfgc ,"\u0062\u006d\u0031");};_deeb :=&_ge .Stack {};_deeb .Aux =&_ge .Stack {};_fagc =&Boxes {};var (_aegc ,_cadg int ;_egbd _bf .Point ;_cadf bool ;
-_gabg *_bf .Rectangle ;);for {if _egbd ,_cadf ,_gcbf =_fbcf .nextOnPixel (_cadg ,_aegc );_gcbf !=nil {return nil ,_a .Wrap (_gcbf ,_edfgc ,"");};if !_cadf {break ;};if _gabg ,_gcbf =_dgeba (_fbcf ,_deeb ,_egbd .X ,_egbd .Y ,_cbgc );_gcbf !=nil {return nil ,_a .Wrap (_gcbf ,_edfgc ,"");
-};if _gcbf =_fagc .Add (_gabg );_gcbf !=nil {return nil ,_a .Wrap (_gcbf ,_edfgc ,"");};_cadg =_egbd .X ;_aegc =_egbd .Y ;};return _fagc ,nil ;};func (_cfcb *Bitmaps )AddBitmap (bm *Bitmap ){_cfcb .Values =append (_cfcb .Values ,bm )};const (_dgfb shift =iota ;
-_acce ;);func _dage (_gdgc ,_abea *Bitmap ,_cgge ,_bggb int )(*Bitmap ,error ){const _debcd ="\u006fp\u0065\u006e\u0042\u0072\u0069\u0063k";if _abea ==nil {return nil ,_a .Error (_debcd ,"\u0073o\u0075\u0072\u0063\u0065 \u0062\u0069\u0074\u006d\u0061p\u0020n\u006ft\u0020\u0064\u0065\u0066\u0069\u006e\u0065d");
-};if _cgge < 1&&_bggb < 1{return nil ,_a .Error (_debcd ,"\u0068\u0053\u0069\u007ae \u003c\u0020\u0031\u0020\u0026\u0026\u0020\u0076\u0053\u0069\u007a\u0065\u0020\u003c \u0031");};if _cgge ==1&&_bggb ==1{return _abea .Copy (),nil ;};if _cgge ==1||_bggb ==1{var _fafb error ;
-_faa :=SelCreateBrick (_bggb ,_cgge ,_bggb /2,_cgge /2,SelHit );_gdgc ,_fafb =_fff (_gdgc ,_abea ,_faa );if _fafb !=nil {return nil ,_a .Wrap (_fafb ,_debcd ,"\u0068S\u0069\u007a\u0065\u0020\u003d\u003d\u0020\u0031\u0020\u007c\u007c \u0076\u0053\u0069\u007a\u0065\u0020\u003d\u003d\u0020\u0031");
-};return _gdgc ,nil ;};_agcc :=SelCreateBrick (1,_cgge ,0,_cgge /2,SelHit );_cgdc :=SelCreateBrick (_bggb ,1,_bggb /2,0,SelHit );_ccdc ,_bcfg :=_bfcc (nil ,_abea ,_agcc );if _bcfg !=nil {return nil ,_a .Wrap (_bcfg ,_debcd ,"\u0031s\u0074\u0020\u0065\u0072\u006f\u0064e");
-};_gdgc ,_bcfg =_bfcc (_gdgc ,_ccdc ,_cgdc );if _bcfg !=nil {return nil ,_a .Wrap (_bcfg ,_debcd ,"\u0032n\u0064\u0020\u0065\u0072\u006f\u0064e");};_ ,_bcfg =_acga (_ccdc ,_gdgc ,_agcc );if _bcfg !=nil {return nil ,_a .Wrap (_bcfg ,_debcd ,"\u0031\u0073\u0074\u0020\u0064\u0069\u006c\u0061\u0074\u0065");
-};_ ,_bcfg =_acga (_gdgc ,_ccdc ,_cgdc );if _bcfg !=nil {return nil ,_a .Wrap (_bcfg ,_debcd ,"\u0032\u006e\u0064\u0020\u0064\u0069\u006c\u0061\u0074\u0065");};return _gdgc ,nil ;};func _dfdg (_abcg ,_gca *Bitmap ,_feag ,_gfec int )(*Bitmap ,error ){const _dddc ="\u0065\u0072\u006f\u0064\u0065\u0042\u0072\u0069\u0063\u006b";
-if _gca ==nil {return nil ,_a .Error (_dddc ,"\u0073o\u0075r\u0063\u0065\u0020\u006e\u006ft\u0020\u0064e\u0066\u0069\u006e\u0065\u0064");};if _feag < 1||_gfec < 1{return nil ,_a .Error (_dddc ,"\u0068\u0073\u0069\u007a\u0065\u0020\u0061\u006e\u0064\u0020\u0076\u0073\u0069\u007a\u0065\u0020\u0061\u0072e\u0020\u006e\u006f\u0074\u0020\u0067\u0072e\u0061\u0074\u0065\u0072\u0020\u0074\u0068\u0061\u006e\u0020\u006fr\u0020\u0065\u0071\u0075\u0061\u006c\u0020\u0074\u006f\u0020\u0031");
-};if _feag ==1&&_gfec ==1{_edacf ,_afef :=_fedg (_abcg ,_gca );if _afef !=nil {return nil ,_a .Wrap (_afef ,_dddc ,"\u0068S\u0069\u007a\u0065\u0020\u003d\u003d\u0020\u0031\u0020\u0026\u0026 \u0076\u0053\u0069\u007a\u0065\u0020\u003d\u003d\u0020\u0031");
-};return _edacf ,nil ;};if _feag ==1||_gfec ==1{_babg :=SelCreateBrick (_gfec ,_feag ,_gfec /2,_feag /2,SelHit );_deea ,_ecag :=_bfcc (_abcg ,_gca ,_babg );if _ecag !=nil {return nil ,_a .Wrap (_ecag ,_dddc ,"\u0068S\u0069\u007a\u0065\u0020\u003d\u003d\u0020\u0031\u0020\u007c\u007c \u0076\u0053\u0069\u007a\u0065\u0020\u003d\u003d\u0020\u0031");
-};return _deea ,nil ;};_cddf :=SelCreateBrick (1,_feag ,0,_feag /2,SelHit );_aaaaa :=SelCreateBrick (_gfec ,1,_gfec /2,0,SelHit );_bdbed ,_egca :=_bfcc (nil ,_gca ,_cddf );if _egca !=nil {return nil ,_a .Wrap (_egca ,_dddc ,"\u0031s\u0074\u0020\u0065\u0072\u006f\u0064e");
-};_abcg ,_egca =_bfcc (_abcg ,_bdbed ,_aaaaa );if _egca !=nil {return nil ,_a .Wrap (_egca ,_dddc ,"\u0032n\u0064\u0020\u0065\u0072\u006f\u0064e");};return _abcg ,nil ;};type Getter interface{GetBitmap ()*Bitmap ;};type Color int ;func CorrelationScoreThresholded (bm1 ,bm2 *Bitmap ,area1 ,area2 int ,delX ,delY float32 ,maxDiffW ,maxDiffH int ,tab ,downcount []int ,scoreThreshold float32 )(bool ,error ){const _gfda ="C\u006f\u0072\u0072\u0065\u006c\u0061t\u0069\u006f\u006e\u0053\u0063\u006f\u0072\u0065\u0054h\u0072\u0065\u0073h\u006fl\u0064\u0065\u0064";
-if bm1 ==nil {return false ,_a .Error (_gfda ,"\u0063\u006f\u0072\u0072\u0065\u006c\u0061\u0074\u0069\u006f\u006e\u0053\u0063\u006f\u0072\u0065\u0054\u0068\u0072\u0065\u0073\u0068\u006f\u006cd\u0065\u0064\u0020\u0062\u006d1\u0020\u0069s\u0020\u006e\u0069\u006c");
-};if bm2 ==nil {return false ,_a .Error (_gfda ,"\u0063\u006f\u0072\u0072\u0065\u006c\u0061\u0074\u0069\u006f\u006e\u0053\u0063\u006f\u0072\u0065\u0054\u0068\u0072\u0065\u0073\u0068\u006f\u006cd\u0065\u0064\u0020\u0062\u006d2\u0020\u0069s\u0020\u006e\u0069\u006c");
-};if area1 <=0||area2 <=0{return false ,_a .Error (_gfda ,"c\u006f\u0072\u0072\u0065\u006c\u0061\u0074\u0069\u006fn\u0053\u0063\u006f\u0072\u0065\u0054\u0068re\u0073\u0068\u006f\u006cd\u0065\u0064\u0020\u002d\u0020\u0061\u0072\u0065\u0061s \u006d\u0075s\u0074\u0020\u0062\u0065\u0020\u003e\u0020\u0030");
-};if downcount ==nil {return false ,_a .Error (_gfda ,"\u0070\u0072\u006fvi\u0064\u0065\u0064\u0020\u006e\u006f\u0020\u0027\u0064\u006f\u0077\u006e\u0063\u006f\u0075\u006e\u0074\u0027");};if tab ==nil {return false ,_a .Error (_gfda ,"p\u0072\u006f\u0076\u0069de\u0064 \u006e\u0069\u006c\u0020\u0027s\u0075\u006d\u0074\u0061\u0062\u0027");
-};_aecf ,_ceaf :=bm1 .Width ,bm1 .Height ;_fcad ,_ccbea :=bm2 .Width ,bm2 .Height ;if _ge .Abs (_aecf -_fcad )> maxDiffW {return false ,nil ;};if _ge .Abs (_ceaf -_ccbea )> maxDiffH {return false ,nil ;};_gedb :=int (delX +_ge .Sign (delX )*0.5);_dbcda :=int (delY +_ge .Sign (delY )*0.5);
-_ggab :=int (_ad .Ceil (_ad .Sqrt (float64 (scoreThreshold )*float64 (area1 )*float64 (area2 ))));_gdff :=bm2 .RowStride ;_cacge :=_aega (_dbcda ,0);_egegg :=_efd (_ccbea +_dbcda ,_ceaf );_adg :=bm1 .RowStride *_cacge ;_ffg :=bm2 .RowStride *(_cacge -_dbcda );
-var _fecf int ;if _egegg <=_ceaf {_fecf =downcount [_egegg -1];};_dfge :=_aega (_gedb ,0);_fbcb :=_efd (_fcad +_gedb ,_aecf );var _ebcd ,_cdga int ;if _gedb >=8{_ebcd =_gedb >>3;_adg +=_ebcd ;_dfge -=_ebcd <<3;_fbcb -=_ebcd <<3;_gedb &=7;}else if _gedb <=-8{_cdga =-((_gedb +7)>>3);
-_ffg +=_cdga ;_gdff -=_cdga ;_gedb +=_cdga <<3;};var (_adde ,_geag ,_adfca int ;_fafc ,_dfa ,_bddf byte ;);if _dfge >=_fbcb ||_cacge >=_egegg {return false ,nil ;};_cbdfg :=(_fbcb +7)>>3;switch {case _gedb ==0:for _geag =_cacge ;_geag < _egegg ;_geag ,_adg ,_ffg =_geag +1,_adg +bm1 .RowStride ,_ffg +bm2 .RowStride {for _adfca =0;
-_adfca < _cbdfg ;_adfca ++{_fafc =bm1 .Data [_adg +_adfca ]&bm2 .Data [_ffg +_adfca ];_adde +=tab [_fafc ];};if _adde >=_ggab {return true ,nil ;};if _bfbc :=_adde +downcount [_geag ]-_fecf ;_bfbc < _ggab {return false ,nil ;};};case _gedb > 0&&_gdff < _cbdfg :for _geag =_cacge ;
-_geag < _egegg ;_geag ,_adg ,_ffg =_geag +1,_adg +bm1 .RowStride ,_ffg +bm2 .RowStride {_dfa =bm1 .Data [_adg ];_bddf =bm2 .Data [_ffg ]>>uint (_gedb );_fafc =_dfa &_bddf ;_adde +=tab [_fafc ];for _adfca =1;_adfca < _gdff ;_adfca ++{_dfa =bm1 .Data [_adg +_adfca ];
-_bddf =bm2 .Data [_ffg +_adfca ]>>uint (_gedb )|bm2 .Data [_ffg +_adfca -1]<<uint (8-_gedb );_fafc =_dfa &_bddf ;_adde +=tab [_fafc ];};_dfa =bm1 .Data [_adg +_adfca ];_bddf =bm2 .Data [_ffg +_adfca -1]<<uint (8-_gedb );_fafc =_dfa &_bddf ;_adde +=tab [_fafc ];
-if _adde >=_ggab {return true ,nil ;}else if _adde +downcount [_geag ]-_fecf < _ggab {return false ,nil ;};};case _gedb > 0&&_gdff >=_cbdfg :for _geag =_cacge ;_geag < _egegg ;_geag ,_adg ,_ffg =_geag +1,_adg +bm1 .RowStride ,_ffg +bm2 .RowStride {_dfa =bm1 .Data [_adg ];
-_bddf =bm2 .Data [_ffg ]>>uint (_gedb );_fafc =_dfa &_bddf ;_adde +=tab [_fafc ];for _adfca =1;_adfca < _cbdfg ;_adfca ++{_dfa =bm1 .Data [_adg +_adfca ];_bddf =bm2 .Data [_ffg +_adfca ]>>uint (_gedb );_bddf |=bm2 .Data [_ffg +_adfca -1]<<uint (8-_gedb );
-_fafc =_dfa &_bddf ;_adde +=tab [_fafc ];};if _adde >=_ggab {return true ,nil ;}else if _adde +downcount [_geag ]-_fecf < _ggab {return false ,nil ;};};case _cbdfg < _gdff :for _geag =_cacge ;_geag < _egegg ;_geag ,_adg ,_ffg =_geag +1,_adg +bm1 .RowStride ,_ffg +bm2 .RowStride {for _adfca =0;
-_adfca < _cbdfg ;_adfca ++{_dfa =bm1 .Data [_adg +_adfca ];_bddf =bm2 .Data [_ffg +_adfca ]<<uint (-_gedb );_bddf |=bm2 .Data [_ffg +_adfca +1]>>uint (8+_gedb );_fafc =_dfa &_bddf ;_adde +=tab [_fafc ];};if _adde >=_ggab {return true ,nil ;}else if _bcce :=_adde +downcount [_geag ]-_fecf ;
-_bcce < _ggab {return false ,nil ;};};case _gdff >=_cbdfg :for _geag =_cacge ;_geag < _egegg ;_geag ,_adg ,_ffg =_geag +1,_adg +bm1 .RowStride ,_ffg +bm2 .RowStride {for _adfca =0;_adfca < _cbdfg ;_adfca ++{_dfa =bm1 .Data [_adg +_adfca ];_bddf =bm2 .Data [_ffg +_adfca ]<<uint (-_gedb );
-_bddf |=bm2 .Data [_ffg +_adfca +1]>>uint (8+_gedb );_fafc =_dfa &_bddf ;_adde +=tab [_fafc ];};_dfa =bm1 .Data [_adg +_adfca ];_bddf =bm2 .Data [_ffg +_adfca ]<<uint (-_gedb );_fafc =_dfa &_bddf ;_adde +=tab [_fafc ];if _adde >=_ggab {return true ,nil ;
-}else if _adde +downcount [_geag ]-_fecf < _ggab {return false ,nil ;};};};_debc :=float32 (_adde )*float32 (_adde )/(float32 (area1 )*float32 (area2 ));if _debc >=scoreThreshold {_dc .Log .Trace ("\u0063\u006f\u0075\u006e\u0074\u003a\u0020\u0025\u0064\u0020\u003c\u0020\u0074\u0068\u0072\u0065\u0073\u0068\u006f\u006cd\u0020\u0025\u0064\u0020\u0062\u0075\u0074\u0020\u0073c\u006f\u0072\u0065\u0020\u0025\u0066\u0020\u003e\u003d\u0020\u0073\u0063\u006fr\u0065\u0054\u0068\u0072\u0065\u0073h\u006f\u006c\u0064 \u0025\u0066",_adde ,_ggab ,_debc ,scoreThreshold );
-};return false ,nil ;};func _bfcc (_eebaa ,_ffbd *Bitmap ,_cfdd *Selection )(*Bitmap ,error ){const _afbbd ="\u0065\u0072\u006fd\u0065";var (_bdbe error ;_ebdf *Bitmap ;);_eebaa ,_bdbe =_bfbb (_eebaa ,_ffbd ,_cfdd ,&_ebdf );if _bdbe !=nil {return nil ,_a .Wrap (_bdbe ,_afbbd ,"");
-};if _bdbe =_eebaa .setAll ();_bdbe !=nil {return nil ,_a .Wrap (_bdbe ,_afbbd ,"");};var _bbf SelectionValue ;for _dcbg :=0;_dcbg < _cfdd .Height ;_dcbg ++{for _dgadb :=0;_dgadb < _cfdd .Width ;_dgadb ++{_bbf =_cfdd .Data [_dcbg ][_dgadb ];if _bbf ==SelHit {_bdbe =_ece (_eebaa ,_cfdd .Cx -_dgadb ,_cfdd .Cy -_dcbg ,_ffbd .Width ,_ffbd .Height ,PixSrcAndDst ,_ebdf ,0,0);
-if _bdbe !=nil {return nil ,_a .Wrap (_bdbe ,_afbbd ,"");};};};};if MorphBC ==SymmetricMorphBC {return _eebaa ,nil ;};_bfe ,_gcfg ,_gcde ,_bcgg :=_cfdd .findMaxTranslations ();if _bfe > 0{if _bdbe =_eebaa .RasterOperation (0,0,_bfe ,_ffbd .Height ,PixClr ,nil ,0,0);
-_bdbe !=nil {return nil ,_a .Wrap (_bdbe ,_afbbd ,"\u0078\u0070\u0020\u003e\u0020\u0030");};};if _gcde > 0{if _bdbe =_eebaa .RasterOperation (_ffbd .Width -_gcde ,0,_gcde ,_ffbd .Height ,PixClr ,nil ,0,0);_bdbe !=nil {return nil ,_a .Wrap (_bdbe ,_afbbd ,"\u0078\u006e\u0020\u003e\u0020\u0030");
-};};if _gcfg > 0{if _bdbe =_eebaa .RasterOperation (0,0,_ffbd .Width ,_gcfg ,PixClr ,nil ,0,0);_bdbe !=nil {return nil ,_a .Wrap (_bdbe ,_afbbd ,"\u0079\u0070\u0020\u003e\u0020\u0030");};};if _bcgg > 0{if _bdbe =_eebaa .RasterOperation (0,_ffbd .Height -_bcgg ,_ffbd .Width ,_bcgg ,PixClr ,nil ,0,0);
-_bdbe !=nil {return nil ,_a .Wrap (_bdbe ,_afbbd ,"\u0079\u006e\u0020\u003e\u0020\u0030");};};return _eebaa ,nil ;};func TstRSymbol (t *_c .T ,scale ...int )*Bitmap {_geggg ,_badcf :=NewWithData (4,5,[]byte {0xF0,0x90,0xF0,0xA0,0x90});_d .NoError (t ,_badcf );
-return TstGetScaledSymbol (t ,_geggg ,scale ...);};func DilateBrick (d ,s *Bitmap ,hSize ,vSize int )(*Bitmap ,error ){return _edacg (d ,s ,hSize ,vSize )};func (_ggdcd *Boxes )makeSizeIndicator (_dcg ,_daea int ,_baeg LocationFilter ,_edcd SizeComparison )*_ge .NumSlice {_gcgb :=&_ge .NumSlice {};
-var _becf ,_dbd ,_gbcd int ;for _ ,_acfa :=range *_ggdcd {_becf =0;_dbd ,_gbcd =_acfa .Dx (),_acfa .Dy ();switch _baeg {case LocSelectWidth :if (_edcd ==SizeSelectIfLT &&_dbd < _dcg )||(_edcd ==SizeSelectIfGT &&_dbd > _dcg )||(_edcd ==SizeSelectIfLTE &&_dbd <=_dcg )||(_edcd ==SizeSelectIfGTE &&_dbd >=_dcg ){_becf =1;
-};case LocSelectHeight :if (_edcd ==SizeSelectIfLT &&_gbcd < _daea )||(_edcd ==SizeSelectIfGT &&_gbcd > _daea )||(_edcd ==SizeSelectIfLTE &&_gbcd <=_daea )||(_edcd ==SizeSelectIfGTE &&_gbcd >=_daea ){_becf =1;};case LocSelectIfEither :if (_edcd ==SizeSelectIfLT &&(_gbcd < _daea ||_dbd < _dcg ))||(_edcd ==SizeSelectIfGT &&(_gbcd > _daea ||_dbd > _dcg ))||(_edcd ==SizeSelectIfLTE &&(_gbcd <=_daea ||_dbd <=_dcg ))||(_edcd ==SizeSelectIfGTE &&(_gbcd >=_daea ||_dbd >=_dcg )){_becf =1;
-};case LocSelectIfBoth :if (_edcd ==SizeSelectIfLT &&(_gbcd < _daea &&_dbd < _dcg ))||(_edcd ==SizeSelectIfGT &&(_gbcd > _daea &&_dbd > _dcg ))||(_edcd ==SizeSelectIfLTE &&(_gbcd <=_daea &&_dbd <=_dcg ))||(_edcd ==SizeSelectIfGTE &&(_gbcd >=_daea &&_dbd >=_dcg )){_becf =1;
-};};_gcgb .AddInt (_becf );};return _gcgb ;};func _ebac (_gaabf ,_dfgd *Bitmap ,_gegb *Selection )(*Bitmap ,error ){const _baff ="\u0070\u0072\u006f\u0063\u0065\u0073\u0073\u004d\u006f\u0072\u0070\u0068A\u0072\u0067\u0073\u0032";var _fbda ,_gfbdd int ;
-if _dfgd ==nil {return nil ,_a .Error (_baff ,"s\u006fu\u0072\u0063\u0065\u0020\u0062\u0069\u0074\u006da\u0070\u0020\u0069\u0073 n\u0069\u006c");};if _gegb ==nil {return nil ,_a .Error (_baff ,"\u0073e\u006c \u006e\u006f\u0074\u0020\u0064\u0065\u0066\u0069\u006e\u0065\u0064");
-};_fbda =_gegb .Width ;_gfbdd =_gegb .Height ;if _fbda ==0||_gfbdd ==0{return nil ,_a .Error (_baff ,"\u0073\u0065\u006c\u0020\u006f\u0066\u0020\u0073\u0069\u007a\u0065\u0020\u0030");};if _gaabf ==nil {return _dfgd .createTemplate (),nil ;};if _agdd :=_gaabf .resizeImageData (_dfgd );
-_agdd !=nil {return nil ,_agdd ;};return _gaabf ,nil ;};func _aega (_bfb ,_fag int )int {if _bfb > _fag {return _bfb ;};return _fag ;};func (_gdg *Bitmap )GetByteIndex (x ,y int )int {return y *_gdg .RowStride +(x >>3)};type ClassedPoints struct{*Points ;
-_ge .IntSlice ;_ggfg func (_cfb ,_ebaff int )bool ;};type LocationFilter int ;func (_bgdec *BitmapsArray )AddBox (box *_bf .Rectangle ){_bgdec .Boxes =append (_bgdec .Boxes ,box )};func (_cef *Bitmap )RemoveBorder (borderSize int )(*Bitmap ,error ){if borderSize ==0{return _cef .Copy (),nil ;
-};_bfd ,_bgc :=_cef .removeBorderGeneral (borderSize ,borderSize ,borderSize ,borderSize );if _bgc !=nil {return nil ,_a .Wrap (_bgc ,"\u0052\u0065\u006do\u0076\u0065\u0042\u006f\u0072\u0064\u0065\u0072","");};return _bfd ,nil ;};func Centroids (bms []*Bitmap )(*Points ,error ){_cded :=make ([]Point ,len (bms ));
-_bcfc :=_bfcce ();_fcce :=_afgg ();var _adfcc error ;for _bccec ,_cccgg :=range bms {_cded [_bccec ],_adfcc =_cccgg .centroid (_bcfc ,_fcce );if _adfcc !=nil {return nil ,_adfcc ;};};_gfbd :=Points (_cded );return &_gfbd ,nil ;};func _abb ()(_dca [256]uint64 ){for _cdd :=0;
-_cdd < 256;_cdd ++{if _cdd &0x01!=0{_dca [_cdd ]|=0xff;};if _cdd &0x02!=0{_dca [_cdd ]|=0xff00;};if _cdd &0x04!=0{_dca [_cdd ]|=0xff0000;};if _cdd &0x08!=0{_dca [_cdd ]|=0xff000000;};if _cdd &0x10!=0{_dca [_cdd ]|=0xff00000000;};if _cdd &0x20!=0{_dca [_cdd ]|=0xff0000000000;
-};if _cdd &0x40!=0{_dca [_cdd ]|=0xff000000000000;};if _cdd &0x80!=0{_dca [_cdd ]|=0xff00000000000000;};};return _dca ;};func (_ffee *Bitmap )String ()string {var _bagf ="\u000a";for _gde :=0;_gde < _ffee .Height ;_gde ++{var _fca string ;for _fgd :=0;
-_fgd < _ffee .Width ;_fgd ++{_daac :=_ffee .GetPixel (_fgd ,_gde );if _daac {_fca +="\u0031";}else {_fca +="\u0030";};};_bagf +=_fca +"\u000a";};return _bagf ;};func (_bda CombinationOperator )String ()string {var _adea string ;switch _bda {case CmbOpOr :_adea ="\u004f\u0052";
-case CmbOpAnd :_adea ="\u0041\u004e\u0044";case CmbOpXor :_adea ="\u0058\u004f\u0052";case CmbOpXNor :_adea ="\u0058\u004e\u004f\u0052";case CmbOpReplace :_adea ="\u0052E\u0050\u004c\u0041\u0043\u0045";case CmbOpNot :_adea ="\u004e\u004f\u0054";};return _adea ;
-};func TstWSymbol (t *_c .T ,scale ...int )*Bitmap {_badcc ,_ccab :=NewWithData (5,5,[]byte {0x88,0x88,0xA8,0xD8,0x88});_d .NoError (t ,_ccab );return TstGetScaledSymbol (t ,_badcc ,scale ...);};func (_fcdgc *Bitmaps )selectByIndicator (_bfcf *_ge .NumSlice )(_fcgab *Bitmaps ,_gceb error ){const _gefg ="\u0042i\u0074\u006d\u0061\u0070s\u002e\u0073\u0065\u006c\u0065c\u0074B\u0079I\u006e\u0064\u0069\u0063\u0061\u0074\u006fr";
-if _fcdgc ==nil {return nil ,_a .Error (_gefg ,"\u0027\u0062\u0027 b\u0069\u0074\u006d\u0061\u0070\u0073\u0020\u006e\u006f\u0074\u0020\u0064\u0065\u0066\u0069\u006e\u0065\u0064");};if _bfcf ==nil {return nil ,_a .Error (_gefg ,"'\u006e\u0061\u0027\u0020\u0069\u006ed\u0069\u0063\u0061\u0074\u006f\u0072\u0073\u0020\u006eo\u0074\u0020\u0064e\u0066i\u006e\u0065\u0064");
-};if len (_fcdgc .Values )==0{return _fcdgc ,nil ;};if len (*_bfcf )!=len (_fcdgc .Values ){return nil ,_a .Errorf (_gefg ,"\u006ea\u0020\u006ce\u006e\u0067\u0074\u0068:\u0020\u0025\u0064,\u0020\u0069\u0073\u0020\u0064\u0069\u0066\u0066\u0065re\u006e\u0074\u0020t\u0068\u0061n\u0020\u0062\u0069\u0074\u006d\u0061p\u0073\u003a \u0025\u0064",len (*_bfcf ),len (_fcdgc .Values ));
-};var _bgbdd ,_agfd ,_ffbgdd int ;for _agfd =0;_agfd < len (*_bfcf );_agfd ++{if _bgbdd ,_gceb =_bfcf .GetInt (_agfd );_gceb !=nil {return nil ,_a .Wrap (_gceb ,_gefg ,"f\u0069\u0072\u0073\u0074\u0020\u0063\u0068\u0065\u0063\u006b");};if _bgbdd ==1{_ffbgdd ++;
-};};if _ffbgdd ==len (_fcdgc .Values ){return _fcdgc ,nil ;};_fcgab =&Bitmaps {};_dcgf :=len (_fcdgc .Values )==len (_fcdgc .Boxes );for _agfd =0;_agfd < len (*_bfcf );_agfd ++{if _bgbdd =int ((*_bfcf )[_agfd ]);_bgbdd ==0{continue ;};_fcgab .Values =append (_fcgab .Values ,_fcdgc .Values [_agfd ]);
-if _dcgf {_fcgab .Boxes =append (_fcgab .Boxes ,_fcdgc .Boxes [_agfd ]);};};return _fcgab ,nil ;};func (_gfg *Bitmap )resizeImageData (_cagb *Bitmap )error {if _cagb ==nil {return _a .Error ("\u0072e\u0073i\u007a\u0065\u0049\u006d\u0061\u0067\u0065\u0044\u0061\u0074\u0061","\u0073r\u0063 \u0069\u0073\u0020\u006e\u006ft\u0020\u0064e\u0066\u0069\u006e\u0065\u0064");
-};if _gfg .SizesEqual (_cagb ){return nil ;};_gfg .Data =make ([]byte ,len (_cagb .Data ));_gfg .Width =_cagb .Width ;_gfg .Height =_cagb .Height ;_gfg .RowStride =_cagb .RowStride ;return nil ;};func _fff (_aedc ,_ggdb *Bitmap ,_dbdc *Selection )(*Bitmap ,error ){const _afad ="\u006f\u0070\u0065\u006e";
-var _ffgb error ;_aedc ,_ffgb =_ebac (_aedc ,_ggdb ,_dbdc );if _ffgb !=nil {return nil ,_a .Wrap (_ffgb ,_afad ,"");};_edaf ,_ffgb :=_bfcc (nil ,_ggdb ,_dbdc );if _ffgb !=nil {return nil ,_a .Wrap (_ffgb ,_afad ,"");};_ ,_ffgb =_acga (_aedc ,_edaf ,_dbdc );
-if _ffgb !=nil {return nil ,_a .Wrap (_ffgb ,_afad ,"");};return _aedc ,nil ;};type Component int ;func (_dcfa *Bitmap )connComponentsBitmapsBB (_afae *Bitmaps ,_cfdg int )(_fge *Boxes ,_gbe error ){const _gffd ="\u0063\u006f\u006enC\u006f\u006d\u0070\u006f\u006e\u0065\u006e\u0074\u0073\u0042\u0069\u0074\u006d\u0061\u0070\u0073\u0042\u0042";
-if _cfdg !=4&&_cfdg !=8{return nil ,_a .Error (_gffd ,"\u0063\u006f\u006e\u006e\u0065\u0063t\u0069\u0076\u0069\u0074\u0079\u0020\u006d\u0075\u0073\u0074\u0020\u0062\u0065 \u0061\u0020\u0027\u0034\u0027\u0020\u006fr\u0020\u0027\u0038\u0027");};if _afae ==nil {return nil ,_a .Error (_gffd ,"p\u0072o\u0076\u0069\u0064\u0065\u0064\u0020\u006e\u0069l\u0020\u0042\u0069\u0074ma\u0070\u0073");
-};if len (_afae .Values )> 0{return nil ,_a .Error (_gffd ,"\u0070\u0072\u006f\u0076\u0069\u0064\u0065\u0064\u0020\u006e\u006fn\u002d\u0065\u006d\u0070\u0074\u0079\u0020\u0042\u0069\u0074m\u0061\u0070\u0073");};if _dcfa .Zero (){return &Boxes {},nil ;};
-var (_edgg ,_edcde ,_bef ,_becaf *Bitmap ;);_dcfa .setPadBits (0);if _edgg ,_gbe =_fedg (nil ,_dcfa );_gbe !=nil {return nil ,_a .Wrap (_gbe ,_gffd ,"\u0062\u006d\u0031");};if _edcde ,_gbe =_fedg (nil ,_dcfa );_gbe !=nil {return nil ,_a .Wrap (_gbe ,_gffd ,"\u0062\u006d\u0032");
-};_fbfc :=&_ge .Stack {};_fbfc .Aux =&_ge .Stack {};_fge =&Boxes {};var (_edgde ,_ecbf int ;_gae _bf .Point ;_acbg bool ;_bfca *_bf .Rectangle ;);for {if _gae ,_acbg ,_gbe =_edgg .nextOnPixel (_edgde ,_ecbf );_gbe !=nil {return nil ,_a .Wrap (_gbe ,_gffd ,"");
-};if !_acbg {break ;};if _bfca ,_gbe =_dgeba (_edgg ,_fbfc ,_gae .X ,_gae .Y ,_cfdg );_gbe !=nil {return nil ,_a .Wrap (_gbe ,_gffd ,"");};if _gbe =_fge .Add (_bfca );_gbe !=nil {return nil ,_a .Wrap (_gbe ,_gffd ,"");};if _bef ,_gbe =_edgg .clipRectangle (_bfca ,nil );
-_gbe !=nil {return nil ,_a .Wrap (_gbe ,_gffd ,"\u0062\u006d\u0033");};if _becaf ,_gbe =_edcde .clipRectangle (_bfca ,nil );_gbe !=nil {return nil ,_a .Wrap (_gbe ,_gffd ,"\u0062\u006d\u0034");};if _ ,_gbe =_dedg (_bef ,_bef ,_becaf );_gbe !=nil {return nil ,_a .Wrap (_gbe ,_gffd ,"\u0062m\u0033\u0020\u005e\u0020\u0062\u006d4");
-};if _gbe =_edcde .RasterOperation (_bfca .Min .X ,_bfca .Min .Y ,_bfca .Dx (),_bfca .Dy (),PixSrcXorDst ,_bef ,0,0);_gbe !=nil {return nil ,_a .Wrap (_gbe ,_gffd ,"\u0062\u006d\u0032\u0020\u002d\u0058\u004f\u0052\u002d>\u0020\u0062\u006d\u0033");};_afae .AddBitmap (_bef );
-_edgde =_gae .X ;_ecbf =_gae .Y ;};_afae .Boxes =*_fge ;return _fge ,nil ;};func TstFrameBitmap ()*Bitmap {return _ggbf .Copy ()};func (_dcdb *ClassedPoints )GroupByY ()([]*ClassedPoints ,error ){const _cdfef ="\u0043\u006c\u0061\u0073se\u0064\u0050\u006f\u0069\u006e\u0074\u0073\u002e\u0047\u0072\u006f\u0075\u0070\u0042y\u0059";
-if _faga :=_dcdb .validateIntSlice ();_faga !=nil {return nil ,_a .Wrap (_faga ,_cdfef ,"");};if _dcdb .IntSlice .Size ()==0{return nil ,_a .Error (_cdfef ,"\u004e\u006f\u0020\u0063la\u0073\u0073\u0065\u0073\u0020\u0070\u0072\u006f\u0076\u0069\u0064\u0065\u0064");
-};_dcdb .SortByY ();var (_cgda []*ClassedPoints ;_edda int ;);_ebec :=-1;var _eaec *ClassedPoints ;for _cdcd :=0;_cdcd < len (_dcdb .IntSlice );_cdcd ++{_edda =int (_dcdb .YAtIndex (_cdcd ));if _edda !=_ebec {_eaec =&ClassedPoints {Points :_dcdb .Points };
-_ebec =_edda ;_cgda =append (_cgda ,_eaec );};_eaec .IntSlice =append (_eaec .IntSlice ,_dcdb .IntSlice [_cdcd ]);};for _ ,_dgeb :=range _cgda {_dgeb .SortByX ();};return _cgda ,nil ;};func _efd (_gaa ,_bcfb int )int {if _gaa < _bcfb {return _gaa ;};return _bcfb ;
-};func _dedb (_bggf ,_fecdb *Bitmap ,_deff ,_cbda int )(_bba error ){const _fbefe ="\u0073e\u0065d\u0066\u0069\u006c\u006c\u0042i\u006e\u0061r\u0079\u004c\u006f\u0077\u0034";var (_bbdf ,_cabe ,_eefe ,_gaed int ;_cfec ,_cbdeb ,_defad ,_ccadc ,_dgaf ,_gegd ,_fbdf byte ;
-);for _bbdf =0;_bbdf < _deff ;_bbdf ++{_eefe =_bbdf *_bggf .RowStride ;_gaed =_bbdf *_fecdb .RowStride ;for _cabe =0;_cabe < _cbda ;_cabe ++{_cfec ,_bba =_bggf .GetByte (_eefe +_cabe );if _bba !=nil {return _a .Wrap (_bba ,_fbefe ,"\u0066i\u0072\u0073\u0074\u0020\u0067\u0065t");
-};_cbdeb ,_bba =_fecdb .GetByte (_gaed +_cabe );if _bba !=nil {return _a .Wrap (_bba ,_fbefe ,"\u0073\u0065\u0063\u006f\u006e\u0064\u0020\u0067\u0065\u0074");};if _bbdf > 0{_defad ,_bba =_bggf .GetByte (_eefe -_bggf .RowStride +_cabe );if _bba !=nil {return _a .Wrap (_bba ,_fbefe ,"\u0069\u0020\u003e \u0030");
-};_cfec |=_defad ;};if _cabe > 0{_ccadc ,_bba =_bggf .GetByte (_eefe +_cabe -1);if _bba !=nil {return _a .Wrap (_bba ,_fbefe ,"\u006a\u0020\u003e \u0030");};_cfec |=_ccadc <<7;};_cfec &=_cbdeb ;if _cfec ==0||(^_cfec )==0{if _bba =_bggf .SetByte (_eefe +_cabe ,_cfec );
-_bba !=nil {return _a .Wrap (_bba ,_fbefe ,"b\u0074\u0020\u003d\u003d 0\u0020|\u007c\u0020\u0028\u005e\u0062t\u0029\u0020\u003d\u003d\u0020\u0030");};continue ;};for {_fbdf =_cfec ;_cfec =(_cfec |(_cfec >>1)|(_cfec <<1))&_cbdeb ;if (_cfec ^_fbdf )==0{if _bba =_bggf .SetByte (_eefe +_cabe ,_cfec );
-_bba !=nil {return _a .Wrap (_bba ,_fbefe ,"\u0073\u0065\u0074\u0074\u0069\u006e\u0067\u0020\u0070\u0072\u0065\u0076 \u0062\u0079\u0074\u0065");};break ;};};};};for _bbdf =_deff -1;_bbdf >=0;_bbdf --{_eefe =_bbdf *_bggf .RowStride ;_gaed =_bbdf *_fecdb .RowStride ;
-for _cabe =_cbda -1;_cabe >=0;_cabe --{if _cfec ,_bba =_bggf .GetByte (_eefe +_cabe );_bba !=nil {return _a .Wrap (_bba ,_fbefe ,"\u0072\u0065\u0076\u0065\u0072\u0073\u0065\u0020\u0066\u0069\u0072\u0073t\u0020\u0067\u0065\u0074");};if _cbdeb ,_bba =_fecdb .GetByte (_gaed +_cabe );
-_bba !=nil {return _a .Wrap (_bba ,_fbefe ,"r\u0065\u0076\u0065\u0072se\u0020g\u0065\u0074\u0020\u006d\u0061s\u006b\u0020\u0062\u0079\u0074\u0065");};if _bbdf < _deff -1{if _dgaf ,_bba =_bggf .GetByte (_eefe +_bggf .RowStride +_cabe );_bba !=nil {return _a .Wrap (_bba ,_fbefe ,"\u0072\u0065v\u0065\u0072\u0073e\u0020\u0069\u0020\u003c\u0020\u0068\u0020\u002d\u0031");
-};_cfec |=_dgaf ;};if _cabe < _cbda -1{if _gegd ,_bba =_bggf .GetByte (_eefe +_cabe +1);_bba !=nil {return _a .Wrap (_bba ,_fbefe ,"\u0072\u0065\u0076\u0065rs\u0065\u0020\u006a\u0020\u003c\u0020\u0077\u0070\u006c\u0020\u002d\u0020\u0031");};_cfec |=_gegd >>7;
-};_cfec &=_cbdeb ;if _cfec ==0||(^_cfec )==0{if _bba =_bggf .SetByte (_eefe +_cabe ,_cfec );_bba !=nil {return _a .Wrap (_bba ,_fbefe ,"\u0073\u0065\u0074\u0074\u0069\u006e\u0067\u0020\u006d\u0061\u0073k\u0065\u0064\u0020\u0062\u0079\u0074\u0065\u0020\u0066\u0061i\u006c\u0065\u0064");
-};continue ;};for {_fbdf =_cfec ;_cfec =(_cfec |(_cfec >>1)|(_cfec <<1))&_cbdeb ;if (_cfec ^_fbdf )==0{if _bba =_bggf .SetByte (_eefe +_cabe ,_cfec );_bba !=nil {return _a .Wrap (_bba ,_fbefe ,"\u0072e\u0076\u0065\u0072\u0073e\u0020\u0073\u0065\u0074\u0074i\u006eg\u0020p\u0072\u0065\u0076\u0020\u0062\u0079\u0074e");
-};break ;};};};};return nil ;};func (_cbf *Bitmap )Equals (s *Bitmap )bool {if len (_cbf .Data )!=len (s .Data )||_cbf .Width !=s .Width ||_cbf .Height !=s .Height {return false ;};for _cca :=0;_cca < _cbf .Height ;_cca ++{_ggec :=_cca *_cbf .RowStride ;
-for _gbgc :=0;_gbgc < _cbf .RowStride ;_gbgc ++{if _cbf .Data [_ggec +_gbgc ]!=s .Data [_ggec +_gbgc ]{return false ;};};};return true ;};func (_fgba *Bitmap )setTwoBytes (_cbg int ,_dcbf uint16 )error {if _cbg +1> len (_fgba .Data )-1{return _a .Errorf ("s\u0065\u0074\u0054\u0077\u006f\u0042\u0079\u0074\u0065\u0073","\u0069n\u0064\u0065\u0078\u003a\u0020\u0027\u0025\u0064\u0027\u0020\u006fu\u0074\u0020\u006f\u0066\u0020\u0072\u0061\u006e\u0067\u0065",_cbg );
-};_fgba .Data [_cbg ]=byte ((_dcbf &0xff00)>>8);_fgba .Data [_cbg +1]=byte (_dcbf &0xff);return nil ;};func TstImageBitmapInverseData ()[]byte {_geed :=_bceg .Copy ();_geed .InverseData ();return _geed .Data ;};func _aegcc (_bcdb ...MorphProcess )(_bcgc error ){const _fafbd ="v\u0065r\u0069\u0066\u0079\u004d\u006f\u0072\u0070\u0068P\u0072\u006f\u0063\u0065ss\u0065\u0073";
-var _gaff ,_gaba int ;for _aegf ,_gebf :=range _bcdb {if _bcgc =_gebf .verify (_aegf ,&_gaff ,&_gaba );_bcgc !=nil {return _a .Wrap (_bcgc ,_fafbd ,"");};};if _gaba !=0&&_gaff !=0{return _a .Error (_fafbd ,"\u004d\u006f\u0072\u0070\u0068\u0020\u0073\u0065\u0071\u0075\u0065n\u0063\u0065\u0020\u002d\u0020\u0062\u006f\u0072d\u0065r\u0020\u0061\u0064\u0064\u0065\u0064\u0020\u0062\u0075\u0074\u0020\u006e\u0065\u0074\u0020\u0072\u0065\u0064u\u0063\u0074\u0069\u006f\u006e\u0020\u006e\u006f\u0074\u0020\u0030");
-};return nil ;};func TstPSymbol (t *_c .T )*Bitmap {t .Helper ();_afeed :=New (5,8);_d .NoError (t ,_afeed .SetPixel (0,0,1));_d .NoError (t ,_afeed .SetPixel (1,0,1));_d .NoError (t ,_afeed .SetPixel (2,0,1));_d .NoError (t ,_afeed .SetPixel (3,0,1));
-_d .NoError (t ,_afeed .SetPixel (4,1,1));_d .NoError (t ,_afeed .SetPixel (0,1,1));_d .NoError (t ,_afeed .SetPixel (4,2,1));_d .NoError (t ,_afeed .SetPixel (0,2,1));_d .NoError (t ,_afeed .SetPixel (4,3,1));_d .NoError (t ,_afeed .SetPixel (0,3,1));
-_d .NoError (t ,_afeed .SetPixel (0,4,1));_d .NoError (t ,_afeed .SetPixel (1,4,1));_d .NoError (t ,_afeed .SetPixel (2,4,1));_d .NoError (t ,_afeed .SetPixel (3,4,1));_d .NoError (t ,_afeed .SetPixel (0,5,1));_d .NoError (t ,_afeed .SetPixel (0,6,1));
-_d .NoError (t ,_afeed .SetPixel (0,7,1));return _afeed ;};func MakePixelCentroidTab8 ()[]int {return _bfcce ()};type MorphProcess struct{Operation MorphOperation ;Arguments []int ;};func _cggb ()(_dab [256]uint16 ){for _gff :=0;_gff < 256;_gff ++{if _gff &0x01!=0{_dab [_gff ]|=0x3;
-};if _gff &0x02!=0{_dab [_gff ]|=0xc;};if _gff &0x04!=0{_dab [_gff ]|=0x30;};if _gff &0x08!=0{_dab [_gff ]|=0xc0;};if _gff &0x10!=0{_dab [_gff ]|=0x300;};if _gff &0x20!=0{_dab [_gff ]|=0xc00;};if _gff &0x40!=0{_dab [_gff ]|=0x3000;};if _gff &0x80!=0{_dab [_gff ]|=0xc000;
-};};return _dab ;};func (_fgbe *Bitmaps )SortByWidth (){_egdbe :=(*byWidth )(_fgbe );_df .Sort (_egdbe )};func MorphSequence (src *Bitmap ,sequence ...MorphProcess )(*Bitmap ,error ){return _defa (src ,sequence ...);};func _dbfb (_efgc *Bitmap ,_addg ,_bcac int ,_begf ,_gfge int ,_ceaa RasterOperator ){var (_aafbf bool ;
-_fffc bool ;_accb int ;_bbgd int ;_aabed int ;_fadg int ;_caedf bool ;_dgcc byte ;);_ddagd :=8-(_addg &7);_adeg :=_beeb [_ddagd ];_dacc :=_efgc .RowStride *_bcac +(_addg >>3);if _begf < _ddagd {_aafbf =true ;_adeg &=_dcga [8-_ddagd +_begf ];};if !_aafbf {_accb =(_begf -_ddagd )>>3;
-if _accb !=0{_fffc =true ;_bbgd =_dacc +1;};};_aabed =(_addg +_begf )&7;if !_aafbf &&_aabed !=0{_caedf =true ;_dgcc =_dcga [_aabed ];_fadg =_dacc +1+_accb ;};var _fcff ,_deeg int ;switch _ceaa {case PixClr :for _fcff =0;_fcff < _gfge ;_fcff ++{_efgc .Data [_dacc ]=_fbaa (_efgc .Data [_dacc ],0x0,_adeg );
-_dacc +=_efgc .RowStride ;};if _fffc {for _fcff =0;_fcff < _gfge ;_fcff ++{for _deeg =0;_deeg < _accb ;_deeg ++{_efgc .Data [_bbgd +_deeg ]=0x0;};_bbgd +=_efgc .RowStride ;};};if _caedf {for _fcff =0;_fcff < _gfge ;_fcff ++{_efgc .Data [_fadg ]=_fbaa (_efgc .Data [_fadg ],0x0,_dgcc );
-_fadg +=_efgc .RowStride ;};};case PixSet :for _fcff =0;_fcff < _gfge ;_fcff ++{_efgc .Data [_dacc ]=_fbaa (_efgc .Data [_dacc ],0xff,_adeg );_dacc +=_efgc .RowStride ;};if _fffc {for _fcff =0;_fcff < _gfge ;_fcff ++{for _deeg =0;_deeg < _accb ;_deeg ++{_efgc .Data [_bbgd +_deeg ]=0xff;
-};_bbgd +=_efgc .RowStride ;};};if _caedf {for _fcff =0;_fcff < _gfge ;_fcff ++{_efgc .Data [_fadg ]=_fbaa (_efgc .Data [_fadg ],0xff,_dgcc );_fadg +=_efgc .RowStride ;};};case PixNotDst :for _fcff =0;_fcff < _gfge ;_fcff ++{_efgc .Data [_dacc ]=_fbaa (_efgc .Data [_dacc ],^_efgc .Data [_dacc ],_adeg );
-_dacc +=_efgc .RowStride ;};if _fffc {for _fcff =0;_fcff < _gfge ;_fcff ++{for _deeg =0;_deeg < _accb ;_deeg ++{_efgc .Data [_bbgd +_deeg ]=^(_efgc .Data [_bbgd +_deeg ]);};_bbgd +=_efgc .RowStride ;};};if _caedf {for _fcff =0;_fcff < _gfge ;_fcff ++{_efgc .Data [_fadg ]=_fbaa (_efgc .Data [_fadg ],^_efgc .Data [_fadg ],_dgcc );
-_fadg +=_efgc .RowStride ;};};};};func (_bfgd *Bitmap )GetVanillaData ()[]byte {if _bfgd .Color ==Chocolate {_bfgd .inverseData ();};return _bfgd .Data ;};func TstImageBitmapData ()[]byte {return _bceg .Data };func TstFrameBitmapData ()[]byte {return _ggbf .Data };
-func _bb (_db ,_ca *Bitmap )(_gf error ){const _ade ="\u0065\u0078\u0070\u0061nd\u0042\u0069\u006e\u0061\u0072\u0079\u0046\u0061\u0063\u0074\u006f\u0072\u0032";_fe :=_ca .RowStride ;_fb :=_db .RowStride ;var (_ba byte ;_fg uint16 ;_fc ,_e ,_bd ,_ee ,_ce int ;
-);for _bd =0;_bd < _ca .Height ;_bd ++{_fc =_bd *_fe ;_e =2*_bd *_fb ;for _ee =0;_ee < _fe ;_ee ++{_ba =_ca .Data [_fc +_ee ];_fg =_cece [_ba ];_ce =_e +_ee *2;if _db .RowStride !=_ca .RowStride *2&&(_ee +1)*2> _db .RowStride {_gf =_db .SetByte (_ce ,byte (_fg >>8));
-}else {_gf =_db .setTwoBytes (_ce ,_fg );};if _gf !=nil {return _a .Wrap (_gf ,_ade ,"");};};for _ee =0;_ee < _fb ;_ee ++{_ce =_e +_fb +_ee ;_ba =_db .Data [_e +_ee ];if _gf =_db .SetByte (_ce ,_ba );_gf !=nil {return _a .Wrapf (_gf ,_ade ,"c\u006f\u0070\u0079\u0020\u0064\u006fu\u0062\u006c\u0065\u0064\u0020\u006ci\u006e\u0065\u003a\u0020\u0027\u0025\u0064'\u002c\u0020\u0042\u0079\u0074\u0065\u003a\u0020\u0027\u0025d\u0027",_e +_ee ,_e +_fb +_ee );
-};};};return nil ;};func (_cbge *ClassedPoints )Less (i ,j int )bool {return _cbge ._ggfg (i ,j )};func _fga (_cge *Bitmap ,_cac ,_ccd int )(*Bitmap ,error ){const _aa ="e\u0078\u0070\u0061\u006edB\u0069n\u0061\u0072\u0079\u0052\u0065p\u006c\u0069\u0063\u0061\u0074\u0065";
-if _cge ==nil {return nil ,_a .Error (_aa ,"\u0073o\u0075r\u0063\u0065\u0020\u006e\u006ft\u0020\u0064e\u0066\u0069\u006e\u0065\u0064");};if _cac <=0||_ccd <=0{return nil ,_a .Error (_aa ,"\u0069\u006e\u0076\u0061\u006c\u0069\u0064\u0020\u0073\u0063\u0061l\u0065\u0020\u0066\u0061\u0063\u0074\u006f\u0072\u003a\u0020<\u003d\u0020\u0030");
-};if _cac ==_ccd {if _cac ==1{_cff ,_cfg :=_fedg (nil ,_cge );if _cfg !=nil {return nil ,_a .Wrap (_cfg ,_aa ,"\u0078\u0046\u0061\u0063\u0074\u0020\u003d\u003d\u0020y\u0046\u0061\u0063\u0074");};return _cff ,nil ;};if _cac ==2||_cac ==4||_cac ==8{_deb ,_eaf :=_da (_cge ,_cac );
-if _eaf !=nil {return nil ,_a .Wrap (_eaf ,_aa ,"\u0078\u0046a\u0063\u0074\u0020i\u006e\u0020\u007b\u0032\u002c\u0034\u002c\u0038\u007d");};return _deb ,nil ;};};_gd :=_cac *_cge .Width ;_cffd :=_ccd *_cge .Height ;_cgg :=New (_gd ,_cffd );_dcdg :=_cgg .RowStride ;
-var (_dg ,_faf ,_bfg ,_gdc ,_egec int ;_bfc byte ;_edf error ;);for _faf =0;_faf < _cge .Height ;_faf ++{_dg =_ccd *_faf *_dcdg ;for _bfg =0;_bfg < _cge .Width ;_bfg ++{if _dd :=_cge .GetPixel (_bfg ,_faf );_dd {_egec =_cac *_bfg ;for _gdc =0;_gdc < _cac ;
-_gdc ++{_cgg .setBit (_dg *8+_egec +_gdc );};};};for _gdc =1;_gdc < _ccd ;_gdc ++{_dcb :=_dg +_gdc *_dcdg ;for _beb :=0;_beb < _dcdg ;_beb ++{if _bfc ,_edf =_cgg .GetByte (_dg +_beb );_edf !=nil {return nil ,_a .Wrapf (_edf ,_aa ,"\u0072\u0065\u0070\u006cic\u0061\u0074\u0069\u006e\u0067\u0020\u006c\u0069\u006e\u0065\u003a\u0020\u0027\u0025d\u0027",_gdc );
-};if _edf =_cgg .SetByte (_dcb +_beb ,_bfc );_edf !=nil {return nil ,_a .Wrap (_edf ,_aa ,"\u0053\u0065\u0074\u0074in\u0067\u0020\u0062\u0079\u0074\u0065\u0020\u0066\u0061\u0069\u006c\u0065\u0064");};};};};return _cgg ,nil ;};func HausTest (p1 ,p2 ,p3 ,p4 *Bitmap ,delX ,delY float32 ,maxDiffW ,maxDiffH int )(bool ,error ){const _cbfaf ="\u0048\u0061\u0075\u0073\u0054\u0065\u0073\u0074";
-_bebg ,_eege :=p1 .Width ,p1 .Height ;_eff ,_bdec :=p3 .Width ,p3 .Height ;if _ge .Abs (_bebg -_eff )> maxDiffW {return false ,nil ;};if _ge .Abs (_eege -_bdec )> maxDiffH {return false ,nil ;};_aaab :=int (delX +_ge .Sign (delX )*0.5);_dacbb :=int (delY +_ge .Sign (delY )*0.5);
-var _cdb error ;_defd :=p1 .CreateTemplate ();if _cdb =_defd .RasterOperation (0,0,_bebg ,_eege ,PixSrc ,p1 ,0,0);_cdb !=nil {return false ,_a .Wrap (_cdb ,_cbfaf ,"p\u0031\u0020\u002d\u0053\u0052\u0043\u002d\u003e\u0020\u0074");};if _cdb =_defd .RasterOperation (_aaab ,_dacbb ,_bebg ,_eege ,PixNotSrcAndDst ,p4 ,0,0);
-_cdb !=nil {return false ,_a .Wrap (_cdb ,_cbfaf ,"\u0021p\u0034\u0020\u0026\u0020\u0074");};if _defd .Zero (){return false ,nil ;};if _cdb =_defd .RasterOperation (_aaab ,_dacbb ,_eff ,_bdec ,PixSrc ,p3 ,0,0);_cdb !=nil {return false ,_a .Wrap (_cdb ,_cbfaf ,"p\u0033\u0020\u002d\u0053\u0052\u0043\u002d\u003e\u0020\u0074");
-};if _cdb =_defd .RasterOperation (0,0,_eff ,_bdec ,PixNotSrcAndDst ,p2 ,0,0);_cdb !=nil {return false ,_a .Wrap (_cdb ,_cbfaf ,"\u0021p\u0032\u0020\u0026\u0020\u0074");};return _defd .Zero (),nil ;};func _agf (_ccc ,_bfa *Bitmap ,_babf int ,_gge []byte ,_aag int )(_edc error ){const _eb ="\u0072\u0065\u0064uc\u0065\u0052\u0061\u006e\u006b\u0042\u0069\u006e\u0061\u0072\u0079\u0032\u004c\u0065\u0076\u0065\u006c\u0033";
-var (_ebg ,_eda ,_beed ,_eega ,_adee ,_gea ,_agd ,_ffa int ;_cgd ,_fda ,_add ,_eee uint32 ;_ffe ,_cgde byte ;_cdfb uint16 ;);_aae :=make ([]byte ,4);_egb :=make ([]byte ,4);for _beed =0;_beed < _ccc .Height -1;_beed ,_eega =_beed +2,_eega +1{_ebg =_beed *_ccc .RowStride ;
-_eda =_eega *_bfa .RowStride ;for _adee ,_gea =0,0;_adee < _aag ;_adee ,_gea =_adee +4,_gea +1{for _agd =0;_agd < 4;_agd ++{_ffa =_ebg +_adee +_agd ;if _ffa <=len (_ccc .Data )-1&&_ffa < _ebg +_ccc .RowStride {_aae [_agd ]=_ccc .Data [_ffa ];}else {_aae [_agd ]=0x00;
-};_ffa =_ebg +_ccc .RowStride +_adee +_agd ;if _ffa <=len (_ccc .Data )-1&&_ffa < _ebg +(2*_ccc .RowStride ){_egb [_agd ]=_ccc .Data [_ffa ];}else {_egb [_agd ]=0x00;};};_cgd =_ag .BigEndian .Uint32 (_aae );_fda =_ag .BigEndian .Uint32 (_egb );_add =_cgd &_fda ;
-_add |=_add <<1;_eee =_cgd |_fda ;_eee &=_eee <<1;_fda =_add &_eee ;_fda &=0xaaaaaaaa;_cgd =_fda |(_fda <<7);_ffe =byte (_cgd >>24);_cgde =byte ((_cgd >>8)&0xff);_ffa =_eda +_gea ;if _ffa +1==len (_bfa .Data )-1||_ffa +1>=_eda +_bfa .RowStride {if _edc =_bfa .SetByte (_ffa ,_gge [_ffe ]);
-_edc !=nil {return _a .Wrapf (_edc ,_eb ,"\u0069n\u0064\u0065\u0078\u003a\u0020\u0025d",_ffa );};}else {_cdfb =(uint16 (_gge [_ffe ])<<8)|uint16 (_gge [_cgde ]);if _edc =_bfa .setTwoBytes (_ffa ,_cdfb );_edc !=nil {return _a .Wrapf (_edc ,_eb ,"s\u0065\u0074\u0074\u0069\u006e\u0067 \u0074\u0077\u006f\u0020\u0062\u0079t\u0065\u0073\u0020\u0066\u0061\u0069\u006ce\u0064\u002c\u0020\u0069\u006e\u0064\u0065\u0078\u003a\u0020%\u0064",_ffa );
-};_gea ++;};};};return nil ;};type Points []Point ;func (_bff *Points )Add (pt *Points )error {const _ggbc ="\u0050\u006f\u0069\u006e\u0074\u0073\u002e\u0041\u0064\u0064";if _bff ==nil {return _a .Error (_ggbc ,"\u0070o\u0069n\u0074\u0073\u0020\u006e\u006ft\u0020\u0064e\u0066\u0069\u006e\u0065\u0064");
-};if pt ==nil {return _a .Error (_ggbc ,"a\u0072\u0067\u0075\u006d\u0065\u006et\u0020\u0070\u006f\u0069\u006e\u0074\u0073\u0020\u006eo\u0074\u0020\u0064e\u0066i\u006e\u0065\u0064");};*_bff =append (*_bff ,*pt ...);return nil ;};func _eab (_fdbf ,_aaggb ,_edfg *Bitmap )(*Bitmap ,error ){const _eca ="\u0073\u0075\u0062\u0074\u0072\u0061\u0063\u0074";
-if _aaggb ==nil {return nil ,_a .Error (_eca ,"'\u0073\u0031\u0027\u0020\u0069\u0073\u0020\u006e\u0069\u006c");};if _edfg ==nil {return nil ,_a .Error (_eca ,"'\u0073\u0032\u0027\u0020\u0069\u0073\u0020\u006e\u0069\u006c");};var _ccec error ;switch _fdbf {case _aaggb :if _ccec =_fdbf .RasterOperation (0,0,_aaggb .Width ,_aaggb .Height ,PixNotSrcAndDst ,_edfg ,0,0);
-_ccec !=nil {return nil ,_a .Wrap (_ccec ,_eca ,"\u0064 \u003d\u003d\u0020\u0073\u0031");};case _edfg :if _ccec =_fdbf .RasterOperation (0,0,_aaggb .Width ,_aaggb .Height ,PixNotSrcAndDst ,_aaggb ,0,0);_ccec !=nil {return nil ,_a .Wrap (_ccec ,_eca ,"\u0064 \u003d\u003d\u0020\u0073\u0032");
-};default:_fdbf ,_ccec =_fedg (_fdbf ,_aaggb );if _ccec !=nil {return nil ,_a .Wrap (_ccec ,_eca ,"");};if _ccec =_fdbf .RasterOperation (0,0,_aaggb .Width ,_aaggb .Height ,PixNotSrcAndDst ,_edfg ,0,0);_ccec !=nil {return nil ,_a .Wrap (_ccec ,_eca ,"\u0064e\u0066\u0061\u0075\u006c\u0074");
-};};return _fdbf ,nil ;};func _cgad (_aggc ,_bgbd *Bitmap ,_gggcb ,_cda int )(*Bitmap ,error ){const _eadb ="\u0063\u006c\u006f\u0073\u0065\u0053\u0061\u0066\u0065B\u0072\u0069\u0063\u006b";if _bgbd ==nil {return nil ,_a .Error (_eadb ,"\u0073\u006f\u0075\u0072\u0063\u0065\u0020\u0069\u0073\u0020\u006e\u0069\u006c");
-};if _gggcb < 1||_cda < 1{return nil ,_a .Error (_eadb ,"\u0068s\u0069\u007a\u0065\u0020\u0061\u006e\u0064\u0020\u0076\u0073\u0069z\u0065\u0020\u006e\u006f\u0074\u0020\u003e\u003d\u0020\u0031");};if _gggcb ==1&&_cda ==1{return _fedg (_aggc ,_bgbd );};if MorphBC ==SymmetricMorphBC {_ffcga ,_cgf :=_eaad (_aggc ,_bgbd ,_gggcb ,_cda );
-if _cgf !=nil {return nil ,_a .Wrap (_cgf ,_eadb ,"\u0053\u0079m\u006d\u0065\u0074r\u0069\u0063\u004d\u006f\u0072\u0070\u0068\u0042\u0043");};return _ffcga ,nil ;};_aacc :=_aega (_gggcb /2,_cda /2);_ceef :=8*((_aacc +7)/8);_gebg ,_dggdd :=_bgbd .AddBorder (_ceef ,0);
-if _dggdd !=nil {return nil ,_a .Wrapf (_dggdd ,_eadb ,"\u0042\u006f\u0072\u0064\u0065\u0072\u0053\u0069\u007ae\u003a\u0020\u0025\u0064",_ceef );};var _edag ,_ddd *Bitmap ;if _gggcb ==1||_cda ==1{_acba :=SelCreateBrick (_cda ,_gggcb ,_cda /2,_gggcb /2,SelHit );
-_edag ,_dggdd =_gbae (nil ,_gebg ,_acba );if _dggdd !=nil {return nil ,_a .Wrap (_dggdd ,_eadb ,"\u0068S\u0069\u007a\u0065\u0020\u003d\u003d\u0020\u0031\u0020\u007c\u007c \u0076\u0053\u0069\u007a\u0065\u0020\u003d\u003d\u0020\u0031");};}else {_eeeb :=SelCreateBrick (1,_gggcb ,0,_gggcb /2,SelHit );
-_dfce ,_baee :=_acga (nil ,_gebg ,_eeeb );if _baee !=nil {return nil ,_a .Wrap (_baee ,_eadb ,"\u0072\u0065\u0067\u0075la\u0072\u0020\u002d\u0020\u0066\u0069\u0072\u0073\u0074\u0020\u0064\u0069\u006c\u0061t\u0065");};_dbgc :=SelCreateBrick (_cda ,1,_cda /2,0,SelHit );
-_edag ,_baee =_acga (nil ,_dfce ,_dbgc );if _baee !=nil {return nil ,_a .Wrap (_baee ,_eadb ,"\u0072\u0065\u0067ul\u0061\u0072\u0020\u002d\u0020\u0073\u0065\u0063\u006f\u006e\u0064\u0020\u0064\u0069\u006c\u0061\u0074\u0065");};if _ ,_baee =_bfcc (_dfce ,_edag ,_eeeb );
-_baee !=nil {return nil ,_a .Wrap (_baee ,_eadb ,"r\u0065\u0067\u0075\u006car\u0020-\u0020\u0066\u0069\u0072\u0073t\u0020\u0065\u0072\u006f\u0064\u0065");};if _ ,_baee =_bfcc (_edag ,_dfce ,_dbgc );_baee !=nil {return nil ,_a .Wrap (_baee ,_eadb ,"\u0072\u0065\u0067\u0075la\u0072\u0020\u002d\u0020\u0073\u0065\u0063\u006f\u006e\u0064\u0020\u0065\u0072\u006fd\u0065");
-};};if _ddd ,_dggdd =_edag .RemoveBorder (_ceef );_dggdd !=nil {return nil ,_a .Wrap (_dggdd ,_eadb ,"\u0072e\u0067\u0075\u006c\u0061\u0072");};if _aggc ==nil {return _ddd ,nil ;};if _ ,_dggdd =_fedg (_aggc ,_ddd );_dggdd !=nil {return nil ,_dggdd ;};return _aggc ,nil ;
-};func (_ggef *Bitmap )RemoveBorderGeneral (left ,right ,top ,bot int )(*Bitmap ,error ){return _ggef .removeBorderGeneral (left ,right ,top ,bot );};func (_aaae *Bitmap )centroid (_fefe ,_dbf []int )(Point ,error ){_bccde :=Point {};_aaae .setPadBits (0);
-if len (_fefe )==0{_fefe =_bfcce ();};if len (_dbf )==0{_dbf =_afgg ();};var _ddcd ,_gbfeb ,_eaaf ,_cgeg ,_adag ,_ccfc int ;var _fcdg byte ;for _adag =0;_adag < _aaae .Height ;_adag ++{_ceed :=_aaae .RowStride *_adag ;_cgeg =0;for _ccfc =0;_ccfc < _aaae .RowStride ;
-_ccfc ++{_fcdg =_aaae .Data [_ceed +_ccfc ];if _fcdg !=0{_cgeg +=_dbf [_fcdg ];_ddcd +=_fefe [_fcdg ]+_ccfc *8*_dbf [_fcdg ];};};_eaaf +=_cgeg ;_gbfeb +=_cgeg *_adag ;};if _eaaf !=0{_bccde .X =float32 (_ddcd )/float32 (_eaaf );_bccde .Y =float32 (_gbfeb )/float32 (_eaaf );
-};return _bccde ,nil ;};var MorphBC BoundaryCondition ;type BoundaryCondition int ;func TstWordBitmapWithSpaces (t *_c .T ,scale ...int )*Bitmap {_aeed :=1;if len (scale )> 0{_aeed =scale [0];};_fafec :=3;_abbf :=9+7+15+2*_fafec +2*_fafec ;_edbfe :=5+_fafec +5+2*_fafec ;
-_dafda :=New (_abbf *_aeed ,_edbfe *_aeed );_cdce :=&Bitmaps {};var _gefba *int ;_fafec *=_aeed ;_eddd :=_fafec ;_gefba =&_eddd ;_gdbg :=_fafec ;_gdgb :=TstDSymbol (t ,scale ...);TstAddSymbol (t ,_cdce ,_gdgb ,_gefba ,_gdbg ,1*_aeed );_gdgb =TstOSymbol (t ,scale ...);
-TstAddSymbol (t ,_cdce ,_gdgb ,_gefba ,_gdbg ,_fafec );_gdgb =TstISymbol (t ,scale ...);TstAddSymbol (t ,_cdce ,_gdgb ,_gefba ,_gdbg ,1*_aeed );_gdgb =TstTSymbol (t ,scale ...);TstAddSymbol (t ,_cdce ,_gdgb ,_gefba ,_gdbg ,_fafec );_gdgb =TstNSymbol (t ,scale ...);
-TstAddSymbol (t ,_cdce ,_gdgb ,_gefba ,_gdbg ,1*_aeed );_gdgb =TstOSymbol (t ,scale ...);TstAddSymbol (t ,_cdce ,_gdgb ,_gefba ,_gdbg ,1*_aeed );_gdgb =TstWSymbol (t ,scale ...);TstAddSymbol (t ,_cdce ,_gdgb ,_gefba ,_gdbg ,0);*_gefba =_fafec ;_gdbg =5*_aeed +_fafec ;
-_gdgb =TstOSymbol (t ,scale ...);TstAddSymbol (t ,_cdce ,_gdgb ,_gefba ,_gdbg ,1*_aeed );_gdgb =TstRSymbol (t ,scale ...);TstAddSymbol (t ,_cdce ,_gdgb ,_gefba ,_gdbg ,_fafec );_gdgb =TstNSymbol (t ,scale ...);TstAddSymbol (t ,_cdce ,_gdgb ,_gefba ,_gdbg ,1*_aeed );
-_gdgb =TstESymbol (t ,scale ...);TstAddSymbol (t ,_cdce ,_gdgb ,_gefba ,_gdbg ,1*_aeed );_gdgb =TstVSymbol (t ,scale ...);TstAddSymbol (t ,_cdce ,_gdgb ,_gefba ,_gdbg ,1*_aeed );_gdgb =TstESymbol (t ,scale ...);TstAddSymbol (t ,_cdce ,_gdgb ,_gefba ,_gdbg ,1*_aeed );
-_gdgb =TstRSymbol (t ,scale ...);TstAddSymbol (t ,_cdce ,_gdgb ,_gefba ,_gdbg ,0);TstWriteSymbols (t ,_cdce ,_dafda );return _dafda ;};func (_caaf *ClassedPoints )validateIntSlice ()error {const _fdfc ="\u0076\u0061l\u0069\u0064\u0061t\u0065\u0049\u006e\u0074\u0053\u006c\u0069\u0063\u0065";
-for _ ,_fdgde :=range _caaf .IntSlice {if _fdgde >=(_caaf .Points .Size ()){return _a .Errorf (_fdfc ,"c\u006c\u0061\u0073\u0073\u0020\u0069\u0064\u003a\u0020\u0027\u0025\u0064\u0027\u0020\u0069\u0073\u0020\u006e\u006f\u0074\u0020\u0061\u0020\u0076\u0061\u006ci\u0064 \u0069\u006e\u0064\u0065x\u0020\u0069n\u0020\u0074\u0068\u0065\u0020\u0070\u006f\u0069\u006e\u0074\u0073\u0020\u006f\u0066\u0020\u0073\u0069\u007a\u0065\u003a\u0020\u0025\u0064",_fdgde ,_caaf .Points .Size ());
-};};return nil ;};func (_acfe *Bitmaps )GroupByWidth ()(*BitmapsArray ,error ){const _gggd ="\u0047\u0072\u006fu\u0070\u0042\u0079\u0057\u0069\u0064\u0074\u0068";if len (_acfe .Values )==0{return nil ,_a .Error (_gggd ,"\u006eo\u0020v\u0061\u006c\u0075\u0065\u0073 \u0070\u0072o\u0076\u0069\u0064\u0065\u0064");
-};_gaedc :=&BitmapsArray {};_acfe .SortByWidth ();_bcdf :=-1;_cgegc :=-1;for _cgaf :=0;_cgaf < len (_acfe .Values );_cgaf ++{_dgafa :=_acfe .Values [_cgaf ].Width ;if _dgafa > _bcdf {_bcdf =_dgafa ;_cgegc ++;_gaedc .Values =append (_gaedc .Values ,&Bitmaps {});
-};_gaedc .Values [_cgegc ].AddBitmap (_acfe .Values [_cgaf ]);};return _gaedc ,nil ;};const (SelDontCare SelectionValue =iota ;SelHit ;SelMiss ;);func _bg ()(_eged []byte ){_eged =make ([]byte ,256);for _ggdd :=0;_ggdd < 256;_ggdd ++{_cecd :=byte (_ggdd );
-_eged [_cecd ]=(_cecd &0x01)|((_cecd &0x04)>>1)|((_cecd &0x10)>>2)|((_cecd &0x40)>>3)|((_cecd &0x02)<<3)|((_cecd &0x08)<<2)|((_cecd &0x20)<<1)|(_cecd &0x80);};return _eged ;};func Rect (x ,y ,w ,h int )(*_bf .Rectangle ,error ){const _fcaf ="b\u0069\u0074\u006d\u0061\u0070\u002e\u0052\u0065\u0063\u0074";
-if x < 0{w +=x ;x =0;if w <=0{return nil ,_a .Errorf (_fcaf ,"x\u003a\u0027\u0025\u0064\u0027\u0020<\u0020\u0030\u0020\u0061\u006e\u0064\u0020\u0077\u003a \u0027\u0025\u0064'\u0020<\u003d\u0020\u0030",x ,w );};};if y < 0{h +=y ;y =0;if h <=0{return nil ,_a .Error (_fcaf ,"\u0079\u0020\u003c 0\u0020\u0061\u006e\u0064\u0020\u0062\u006f\u0078\u0020\u006f\u0066\u0066\u0020\u002b\u0071\u0075\u0061\u0064");
-};};_ffad :=_bf .Rect (x ,y ,x +w ,y +h );return &_ffad ,nil ;};func TstGetScaledSymbol (t *_c .T ,sm *Bitmap ,scale ...int )*Bitmap {if len (scale )==0{return sm ;};if scale [0]==1{return sm ;};_dgdf ,_afbfd :=MorphSequence (sm ,MorphProcess {Operation :MopReplicativeBinaryExpansion ,Arguments :scale });
-_d .NoError (t ,_afbfd );return _dgdf ;};var (_cece =_cggb ();_gbb =_cfa ();_ceba =_abb (););func (_ddfe Points )XSorter ()func (_bfcaad ,_eaffda int )bool {return func (_aga ,_bgcb int )bool {return _ddfe [_aga ].X < _ddfe [_bgcb ].X };};func (_fdef *Bitmaps )SelectBySize (width ,height int ,tp LocationFilter ,relation SizeComparison )(_ddeg *Bitmaps ,_afda error ){const _gcfgg ="B\u0069t\u006d\u0061\u0070\u0073\u002e\u0053\u0065\u006ce\u0063\u0074\u0042\u0079Si\u007a\u0065";
-if _fdef ==nil {return nil ,_a .Error (_gcfgg ,"\u0027\u0062\u0027 B\u0069\u0074\u006d\u0061\u0070\u0073\u0020\u006e\u006f\u0074\u0020\u0064\u0065\u0066\u0069\u006e\u0065\u0064");};switch tp {case LocSelectWidth ,LocSelectHeight ,LocSelectIfEither ,LocSelectIfBoth :default:return nil ,_a .Errorf (_gcfgg ,"\u0070\u0072\u006f\u0076\u0069d\u0065\u0064\u0020\u0069\u006e\u0076\u0061\u006c\u0069\u0064\u0020\u006c\u006fc\u0061\u0074\u0069\u006f\u006e\u0020\u0066\u0069\u006c\u0074\u0065\u0072\u0020\u0074\u0079\u0070\u0065\u003a\u0020\u0025\u0064",tp );
-};switch relation {case SizeSelectIfLT ,SizeSelectIfGT ,SizeSelectIfLTE ,SizeSelectIfGTE ,SizeSelectIfEQ :default:return nil ,_a .Errorf (_gcfgg ,"\u0069\u006e\u0076\u0061li\u0064\u0020\u0072\u0065\u006c\u0061\u0074\u0069\u006f\u006e\u003a\u0020\u0027\u0025d\u0027",relation );
-};_ddgf ,_afda :=_fdef .makeSizeIndicator (width ,height ,tp ,relation );if _afda !=nil {return nil ,_a .Wrap (_afda ,_gcfgg ,"");};_ddeg ,_afda =_fdef .selectByIndicator (_ddgf );if _afda !=nil {return nil ,_a .Wrap (_afda ,_gcfgg ,"");};return _ddeg ,nil ;
-};func _fbaa (_ebce ,_adadf ,_dedf byte )byte {return (_ebce &^(_dedf ))|(_adadf &_dedf )};func _fceb (_feae *Bitmap ,_cddd int )(*Bitmap ,error ){const _afcf ="\u0065x\u0070a\u006e\u0064\u0052\u0065\u0070\u006c\u0069\u0063\u0061\u0074\u0065";if _feae ==nil {return nil ,_a .Error (_afcf ,"\u0073o\u0075r\u0063\u0065\u0020\u006e\u006ft\u0020\u0064e\u0066\u0069\u006e\u0065\u0064");
-};if _cddd <=0{return nil ,_a .Error (_afcf ,"i\u006e\u0076\u0061\u006cid\u0020f\u0061\u0063\u0074\u006f\u0072 \u002d\u0020\u003c\u003d\u0020\u0030");};if _cddd ==1{_gbgd ,_fgea :=_fedg (nil ,_feae );if _fgea !=nil {return nil ,_a .Wrap (_fgea ,_afcf ,"\u0066\u0061\u0063\u0074\u006f\u0072\u0020\u003d\u0020\u0031");
-};return _gbgd ,nil ;};_eedd ,_afefb :=_fga (_feae ,_cddd ,_cddd );if _afefb !=nil {return nil ,_a .Wrap (_afefb ,_afcf ,"");};return _eedd ,nil ;};func (_faff *Boxes )Get (i int )(*_bf .Rectangle ,error ){const _gbfe ="\u0042o\u0078\u0065\u0073\u002e\u0047\u0065t";
-if _faff ==nil {return nil ,_a .Error (_gbfe ,"\u0027\u0042\u006f\u0078es\u0027\u0020\u006e\u006f\u0074\u0020\u0064\u0065\u0066\u0069\u006e\u0065\u0064");};if i > len (*_faff )-1{return nil ,_a .Errorf (_gbfe ,"\u0069n\u0064\u0065\u0078\u003a\u0020\u0027\u0025\u0064\u0027\u0020\u006fu\u0074\u0020\u006f\u0066\u0020\u0072\u0061\u006e\u0067\u0065",i );
-};return (*_faff )[i ],nil ;};type SizeComparison int ;type SelectionValue int ;func _ceac (_eaac ,_eba *Bitmap ,_fce CombinationOperator )*Bitmap {_ecdac :=New (_eaac .Width ,_eaac .Height );for _aabe :=0;_aabe < len (_ecdac .Data );_aabe ++{_ecdac .Data [_aabe ]=_ccecc (_eaac .Data [_aabe ],_eba .Data [_aabe ],_fce );
-};return _ecdac ;};func (_agfg *Bitmap )SetByte (index int ,v byte )error {if index > len (_agfg .Data )-1||index < 0{return _a .Errorf ("\u0053e\u0074\u0042\u0079\u0074\u0065","\u0069\u006e\u0064\u0065x \u006f\u0075\u0074\u0020\u006f\u0066\u0020\u0072\u0061\u006e\u0067\u0065\u003a\u0020%\u0064",index );
-};_agfg .Data [index ]=v ;return nil ;};type fillSegment struct{_cdac int ;_afgf int ;_decd int ;_fadf int ;};func TstAddSymbol (t *_c .T ,bms *Bitmaps ,sym *Bitmap ,x *int ,y int ,space int ){bms .AddBitmap (sym );_bggd :=_bf .Rect (*x ,y ,*x +sym .Width ,y +sym .Height );
-bms .AddBox (&_bggd );*x +=sym .Width +space ;};var (_ggbf *Bitmap ;_bceg *Bitmap ;);func _cdeg (_fcea *Bitmap ,_adeb *Bitmap ,_cdgc int )(_ebdae error ){const _cbcg ="\u0073\u0065\u0065\u0064\u0066\u0069\u006c\u006c\u0042\u0069\u006e\u0061r\u0079\u004c\u006f\u0077";
-_agccc :=_efd (_fcea .Height ,_adeb .Height );_fafa :=_efd (_fcea .RowStride ,_adeb .RowStride );switch _cdgc {case 4:_ebdae =_dedb (_fcea ,_adeb ,_agccc ,_fafa );case 8:_ebdae =_efaa (_fcea ,_adeb ,_agccc ,_fafa );default:return _a .Errorf (_cbcg ,"\u0063\u006f\u006e\u006e\u0065\u0063\u0074\u0069\u0076\u0069\u0074\u0079\u0020\u006d\u0075\u0073\u0074\u0020\u0062\u0065\u0020\u0034\u0020\u006fr\u0020\u0038\u0020\u002d\u0020i\u0073\u003a \u0027\u0025\u0064\u0027",_cdgc );
-};if _ebdae !=nil {return _a .Wrap (_ebdae ,_cbcg ,"");};return nil ;};func (_bgbg MorphProcess )verify (_agcg int ,_cgaa ,_dfae *int )error {const _aaggg ="\u004d\u006f\u0072\u0070hP\u0072\u006f\u0063\u0065\u0073\u0073\u002e\u0076\u0065\u0072\u0069\u0066\u0079";
-switch _bgbg .Operation {case MopDilation ,MopErosion ,MopOpening ,MopClosing :if len (_bgbg .Arguments )!=2{return _a .Error (_aaggg ,"\u004f\u0070\u0065\u0072\u0061\u0074\u0069\u006f\u006e\u003a\u0020\u0027\u0064\u0027\u002c\u0020\u0027\u0065\u0027\u002c \u0027\u006f\u0027\u002c\u0020\u0027\u0063\u0027\u0020\u0072\u0065\u0071\u0075\u0069\u0072\u0065\u0073\u0020\u0061\u0074\u0020\u006c\u0065\u0061\u0073\u0074\u0020\u0032\u0020\u0061r\u0067\u0075\u006d\u0065\u006et\u0073");
-};_fcbb ,_dcba :=_bgbg .getWidthHeight ();if _fcbb <=0||_dcba <=0{return _a .Error (_aaggg ,"O\u0070er\u0061t\u0069o\u006e\u003a\u0020\u0027\u0064'\u002c\u0020\u0027e\u0027\u002c\u0020\u0027\u006f'\u002c\u0020\u0027c\u0027\u0020\u0020\u0072\u0065\u0071\u0075\u0069\u0072\u0065\u0073 \u0062\u006f\u0074h w\u0069\u0064\u0074\u0068\u0020\u0061n\u0064\u0020\u0068\u0065\u0069\u0067\u0068\u0074\u0020\u0074\u006f\u0020b\u0065 \u003e\u003d\u0020\u0030");
-};case MopRankBinaryReduction :_bfdb :=len (_bgbg .Arguments );*_cgaa +=_bfdb ;if _bfdb < 1||_bfdb > 4{return _a .Error (_aaggg ,"\u004f\u0070\u0065\u0072\u0061\u0074\u0069\u006f\u006e\u003a\u0020\u0027\u0072\u0027\u0020\u0072\u0065\u0071\u0075\u0069r\u0065\u0073\u0020\u0061\u0074\u0020\u006c\u0065\u0061s\u0074\u0020\u0031\u0020\u0061\u006e\u0064\u0020\u0061\u0074\u0020\u006d\u006fs\u0074\u0020\u0034\u0020\u0061\u0072g\u0075\u006d\u0065n\u0074\u0073");
-};for _agdcg :=0;_agdcg < _bfdb ;_agdcg ++{if _bgbg .Arguments [_agdcg ]< 1||_bgbg .Arguments [_agdcg ]> 4{return _a .Error (_aaggg ,"\u0052\u0061\u006e\u006b\u0042\u0069n\u0061\u0072\u0079\u0052\u0065\u0064\u0075\u0063\u0074\u0069\u006f\u006e\u0020\u006c\u0065\u0076\u0065\u006c\u0020\u006du\u0073\u0074\u0020\u0062\u0065\u0020\u0069\u006e\u0020\u0072\u0061\u006e\u0067\u0065 \u00280\u002c\u0020\u0034\u003e");
-};};case MopReplicativeBinaryExpansion :if len (_bgbg .Arguments )==0{return _a .Error (_aaggg ,"\u0052\u0065\u0070\u006c\u0069\u0063\u0061\u0074i\u0076\u0065\u0042in\u0061\u0072\u0079\u0045\u0078\u0070a\u006e\u0073\u0069\u006f\u006e\u0020\u0072\u0065\u0071\u0075\u0069\u0072\u0065\u0073\u0020o\u006e\u0065\u0020\u0061\u0072\u0067\u0075\u006de\u006e\u0074");
-};_cgc :=_bgbg .Arguments [0];if _cgc !=2&&_cgc !=4&&_cgc !=8{return _a .Error (_aaggg ,"R\u0065\u0070\u006c\u0069\u0063\u0061\u0074\u0069\u0076\u0065\u0042\u0069\u006e\u0061\u0072\u0079\u0045\u0078\u0070\u0061\u006e\u0073\u0069\u006f\u006e\u0020m\u0075s\u0074\u0020\u0062\u0065 \u006f\u0066 \u0066\u0061\u0063\u0074\u006f\u0072\u0020\u0069\u006e\u0020\u0072\u0061\u006e\u0067\u0065\u0020\u007b\u0032\u002c\u0034\u002c\u0038\u007d");
-};*_cgaa -=_fdgd [_cgc /4];case MopAddBorder :if len (_bgbg .Arguments )==0{return _a .Error (_aaggg ,"\u0041\u0064\u0064B\u006f\u0072\u0064\u0065r\u0020\u0072\u0065\u0071\u0075\u0069\u0072e\u0073\u0020\u006f\u006e\u0065\u0020\u0061\u0072\u0067\u0075\u006d\u0065\u006e\u0074");
-};_dffc :=_bgbg .Arguments [0];if _agcg > 0{return _a .Error (_aaggg ,"\u0041\u0064\u0064\u0042\u006f\u0072\u0064\u0065\u0072\u0020\u006d\u0075\u0073t\u0020\u0062\u0065\u0020\u0061\u0020f\u0069\u0072\u0073\u0074\u0020\u006d\u006f\u0072\u0070\u0068\u0020\u0070\u0072o\u0063\u0065\u0073\u0073");
-};if _dffc < 1{return _a .Error (_aaggg ,"\u0041\u0064\u0064\u0042o\u0072\u0064\u0065\u0072\u0020\u0076\u0061\u006c\u0075\u0065 \u006co\u0077\u0065\u0072\u0020\u0074\u0068\u0061n\u0020\u0030");};*_dfae =_dffc ;};return nil ;};func (_cccf *BitmapsArray )AddBitmaps (bm *Bitmaps ){_cccf .Values =append (_cccf .Values ,bm )};
-func _dad (_bgd ,_dggf int )*Bitmap {return &Bitmap {Width :_bgd ,Height :_dggf ,RowStride :(_bgd +7)>>3};};func _edacg (_ceceb ,_ddgb *Bitmap ,_edagd ,_dafa int )(*Bitmap ,error ){const _efge ="d\u0069\u006c\u0061\u0074\u0065\u0042\u0072\u0069\u0063\u006b";
-if _ddgb ==nil {_dc .Log .Debug ("\u0064\u0069\u006c\u0061\u0074\u0065\u0042\u0072\u0069\u0063k\u0020\u0073\u006f\u0075\u0072\u0063\u0065 \u006e\u006f\u0074\u0020\u0064\u0065\u0066\u0069\u006e\u0065\u0064");return nil ,_a .Error (_efge ,"\u0073o\u0075\u0072\u0063\u0065 \u0062\u0069\u0074\u006d\u0061p\u0020n\u006ft\u0020\u0064\u0065\u0066\u0069\u006e\u0065d");
-};if _edagd < 1||_dafa < 1{return nil ,_a .Error (_efge ,"\u0068\u0053\u007a\u0069\u0065 \u0061\u006e\u0064\u0020\u0076\u0053\u0069\u007a\u0065\u0020\u0061\u0072\u0065 \u006e\u006f\u0020\u0067\u0072\u0065\u0061\u0074\u0065\u0072\u0020\u0065\u0071\u0075\u0061\u006c\u0020\u0074\u006f\u0020\u0031");
-};if _edagd ==1&&_dafa ==1{_fgdc ,_cgbcd :=_fedg (_ceceb ,_ddgb );if _cgbcd !=nil {return nil ,_a .Wrap (_cgbcd ,_efge ,"\u0068S\u0069\u007a\u0065\u0020\u003d\u003d\u0020\u0031\u0020\u0026\u0026 \u0076\u0053\u0069\u007a\u0065\u0020\u003d\u003d\u0020\u0031");
-};return _fgdc ,nil ;};if _edagd ==1||_dafa ==1{_feef :=SelCreateBrick (_dafa ,_edagd ,_dafa /2,_edagd /2,SelHit );_fdge ,_bcafb :=_acga (_ceceb ,_ddgb ,_feef );if _bcafb !=nil {return nil ,_a .Wrap (_bcafb ,_efge ,"\u0068s\u0069\u007a\u0065\u0020\u003d\u003d\u0020\u0031\u0020\u007c\u007c \u0076\u0053\u0069\u007a\u0065\u0020\u003d\u003d\u0020\u0031");
-};return _fdge ,nil ;};_dafd :=SelCreateBrick (1,_edagd ,0,_edagd /2,SelHit );_fabbag :=SelCreateBrick (_dafa ,1,_dafa /2,0,SelHit );_gecf ,_fdf :=_acga (nil ,_ddgb ,_dafd );if _fdf !=nil {return nil ,_a .Wrap (_fdf ,_efge ,"\u0031\u0073\u0074\u0020\u0064\u0069\u006c\u0061\u0074\u0065");
-};_ceceb ,_fdf =_acga (_ceceb ,_gecf ,_fabbag );if _fdf !=nil {return nil ,_a .Wrap (_fdf ,_efge ,"\u0032\u006e\u0064\u0020\u0064\u0069\u006c\u0061\u0074\u0065");};return _ceceb ,nil ;};func (_eddgd Points )YSorter ()func (_dgea ,_cgbe int )bool {return func (_cedfc ,_gfa int )bool {return _eddgd [_cedfc ].Y < _eddgd [_gfa ].Y };
-};func (_bbdc Points )Get (i int )(Point ,error ){if i > len (_bbdc )-1{return Point {},_a .Errorf ("\u0050\u006f\u0069\u006e\u0074\u0073\u002e\u0047\u0065\u0074","\u0069n\u0064\u0065\u0078\u003a\u0020\u0027\u0025\u0064\u0027\u0020\u006fu\u0074\u0020\u006f\u0066\u0020\u0072\u0061\u006e\u0067\u0065",i );
-};return _bbdc [i ],nil ;};func (_dbbb *Selection )findMaxTranslations ()(_gagf ,_cfcc ,_bdf ,_gdcfa int ){for _gbeda :=0;_gbeda < _dbbb .Height ;_gbeda ++{for _gdce :=0;_gdce < _dbbb .Width ;_gdce ++{if _dbbb .Data [_gbeda ][_gdce ]==SelHit {_gagf =_aega (_gagf ,_dbbb .Cx -_gdce );
-_cfcc =_aega (_cfcc ,_dbbb .Cy -_gbeda );_bdf =_aega (_bdf ,_gdce -_dbbb .Cx );_gdcfa =_aega (_gdcfa ,_gbeda -_dbbb .Cy );};};};return _gagf ,_cfcc ,_bdf ,_gdcfa ;};func (_bcca *byHeight )Len ()int {return len (_bcca .Values )};func (_gadg *Bitmaps )SelectByIndexes (idx []int )(*Bitmaps ,error ){const _abaa ="B\u0069\u0074\u006d\u0061\u0070\u0073.\u0053\u006f\u0072\u0074\u0049\u006e\u0064\u0065\u0078e\u0073\u0042\u0079H\u0065i\u0067\u0068\u0074";
-_caef ,_geee :=_gadg .selectByIndexes (idx );if _geee !=nil {return nil ,_a .Wrap (_geee ,_abaa ,"");};return _caef ,nil ;};func (_fefd *Bitmaps )GroupByHeight ()(*BitmapsArray ,error ){const _fdfca ="\u0047\u0072\u006f\u0075\u0070\u0042\u0079\u0048\u0065\u0069\u0067\u0068\u0074";
-if len (_fefd .Values )==0{return nil ,_a .Error (_fdfca ,"\u006eo\u0020v\u0061\u006c\u0075\u0065\u0073 \u0070\u0072o\u0076\u0069\u0064\u0065\u0064");};_bcaee :=&BitmapsArray {};_fefd .SortByHeight ();_edfee :=-1;_abcc :=-1;for _eedc :=0;_eedc < len (_fefd .Values );
-_eedc ++{_gfbef :=_fefd .Values [_eedc ].Height ;if _gfbef > _edfee {_edfee =_gfbef ;_abcc ++;_bcaee .Values =append (_bcaee .Values ,&Bitmaps {});};_bcaee .Values [_abcc ].AddBitmap (_fefd .Values [_eedc ]);};return _bcaee ,nil ;};func (_bced *Bitmap )Copy ()*Bitmap {_ddb :=make ([]byte ,len (_bced .Data ));
-copy (_ddb ,_bced .Data );return &Bitmap {Width :_bced .Width ,Height :_bced .Height ,RowStride :_bced .RowStride ,Data :_ddb ,Color :_bced .Color ,Text :_bced .Text ,BitmapNumber :_bced .BitmapNumber ,Special :_bced .Special };};func (_aafg *ClassedPoints )Len ()int {return _aafg .IntSlice .Size ()};
-func (_gad *Bitmap )Equivalent (s *Bitmap )bool {return _gad .equivalent (s )};func (_ffgc *Bitmaps )CountPixels ()*_ge .NumSlice {_gbca :=&_ge .NumSlice {};for _ ,_bffd :=range _ffgc .Values {_gbca .AddInt (_bffd .CountPixels ());};return _gbca ;};func _aggg (_cfac *_ge .Stack ,_cdgfc ,_bgac ,_afggg ,_cbgg ,_gffb int ,_ggde *_bf .Rectangle )(_becff error ){const _eecf ="\u0070\u0075\u0073\u0068\u0046\u0069\u006c\u006c\u0053\u0065\u0067m\u0065\u006e\u0074\u0042\u006f\u0075\u006e\u0064\u0069\u006eg\u0042\u006f\u0078";
-if _cfac ==nil {return _a .Error (_eecf ,"\u006ei\u006c \u0073\u0074\u0061\u0063\u006b \u0070\u0072o\u0076\u0069\u0064\u0065\u0064");};if _ggde ==nil {return _a .Error (_eecf ,"\u0070\u0072\u006f\u0076i\u0064\u0065\u0064\u0020\u006e\u0069\u006c\u0020\u0069\u006da\u0067e\u002e\u0052\u0065\u0063\u0074\u0061\u006eg\u006c\u0065");
-};_ggde .Min .X =_ge .Min (_ggde .Min .X ,_cdgfc );_ggde .Max .X =_ge .Max (_ggde .Max .X ,_bgac );_ggde .Min .Y =_ge .Min (_ggde .Min .Y ,_afggg );_ggde .Max .Y =_ge .Max (_ggde .Max .Y ,_afggg );if _afggg +_cbgg < 0||_afggg +_cbgg > _gffb {return nil ;
-};if _cfac .Aux ==nil {return _a .Error (_eecf ,"a\u0075x\u0053\u0074\u0061\u0063\u006b\u0020\u006e\u006ft\u0020\u0064\u0065\u0066in\u0065\u0064");};var _dbcf *fillSegment ;_ddfef ,_ccac :=_cfac .Aux .Pop ();if _ccac {if _dbcf ,_ccac =_ddfef .(*fillSegment );
-!_ccac {return _a .Error (_eecf ,"a\u0075\u0078\u0053\u0074\u0061\u0063k\u0020\u0064\u0061\u0074\u0061\u0020i\u0073\u0020\u006e\u006f\u0074\u0020\u0061 \u002a\u0066\u0069\u006c\u006c\u0053\u0065\u0067\u006d\u0065n\u0074");};}else {_dbcf =&fillSegment {};
-};_dbcf ._cdac =_cdgfc ;_dbcf ._afgf =_bgac ;_dbcf ._decd =_afggg ;_dbcf ._fadf =_cbgg ;_cfac .Push (_dbcf );return nil ;};func (_acbe *Bitmap )ThresholdPixelSum (thresh int ,tab8 []int )(_cdda bool ,_acac error ){const _ccafa ="\u0042i\u0074\u006d\u0061\u0070\u002e\u0054\u0068\u0072\u0065\u0073\u0068o\u006c\u0064\u0050\u0069\u0078\u0065\u006c\u0053\u0075\u006d";
-if tab8 ==nil {tab8 =_afgg ();};_bdbd :=_acbe .Width >>3;_cae :=_acbe .Width &7;_ggg :=byte (0xff<<uint (8-_cae ));var (_daca ,_fcgg ,_fac ,_ddg int ;_edea byte ;);for _daca =0;_daca < _acbe .Height ;_daca ++{_fac =_acbe .RowStride *_daca ;for _fcgg =0;
-_fcgg < _bdbd ;_fcgg ++{_edea ,_acac =_acbe .GetByte (_fac +_fcgg );if _acac !=nil {return false ,_a .Wrap (_acac ,_ccafa ,"\u0066\u0075\u006c\u006c\u0042\u0079\u0074\u0065");};_ddg +=tab8 [_edea ];};if _cae !=0{_edea ,_acac =_acbe .GetByte (_fac +_fcgg );
-if _acac !=nil {return false ,_a .Wrap (_acac ,_ccafa ,"p\u0061\u0072\u0074\u0069\u0061\u006c\u0042\u0079\u0074\u0065");};_edea &=_ggg ;_ddg +=tab8 [_edea ];};if _ddg > thresh {return true ,nil ;};};return _cdda ,nil ;};func (_gfac *BitmapsArray )GetBitmaps (i int )(*Bitmaps ,error ){const _dcea ="\u0042\u0069\u0074ma\u0070\u0073\u0041\u0072\u0072\u0061\u0079\u002e\u0047\u0065\u0074\u0042\u0069\u0074\u006d\u0061\u0070\u0073";
-if _gfac ==nil {return nil ,_a .Error (_dcea ,"p\u0072\u006f\u0076\u0069\u0064\u0065d\u0020\u006e\u0069\u006c\u0020\u0027\u0042\u0069\u0074m\u0061\u0070\u0073A\u0072r\u0061\u0079\u0027");};if i > len (_gfac .Values )-1{return nil ,_a .Errorf (_dcea ,"\u0069n\u0064\u0065\u0078\u003a\u0020\u0027\u0025\u0064\u0027\u0020\u006fu\u0074\u0020\u006f\u0066\u0020\u0072\u0061\u006e\u0067\u0065",i );
-};return _gfac .Values [i ],nil ;};func (_gfegae *Bitmaps )GetBox (i int )(*_bf .Rectangle ,error ){const _ebgdc ="\u0047\u0065\u0074\u0042\u006f\u0078";if _gfegae ==nil {return nil ,_a .Error (_ebgdc ,"\u0070\u0072\u006f\u0076id\u0065\u0064\u0020\u006e\u0069\u006c\u0020\u0027\u0042\u0069\u0074\u006d\u0061\u0070s\u0027");
-};if i > len (_gfegae .Boxes )-1{return nil ,_a .Errorf (_ebgdc ,"\u0069n\u0064\u0065\u0078\u003a\u0020\u0027\u0025\u0064\u0027\u0020\u006fu\u0074\u0020\u006f\u0066\u0020\u0072\u0061\u006e\u0067\u0065",i );};return _gfegae .Boxes [i ],nil ;};func (_bgddc *ClassedPoints )xSortFunction ()func (_ddaf int ,_bfdg int )bool {return func (_gffag ,_becaff int )bool {return _bgddc .XAtIndex (_gffag )< _bgddc .XAtIndex (_becaff )};
-};func (_adad *ClassedPoints )YAtIndex (i int )float32 {return (*_adad .Points )[_adad .IntSlice [i ]].Y };func (_afag *Bitmap )AddBorder (borderSize ,val int )(*Bitmap ,error ){if borderSize ==0{return _afag .Copy (),nil ;};_fab ,_cdfe :=_afag .addBorderGeneral (borderSize ,borderSize ,borderSize ,borderSize ,val );
-if _cdfe !=nil {return nil ,_a .Wrap (_cdfe ,"\u0041d\u0064\u0042\u006f\u0072\u0064\u0065r","");};return _fab ,nil ;};func (_fdbg *Bitmap )SetDefaultPixel (){for _eaag :=range _fdbg .Data {_fdbg .Data [_eaag ]=byte (0xff);};};func (_ceab Points )Size ()int {return len (_ceab )};
-func CombineBytes (oldByte ,newByte byte ,op CombinationOperator )byte {return _ccecc (oldByte ,newByte ,op );};func (_egdef *byHeight )Less (i ,j int )bool {return _egdef .Values [i ].Height < _egdef .Values [j ].Height };func NewClassedPoints (points *Points ,classes _ge .IntSlice )(*ClassedPoints ,error ){const _bbdd ="\u004e\u0065w\u0043\u006c\u0061s\u0073\u0065\u0064\u0050\u006f\u0069\u006e\u0074\u0073";
-if points ==nil {return nil ,_a .Error (_bbdd ,"\u0070\u0072\u006f\u0076id\u0065\u0064\u0020\u006e\u0069\u006c\u0020\u0070\u006f\u0069\u006e\u0074\u0073");};if classes ==nil {return nil ,_a .Error (_bbdd ,"p\u0072o\u0076\u0069\u0064\u0065\u0064\u0020\u006e\u0069l\u0020\u0063\u006c\u0061ss\u0065\u0073");
-};_effe :=&ClassedPoints {Points :points ,IntSlice :classes };if _gade :=_effe .validateIntSlice ();_gade !=nil {return nil ,_a .Wrap (_gade ,_bbdd ,"");};return _effe ,nil ;};type byHeight Bitmaps ;func (_cedf Points )GetIntY (i int )(int ,error ){if i >=len (_cedf ){return 0,_a .Errorf ("\u0050\u006f\u0069\u006e\u0074\u0073\u002e\u0047\u0065t\u0049\u006e\u0074\u0059","\u0069n\u0064\u0065\u0078\u003a\u0020\u0027\u0025\u0064\u0027\u0020\u006fu\u0074\u0020\u006f\u0066\u0020\u0072\u0061\u006e\u0067\u0065",i );
-};return int (_cedf [i ].Y ),nil ;};func _cfa ()(_dfg [256]uint32 ){for _bbe :=0;_bbe < 256;_bbe ++{if _bbe &0x01!=0{_dfg [_bbe ]|=0xf;};if _bbe &0x02!=0{_dfg [_bbe ]|=0xf0;};if _bbe &0x04!=0{_dfg [_bbe ]|=0xf00;};if _bbe &0x08!=0{_dfg [_bbe ]|=0xf000;
-};if _bbe &0x10!=0{_dfg [_bbe ]|=0xf0000;};if _bbe &0x20!=0{_dfg [_bbe ]|=0xf00000;};if _bbe &0x40!=0{_dfg [_bbe ]|=0xf000000;};if _bbe &0x80!=0{_dfg [_bbe ]|=0xf0000000;};};return _dfg ;};func (_afbf *Bitmaps )HeightSorter ()func (_egega ,_efbc int )bool {return func (_fbeb ,_bgdde int )bool {_ceafc :=_afbf .Values [_fbeb ].Height < _afbf .Values [_bgdde ].Height ;
-_dc .Log .Debug ("H\u0065i\u0067\u0068\u0074\u003a\u0020\u0025\u0076\u0020<\u0020\u0025\u0076\u0020= \u0025\u0076",_afbf .Values [_fbeb ].Height ,_afbf .Values [_bgdde ].Height ,_ceafc );return _ceafc ;};};func _dcdf (_aaccc ,_gcgd ,_gee *Bitmap ,_gegc int )(*Bitmap ,error ){const _ggcb ="\u0073\u0065\u0065\u0064\u0046\u0069\u006c\u006c\u0042i\u006e\u0061\u0072\u0079";
-if _gcgd ==nil {return nil ,_a .Error (_ggcb ,"s\u006fu\u0072\u0063\u0065\u0020\u0062\u0069\u0074\u006da\u0070\u0020\u0069\u0073 n\u0069\u006c");};if _gee ==nil {return nil ,_a .Error (_ggcb ,"'\u006da\u0073\u006b\u0027\u0020\u0062\u0069\u0074\u006da\u0070\u0020\u0069\u0073 n\u0069\u006c");
-};if _gegc !=4&&_gegc !=8{return nil ,_a .Error (_ggcb ,"\u0063\u006f\u006en\u0065\u0063\u0074\u0069v\u0069\u0074\u0079\u0020\u006e\u006f\u0074 \u0069\u006e\u0020\u0072\u0061\u006e\u0067\u0065\u0020\u007b\u0034\u002c\u0038\u007d");};var _gedda error ;_aaccc ,_gedda =_fedg (_aaccc ,_gcgd );
-if _gedda !=nil {return nil ,_a .Wrap (_gedda ,_ggcb ,"\u0063o\u0070y\u0020\u0073\u006f\u0075\u0072c\u0065\u0020t\u006f\u0020\u0027\u0064\u0027");};_aefc :=_gcgd .createTemplate ();_gee .setPadBits (0);for _dced :=0;_dced < _aecca ;_dced ++{_aefc ,_gedda =_fedg (_aefc ,_aaccc );
-if _gedda !=nil {return nil ,_a .Wrapf (_gedda ,_ggcb ,"\u0069\u0074\u0065\u0072\u0061\u0074\u0069\u006f\u006e\u003a\u0020\u0025\u0064",_dced );};if _gedda =_cdeg (_aaccc ,_gee ,_gegc );_gedda !=nil {return nil ,_a .Wrapf (_gedda ,_ggcb ,"\u0069\u0074\u0065\u0072\u0061\u0074\u0069\u006f\u006e\u003a\u0020\u0025\u0064",_dced );
-};if _aefc .Equals (_aaccc ){break ;};};return _aaccc ,nil ;};func RasterOperation (dest *Bitmap ,dx ,dy ,dw ,dh int ,op RasterOperator ,src *Bitmap ,sx ,sy int )error {return _ece (dest ,dx ,dy ,dw ,dh ,op ,src ,sx ,sy );};func (_acab *Bitmap )setFourBytes (_adfc int ,_cfff uint32 )error {if _adfc +3> len (_acab .Data )-1{return _a .Errorf ("\u0073\u0065\u0074F\u006f\u0075\u0072\u0042\u0079\u0074\u0065\u0073","\u0069n\u0064\u0065\u0078\u003a\u0020\u0027\u0025\u0064\u0027\u0020\u006fu\u0074\u0020\u006f\u0066\u0020\u0072\u0061\u006e\u0067\u0065",_adfc );
-};_acab .Data [_adfc ]=byte ((_cfff &0xff000000)>>24);_acab .Data [_adfc +1]=byte ((_cfff &0xff0000)>>16);_acab .Data [_adfc +2]=byte ((_cfff &0xff00)>>8);_acab .Data [_adfc +3]=byte (_cfff &0xff);return nil ;};func (_dde *Bitmap )SetPixel (x ,y int ,pixel byte )error {_aac :=_dde .GetByteIndex (x ,y );
-if _aac > len (_dde .Data )-1{return _a .Errorf ("\u0053\u0065\u0074\u0050\u0069\u0078\u0065\u006c","\u0069\u006e\u0064\u0065x \u006f\u0075\u0074\u0020\u006f\u0066\u0020\u0072\u0061\u006e\u0067\u0065\u003a\u0020%\u0064",_aac );};_eegf :=_dde .GetBitOffset (x );
-_cbd :=uint (7-_eegf );_eaa :=_dde .Data [_aac ];var _egeg byte ;if pixel ==1{_egeg =_eaa |(pixel &0x01<<_cbd );}else {_egeg =_eaa &^(1<<_cbd );};_dde .Data [_aac ]=_egeg ;return nil ;};func (_bgcd *byWidth )Swap (i ,j int ){_bgcd .Values [i ],_bgcd .Values [j ]=_bgcd .Values [j ],_bgcd .Values [i ];
-if _bgcd .Boxes !=nil {_bgcd .Boxes [i ],_bgcd .Boxes [j ]=_bgcd .Boxes [j ],_bgcd .Boxes [i ];};};func TstWordBitmap (t *_c .T ,scale ...int )*Bitmap {_ebgdcc :=1;if len (scale )> 0{_ebgdcc =scale [0];};_bdfg :=3;_ebfb :=9+7+15+2*_bdfg ;_cffe :=5+_bdfg +5;
-_gfcf :=New (_ebfb *_ebgdcc ,_cffe *_ebgdcc );_bgge :=&Bitmaps {};var _dcgg *int ;_bdfg *=_ebgdcc ;_cagf :=0;_dcgg =&_cagf ;_dcbc :=0;_fbed :=TstDSymbol (t ,scale ...);TstAddSymbol (t ,_bgge ,_fbed ,_dcgg ,_dcbc ,1*_ebgdcc );_fbed =TstOSymbol (t ,scale ...);
-TstAddSymbol (t ,_bgge ,_fbed ,_dcgg ,_dcbc ,_bdfg );_fbed =TstISymbol (t ,scale ...);TstAddSymbol (t ,_bgge ,_fbed ,_dcgg ,_dcbc ,1*_ebgdcc );_fbed =TstTSymbol (t ,scale ...);TstAddSymbol (t ,_bgge ,_fbed ,_dcgg ,_dcbc ,_bdfg );_fbed =TstNSymbol (t ,scale ...);
-TstAddSymbol (t ,_bgge ,_fbed ,_dcgg ,_dcbc ,1*_ebgdcc );_fbed =TstOSymbol (t ,scale ...);TstAddSymbol (t ,_bgge ,_fbed ,_dcgg ,_dcbc ,1*_ebgdcc );_fbed =TstWSymbol (t ,scale ...);TstAddSymbol (t ,_bgge ,_fbed ,_dcgg ,_dcbc ,0);*_dcgg =0;_dcbc =5*_ebgdcc +_bdfg ;
-_fbed =TstOSymbol (t ,scale ...);TstAddSymbol (t ,_bgge ,_fbed ,_dcgg ,_dcbc ,1*_ebgdcc );_fbed =TstRSymbol (t ,scale ...);TstAddSymbol (t ,_bgge ,_fbed ,_dcgg ,_dcbc ,_bdfg );_fbed =TstNSymbol (t ,scale ...);TstAddSymbol (t ,_bgge ,_fbed ,_dcgg ,_dcbc ,1*_ebgdcc );
-_fbed =TstESymbol (t ,scale ...);TstAddSymbol (t ,_bgge ,_fbed ,_dcgg ,_dcbc ,1*_ebgdcc );_fbed =TstVSymbol (t ,scale ...);TstAddSymbol (t ,_bgge ,_fbed ,_dcgg ,_dcbc ,1*_ebgdcc );_fbed =TstESymbol (t ,scale ...);TstAddSymbol (t ,_bgge ,_fbed ,_dcgg ,_dcbc ,1*_ebgdcc );
-_fbed =TstRSymbol (t ,scale ...);TstAddSymbol (t ,_bgge ,_fbed ,_dcgg ,_dcbc ,0);TstWriteSymbols (t ,_bgge ,_gfcf );return _gfcf ;};func (_bded *ClassedPoints )Swap (i ,j int ){_bded .IntSlice [i ],_bded .IntSlice [j ]=_bded .IntSlice [j ],_bded .IntSlice [i ];
-};func (_cdgdc *Bitmaps )String ()string {_feg :=_b .Builder {};for _ ,_bffac :=range _cdgdc .Values {_feg .WriteString (_bffac .String ());_feg .WriteRune ('\n');};return _feg .String ();};func _baca (_adab *Bitmap ,_deec *_ge .Stack ,_efag ,_dfcd int )(_defe *_bf .Rectangle ,_fcbc error ){const _ffbbb ="\u0073e\u0065d\u0046\u0069\u006c\u006c\u0053\u0074\u0061\u0063\u006b\u0042\u0042";
-if _adab ==nil {return nil ,_a .Error (_ffbbb ,"\u0070\u0072\u006fvi\u0064\u0065\u0064\u0020\u006e\u0069\u006c\u0020\u0027\u0073\u0027\u0020\u0042\u0069\u0074\u006d\u0061\u0070");};if _deec ==nil {return nil ,_a .Error (_ffbbb ,"p\u0072o\u0076\u0069\u0064\u0065\u0064\u0020\u006e\u0069l\u0020\u0027\u0073\u0074ac\u006b\u0027");
-};_ebgad ,_cgga :=_adab .Width ,_adab .Height ;_daga :=_ebgad -1;_ffbgd :=_cgga -1;if _efag < 0||_efag > _daga ||_dfcd < 0||_dfcd > _ffbgd ||!_adab .GetPixel (_efag ,_dfcd ){return nil ,nil ;};var _cabc *_bf .Rectangle ;_cabc ,_fcbc =Rect (100000,100000,0,0);
-if _fcbc !=nil {return nil ,_a .Wrap (_fcbc ,_ffbbb ,"");};if _fcbc =_aggg (_deec ,_efag ,_efag ,_dfcd ,1,_ffbgd ,_cabc );_fcbc !=nil {return nil ,_a .Wrap (_fcbc ,_ffbbb ,"\u0069\u006e\u0069t\u0069\u0061\u006c\u0020\u0070\u0075\u0073\u0068");};if _fcbc =_aggg (_deec ,_efag ,_efag ,_dfcd +1,-1,_ffbgd ,_cabc );
-_fcbc !=nil {return nil ,_a .Wrap (_fcbc ,_ffbbb ,"\u0032\u006ed\u0020\u0069\u006ei\u0074\u0069\u0061\u006c\u0020\u0070\u0075\u0073\u0068");};_cabc .Min .X ,_cabc .Max .X =_efag ,_efag ;_cabc .Min .Y ,_cabc .Max .Y =_dfcd ,_dfcd ;var (_eggd *fillSegment ;
-_gabag int ;);for _deec .Len ()> 0{if _eggd ,_fcbc =_gaaf (_deec );_fcbc !=nil {return nil ,_a .Wrap (_fcbc ,_ffbbb ,"");};_dfcd =_eggd ._decd ;for _efag =_eggd ._cdac ;_efag >=0&&_adab .GetPixel (_efag ,_dfcd );_efag --{if _fcbc =_adab .SetPixel (_efag ,_dfcd ,0);
-_fcbc !=nil {return nil ,_a .Wrap (_fcbc ,_ffbbb ,"");};};if _efag >=_eggd ._cdac {for _efag ++;_efag <=_eggd ._afgf &&_efag <=_daga &&!_adab .GetPixel (_efag ,_dfcd );_efag ++{};_gabag =_efag ;if _efag > _eggd ._afgf ||_efag > _daga {continue ;};}else {_gabag =_efag +1;
-if _gabag < _eggd ._cdac -1{if _fcbc =_aggg (_deec ,_gabag ,_eggd ._cdac -1,_eggd ._decd ,-_eggd ._fadf ,_ffbgd ,_cabc );_fcbc !=nil {return nil ,_a .Wrap (_fcbc ,_ffbbb ,"\u006c\u0065\u0061\u006b\u0020\u006f\u006e\u0020\u006c\u0065\u0066\u0074 \u0073\u0069\u0064\u0065");
-};};_efag =_eggd ._cdac +1;};for {for ;_efag <=_daga &&_adab .GetPixel (_efag ,_dfcd );_efag ++{if _fcbc =_adab .SetPixel (_efag ,_dfcd ,0);_fcbc !=nil {return nil ,_a .Wrap (_fcbc ,_ffbbb ,"\u0032n\u0064\u0020\u0073\u0065\u0074");};};if _fcbc =_aggg (_deec ,_gabag ,_efag -1,_eggd ._decd ,_eggd ._fadf ,_ffbgd ,_cabc );
-_fcbc !=nil {return nil ,_a .Wrap (_fcbc ,_ffbbb ,"n\u006f\u0072\u006d\u0061\u006c\u0020\u0070\u0075\u0073\u0068");};if _efag > _eggd ._afgf +1{if _fcbc =_aggg (_deec ,_eggd ._afgf +1,_efag -1,_eggd ._decd ,-_eggd ._fadf ,_ffbgd ,_cabc );_fcbc !=nil {return nil ,_a .Wrap (_fcbc ,_ffbbb ,"\u006ce\u0061k\u0020\u006f\u006e\u0020\u0072i\u0067\u0068t\u0020\u0073\u0069\u0064\u0065");
-};};for _efag ++;_efag <=_eggd ._afgf &&_efag <=_daga &&!_adab .GetPixel (_efag ,_dfcd );_efag ++{};_gabag =_efag ;if _efag > _eggd ._afgf ||_efag > _daga {break ;};};};_cabc .Max .X ++;_cabc .Max .Y ++;return _cabc ,nil ;};func TstASymbol (t *_c .T )*Bitmap {t .Helper ();
-_fagg :=New (6,6);_d .NoError (t ,_fagg .SetPixel (1,0,1));_d .NoError (t ,_fagg .SetPixel (2,0,1));_d .NoError (t ,_fagg .SetPixel (3,0,1));_d .NoError (t ,_fagg .SetPixel (4,0,1));_d .NoError (t ,_fagg .SetPixel (5,1,1));_d .NoError (t ,_fagg .SetPixel (1,2,1));
-_d .NoError (t ,_fagg .SetPixel (2,2,1));_d .NoError (t ,_fagg .SetPixel (3,2,1));_d .NoError (t ,_fagg .SetPixel (4,2,1));_d .NoError (t ,_fagg .SetPixel (5,2,1));_d .NoError (t ,_fagg .SetPixel (0,3,1));_d .NoError (t ,_fagg .SetPixel (5,3,1));_d .NoError (t ,_fagg .SetPixel (0,4,1));
-_d .NoError (t ,_fagg .SetPixel (5,4,1));_d .NoError (t ,_fagg .SetPixel (1,5,1));_d .NoError (t ,_fagg .SetPixel (2,5,1));_d .NoError (t ,_fagg .SetPixel (3,5,1));_d .NoError (t ,_fagg .SetPixel (4,5,1));_d .NoError (t ,_fagg .SetPixel (5,5,1));return _fagg ;
-};const (ComponentConn Component =iota ;ComponentCharacters ;ComponentWords ;);var _ _df .Interface =&ClassedPoints {};const (AsymmetricMorphBC BoundaryCondition =iota ;SymmetricMorphBC ;);func _gfde (_ffbdf *Bitmap ,_acacg ,_bffa ,_fagd ,_fcee int ,_abbbf RasterOperator ,_abef *Bitmap ,_gbeb ,_gbeg int )error {var (_fcga bool ;
-_agdbd bool ;_debag byte ;_aeaaa int ;_gacc int ;_fddc int ;_decc int ;_feagf bool ;_gfaa int ;_cdgg int ;_fbdb int ;_eedde bool ;_bac byte ;_aaad int ;_fdfg int ;_bfbae int ;_degfb byte ;_fbee int ;_accg int ;_afefbf uint ;_gcdec uint ;_bdgd byte ;_gabc shift ;
-_addb bool ;_ebcc bool ;_ggdfa ,_eedab int ;);if _gbeb &7!=0{_accg =8-(_gbeb &7);};if _acacg &7!=0{_gacc =8-(_acacg &7);};if _accg ==0&&_gacc ==0{_bdgd =_beeb [0];}else {if _gacc > _accg {_afefbf =uint (_gacc -_accg );}else {_afefbf =uint (8-(_accg -_gacc ));
-};_gcdec =8-_afefbf ;_bdgd =_beeb [_afefbf ];};if (_acacg &7)!=0{_fcga =true ;_aeaaa =8-(_acacg &7);_debag =_beeb [_aeaaa ];_fddc =_ffbdf .RowStride *_bffa +(_acacg >>3);_decc =_abef .RowStride *_gbeg +(_gbeb >>3);_fbee =8-(_gbeb &7);if _aeaaa > _fbee {_gabc =_dgfb ;
-if _fagd >=_accg {_addb =true ;};}else {_gabc =_acce ;};};if _fagd < _aeaaa {_agdbd =true ;_debag &=_dcga [8-_aeaaa +_fagd ];};if !_agdbd {_gfaa =(_fagd -_aeaaa )>>3;if _gfaa !=0{_feagf =true ;_cdgg =_ffbdf .RowStride *_bffa +((_acacg +_gacc )>>3);_fbdb =_abef .RowStride *_gbeg +((_gbeb +_gacc )>>3);
-};};_aaad =(_acacg +_fagd )&7;if !_agdbd &&_aaad !=0{_eedde =true ;_bac =_dcga [_aaad ];_fdfg =_ffbdf .RowStride *_bffa +((_acacg +_gacc )>>3)+_gfaa ;_bfbae =_abef .RowStride *_gbeg +((_gbeb +_gacc )>>3)+_gfaa ;if _aaad > int (_gcdec ){_ebcc =true ;};};
-switch _abbbf {case PixSrc :if _fcga {for _ggdfa =0;_ggdfa < _fcee ;_ggdfa ++{if _gabc ==_dgfb {_degfb =_abef .Data [_decc ]<<_afefbf ;if _addb {_degfb =_fbaa (_degfb ,_abef .Data [_decc +1]>>_gcdec ,_bdgd );};}else {_degfb =_abef .Data [_decc ]>>_gcdec ;
-};_ffbdf .Data [_fddc ]=_fbaa (_ffbdf .Data [_fddc ],_degfb ,_debag );_fddc +=_ffbdf .RowStride ;_decc +=_abef .RowStride ;};};if _feagf {for _ggdfa =0;_ggdfa < _fcee ;_ggdfa ++{for _eedab =0;_eedab < _gfaa ;_eedab ++{_degfb =_fbaa (_abef .Data [_fbdb +_eedab ]<<_afefbf ,_abef .Data [_fbdb +_eedab +1]>>_gcdec ,_bdgd );
-_ffbdf .Data [_cdgg +_eedab ]=_degfb ;};_cdgg +=_ffbdf .RowStride ;_fbdb +=_abef .RowStride ;};};if _eedde {for _ggdfa =0;_ggdfa < _fcee ;_ggdfa ++{_degfb =_abef .Data [_bfbae ]<<_afefbf ;if _ebcc {_degfb =_fbaa (_degfb ,_abef .Data [_bfbae +1]>>_gcdec ,_bdgd );
-};_ffbdf .Data [_fdfg ]=_fbaa (_ffbdf .Data [_fdfg ],_degfb ,_bac );_fdfg +=_ffbdf .RowStride ;_bfbae +=_abef .RowStride ;};};case PixNotSrc :if _fcga {for _ggdfa =0;_ggdfa < _fcee ;_ggdfa ++{if _gabc ==_dgfb {_degfb =_abef .Data [_decc ]<<_afefbf ;if _addb {_degfb =_fbaa (_degfb ,_abef .Data [_decc +1]>>_gcdec ,_bdgd );
-};}else {_degfb =_abef .Data [_decc ]>>_gcdec ;};_ffbdf .Data [_fddc ]=_fbaa (_ffbdf .Data [_fddc ],^_degfb ,_debag );_fddc +=_ffbdf .RowStride ;_decc +=_abef .RowStride ;};};if _feagf {for _ggdfa =0;_ggdfa < _fcee ;_ggdfa ++{for _eedab =0;_eedab < _gfaa ;
-_eedab ++{_degfb =_fbaa (_abef .Data [_fbdb +_eedab ]<<_afefbf ,_abef .Data [_fbdb +_eedab +1]>>_gcdec ,_bdgd );_ffbdf .Data [_cdgg +_eedab ]=^_degfb ;};_cdgg +=_ffbdf .RowStride ;_fbdb +=_abef .RowStride ;};};if _eedde {for _ggdfa =0;_ggdfa < _fcee ;_ggdfa ++{_degfb =_abef .Data [_bfbae ]<<_afefbf ;
-if _ebcc {_degfb =_fbaa (_degfb ,_abef .Data [_bfbae +1]>>_gcdec ,_bdgd );};_ffbdf .Data [_fdfg ]=_fbaa (_ffbdf .Data [_fdfg ],^_degfb ,_bac );_fdfg +=_ffbdf .RowStride ;_bfbae +=_abef .RowStride ;};};case PixSrcOrDst :if _fcga {for _ggdfa =0;_ggdfa < _fcee ;
-_ggdfa ++{if _gabc ==_dgfb {_degfb =_abef .Data [_decc ]<<_afefbf ;if _addb {_degfb =_fbaa (_degfb ,_abef .Data [_decc +1]>>_gcdec ,_bdgd );};}else {_degfb =_abef .Data [_decc ]>>_gcdec ;};_ffbdf .Data [_fddc ]=_fbaa (_ffbdf .Data [_fddc ],_degfb |_ffbdf .Data [_fddc ],_debag );
-_fddc +=_ffbdf .RowStride ;_decc +=_abef .RowStride ;};};if _feagf {for _ggdfa =0;_ggdfa < _fcee ;_ggdfa ++{for _eedab =0;_eedab < _gfaa ;_eedab ++{_degfb =_fbaa (_abef .Data [_fbdb +_eedab ]<<_afefbf ,_abef .Data [_fbdb +_eedab +1]>>_gcdec ,_bdgd );_ffbdf .Data [_cdgg +_eedab ]|=_degfb ;
-};_cdgg +=_ffbdf .RowStride ;_fbdb +=_abef .RowStride ;};};if _eedde {for _ggdfa =0;_ggdfa < _fcee ;_ggdfa ++{_degfb =_abef .Data [_bfbae ]<<_afefbf ;if _ebcc {_degfb =_fbaa (_degfb ,_abef .Data [_bfbae +1]>>_gcdec ,_bdgd );};_ffbdf .Data [_fdfg ]=_fbaa (_ffbdf .Data [_fdfg ],_degfb |_ffbdf .Data [_fdfg ],_bac );
-_fdfg +=_ffbdf .RowStride ;_bfbae +=_abef .RowStride ;};};case PixSrcAndDst :if _fcga {for _ggdfa =0;_ggdfa < _fcee ;_ggdfa ++{if _gabc ==_dgfb {_degfb =_abef .Data [_decc ]<<_afefbf ;if _addb {_degfb =_fbaa (_degfb ,_abef .Data [_decc +1]>>_gcdec ,_bdgd );
-};}else {_degfb =_abef .Data [_decc ]>>_gcdec ;};_ffbdf .Data [_fddc ]=_fbaa (_ffbdf .Data [_fddc ],_degfb &_ffbdf .Data [_fddc ],_debag );_fddc +=_ffbdf .RowStride ;_decc +=_abef .RowStride ;};};if _feagf {for _ggdfa =0;_ggdfa < _fcee ;_ggdfa ++{for _eedab =0;
-_eedab < _gfaa ;_eedab ++{_degfb =_fbaa (_abef .Data [_fbdb +_eedab ]<<_afefbf ,_abef .Data [_fbdb +_eedab +1]>>_gcdec ,_bdgd );_ffbdf .Data [_cdgg +_eedab ]&=_degfb ;};_cdgg +=_ffbdf .RowStride ;_fbdb +=_abef .RowStride ;};};if _eedde {for _ggdfa =0;_ggdfa < _fcee ;
-_ggdfa ++{_degfb =_abef .Data [_bfbae ]<<_afefbf ;if _ebcc {_degfb =_fbaa (_degfb ,_abef .Data [_bfbae +1]>>_gcdec ,_bdgd );};_ffbdf .Data [_fdfg ]=_fbaa (_ffbdf .Data [_fdfg ],_degfb &_ffbdf .Data [_fdfg ],_bac );_fdfg +=_ffbdf .RowStride ;_bfbae +=_abef .RowStride ;
-};};case PixSrcXorDst :if _fcga {for _ggdfa =0;_ggdfa < _fcee ;_ggdfa ++{if _gabc ==_dgfb {_degfb =_abef .Data [_decc ]<<_afefbf ;if _addb {_degfb =_fbaa (_degfb ,_abef .Data [_decc +1]>>_gcdec ,_bdgd );};}else {_degfb =_abef .Data [_decc ]>>_gcdec ;};
-_ffbdf .Data [_fddc ]=_fbaa (_ffbdf .Data [_fddc ],_degfb ^_ffbdf .Data [_fddc ],_debag );_fddc +=_ffbdf .RowStride ;_decc +=_abef .RowStride ;};};if _feagf {for _ggdfa =0;_ggdfa < _fcee ;_ggdfa ++{for _eedab =0;_eedab < _gfaa ;_eedab ++{_degfb =_fbaa (_abef .Data [_fbdb +_eedab ]<<_afefbf ,_abef .Data [_fbdb +_eedab +1]>>_gcdec ,_bdgd );
-_ffbdf .Data [_cdgg +_eedab ]^=_degfb ;};_cdgg +=_ffbdf .RowStride ;_fbdb +=_abef .RowStride ;};};if _eedde {for _ggdfa =0;_ggdfa < _fcee ;_ggdfa ++{_degfb =_abef .Data [_bfbae ]<<_afefbf ;if _ebcc {_degfb =_fbaa (_degfb ,_abef .Data [_bfbae +1]>>_gcdec ,_bdgd );
-};_ffbdf .Data [_fdfg ]=_fbaa (_ffbdf .Data [_fdfg ],_degfb ^_ffbdf .Data [_fdfg ],_bac );_fdfg +=_ffbdf .RowStride ;_bfbae +=_abef .RowStride ;};};case PixNotSrcOrDst :if _fcga {for _ggdfa =0;_ggdfa < _fcee ;_ggdfa ++{if _gabc ==_dgfb {_degfb =_abef .Data [_decc ]<<_afefbf ;
-if _addb {_degfb =_fbaa (_degfb ,_abef .Data [_decc +1]>>_gcdec ,_bdgd );};}else {_degfb =_abef .Data [_decc ]>>_gcdec ;};_ffbdf .Data [_fddc ]=_fbaa (_ffbdf .Data [_fddc ],^_degfb |_ffbdf .Data [_fddc ],_debag );_fddc +=_ffbdf .RowStride ;_decc +=_abef .RowStride ;
-};};if _feagf {for _ggdfa =0;_ggdfa < _fcee ;_ggdfa ++{for _eedab =0;_eedab < _gfaa ;_eedab ++{_degfb =_fbaa (_abef .Data [_fbdb +_eedab ]<<_afefbf ,_abef .Data [_fbdb +_eedab +1]>>_gcdec ,_bdgd );_ffbdf .Data [_cdgg +_eedab ]|=^_degfb ;};_cdgg +=_ffbdf .RowStride ;
-_fbdb +=_abef .RowStride ;};};if _eedde {for _ggdfa =0;_ggdfa < _fcee ;_ggdfa ++{_degfb =_abef .Data [_bfbae ]<<_afefbf ;if _ebcc {_degfb =_fbaa (_degfb ,_abef .Data [_bfbae +1]>>_gcdec ,_bdgd );};_ffbdf .Data [_fdfg ]=_fbaa (_ffbdf .Data [_fdfg ],^_degfb |_ffbdf .Data [_fdfg ],_bac );
-_fdfg +=_ffbdf .RowStride ;_bfbae +=_abef .RowStride ;};};case PixNotSrcAndDst :if _fcga {for _ggdfa =0;_ggdfa < _fcee ;_ggdfa ++{if _gabc ==_dgfb {_degfb =_abef .Data [_decc ]<<_afefbf ;if _addb {_degfb =_fbaa (_degfb ,_abef .Data [_decc +1]>>_gcdec ,_bdgd );
-};}else {_degfb =_abef .Data [_decc ]>>_gcdec ;};_ffbdf .Data [_fddc ]=_fbaa (_ffbdf .Data [_fddc ],^_degfb &_ffbdf .Data [_fddc ],_debag );_fddc +=_ffbdf .RowStride ;_decc +=_abef .RowStride ;};};if _feagf {for _ggdfa =0;_ggdfa < _fcee ;_ggdfa ++{for _eedab =0;
-_eedab < _gfaa ;_eedab ++{_degfb =_fbaa (_abef .Data [_fbdb +_eedab ]<<_afefbf ,_abef .Data [_fbdb +_eedab +1]>>_gcdec ,_bdgd );_ffbdf .Data [_cdgg +_eedab ]&=^_degfb ;};_cdgg +=_ffbdf .RowStride ;_fbdb +=_abef .RowStride ;};};if _eedde {for _ggdfa =0;
-_ggdfa < _fcee ;_ggdfa ++{_degfb =_abef .Data [_bfbae ]<<_afefbf ;if _ebcc {_degfb =_fbaa (_degfb ,_abef .Data [_bfbae +1]>>_gcdec ,_bdgd );};_ffbdf .Data [_fdfg ]=_fbaa (_ffbdf .Data [_fdfg ],^_degfb &_ffbdf .Data [_fdfg ],_bac );_fdfg +=_ffbdf .RowStride ;
-_bfbae +=_abef .RowStride ;};};case PixSrcOrNotDst :if _fcga {for _ggdfa =0;_ggdfa < _fcee ;_ggdfa ++{if _gabc ==_dgfb {_degfb =_abef .Data [_decc ]<<_afefbf ;if _addb {_degfb =_fbaa (_degfb ,_abef .Data [_decc +1]>>_gcdec ,_bdgd );};}else {_degfb =_abef .Data [_decc ]>>_gcdec ;
-};_ffbdf .Data [_fddc ]=_fbaa (_ffbdf .Data [_fddc ],_degfb |^_ffbdf .Data [_fddc ],_debag );_fddc +=_ffbdf .RowStride ;_decc +=_abef .RowStride ;};};if _feagf {for _ggdfa =0;_ggdfa < _fcee ;_ggdfa ++{for _eedab =0;_eedab < _gfaa ;_eedab ++{_degfb =_fbaa (_abef .Data [_fbdb +_eedab ]<<_afefbf ,_abef .Data [_fbdb +_eedab +1]>>_gcdec ,_bdgd );
-_ffbdf .Data [_cdgg +_eedab ]=_degfb |^_ffbdf .Data [_cdgg +_eedab ];};_cdgg +=_ffbdf .RowStride ;_fbdb +=_abef .RowStride ;};};if _eedde {for _ggdfa =0;_ggdfa < _fcee ;_ggdfa ++{_degfb =_abef .Data [_bfbae ]<<_afefbf ;if _ebcc {_degfb =_fbaa (_degfb ,_abef .Data [_bfbae +1]>>_gcdec ,_bdgd );
-};_ffbdf .Data [_fdfg ]=_fbaa (_ffbdf .Data [_fdfg ],_degfb |^_ffbdf .Data [_fdfg ],_bac );_fdfg +=_ffbdf .RowStride ;_bfbae +=_abef .RowStride ;};};case PixSrcAndNotDst :if _fcga {for _ggdfa =0;_ggdfa < _fcee ;_ggdfa ++{if _gabc ==_dgfb {_degfb =_abef .Data [_decc ]<<_afefbf ;
-if _addb {_degfb =_fbaa (_degfb ,_abef .Data [_decc +1]>>_gcdec ,_bdgd );};}else {_degfb =_abef .Data [_decc ]>>_gcdec ;};_ffbdf .Data [_fddc ]=_fbaa (_ffbdf .Data [_fddc ],_degfb &^_ffbdf .Data [_fddc ],_debag );_fddc +=_ffbdf .RowStride ;_decc +=_abef .RowStride ;
-};};if _feagf {for _ggdfa =0;_ggdfa < _fcee ;_ggdfa ++{for _eedab =0;_eedab < _gfaa ;_eedab ++{_degfb =_fbaa (_abef .Data [_fbdb +_eedab ]<<_afefbf ,_abef .Data [_fbdb +_eedab +1]>>_gcdec ,_bdgd );_ffbdf .Data [_cdgg +_eedab ]=_degfb &^_ffbdf .Data [_cdgg +_eedab ];
-};_cdgg +=_ffbdf .RowStride ;_fbdb +=_abef .RowStride ;};};if _eedde {for _ggdfa =0;_ggdfa < _fcee ;_ggdfa ++{_degfb =_abef .Data [_bfbae ]<<_afefbf ;if _ebcc {_degfb =_fbaa (_degfb ,_abef .Data [_bfbae +1]>>_gcdec ,_bdgd );};_ffbdf .Data [_fdfg ]=_fbaa (_ffbdf .Data [_fdfg ],_degfb &^_ffbdf .Data [_fdfg ],_bac );
-_fdfg +=_ffbdf .RowStride ;_bfbae +=_abef .RowStride ;};};case PixNotPixSrcOrDst :if _fcga {for _ggdfa =0;_ggdfa < _fcee ;_ggdfa ++{if _gabc ==_dgfb {_degfb =_abef .Data [_decc ]<<_afefbf ;if _addb {_degfb =_fbaa (_degfb ,_abef .Data [_decc +1]>>_gcdec ,_bdgd );
-};}else {_degfb =_abef .Data [_decc ]>>_gcdec ;};_ffbdf .Data [_fddc ]=_fbaa (_ffbdf .Data [_fddc ],^(_degfb |_ffbdf .Data [_fddc ]),_debag );_fddc +=_ffbdf .RowStride ;_decc +=_abef .RowStride ;};};if _feagf {for _ggdfa =0;_ggdfa < _fcee ;_ggdfa ++{for _eedab =0;
-_eedab < _gfaa ;_eedab ++{_degfb =_fbaa (_abef .Data [_fbdb +_eedab ]<<_afefbf ,_abef .Data [_fbdb +_eedab +1]>>_gcdec ,_bdgd );_ffbdf .Data [_cdgg +_eedab ]=^(_degfb |_ffbdf .Data [_cdgg +_eedab ]);};_cdgg +=_ffbdf .RowStride ;_fbdb +=_abef .RowStride ;
-};};if _eedde {for _ggdfa =0;_ggdfa < _fcee ;_ggdfa ++{_degfb =_abef .Data [_bfbae ]<<_afefbf ;if _ebcc {_degfb =_fbaa (_degfb ,_abef .Data [_bfbae +1]>>_gcdec ,_bdgd );};_ffbdf .Data [_fdfg ]=_fbaa (_ffbdf .Data [_fdfg ],^(_degfb |_ffbdf .Data [_fdfg ]),_bac );
-_fdfg +=_ffbdf .RowStride ;_bfbae +=_abef .RowStride ;};};case PixNotPixSrcAndDst :if _fcga {for _ggdfa =0;_ggdfa < _fcee ;_ggdfa ++{if _gabc ==_dgfb {_degfb =_abef .Data [_decc ]<<_afefbf ;if _addb {_degfb =_fbaa (_degfb ,_abef .Data [_decc +1]>>_gcdec ,_bdgd );
-};}else {_degfb =_abef .Data [_decc ]>>_gcdec ;};_ffbdf .Data [_fddc ]=_fbaa (_ffbdf .Data [_fddc ],^(_degfb &_ffbdf .Data [_fddc ]),_debag );_fddc +=_ffbdf .RowStride ;_decc +=_abef .RowStride ;};};if _feagf {for _ggdfa =0;_ggdfa < _fcee ;_ggdfa ++{for _eedab =0;
-_eedab < _gfaa ;_eedab ++{_degfb =_fbaa (_abef .Data [_fbdb +_eedab ]<<_afefbf ,_abef .Data [_fbdb +_eedab +1]>>_gcdec ,_bdgd );_ffbdf .Data [_cdgg +_eedab ]=^(_degfb &_ffbdf .Data [_cdgg +_eedab ]);};_cdgg +=_ffbdf .RowStride ;_fbdb +=_abef .RowStride ;
-};};if _eedde {for _ggdfa =0;_ggdfa < _fcee ;_ggdfa ++{_degfb =_abef .Data [_bfbae ]<<_afefbf ;if _ebcc {_degfb =_fbaa (_degfb ,_abef .Data [_bfbae +1]>>_gcdec ,_bdgd );};_ffbdf .Data [_fdfg ]=_fbaa (_ffbdf .Data [_fdfg ],^(_degfb &_ffbdf .Data [_fdfg ]),_bac );
-_fdfg +=_ffbdf .RowStride ;_bfbae +=_abef .RowStride ;};};case PixNotPixSrcXorDst :if _fcga {for _ggdfa =0;_ggdfa < _fcee ;_ggdfa ++{if _gabc ==_dgfb {_degfb =_abef .Data [_decc ]<<_afefbf ;if _addb {_degfb =_fbaa (_degfb ,_abef .Data [_decc +1]>>_gcdec ,_bdgd );
-};}else {_degfb =_abef .Data [_decc ]>>_gcdec ;};_ffbdf .Data [_fddc ]=_fbaa (_ffbdf .Data [_fddc ],^(_degfb ^_ffbdf .Data [_fddc ]),_debag );_fddc +=_ffbdf .RowStride ;_decc +=_abef .RowStride ;};};if _feagf {for _ggdfa =0;_ggdfa < _fcee ;_ggdfa ++{for _eedab =0;
-_eedab < _gfaa ;_eedab ++{_degfb =_fbaa (_abef .Data [_fbdb +_eedab ]<<_afefbf ,_abef .Data [_fbdb +_eedab +1]>>_gcdec ,_bdgd );_ffbdf .Data [_cdgg +_eedab ]=^(_degfb ^_ffbdf .Data [_cdgg +_eedab ]);};_cdgg +=_ffbdf .RowStride ;_fbdb +=_abef .RowStride ;
-};};if _eedde {for _ggdfa =0;_ggdfa < _fcee ;_ggdfa ++{_degfb =_abef .Data [_bfbae ]<<_afefbf ;if _ebcc {_degfb =_fbaa (_degfb ,_abef .Data [_bfbae +1]>>_gcdec ,_bdgd );};_ffbdf .Data [_fdfg ]=_fbaa (_ffbdf .Data [_fdfg ],^(_degfb ^_ffbdf .Data [_fdfg ]),_bac );
-_fdfg +=_ffbdf .RowStride ;_bfbae +=_abef .RowStride ;};};default:_dc .Log .Debug ("\u004f\u0070e\u0072\u0061\u0074\u0069\u006f\u006e\u003a\u0020\u0027\u0025\u0064\u0027\u0020\u006e\u006f\u0074\u0020\u0070\u0065\u0072\u006d\u0069tt\u0065\u0064",_abbbf );
-return _a .Error ("\u0072a\u0073t\u0065\u0072\u004f\u0070\u0047e\u006e\u0065r\u0061\u006c\u004c\u006f\u0077","\u0072\u0061\u0073\u0074\u0065\u0072\u0020\u006f\u0070\u0065r\u0061\u0074\u0069\u006f\u006e\u0020\u006eo\u0074\u0020\u0070\u0065\u0072\u006d\u0069\u0074\u0074\u0065\u0064");
-};return nil ;};func (_cgb *Boxes )SelectBySize (width ,height int ,tp LocationFilter ,relation SizeComparison )(_dgdg *Boxes ,_baba error ){const _cafb ="\u0042o\u0078e\u0073\u002e\u0053\u0065\u006ce\u0063\u0074B\u0079\u0053\u0069\u007a\u0065";if _cgb ==nil {return nil ,_a .Error (_cafb ,"b\u006f\u0078\u0065\u0073 '\u0062'\u0020\u006e\u006f\u0074\u0020d\u0065\u0066\u0069\u006e\u0065\u0064");
-};if len (*_cgb )==0{return _cgb ,nil ;};switch tp {case LocSelectWidth ,LocSelectHeight ,LocSelectIfEither ,LocSelectIfBoth :default:return nil ,_a .Errorf (_cafb ,"\u0069\u006e\u0076al\u0069\u0064\u0020\u0066\u0069\u006c\u0074\u0065\u0072\u0020\u0074\u0079\u0070\u0065\u003a\u0020\u0025\u0064",tp );
-};switch relation {case SizeSelectIfLT ,SizeSelectIfGT ,SizeSelectIfLTE ,SizeSelectIfGTE :default:return nil ,_a .Errorf (_cafb ,"i\u006e\u0076\u0061\u006c\u0069\u0064 \u0072\u0065\u006c\u0061\u0074\u0069\u006f\u006e\u0020t\u0079\u0070\u0065:\u0020'\u0025\u0064\u0027",tp );
-};_ecb :=_cgb .makeSizeIndicator (width ,height ,tp ,relation );_gfgd ,_baba :=_cgb .selectWithIndicator (_ecb );if _baba !=nil {return nil ,_a .Wrap (_baba ,_cafb ,"");};return _gfgd ,nil ;};func (_fcg *Bitmap )CountPixels ()int {return _fcg .countPixels ()};
-func TstCSymbol (t *_c .T )*Bitmap {t .Helper ();_bgbddc :=New (6,6);_d .NoError (t ,_bgbddc .SetPixel (1,0,1));_d .NoError (t ,_bgbddc .SetPixel (2,0,1));_d .NoError (t ,_bgbddc .SetPixel (3,0,1));_d .NoError (t ,_bgbddc .SetPixel (4,0,1));_d .NoError (t ,_bgbddc .SetPixel (0,1,1));
-_d .NoError (t ,_bgbddc .SetPixel (5,1,1));_d .NoError (t ,_bgbddc .SetPixel (0,2,1));_d .NoError (t ,_bgbddc .SetPixel (0,3,1));_d .NoError (t ,_bgbddc .SetPixel (0,4,1));_d .NoError (t ,_bgbddc .SetPixel (5,4,1));_d .NoError (t ,_bgbddc .SetPixel (1,5,1));
-_d .NoError (t ,_bgbddc .SetPixel (2,5,1));_d .NoError (t ,_bgbddc .SetPixel (3,5,1));_d .NoError (t ,_bgbddc .SetPixel (4,5,1));return _bgbddc ;};func _ffed (_cbde uint ,_aadd byte )byte {return _aadd >>_cbde <<_cbde };func (_eegb *Bitmap )CreateTemplate ()*Bitmap {return _eegb .createTemplate ()};
-func (_ggdf *Bitmap )nextOnPixelLow (_fdag ,_egda ,_dede ,_bccf ,_gdec int )(_abce _bf .Point ,_cbfa bool ,_ebb error ){const _gfeg ="B\u0069\u0074\u006d\u0061p.\u006ee\u0078\u0074\u004f\u006e\u0050i\u0078\u0065\u006c\u004c\u006f\u0077";var (_afgb int ;
-_fbde byte ;);_cdfd :=_gdec *_dede ;_edga :=_cdfd +(_bccf /8);if _fbde ,_ebb =_ggdf .GetByte (_edga );_ebb !=nil {return _abce ,false ,_a .Wrap (_ebb ,_gfeg ,"\u0078\u0053\u0074\u0061\u0072\u0074\u0020\u0061\u006e\u0064 \u0079\u0053\u0074\u0061\u0072\u0074\u0020o\u0075\u0074\u0020\u006f\u0066\u0020\u0072\u0061\u006e\u0067\u0065");
-};if _fbde !=0{_bga :=_bccf -(_bccf %8)+7;for _afgb =_bccf ;_afgb <=_bga &&_afgb < _fdag ;_afgb ++{if _ggdf .GetPixel (_afgb ,_gdec ){_abce .X =_afgb ;_abce .Y =_gdec ;return _abce ,true ,nil ;};};};_efecc :=(_bccf /8)+1;_afgb =8*_efecc ;var _ebbe int ;
-for _edga =_cdfd +_efecc ;_afgb < _fdag ;_edga ,_afgb =_edga +1,_afgb +8{if _fbde ,_ebb =_ggdf .GetByte (_edga );_ebb !=nil {return _abce ,false ,_a .Wrap (_ebb ,_gfeg ,"r\u0065\u0073\u0074\u0020of\u0020t\u0068\u0065\u0020\u006c\u0069n\u0065\u0020\u0062\u0079\u0074\u0065");
-};if _fbde ==0{continue ;};for _ebbe =0;_ebbe < 8&&_afgb < _fdag ;_ebbe ,_afgb =_ebbe +1,_afgb +1{if _ggdf .GetPixel (_afgb ,_gdec ){_abce .X =_afgb ;_abce .Y =_gdec ;return _abce ,true ,nil ;};};};for _eeeg :=_gdec +1;_eeeg < _egda ;_eeeg ++{_cdfd =_eeeg *_dede ;
-for _edga ,_afgb =_cdfd ,0;_afgb < _fdag ;_edga ,_afgb =_edga +1,_afgb +8{if _fbde ,_ebb =_ggdf .GetByte (_edga );_ebb !=nil {return _abce ,false ,_a .Wrap (_ebb ,_gfeg ,"\u0066o\u006cl\u006f\u0077\u0069\u006e\u0067\u0020\u006c\u0069\u006e\u0065\u0073");
-};if _fbde ==0{continue ;};for _ebbe =0;_ebbe < 8&&_afgb < _fdag ;_ebbe ,_afgb =_ebbe +1,_afgb +1{if _ggdf .GetPixel (_afgb ,_eeeg ){_abce .X =_afgb ;_abce .Y =_eeeg ;return _abce ,true ,nil ;};};};};return _abce ,false ,nil ;};func TstOSymbol (t *_c .T ,scale ...int )*Bitmap {_egcb ,_bggfd :=NewWithData (4,5,[]byte {0xF0,0x90,0x90,0x90,0xF0});
-_d .NoError (t ,_bggfd );return TstGetScaledSymbol (t ,_egcb ,scale ...);};func (_gecd *Bitmaps )WidthSorter ()func (_dadac ,_ffbf int )bool {return func (_adeba ,_efcd int )bool {return _gecd .Values [_adeba ].Width < _gecd .Values [_efcd ].Width };};
-type MorphOperation int ;func (_agbb *Bitmap )equivalent (_bfdf *Bitmap )bool {if _agbb ==_bfdf {return true ;};if !_agbb .SizesEqual (_bfdf ){return false ;};_agea :=_ceac (_agbb ,_bfdf ,CmbOpXor );_dfeg :=_agbb .countPixels ();_gggc :=int (0.25*float32 (_dfeg ));
-if _agea .thresholdPixelSum (_gggc ){return false ;};var (_bfdfe [9][9]int ;_ded [18][9]int ;_fefb [9][18]int ;_eaaa int ;_fcdb int ;);_eegg :=9;_edad :=_agbb .Height /_eegg ;_gcc :=_agbb .Width /_eegg ;_afg ,_bcea :=_edad /2,_gcc /2;if _edad < _gcc {_afg =_gcc /2;
-_bcea =_edad /2;};_aaf :=float64 (_afg )*float64 (_bcea )*_ad .Pi ;_fec :=int (float64 (_edad *_gcc /2)*0.9);_daab :=int (float64 (_gcc *_edad /2)*0.9);for _bdc :=0;_bdc < _eegg ;_bdc ++{_ebdb :=_gcc *_bdc +_eaaa ;var _eddb int ;if _bdc ==_eegg -1{_eaaa =0;
-_eddb =_agbb .Width ;}else {_eddb =_ebdb +_gcc ;if ((_agbb .Width -_eaaa )%_eegg )> 0{_eaaa ++;_eddb ++;};};for _ggac :=0;_ggac < _eegg ;_ggac ++{_ggea :=_edad *_ggac +_fcdb ;var _gfcb int ;if _ggac ==_eegg -1{_fcdb =0;_gfcb =_agbb .Height ;}else {_gfcb =_ggea +_edad ;
-if (_agbb .Height -_fcdb )%_eegg > 0{_fcdb ++;_gfcb ++;};};var _gcf ,_gcfb ,_gffa ,_eegfe int ;_cced :=(_ebdb +_eddb )/2;_dce :=(_ggea +_gfcb )/2;for _aacb :=_ebdb ;_aacb < _eddb ;_aacb ++{for _ddag :=_ggea ;_ddag < _gfcb ;_ddag ++{if _agea .GetPixel (_aacb ,_ddag ){if _aacb < _cced {_gcf ++;
-}else {_gcfb ++;};if _ddag < _dce {_eegfe ++;}else {_gffa ++;};};};};_bfdfe [_bdc ][_ggac ]=_gcf +_gcfb ;_ded [_bdc *2][_ggac ]=_gcf ;_ded [_bdc *2+1][_ggac ]=_gcfb ;_fefb [_bdc ][_ggac *2]=_eegfe ;_fefb [_bdc ][_ggac *2+1]=_gffa ;};};for _geaf :=0;_geaf < _eegg *2-1;
-_geaf ++{for _deda :=0;_deda < (_eegg -1);_deda ++{var _accf int ;for _gbge :=0;_gbge < 2;_gbge ++{for _bdcc :=0;_bdcc < 2;_bdcc ++{_accf +=_ded [_geaf +_gbge ][_deda +_bdcc ];};};if _accf > _daab {return false ;};};};for _fea :=0;_fea < (_eegg -1);_fea ++{for _fddfee :=0;
-_fddfee < ((_eegg *2)-1);_fddfee ++{var _cbfc int ;for _gabe :=0;_gabe < 2;_gabe ++{for _efcf :=0;_efcf < 2;_efcf ++{_cbfc +=_fefb [_fea +_gabe ][_fddfee +_efcf ];};};if _cbfc > _fec {return false ;};};};for _aagg :=0;_aagg < (_eegg -2);_aagg ++{for _afcg :=0;
-_afcg < (_eegg -2);_afcg ++{var _bcff ,_acca int ;for _ead :=0;_ead < 3;_ead ++{for _ccdb :=0;_ccdb < 3;_ccdb ++{if _ead ==_ccdb {_bcff +=_bfdfe [_aagg +_ead ][_afcg +_ccdb ];};if (2-_ead )==_ccdb {_acca +=_bfdfe [_aagg +_ead ][_afcg +_ccdb ];};};};if _bcff > _daab ||_acca > _daab {return false ;
-};};};for _edef :=0;_edef < (_eegg -1);_edef ++{for _edca :=0;_edca < (_eegg -1);_edca ++{var _dgec int ;for _acg :=0;_acg < 2;_acg ++{for _dfca :=0;_dfca < 2;_dfca ++{_dgec +=_bfdfe [_edef +_acg ][_edca +_dfca ];};};if float64 (_dgec )> _aaf {return false ;
-};};};return true ;};func (_babd *byWidth )Len ()int {return len (_babd .Values )};func _bcdbc (_dfaa ,_adega int ,_dgbf string )*Selection {_gedea :=&Selection {Height :_dfaa ,Width :_adega ,Name :_dgbf };_gedea .Data =make ([][]SelectionValue ,_dfaa );
-for _beee :=0;_beee < _dfaa ;_beee ++{_gedea .Data [_beee ]=make ([]SelectionValue ,_adega );};return _gedea ;};func (_afbb *Bitmap )setAll ()error {_bgg :=_ece (_afbb ,0,0,_afbb .Width ,_afbb .Height ,PixSet ,nil ,0,0);if _bgg !=nil {return _a .Wrap (_bgg ,"\u0073\u0065\u0074\u0041\u006c\u006c","");
-};return nil ;};func (_ageg *BitmapsArray )GetBox (i int )(*_bf .Rectangle ,error ){const _cfbg ="\u0042\u0069\u0074\u006dap\u0073\u0041\u0072\u0072\u0061\u0079\u002e\u0047\u0065\u0074\u0042\u006f\u0078";if _ageg ==nil {return nil ,_a .Error (_cfbg ,"p\u0072\u006f\u0076\u0069\u0064\u0065d\u0020\u006e\u0069\u006c\u0020\u0027\u0042\u0069\u0074m\u0061\u0070\u0073A\u0072r\u0061\u0079\u0027");
-};if i > len (_ageg .Boxes )-1{return nil ,_a .Errorf (_cfbg ,"\u0069n\u0064\u0065\u0078\u003a\u0020\u0027\u0025\u0064\u0027\u0020\u006fu\u0074\u0020\u006f\u0066\u0020\u0072\u0061\u006e\u0067\u0065",i );};return _ageg .Boxes [i ],nil ;};func (_fgbaf *ClassedPoints )SortByX (){_fgbaf ._ggfg =_fgbaf .xSortFunction ();
-_df .Sort (_fgbaf )};func _dcd (_daa *Bitmap ,_efg *Bitmap ,_fd int )(_gc error ){const _cdg ="e\u0078\u0070\u0061\u006edB\u0069n\u0061\u0072\u0079\u0050\u006fw\u0065\u0072\u0032\u004c\u006f\u0077";switch _fd {case 2:_gc =_bb (_daa ,_efg );case 4:_gc =_bc (_daa ,_efg );
-case 8:_gc =_ea (_daa ,_efg );default:return _a .Error (_cdg ,"\u0065\u0078p\u0061\u006e\u0073\u0069o\u006e\u0020f\u0061\u0063\u0074\u006f\u0072\u0020\u006e\u006ft\u0020\u0069\u006e\u0020\u007b\u0032\u002c\u0034\u002c\u0038\u007d\u0020r\u0061\u006e\u0067\u0065");
-};if _gc !=nil {_gc =_a .Wrap (_gc ,_cdg ,"");};return _gc ;};func _ggb (_ede *Bitmap ,_dcdc int ,_bce []byte )(_fgg *Bitmap ,_fdd error ){const _ac ="\u0072\u0065\u0064\u0075\u0063\u0065\u0052\u0061\u006e\u006b\u0042\u0069n\u0061\u0072\u0079\u0032";if _ede ==nil {return nil ,_a .Error (_ac ,"\u0073o\u0075\u0072\u0063\u0065 \u0062\u0069\u0074\u006d\u0061p\u0020n\u006ft\u0020\u0064\u0065\u0066\u0069\u006e\u0065d");
-};if _dcdc < 1||_dcdc > 4{return nil ,_a .Error (_ac ,"\u006c\u0065\u0076\u0065\u006c\u0020\u006d\u0075\u0073\u0074 \u0062\u0065\u0020\u0069\u006e\u0020\u0073e\u0074\u0020\u007b\u0031\u002c\u0032\u002c\u0033\u002c\u0034\u007d");};if _ede .Height <=1{return nil ,_a .Errorf (_ac ,"\u0073o\u0075\u0072c\u0065\u0020\u0068e\u0069\u0067\u0068\u0074\u0020\u006d\u0075s\u0074\u0020\u0062\u0065\u0020\u0061t\u0020\u006c\u0065\u0061\u0073\u0074\u0020\u0027\u0032\u0027\u0020-\u0020\u0069\u0073\u003a\u0020\u0027\u0025\u0064\u0027",_ede .Height );
-};_fgg =New (_ede .Width /2,_ede .Height /2);if _bce ==nil {_bce =_bg ();};_cec :=_efd (_ede .RowStride ,2*_fgg .RowStride );switch _dcdc {case 1:_fdd =_ga (_ede ,_fgg ,_dcdc ,_bce ,_cec );case 2:_fdd =_bad (_ede ,_fgg ,_dcdc ,_bce ,_cec );case 3:_fdd =_agf (_ede ,_fgg ,_dcdc ,_bce ,_cec );
-case 4:_fdd =_deg (_ede ,_fgg ,_dcdc ,_bce ,_cec );};if _fdd !=nil {return nil ,_fdd ;};return _fgg ,nil ;};func _dedg (_daef ,_abeg ,_egfa *Bitmap )(*Bitmap ,error ){const _fbdcb ="\u0062\u0069\u0074\u006d\u0061\u0070\u002e\u0078\u006f\u0072";if _abeg ==nil {return nil ,_a .Error (_fbdcb ,"'\u0062\u0031\u0027\u0020\u0069\u0073\u0020\u006e\u0069\u006c");
-};if _egfa ==nil {return nil ,_a .Error (_fbdcb ,"'\u0062\u0032\u0027\u0020\u0069\u0073\u0020\u006e\u0069\u006c");};if _daef ==_egfa {return nil ,_a .Error (_fbdcb ,"'\u0064\u0027\u0020\u003d\u003d\u0020\u0027\u0062\u0032\u0027");};if !_abeg .SizesEqual (_egfa ){_dc .Log .Debug ("\u0025s\u0020\u002d \u0042\u0069\u0074\u006da\u0070\u0020\u0027b\u0031\u0027\u0020\u0069\u0073\u0020\u006e\u006f\u0074 e\u0071\u0075\u0061l\u0020\u0073i\u007a\u0065\u0020\u0077\u0069\u0074h\u0020\u0027b\u0032\u0027",_fbdcb );
-};var _ggeag error ;if _daef ,_ggeag =_fedg (_daef ,_abeg );_ggeag !=nil {return nil ,_a .Wrap (_ggeag ,_fbdcb ,"\u0063\u0061n\u0027\u0074\u0020c\u0072\u0065\u0061\u0074\u0065\u0020\u0027\u0064\u0027");};if _ggeag =_daef .RasterOperation (0,0,_daef .Width ,_daef .Height ,PixSrcXorDst ,_egfa ,0,0);
-_ggeag !=nil {return nil ,_a .Wrap (_ggeag ,_fbdcb ,"");};return _daef ,nil ;};func _ggdc (_fcba ,_gdga *Bitmap ,_aafb ,_ebbea ,_eaga ,_fgac ,_daadc int ,_bae CombinationOperator )error {var _gaab int ;_debd :=func (){_gaab ++;_eaga +=_gdga .RowStride ;
-_fgac +=_fcba .RowStride ;_daadc +=_fcba .RowStride };for _gaab =_aafb ;_gaab < _ebbea ;_debd (){_gagb :=_eaga ;for _caed :=_fgac ;_caed <=_daadc ;_caed ++{_cfe ,_bcda :=_gdga .GetByte (_gagb );if _bcda !=nil {return _bcda ;};_bfcb ,_bcda :=_fcba .GetByte (_caed );
-if _bcda !=nil {return _bcda ;};if _bcda =_gdga .SetByte (_gagb ,_ccecc (_cfe ,_bfcb ,_bae ));_bcda !=nil {return _bcda ;};_gagb ++;};};return nil ;};func (_cada *Bitmap )addBorderGeneral (_fabd ,_afc ,_ggbd ,_dffd int ,_eeb int )(*Bitmap ,error ){const _dbe ="\u0061\u0064d\u0042\u006f\u0072d\u0065\u0072\u0047\u0065\u006e\u0065\u0072\u0061\u006c";
-if _fabd < 0||_afc < 0||_ggbd < 0||_dffd < 0{return nil ,_a .Error (_dbe ,"n\u0065\u0067\u0061\u0074iv\u0065 \u0062\u006f\u0072\u0064\u0065r\u0020\u0061\u0064\u0064\u0065\u0064");};_cab ,_gfcc :=_cada .Width ,_cada .Height ;_gbgcc :=_cab +_fabd +_afc ;
-_aec :=_gfcc +_ggbd +_dffd ;_acad :=New (_gbgcc ,_aec );_acad .Color =_cada .Color ;_fddfe :=PixClr ;if _eeb > 0{_fddfe =PixSet ;};_bagg :=_acad .RasterOperation (0,0,_fabd ,_aec ,_fddfe ,nil ,0,0);if _bagg !=nil {return nil ,_a .Wrap (_bagg ,_dbe ,"\u006c\u0065\u0066\u0074");
-};_bagg =_acad .RasterOperation (_gbgcc -_afc ,0,_afc ,_aec ,_fddfe ,nil ,0,0);if _bagg !=nil {return nil ,_a .Wrap (_bagg ,_dbe ,"\u0072\u0069\u0067h\u0074");};_bagg =_acad .RasterOperation (0,0,_gbgcc ,_ggbd ,_fddfe ,nil ,0,0);if _bagg !=nil {return nil ,_a .Wrap (_bagg ,_dbe ,"\u0074\u006f\u0070");
-};_bagg =_acad .RasterOperation (0,_aec -_dffd ,_gbgcc ,_dffd ,_fddfe ,nil ,0,0);if _bagg !=nil {return nil ,_a .Wrap (_bagg ,_dbe ,"\u0062\u006f\u0074\u0074\u006f\u006d");};_bagg =_acad .RasterOperation (_fabd ,_ggbd ,_cab ,_gfcc ,PixSrc ,_cada ,0,0);
-if _bagg !=nil {return nil ,_a .Wrap (_bagg ,_dbe ,"\u0063\u006f\u0070\u0079");};return _acad ,nil ;};func ClipBoxToRectangle (box *_bf .Rectangle ,wi ,hi int )(_abde *_bf .Rectangle ,_gfea error ){const _ffca ="\u0043l\u0069p\u0042\u006f\u0078\u0054\u006fR\u0065\u0063t\u0061\u006e\u0067\u006c\u0065";
-if box ==nil {return nil ,_a .Error (_ffca ,"\u0027\u0062\u006f\u0078\u0027\u0020\u006e\u006f\u0074\u0020\u0064\u0065f\u0069\u006e\u0065\u0064");};if box .Min .X >=wi ||box .Min .Y >=hi ||box .Max .X <=0||box .Max .Y <=0{return nil ,_a .Error (_ffca ,"\u0027\u0062\u006fx'\u0020\u006f\u0075\u0074\u0073\u0069\u0064\u0065\u0020\u0072\u0065\u0063\u0074\u0061\u006e\u0067\u006c\u0065");
-};_acdc :=*box ;_abde =&_acdc ;if _abde .Min .X < 0{_abde .Max .X +=_abde .Min .X ;_abde .Min .X =0;};if _abde .Min .Y < 0{_abde .Max .Y +=_abde .Min .Y ;_abde .Min .Y =0;};if _abde .Max .X > wi {_abde .Max .X =wi ;};if _abde .Max .Y > hi {_abde .Max .Y =hi ;
-};return _abde ,nil ;};func TstVSymbol (t *_c .T ,scale ...int )*Bitmap {_dagb ,_gaea :=NewWithData (5,5,[]byte {0x88,0x88,0x88,0x50,0x20});_d .NoError (t ,_gaea );return TstGetScaledSymbol (t ,_dagb ,scale ...);};func (_aff *Bitmap )nextOnPixel (_fdba ,_dgbg int )(_ccca _bf .Point ,_fecd bool ,_ecd error ){const _cbb ="n\u0065\u0078\u0074\u004f\u006e\u0050\u0069\u0078\u0065\u006c";
-_ccca ,_fecd ,_ecd =_aff .nextOnPixelLow (_aff .Width ,_aff .Height ,_aff .RowStride ,_fdba ,_dgbg );if _ecd !=nil {return _ccca ,false ,_a .Wrap (_ecd ,_cbb ,"");};return _ccca ,_fecd ,nil ;};func (_gfbe *ClassedPoints )XAtIndex (i int )float32 {return (*_gfbe .Points )[_gfbe .IntSlice [i ]].X };
-type byWidth Bitmaps ;func Dilate (d *Bitmap ,s *Bitmap ,sel *Selection )(*Bitmap ,error ){return _acga (d ,s ,sel )};const (_ SizeComparison =iota ;SizeSelectIfLT ;SizeSelectIfGT ;SizeSelectIfLTE ;SizeSelectIfGTE ;SizeSelectIfEQ ;);func Extract (roi _bf .Rectangle ,src *Bitmap )(*Bitmap ,error ){_fbdea :=New (roi .Dx (),roi .Dy ());
-_bdeb :=roi .Min .X &0x07;_dabc :=8-_bdeb ;_aba :=uint (8-_fbdea .Width &0x07);_ffdd :=src .GetByteIndex (roi .Min .X ,roi .Min .Y );_eccd :=src .GetByteIndex (roi .Max .X -1,roi .Min .Y );_gef :=_fbdea .RowStride ==_eccd +1-_ffdd ;var _bbbd int ;for _ggbdc :=roi .Min .Y ;
-_ggbdc < roi .Max .Y ;_ggbdc ++{_bbbdf :=_ffdd ;_ebgf :=_bbbd ;switch {case _ffdd ==_eccd :_eaffd ,_abgg :=src .GetByte (_bbbdf );if _abgg !=nil {return nil ,_abgg ;};_eaffd <<=uint (_bdeb );_abgg =_fbdea .SetByte (_ebgf ,_ffed (_aba ,_eaffd ));if _abgg !=nil {return nil ,_abgg ;
-};case _bdeb ==0:for _fbe :=_ffdd ;_fbe <=_eccd ;_fbe ++{_gcbd ,_ecda :=src .GetByte (_bbbdf );if _ecda !=nil {return nil ,_ecda ;};_bbbdf ++;if _fbe ==_eccd &&_gef {_gcbd =_ffed (_aba ,_gcbd );};_ecda =_fbdea .SetByte (_ebgf ,_gcbd );if _ecda !=nil {return nil ,_ecda ;
-};_ebgf ++;};default:_fadd :=_bdd (src ,_fbdea ,uint (_bdeb ),uint (_dabc ),_aba ,_ffdd ,_eccd ,_gef ,_bbbdf ,_ebgf );if _fadd !=nil {return nil ,_fadd ;};};_ffdd +=src .RowStride ;_eccd +=src .RowStride ;_bbbd +=_fbdea .RowStride ;};return _fbdea ,nil ;
-};func (_gadc *Bitmap )clearAll ()error {return _gadc .RasterOperation (0,0,_gadc .Width ,_gadc .Height ,PixClr ,nil ,0,0);};func (_dfe *Bitmap )SizesEqual (s *Bitmap )bool {if _dfe ==s {return true ;};if _dfe .Width !=s .Width ||_dfe .Height !=s .Height {return false ;
-};return true ;};func CorrelationScoreSimple (bm1 ,bm2 *Bitmap ,area1 ,area2 int ,delX ,delY float32 ,maxDiffW ,maxDiffH int ,tab []int )(_cacg float64 ,_efdb error ){const _caee ="\u0043\u006f\u0072\u0072el\u0061\u0074\u0069\u006f\u006e\u0053\u0063\u006f\u0072\u0065\u0053\u0069\u006d\u0070l\u0065";
-if bm1 ==nil ||bm2 ==nil {return _cacg ,_a .Error (_caee ,"n\u0069l\u0020\u0062\u0069\u0074\u006d\u0061\u0070\u0073 \u0070\u0072\u006f\u0076id\u0065\u0064");};if tab ==nil {return _cacg ,_a .Error (_caee ,"\u0074\u0061\u0062\u0020\u0075\u006e\u0064\u0065\u0066\u0069\u006e\u0065\u0064");
-};if area1 ==0||area2 ==0{return _cacg ,_a .Error (_caee ,"\u0070\u0072\u006f\u0076\u0069\u0064\u0065\u0064\u0020\u0061\u0072e\u0061\u0073\u0020\u006d\u0075\u0073\u0074\u0020\u0062\u0065 \u003e\u0020\u0030");};_bfcaa ,_gdfe :=bm1 .Width ,bm1 .Height ;_bgfb ,_fbfcd :=bm2 .Width ,bm2 .Height ;
-if _fgfb (_bfcaa -_bgfb )> maxDiffW {return 0,nil ;};if _fgfb (_gdfe -_fbfcd )> maxDiffH {return 0,nil ;};var _bccdd ,_ebga int ;if delX >=0{_bccdd =int (delX +0.5);}else {_bccdd =int (delX -0.5);};if delY >=0{_ebga =int (delY +0.5);}else {_ebga =int (delY -0.5);
-};_cdec :=bm1 .createTemplate ();if _efdb =_cdec .RasterOperation (_bccdd ,_ebga ,_bgfb ,_fbfcd ,PixSrc ,bm2 ,0,0);_efdb !=nil {return _cacg ,_a .Wrap (_efdb ,_caee ,"\u0062m\u0032 \u0074\u006f\u0020\u0054\u0065\u006d\u0070\u006c\u0061\u0074\u0065");};
-if _efdb =_cdec .RasterOperation (0,0,_bfcaa ,_gdfe ,PixSrcAndDst ,bm1 ,0,0);_efdb !=nil {return _cacg ,_a .Wrap (_efdb ,_caee ,"b\u006d\u0031\u0020\u0061\u006e\u0064\u0020\u0062\u006d\u0054");};_bfcg :=_cdec .countPixels ();_cacg =float64 (_bfcg )*float64 (_bfcg )/(float64 (area1 )*float64 (area2 ));
-return _cacg ,nil ;};var (_dcga =[]byte {0x00,0x80,0xC0,0xE0,0xF0,0xF8,0xFC,0xFE,0xFF};_beeb =[]byte {0x00,0x01,0x03,0x07,0x0F,0x1F,0x3F,0x7F,0xFF};);func _dgeba (_adb *Bitmap ,_efeb *_ge .Stack ,_ceede ,_fgdd ,_fgbafc int )(_dfdd *_bf .Rectangle ,_gffdd error ){const _gcfd ="\u0073e\u0065d\u0046\u0069\u006c\u006c\u0053\u0074\u0061\u0063\u006b\u0042\u0042";
-if _adb ==nil {return nil ,_a .Error (_gcfd ,"\u0070\u0072\u006fvi\u0064\u0065\u0064\u0020\u006e\u0069\u006c\u0020\u0027\u0073\u0027\u0020\u0042\u0069\u0074\u006d\u0061\u0070");};if _efeb ==nil {return nil ,_a .Error (_gcfd ,"p\u0072o\u0076\u0069\u0064\u0065\u0064\u0020\u006e\u0069l\u0020\u0027\u0073\u0074ac\u006b\u0027");
-};switch _fgbafc {case 4:if _dfdd ,_gffdd =_baca (_adb ,_efeb ,_ceede ,_fgdd );_gffdd !=nil {return nil ,_a .Wrap (_gffdd ,_gcfd ,"");};return _dfdd ,nil ;case 8:if _dfdd ,_gffdd =_ffbgb (_adb ,_efeb ,_ceede ,_fgdd );_gffdd !=nil {return nil ,_a .Wrap (_gffdd ,_gcfd ,"");
-};return _dfdd ,nil ;default:return nil ,_a .Errorf (_gcfd ,"\u0063\u006f\u006e\u006e\u0065\u0063\u0074\u0069\u0076\u0069\u0074\u0079\u0020\u0069\u0073 \u006eo\u0074\u0020\u0034\u0020\u006f\u0072\u0020\u0038\u003a\u0020\u0027\u0025\u0064\u0027",_fgbafc );
-};};func TstWriteSymbols (t *_c .T ,bms *Bitmaps ,src *Bitmap ){for _bbdb :=0;_bbdb < bms .Size ();_bbdb ++{_acfc :=bms .Values [_bbdb ];_gedg :=bms .Boxes [_bbdb ];_afca :=src .RasterOperation (_gedg .Min .X ,_gedg .Min .Y ,_acfc .Width ,_acfc .Height ,PixSrc ,_acfc ,0,0);
-_d .NoError (t ,_afca );};};func _deg (_fgfg ,_aaec *Bitmap ,_gcg int ,_dcad []byte ,_ecc int )(_bde error ){const _cde ="\u0072\u0065\u0064uc\u0065\u0052\u0061\u006e\u006b\u0042\u0069\u006e\u0061\u0072\u0079\u0032\u004c\u0065\u0076\u0065\u006c\u0034";
-var (_fbd ,_ceca ,_abbb ,_daf ,_dag ,_fbc ,_acf ,_fcf int ;_acc ,_cad uint32 ;_abff ,_ggf byte ;_ggd uint16 ;);_aea :=make ([]byte ,4);_fddf :=make ([]byte ,4);for _abbb =0;_abbb < _fgfg .Height -1;_abbb ,_daf =_abbb +2,_daf +1{_fbd =_abbb *_fgfg .RowStride ;
-_ceca =_daf *_aaec .RowStride ;for _dag ,_fbc =0,0;_dag < _ecc ;_dag ,_fbc =_dag +4,_fbc +1{for _acf =0;_acf < 4;_acf ++{_fcf =_fbd +_dag +_acf ;if _fcf <=len (_fgfg .Data )-1&&_fcf < _fbd +_fgfg .RowStride {_aea [_acf ]=_fgfg .Data [_fcf ];}else {_aea [_acf ]=0x00;
-};_fcf =_fbd +_fgfg .RowStride +_dag +_acf ;if _fcf <=len (_fgfg .Data )-1&&_fcf < _fbd +(2*_fgfg .RowStride ){_fddf [_acf ]=_fgfg .Data [_fcf ];}else {_fddf [_acf ]=0x00;};};_acc =_ag .BigEndian .Uint32 (_aea );_cad =_ag .BigEndian .Uint32 (_fddf );_cad &=_acc ;
-_cad &=_cad <<1;_cad &=0xaaaaaaaa;_acc =_cad |(_cad <<7);_abff =byte (_acc >>24);_ggf =byte ((_acc >>8)&0xff);_fcf =_ceca +_fbc ;if _fcf +1==len (_aaec .Data )-1||_fcf +1>=_ceca +_aaec .RowStride {_aaec .Data [_fcf ]=_dcad [_abff ];if _bde =_aaec .SetByte (_fcf ,_dcad [_abff ]);
-_bde !=nil {return _a .Wrapf (_bde ,_cde ,"\u0069n\u0064\u0065\u0078\u003a\u0020\u0025d",_fcf );};}else {_ggd =(uint16 (_dcad [_abff ])<<8)|uint16 (_dcad [_ggf ]);if _bde =_aaec .setTwoBytes (_fcf ,_ggd );_bde !=nil {return _a .Wrapf (_bde ,_cde ,"s\u0065\u0074\u0074\u0069\u006e\u0067 \u0074\u0077\u006f\u0020\u0062\u0079t\u0065\u0073\u0020\u0066\u0061\u0069\u006ce\u0064\u002c\u0020\u0069\u006e\u0064\u0065\u0078\u003a\u0020%\u0064",_fcf );
-};_fbc ++;};};};return nil ;};func _daadf (_eeee *Bitmap ,_fbgc ,_cadfa ,_ecdb ,_bdcf int ,_dedee RasterOperator ){if _fbgc < 0{_ecdb +=_fbgc ;_fbgc =0;};_fba :=_fbgc +_ecdb -_eeee .Width ;if _fba > 0{_ecdb -=_fba ;};if _cadfa < 0{_bdcf +=_cadfa ;_cadfa =0;
-};_gdba :=_cadfa +_bdcf -_eeee .Height ;if _gdba > 0{_bdcf -=_gdba ;};if _ecdb <=0||_bdcf <=0{return ;};if (_fbgc &7)==0{_debe (_eeee ,_fbgc ,_cadfa ,_ecdb ,_bdcf ,_dedee );}else {_dbfb (_eeee ,_fbgc ,_cadfa ,_ecdb ,_bdcf ,_dedee );};};func (_dacf *ClassedPoints )GetIntYByClass (i int )(int ,error ){const _degf ="\u0043\u006c\u0061\u0073s\u0065\u0064\u0050\u006f\u0069\u006e\u0074\u0073\u002e\u0047e\u0074I\u006e\u0074\u0059\u0042\u0079\u0043\u006ca\u0073\u0073";
-if i >=_dacf .IntSlice .Size (){return 0,_a .Errorf (_degf ,"\u0069\u003a\u0020\u0027\u0025\u0064\u0027 \u0069\u0073\u0020o\u0075\u0074\u0020\u006ff\u0020\u0074\u0068\u0065\u0020\u0072\u0061\u006e\u0067\u0065\u0020\u006f\u0066\u0020\u0074\u0068\u0065\u0020\u0049\u006e\u0074\u0053\u006c\u0069\u0063\u0065",i );
-};return int (_dacf .YAtIndex (i )),nil ;};var _fdgd =[5]int {1,2,3,0,4};func (_aca *Bitmap )GetUnpaddedData ()([]byte ,error ){_eed :=uint (_aca .Width &0x07);if _eed ==0{return _aca .Data ,nil ;};_egdb :=_aca .Width *_aca .Height ;if _egdb %8!=0{_egdb >>=3;
-_egdb ++;}else {_egdb >>=3;};_dec :=make ([]byte ,_egdb );_fdg :=_f .NewWriterMSB (_dec );const _dadc ="\u0047e\u0074U\u006e\u0070\u0061\u0064\u0064\u0065\u0064\u0044\u0061\u0074\u0061";for _ccaf :=0;_ccaf < _aca .Height ;_ccaf ++{for _dggd :=0;_dggd < _aca .RowStride ;
-_dggd ++{_cag :=_aca .Data [_ccaf *_aca .RowStride +_dggd ];if _dggd !=_aca .RowStride -1{_gede :=_fdg .WriteByte (_cag );if _gede !=nil {return nil ,_a .Wrap (_gede ,_dadc ,"");};continue ;};for _afe :=uint (0);_afe < _eed ;_afe ++{_ecge :=_fdg .WriteBit (int (_cag >>(7-_afe )&0x01));
-if _ecge !=nil {return nil ,_a .Wrap (_ecge ,_dadc ,"");};};};};return _dec ,nil ;};func _ccecc (_abdb ,_acgd byte ,_eagdc CombinationOperator )byte {switch _eagdc {case CmbOpOr :return _acgd |_abdb ;case CmbOpAnd :return _acgd &_abdb ;case CmbOpXor :return _acgd ^_abdb ;
-case CmbOpXNor :return ^(_acgd ^_abdb );case CmbOpNot :return ^(_acgd );default:return _acgd ;};};func (_bfba MorphProcess )getWidthHeight ()(_aaaa ,_gbcg int ){return _bfba .Arguments [0],_bfba .Arguments [1];};func _fedg (_fabf ,_dagf *Bitmap )(*Bitmap ,error ){if _dagf ==nil {return nil ,_a .Error ("\u0063\u006f\u0070\u0079\u0042\u0069\u0074\u006d\u0061\u0070","\u0073o\u0075r\u0063\u0065\u0020\u006e\u006ft\u0020\u0064e\u0066\u0069\u006e\u0065\u0064");
-};if _dagf ==_fabf {return _fabf ,nil ;};if _fabf ==nil {_fabf =_dagf .createTemplate ();copy (_fabf .Data ,_dagf .Data );return _fabf ,nil ;};_afbd :=_fabf .resizeImageData (_dagf );if _afbd !=nil {return nil ,_a .Wrap (_afbd ,"\u0063\u006f\u0070\u0079\u0042\u0069\u0074\u006d\u0061\u0070","");
-};_fabf .Text =_dagf .Text ;copy (_fabf .Data ,_dagf .Data );return _fabf ,nil ;};func RankHausTest (p1 ,p2 ,p3 ,p4 *Bitmap ,delX ,delY float32 ,maxDiffW ,maxDiffH ,area1 ,area3 int ,rank float32 ,tab8 []int )(_cadae bool ,_eegaa error ){const _aadc ="\u0052\u0061\u006ek\u0048\u0061\u0075\u0073\u0054\u0065\u0073\u0074";
-_dcbe ,_ecce :=p1 .Width ,p1 .Height ;_ebbd ,_fcfd :=p3 .Width ,p3 .Height ;if _ge .Abs (_dcbe -_ebbd )> maxDiffW {return false ,nil ;};if _ge .Abs (_ecce -_fcfd )> maxDiffH {return false ,nil ;};_fdc :=int (float32 (area1 )*(1.0-rank )+0.5);_aaba :=int (float32 (area3 )*(1.0-rank )+0.5);
-var _ddgd ,_cdbf int ;if delX >=0{_ddgd =int (delX +0.5);}else {_ddgd =int (delX -0.5);};if delY >=0{_cdbf =int (delY +0.5);}else {_cdbf =int (delY -0.5);};_aecfe :=p1 .CreateTemplate ();if _eegaa =_aecfe .RasterOperation (0,0,_dcbe ,_ecce ,PixSrc ,p1 ,0,0);
-_eegaa !=nil {return false ,_a .Wrap (_eegaa ,_aadc ,"p\u0031\u0020\u002d\u0053\u0052\u0043\u002d\u003e\u0020\u0074");};if _eegaa =_aecfe .RasterOperation (_ddgd ,_cdbf ,_dcbe ,_ecce ,PixNotSrcAndDst ,p4 ,0,0);_eegaa !=nil {return false ,_a .Wrap (_eegaa ,_aadc ,"\u0074 \u0026\u0020\u0021\u0070\u0034");
-};_cadae ,_eegaa =_aecfe .ThresholdPixelSum (_fdc ,tab8 );if _eegaa !=nil {return false ,_a .Wrap (_eegaa ,_aadc ,"\u0074\u002d\u003e\u0074\u0068\u0072\u0065\u0073\u0068\u0031");};if _cadae {return false ,nil ;};if _eegaa =_aecfe .RasterOperation (_ddgd ,_cdbf ,_ebbd ,_fcfd ,PixSrc ,p3 ,0,0);
-_eegaa !=nil {return false ,_a .Wrap (_eegaa ,_aadc ,"p\u0033\u0020\u002d\u0053\u0052\u0043\u002d\u003e\u0020\u0074");};if _eegaa =_aecfe .RasterOperation (0,0,_ebbd ,_fcfd ,PixNotSrcAndDst ,p2 ,0,0);_eegaa !=nil {return false ,_a .Wrap (_eegaa ,_aadc ,"\u0074 \u0026\u0020\u0021\u0070\u0032");
-};_cadae ,_eegaa =_aecfe .ThresholdPixelSum (_aaba ,tab8 );if _eegaa !=nil {return false ,_a .Wrap (_eegaa ,_aadc ,"\u0074\u002d\u003e\u0074\u0068\u0072\u0065\u0073\u0068\u0033");};return !_cadae ,nil ;};func TstISymbol (t *_c .T ,scale ...int )*Bitmap {_adfd ,_fedf :=NewWithData (1,5,[]byte {0x80,0x80,0x80,0x80,0x80});
-_d .NoError (t ,_fedf );return TstGetScaledSymbol (t ,_adfd ,scale ...);};func Centroid (bm *Bitmap ,centTab ,sumTab []int )(Point ,error ){return bm .centroid (centTab ,sumTab )};const _aecca =5000;func _debe (_eacb *Bitmap ,_eeag ,_gacb int ,_cccag ,_ceeb int ,_fbag RasterOperator ){var (_gcef int ;
-_dace byte ;_ffga ,_edba int ;_cecg int ;);_ggce :=_cccag >>3;_gdfa :=_cccag &7;if _gdfa > 0{_dace =_dcga [_gdfa ];};_gcef =_eacb .RowStride *_gacb +(_eeag >>3);switch _fbag {case PixClr :for _ffga =0;_ffga < _ceeb ;_ffga ++{_cecg =_gcef +_ffga *_eacb .RowStride ;
-for _edba =0;_edba < _ggce ;_edba ++{_eacb .Data [_cecg ]=0x0;_cecg ++;};if _gdfa > 0{_eacb .Data [_cecg ]=_fbaa (_eacb .Data [_cecg ],0x0,_dace );};};case PixSet :for _ffga =0;_ffga < _ceeb ;_ffga ++{_cecg =_gcef +_ffga *_eacb .RowStride ;for _edba =0;
-_edba < _ggce ;_edba ++{_eacb .Data [_cecg ]=0xff;_cecg ++;};if _gdfa > 0{_eacb .Data [_cecg ]=_fbaa (_eacb .Data [_cecg ],0xff,_dace );};};case PixNotDst :for _ffga =0;_ffga < _ceeb ;_ffga ++{_cecg =_gcef +_ffga *_eacb .RowStride ;for _edba =0;_edba < _ggce ;
-_edba ++{_eacb .Data [_cecg ]=^_eacb .Data [_cecg ];_cecg ++;};if _gdfa > 0{_eacb .Data [_cecg ]=_fbaa (_eacb .Data [_cecg ],^_eacb .Data [_cecg ],_dace );};};};};type Point struct{X ,Y float32 ;};func (_dac *Bitmap )GetPixel (x ,y int )bool {_aeaa :=_dac .GetByteIndex (x ,y );
-_agb :=_dac .GetBitOffset (x );_ebge :=uint (7-_agb );if _aeaa > len (_dac .Data )-1{_dc .Log .Debug ("\u0054\u0072\u0079\u0069\u006e\u0067\u0020\u0074\u006f\u0020\u0067\u0065\u0074\u0020\u0070\u0069\u0078\u0065\u006c\u0020o\u0075\u0074\u0020\u006f\u0066\u0020\u0074\u0068\u0065\u0020\u0064\u0061\u0074\u0061\u0020\u0072\u0061\u006e\u0067\u0065\u002e \u0078\u003a\u0020\u0027\u0025\u0064\u0027\u002c\u0020\u0079\u003a\u0027\u0025\u0064'\u002c\u0020\u0062m\u003a\u0020\u0027\u0025\u0073\u0027",x ,y ,_dac );
-return false ;};if (_dac .Data [_aeaa ]>>_ebge )&0x01>=1{return true ;};return false ;};func init (){const _ddcdf ="\u0062\u0069\u0074\u006dap\u0073\u002e\u0069\u006e\u0069\u0074\u0069\u0061\u006c\u0069\u007a\u0061\u0074\u0069o\u006e";_ggbf =New (50,40);
-var _ffbdc error ;_ggbf ,_ffbdc =_ggbf .AddBorder (2,1);if _ffbdc !=nil {panic (_a .Wrap (_ffbdc ,_ddcdf ,"f\u0072\u0061\u006d\u0065\u0042\u0069\u0074\u006d\u0061\u0070"));};_bceg ,_ffbdc =NewWithData (50,22,_dbcb );if _ffbdc !=nil {panic (_a .Wrap (_ffbdc ,_ddcdf ,"i\u006d\u0061\u0067\u0065\u0042\u0069\u0074\u006d\u0061\u0070"));
-};};func (_defc *Bitmaps )ClipToBitmap (s *Bitmap )(*Bitmaps ,error ){const _egde ="B\u0069t\u006d\u0061\u0070\u0073\u002e\u0043\u006c\u0069p\u0054\u006f\u0042\u0069tm\u0061\u0070";if _defc ==nil {return nil ,_a .Error (_egde ,"\u0042\u0069\u0074\u006dap\u0073\u0020\u006e\u006f\u0074\u0020\u0064\u0065\u0066\u0069\u006e\u0065\u0064");
-};if s ==nil {return nil ,_a .Error (_egde ,"\u0073o\u0075\u0072\u0063\u0065 \u0062\u0069\u0074\u006d\u0061p\u0020n\u006ft\u0020\u0064\u0065\u0066\u0069\u006e\u0065d");};_feac :=len (_defc .Values );_gfega :=&Bitmaps {Values :make ([]*Bitmap ,_feac ),Boxes :make ([]*_bf .Rectangle ,_feac )};
-var (_gcefa ,_afd *Bitmap ;_fedd *_bf .Rectangle ;_ggdbd error ;);for _edce :=0;_edce < _feac ;_edce ++{if _gcefa ,_ggdbd =_defc .GetBitmap (_edce );_ggdbd !=nil {return nil ,_a .Wrap (_ggdbd ,_egde ,"");};if _fedd ,_ggdbd =_defc .GetBox (_edce );_ggdbd !=nil {return nil ,_a .Wrap (_ggdbd ,_egde ,"");
-};if _afd ,_ggdbd =s .clipRectangle (_fedd ,nil );_ggdbd !=nil {return nil ,_a .Wrap (_ggdbd ,_egde ,"");};if _afd ,_ggdbd =_afd .And (_gcefa );_ggdbd !=nil {return nil ,_a .Wrap (_ggdbd ,_egde ,"");};_gfega .Values [_edce ]=_afd ;_gfega .Boxes [_edce ]=_fedd ;
-};return _gfega ,nil ;};func (_edfe *Selection )setOrigin (_afce ,_gcec int ){_edfe .Cy ,_edfe .Cx =_afce ,_gcec };func (_feb *Bitmap )inverseData (){if _fgb :=_feb .RasterOperation (0,0,_feb .Width ,_feb .Height ,PixNotDst ,nil ,0,0);_fgb !=nil {_dc .Log .Debug ("\u0049n\u0076\u0065\u0072\u0073e\u0020\u0064\u0061\u0074\u0061 \u0066a\u0069l\u0065\u0064\u003a\u0020\u0027\u0025\u0076'",_fgb );
-};if _feb .Color ==Chocolate {_feb .Color =Vanilla ;}else {_feb .Color =Chocolate ;};};func (_caad *Bitmap )InverseData (){_caad .inverseData ()};func _gccd (_eefg *Bitmap ,_affe ,_deca ,_cddfg ,_cage int ,_deef RasterOperator ,_aagd *Bitmap ,_agfe ,_gacg int )error {var (_dddg byte ;
-_ceag int ;_aadb int ;_feab ,_gbbg int ;_aef ,_gbcc int ;);_ccfef :=_cddfg >>3;_fbdcg :=_cddfg &7;if _fbdcg > 0{_dddg =_dcga [_fbdcg ];};_ceag =_aagd .RowStride *_gacg +(_agfe >>3);_aadb =_eefg .RowStride *_deca +(_affe >>3);switch _deef {case PixSrc :for _aef =0;
-_aef < _cage ;_aef ++{_feab =_ceag +_aef *_aagd .RowStride ;_gbbg =_aadb +_aef *_eefg .RowStride ;for _gbcc =0;_gbcc < _ccfef ;_gbcc ++{_eefg .Data [_gbbg ]=_aagd .Data [_feab ];_gbbg ++;_feab ++;};if _fbdcg > 0{_eefg .Data [_gbbg ]=_fbaa (_eefg .Data [_gbbg ],_aagd .Data [_feab ],_dddg );
-};};case PixNotSrc :for _aef =0;_aef < _cage ;_aef ++{_feab =_ceag +_aef *_aagd .RowStride ;_gbbg =_aadb +_aef *_eefg .RowStride ;for _gbcc =0;_gbcc < _ccfef ;_gbcc ++{_eefg .Data [_gbbg ]=^(_aagd .Data [_feab ]);_gbbg ++;_feab ++;};if _fbdcg > 0{_eefg .Data [_gbbg ]=_fbaa (_eefg .Data [_gbbg ],^_aagd .Data [_feab ],_dddg );
-};};case PixSrcOrDst :for _aef =0;_aef < _cage ;_aef ++{_feab =_ceag +_aef *_aagd .RowStride ;_gbbg =_aadb +_aef *_eefg .RowStride ;for _gbcc =0;_gbcc < _ccfef ;_gbcc ++{_eefg .Data [_gbbg ]|=_aagd .Data [_feab ];_gbbg ++;_feab ++;};if _fbdcg > 0{_eefg .Data [_gbbg ]=_fbaa (_eefg .Data [_gbbg ],_aagd .Data [_feab ]|_eefg .Data [_gbbg ],_dddg );
-};};case PixSrcAndDst :for _aef =0;_aef < _cage ;_aef ++{_feab =_ceag +_aef *_aagd .RowStride ;_gbbg =_aadb +_aef *_eefg .RowStride ;for _gbcc =0;_gbcc < _ccfef ;_gbcc ++{_eefg .Data [_gbbg ]&=_aagd .Data [_feab ];_gbbg ++;_feab ++;};if _fbdcg > 0{_eefg .Data [_gbbg ]=_fbaa (_eefg .Data [_gbbg ],_aagd .Data [_feab ]&_eefg .Data [_gbbg ],_dddg );
-};};case PixSrcXorDst :for _aef =0;_aef < _cage ;_aef ++{_feab =_ceag +_aef *_aagd .RowStride ;_gbbg =_aadb +_aef *_eefg .RowStride ;for _gbcc =0;_gbcc < _ccfef ;_gbcc ++{_eefg .Data [_gbbg ]^=_aagd .Data [_feab ];_gbbg ++;_feab ++;};if _fbdcg > 0{_eefg .Data [_gbbg ]=_fbaa (_eefg .Data [_gbbg ],_aagd .Data [_feab ]^_eefg .Data [_gbbg ],_dddg );
-};};case PixNotSrcOrDst :for _aef =0;_aef < _cage ;_aef ++{_feab =_ceag +_aef *_aagd .RowStride ;_gbbg =_aadb +_aef *_eefg .RowStride ;for _gbcc =0;_gbcc < _ccfef ;_gbcc ++{_eefg .Data [_gbbg ]|=^(_aagd .Data [_feab ]);_gbbg ++;_feab ++;};if _fbdcg > 0{_eefg .Data [_gbbg ]=_fbaa (_eefg .Data [_gbbg ],^(_aagd .Data [_feab ])|_eefg .Data [_gbbg ],_dddg );
-};};case PixNotSrcAndDst :for _aef =0;_aef < _cage ;_aef ++{_feab =_ceag +_aef *_aagd .RowStride ;_gbbg =_aadb +_aef *_eefg .RowStride ;for _gbcc =0;_gbcc < _ccfef ;_gbcc ++{_eefg .Data [_gbbg ]&=^(_aagd .Data [_feab ]);_gbbg ++;_feab ++;};if _fbdcg > 0{_eefg .Data [_gbbg ]=_fbaa (_eefg .Data [_gbbg ],^(_aagd .Data [_feab ])&_eefg .Data [_gbbg ],_dddg );
-};};case PixSrcOrNotDst :for _aef =0;_aef < _cage ;_aef ++{_feab =_ceag +_aef *_aagd .RowStride ;_gbbg =_aadb +_aef *_eefg .RowStride ;for _gbcc =0;_gbcc < _ccfef ;_gbcc ++{_eefg .Data [_gbbg ]=_aagd .Data [_feab ]|^(_eefg .Data [_gbbg ]);_gbbg ++;_feab ++;
-};if _fbdcg > 0{_eefg .Data [_gbbg ]=_fbaa (_eefg .Data [_gbbg ],_aagd .Data [_feab ]|^(_eefg .Data [_gbbg ]),_dddg );};};case PixSrcAndNotDst :for _aef =0;_aef < _cage ;_aef ++{_feab =_ceag +_aef *_aagd .RowStride ;_gbbg =_aadb +_aef *_eefg .RowStride ;
-for _gbcc =0;_gbcc < _ccfef ;_gbcc ++{_eefg .Data [_gbbg ]=_aagd .Data [_feab ]&^(_eefg .Data [_gbbg ]);_gbbg ++;_feab ++;};if _fbdcg > 0{_eefg .Data [_gbbg ]=_fbaa (_eefg .Data [_gbbg ],_aagd .Data [_feab ]&^(_eefg .Data [_gbbg ]),_dddg );};};case PixNotPixSrcOrDst :for _aef =0;
-_aef < _cage ;_aef ++{_feab =_ceag +_aef *_aagd .RowStride ;_gbbg =_aadb +_aef *_eefg .RowStride ;for _gbcc =0;_gbcc < _ccfef ;_gbcc ++{_eefg .Data [_gbbg ]=^(_aagd .Data [_feab ]|_eefg .Data [_gbbg ]);_gbbg ++;_feab ++;};if _fbdcg > 0{_eefg .Data [_gbbg ]=_fbaa (_eefg .Data [_gbbg ],^(_aagd .Data [_feab ]|_eefg .Data [_gbbg ]),_dddg );
-};};case PixNotPixSrcAndDst :for _aef =0;_aef < _cage ;_aef ++{_feab =_ceag +_aef *_aagd .RowStride ;_gbbg =_aadb +_aef *_eefg .RowStride ;for _gbcc =0;_gbcc < _ccfef ;_gbcc ++{_eefg .Data [_gbbg ]=^(_aagd .Data [_feab ]&_eefg .Data [_gbbg ]);_gbbg ++;
-_feab ++;};if _fbdcg > 0{_eefg .Data [_gbbg ]=_fbaa (_eefg .Data [_gbbg ],^(_aagd .Data [_feab ]&_eefg .Data [_gbbg ]),_dddg );};};case PixNotPixSrcXorDst :for _aef =0;_aef < _cage ;_aef ++{_feab =_ceag +_aef *_aagd .RowStride ;_gbbg =_aadb +_aef *_eefg .RowStride ;
-for _gbcc =0;_gbcc < _ccfef ;_gbcc ++{_eefg .Data [_gbbg ]=^(_aagd .Data [_feab ]^_eefg .Data [_gbbg ]);_gbbg ++;_feab ++;};if _fbdcg > 0{_eefg .Data [_gbbg ]=_fbaa (_eefg .Data [_gbbg ],^(_aagd .Data [_feab ]^_eefg .Data [_gbbg ]),_dddg );};};default:_dc .Log .Debug ("\u0050\u0072ov\u0069\u0064\u0065d\u0020\u0069\u006e\u0076ali\u0064 r\u0061\u0073\u0074\u0065\u0072\u0020\u006fpe\u0072\u0061\u0074\u006f\u0072\u003a\u0020%\u0076",_deef );
-return _a .Error ("\u0072\u0061\u0073\u0074er\u004f\u0070\u0042\u0079\u0074\u0065\u0041\u006c\u0069\u0067\u006e\u0065\u0064\u004co\u0077","\u0069\u006e\u0076al\u0069\u0064\u0020\u0072\u0061\u0073\u0074\u0065\u0072\u0020\u006f\u0070\u0065\u0072\u0061\u0074\u006f\u0072");
-};return nil ;};func _fgfb (_aegd int )int {if _aegd < 0{return -_aegd ;};return _aegd ;};type Bitmap struct{Width ,Height int ;BitmapNumber int ;RowStride int ;Data []byte ;Color Color ;Special int ;Text string ;XResolution ,YResolution int ;};func (_dffcb *ClassedPoints )GetIntXByClass (i int )(int ,error ){const _bgca ="\u0043\u006c\u0061\u0073s\u0065\u0064\u0050\u006f\u0069\u006e\u0074\u0073\u002e\u0047e\u0074I\u006e\u0074\u0059\u0042\u0079\u0043\u006ca\u0073\u0073";
-if i >=_dffcb .IntSlice .Size (){return 0,_a .Errorf (_bgca ,"\u0069\u003a\u0020\u0027\u0025\u0064\u0027 \u0069\u0073\u0020o\u0075\u0074\u0020\u006ff\u0020\u0074\u0068\u0065\u0020\u0072\u0061\u006e\u0067\u0065\u0020\u006f\u0066\u0020\u0074\u0068\u0065\u0020\u0049\u006e\u0074\u0053\u006c\u0069\u0063\u0065",i );
-};return int (_dffcb .XAtIndex (i )),nil ;};func (_eaee *Bitmap )GetChocolateData ()[]byte {if _eaee .Color ==Vanilla {_eaee .inverseData ();};return _eaee .Data ;};func _ffbgb (_ecae *Bitmap ,_ccdg *_ge .Stack ,_cafgf ,_ggbce int )(_bbgc *_bf .Rectangle ,_adff error ){const _ddad ="\u0073e\u0065d\u0046\u0069\u006c\u006c\u0053\u0074\u0061\u0063\u006b\u0042\u0042";
-if _ecae ==nil {return nil ,_a .Error (_ddad ,"\u0070\u0072\u006fvi\u0064\u0065\u0064\u0020\u006e\u0069\u006c\u0020\u0027\u0073\u0027\u0020\u0042\u0069\u0074\u006d\u0061\u0070");};if _ccdg ==nil {return nil ,_a .Error (_ddad ,"p\u0072o\u0076\u0069\u0064\u0065\u0064\u0020\u006e\u0069l\u0020\u0027\u0073\u0074ac\u006b\u0027");
-};_aefb ,_dfdde :=_ecae .Width ,_ecae .Height ;_fdebe :=_aefb -1;_ddbe :=_dfdde -1;if _cafgf < 0||_cafgf > _fdebe ||_ggbce < 0||_ggbce > _ddbe ||!_ecae .GetPixel (_cafgf ,_ggbce ){return nil ,nil ;};_dbda :=_bf .Rect (100000,100000,0,0);if _adff =_aggg (_ccdg ,_cafgf ,_cafgf ,_ggbce ,1,_ddbe ,&_dbda );
-_adff !=nil {return nil ,_a .Wrap (_adff ,_ddad ,"\u0069\u006e\u0069t\u0069\u0061\u006c\u0020\u0070\u0075\u0073\u0068");};if _adff =_aggg (_ccdg ,_cafgf ,_cafgf ,_ggbce +1,-1,_ddbe ,&_dbda );_adff !=nil {return nil ,_a .Wrap (_adff ,_ddad ,"\u0032\u006ed\u0020\u0069\u006ei\u0074\u0069\u0061\u006c\u0020\u0070\u0075\u0073\u0068");
-};_dbda .Min .X ,_dbda .Max .X =_cafgf ,_cafgf ;_dbda .Min .Y ,_dbda .Max .Y =_ggbce ,_ggbce ;var (_cbgd *fillSegment ;_ddab int ;);for _ccdg .Len ()> 0{if _cbgd ,_adff =_gaaf (_ccdg );_adff !=nil {return nil ,_a .Wrap (_adff ,_ddad ,"");};_ggbce =_cbgd ._decd ;
-for _cafgf =_cbgd ._cdac -1;_cafgf >=0&&_ecae .GetPixel (_cafgf ,_ggbce );_cafgf --{if _adff =_ecae .SetPixel (_cafgf ,_ggbce ,0);_adff !=nil {return nil ,_a .Wrap (_adff ,_ddad ,"\u0031s\u0074\u0020\u0073\u0065\u0074");};};if _cafgf >=_cbgd ._cdac -1{for {for _cafgf ++;
-_cafgf <=_cbgd ._afgf +1&&_cafgf <=_fdebe &&!_ecae .GetPixel (_cafgf ,_ggbce );_cafgf ++{};_ddab =_cafgf ;if _cafgf > _cbgd ._afgf +1||_cafgf > _fdebe {break ;};for ;_cafgf <=_fdebe &&_ecae .GetPixel (_cafgf ,_ggbce );_cafgf ++{if _adff =_ecae .SetPixel (_cafgf ,_ggbce ,0);
-_adff !=nil {return nil ,_a .Wrap (_adff ,_ddad ,"\u0032n\u0064\u0020\u0073\u0065\u0074");};};if _adff =_aggg (_ccdg ,_ddab ,_cafgf -1,_cbgd ._decd ,_cbgd ._fadf ,_ddbe ,&_dbda );_adff !=nil {return nil ,_a .Wrap (_adff ,_ddad ,"n\u006f\u0072\u006d\u0061\u006c\u0020\u0070\u0075\u0073\u0068");
-};if _cafgf > _cbgd ._afgf {if _adff =_aggg (_ccdg ,_cbgd ._afgf +1,_cafgf -1,_cbgd ._decd ,-_cbgd ._fadf ,_ddbe ,&_dbda );_adff !=nil {return nil ,_a .Wrap (_adff ,_ddad ,"\u006ce\u0061k\u0020\u006f\u006e\u0020\u0072i\u0067\u0068t\u0020\u0073\u0069\u0064\u0065");
-};};};continue ;};_ddab =_cafgf +1;if _ddab < _cbgd ._cdac {if _adff =_aggg (_ccdg ,_ddab ,_cbgd ._cdac -1,_cbgd ._decd ,-_cbgd ._fadf ,_ddbe ,&_dbda );_adff !=nil {return nil ,_a .Wrap (_adff ,_ddad ,"\u006c\u0065\u0061\u006b\u0020\u006f\u006e\u0020\u006c\u0065\u0066\u0074 \u0073\u0069\u0064\u0065");
-};};_cafgf =_cbgd ._cdac ;for {for ;_cafgf <=_fdebe &&_ecae .GetPixel (_cafgf ,_ggbce );_cafgf ++{if _adff =_ecae .SetPixel (_cafgf ,_ggbce ,0);_adff !=nil {return nil ,_a .Wrap (_adff ,_ddad ,"\u0032n\u0064\u0020\u0073\u0065\u0074");};};if _adff =_aggg (_ccdg ,_ddab ,_cafgf -1,_cbgd ._decd ,_cbgd ._fadf ,_ddbe ,&_dbda );
-_adff !=nil {return nil ,_a .Wrap (_adff ,_ddad ,"n\u006f\u0072\u006d\u0061\u006c\u0020\u0070\u0075\u0073\u0068");};if _cafgf > _cbgd ._afgf {if _adff =_aggg (_ccdg ,_cbgd ._afgf +1,_cafgf -1,_cbgd ._decd ,-_cbgd ._fadf ,_ddbe ,&_dbda );_adff !=nil {return nil ,_a .Wrap (_adff ,_ddad ,"\u006ce\u0061k\u0020\u006f\u006e\u0020\u0072i\u0067\u0068t\u0020\u0073\u0069\u0064\u0065");
-};};for _cafgf ++;_cafgf <=_cbgd ._afgf +1&&_cafgf <=_fdebe &&!_ecae .GetPixel (_cafgf ,_ggbce );_cafgf ++{};_ddab =_cafgf ;if _cafgf > _cbgd ._afgf +1||_cafgf > _fdebe {break ;};};};_dbda .Max .X ++;_dbda .Max .Y ++;return &_dbda ,nil ;};const (_ SizeSelection =iota ;
-SizeSelectByWidth ;SizeSelectByHeight ;SizeSelectByMaxDimension ;SizeSelectByArea ;SizeSelectByPerimeter ;);func (_bcddc *Bitmaps )SortByHeight (){_bafd :=(*byHeight )(_bcddc );_df .Sort (_bafd )};func _acga (_edcad *Bitmap ,_ddf *Bitmap ,_gddba *Selection )(*Bitmap ,error ){var (_afgc *Bitmap ;
-_ggfe error ;);_edcad ,_ggfe =_bfbb (_edcad ,_ddf ,_gddba ,&_afgc );if _ggfe !=nil {return nil ,_ggfe ;};if _ggfe =_edcad .clearAll ();_ggfe !=nil {return nil ,_ggfe ;};var _ecgee SelectionValue ;for _bcafc :=0;_bcafc < _gddba .Height ;_bcafc ++{for _ccea :=0;
-_ccea < _gddba .Width ;_ccea ++{_ecgee =_gddba .Data [_bcafc ][_ccea ];if _ecgee ==SelHit {if _ggfe =_edcad .RasterOperation (_ccea -_gddba .Cx ,_bcafc -_gddba .Cy ,_ddf .Width ,_ddf .Height ,PixSrcOrDst ,_afgc ,0,0);_ggfe !=nil {return nil ,_ggfe ;};};
-};};return _edcad ,nil ;};func _dead (_fcdgg *Bitmap ,_faac ,_gcfe ,_ddea ,_caafc int ,_gebc RasterOperator ,_aaecb *Bitmap ,_gbfg ,_fdggb int )error {var (_dgfc bool ;_fcaa bool ;_dggc int ;_dada int ;_dacaf int ;_ebea bool ;_aged byte ;_ddbdd int ;_cfgf int ;
-_ecfd int ;_ggdfb ,_bbfe int ;);_gedbg :=8-(_faac &7);_dbec :=_beeb [_gedbg ];_aafc :=_fcdgg .RowStride *_gcfe +(_faac >>3);_fdfcg :=_aaecb .RowStride *_fdggb +(_gbfg >>3);if _ddea < _gedbg {_dgfc =true ;_dbec &=_dcga [8-_gedbg +_ddea ];};if !_dgfc {_dggc =(_ddea -_gedbg )>>3;
-if _dggc > 0{_fcaa =true ;_dada =_aafc +1;_dacaf =_fdfcg +1;};};_ddbdd =(_faac +_ddea )&7;if !_dgfc &&_ddbdd !=0{_ebea =true ;_aged =_dcga [_ddbdd ];_cfgf =_aafc +1+_dggc ;_ecfd =_fdfcg +1+_dggc ;};switch _gebc {case PixSrc :for _ggdfb =0;_ggdfb < _caafc ;
-_ggdfb ++{_fcdgg .Data [_aafc ]=_fbaa (_fcdgg .Data [_aafc ],_aaecb .Data [_fdfcg ],_dbec );_aafc +=_fcdgg .RowStride ;_fdfcg +=_aaecb .RowStride ;};if _fcaa {for _ggdfb =0;_ggdfb < _caafc ;_ggdfb ++{for _bbfe =0;_bbfe < _dggc ;_bbfe ++{_fcdgg .Data [_dada +_bbfe ]=_aaecb .Data [_dacaf +_bbfe ];
-};_dada +=_fcdgg .RowStride ;_dacaf +=_aaecb .RowStride ;};};if _ebea {for _ggdfb =0;_ggdfb < _caafc ;_ggdfb ++{_fcdgg .Data [_cfgf ]=_fbaa (_fcdgg .Data [_cfgf ],_aaecb .Data [_ecfd ],_aged );_cfgf +=_fcdgg .RowStride ;_ecfd +=_aaecb .RowStride ;};};case PixNotSrc :for _ggdfb =0;
-_ggdfb < _caafc ;_ggdfb ++{_fcdgg .Data [_aafc ]=_fbaa (_fcdgg .Data [_aafc ],^_aaecb .Data [_fdfcg ],_dbec );_aafc +=_fcdgg .RowStride ;_fdfcg +=_aaecb .RowStride ;};if _fcaa {for _ggdfb =0;_ggdfb < _caafc ;_ggdfb ++{for _bbfe =0;_bbfe < _dggc ;_bbfe ++{_fcdgg .Data [_dada +_bbfe ]=^_aaecb .Data [_dacaf +_bbfe ];
-};_dada +=_fcdgg .RowStride ;_dacaf +=_aaecb .RowStride ;};};if _ebea {for _ggdfb =0;_ggdfb < _caafc ;_ggdfb ++{_fcdgg .Data [_cfgf ]=_fbaa (_fcdgg .Data [_cfgf ],^_aaecb .Data [_ecfd ],_aged );_cfgf +=_fcdgg .RowStride ;_ecfd +=_aaecb .RowStride ;};};
-case PixSrcOrDst :for _ggdfb =0;_ggdfb < _caafc ;_ggdfb ++{_fcdgg .Data [_aafc ]=_fbaa (_fcdgg .Data [_aafc ],_aaecb .Data [_fdfcg ]|_fcdgg .Data [_aafc ],_dbec );_aafc +=_fcdgg .RowStride ;_fdfcg +=_aaecb .RowStride ;};if _fcaa {for _ggdfb =0;_ggdfb < _caafc ;
-_ggdfb ++{for _bbfe =0;_bbfe < _dggc ;_bbfe ++{_fcdgg .Data [_dada +_bbfe ]|=_aaecb .Data [_dacaf +_bbfe ];};_dada +=_fcdgg .RowStride ;_dacaf +=_aaecb .RowStride ;};};if _ebea {for _ggdfb =0;_ggdfb < _caafc ;_ggdfb ++{_fcdgg .Data [_cfgf ]=_fbaa (_fcdgg .Data [_cfgf ],_aaecb .Data [_ecfd ]|_fcdgg .Data [_cfgf ],_aged );
-_cfgf +=_fcdgg .RowStride ;_ecfd +=_aaecb .RowStride ;};};case PixSrcAndDst :for _ggdfb =0;_ggdfb < _caafc ;_ggdfb ++{_fcdgg .Data [_aafc ]=_fbaa (_fcdgg .Data [_aafc ],_aaecb .Data [_fdfcg ]&_fcdgg .Data [_aafc ],_dbec );_aafc +=_fcdgg .RowStride ;_fdfcg +=_aaecb .RowStride ;
-};if _fcaa {for _ggdfb =0;_ggdfb < _caafc ;_ggdfb ++{for _bbfe =0;_bbfe < _dggc ;_bbfe ++{_fcdgg .Data [_dada +_bbfe ]&=_aaecb .Data [_dacaf +_bbfe ];};_dada +=_fcdgg .RowStride ;_dacaf +=_aaecb .RowStride ;};};if _ebea {for _ggdfb =0;_ggdfb < _caafc ;
-_ggdfb ++{_fcdgg .Data [_cfgf ]=_fbaa (_fcdgg .Data [_cfgf ],_aaecb .Data [_ecfd ]&_fcdgg .Data [_cfgf ],_aged );_cfgf +=_fcdgg .RowStride ;_ecfd +=_aaecb .RowStride ;};};case PixSrcXorDst :for _ggdfb =0;_ggdfb < _caafc ;_ggdfb ++{_fcdgg .Data [_aafc ]=_fbaa (_fcdgg .Data [_aafc ],_aaecb .Data [_fdfcg ]^_fcdgg .Data [_aafc ],_dbec );
-_aafc +=_fcdgg .RowStride ;_fdfcg +=_aaecb .RowStride ;};if _fcaa {for _ggdfb =0;_ggdfb < _caafc ;_ggdfb ++{for _bbfe =0;_bbfe < _dggc ;_bbfe ++{_fcdgg .Data [_dada +_bbfe ]^=_aaecb .Data [_dacaf +_bbfe ];};_dada +=_fcdgg .RowStride ;_dacaf +=_aaecb .RowStride ;
-};};if _ebea {for _ggdfb =0;_ggdfb < _caafc ;_ggdfb ++{_fcdgg .Data [_cfgf ]=_fbaa (_fcdgg .Data [_cfgf ],_aaecb .Data [_ecfd ]^_fcdgg .Data [_cfgf ],_aged );_cfgf +=_fcdgg .RowStride ;_ecfd +=_aaecb .RowStride ;};};case PixNotSrcOrDst :for _ggdfb =0;_ggdfb < _caafc ;
-_ggdfb ++{_fcdgg .Data [_aafc ]=_fbaa (_fcdgg .Data [_aafc ],^(_aaecb .Data [_fdfcg ])|_fcdgg .Data [_aafc ],_dbec );_aafc +=_fcdgg .RowStride ;_fdfcg +=_aaecb .RowStride ;};if _fcaa {for _ggdfb =0;_ggdfb < _caafc ;_ggdfb ++{for _bbfe =0;_bbfe < _dggc ;
-_bbfe ++{_fcdgg .Data [_dada +_bbfe ]|=^(_aaecb .Data [_dacaf +_bbfe ]);};_dada +=_fcdgg .RowStride ;_dacaf +=_aaecb .RowStride ;};};if _ebea {for _ggdfb =0;_ggdfb < _caafc ;_ggdfb ++{_fcdgg .Data [_cfgf ]=_fbaa (_fcdgg .Data [_cfgf ],^(_aaecb .Data [_ecfd ])|_fcdgg .Data [_cfgf ],_aged );
-_cfgf +=_fcdgg .RowStride ;_ecfd +=_aaecb .RowStride ;};};case PixNotSrcAndDst :for _ggdfb =0;_ggdfb < _caafc ;_ggdfb ++{_fcdgg .Data [_aafc ]=_fbaa (_fcdgg .Data [_aafc ],^(_aaecb .Data [_fdfcg ])&_fcdgg .Data [_aafc ],_dbec );_aafc +=_fcdgg .RowStride ;
-_fdfcg +=_aaecb .RowStride ;};if _fcaa {for _ggdfb =0;_ggdfb < _caafc ;_ggdfb ++{for _bbfe =0;_bbfe < _dggc ;_bbfe ++{_fcdgg .Data [_dada +_bbfe ]&=^_aaecb .Data [_dacaf +_bbfe ];};_dada +=_fcdgg .RowStride ;_dacaf +=_aaecb .RowStride ;};};if _ebea {for _ggdfb =0;
-_ggdfb < _caafc ;_ggdfb ++{_fcdgg .Data [_cfgf ]=_fbaa (_fcdgg .Data [_cfgf ],^(_aaecb .Data [_ecfd ])&_fcdgg .Data [_cfgf ],_aged );_cfgf +=_fcdgg .RowStride ;_ecfd +=_aaecb .RowStride ;};};case PixSrcOrNotDst :for _ggdfb =0;_ggdfb < _caafc ;_ggdfb ++{_fcdgg .Data [_aafc ]=_fbaa (_fcdgg .Data [_aafc ],_aaecb .Data [_fdfcg ]|^(_fcdgg .Data [_aafc ]),_dbec );
-_aafc +=_fcdgg .RowStride ;_fdfcg +=_aaecb .RowStride ;};if _fcaa {for _ggdfb =0;_ggdfb < _caafc ;_ggdfb ++{for _bbfe =0;_bbfe < _dggc ;_bbfe ++{_fcdgg .Data [_dada +_bbfe ]=_aaecb .Data [_dacaf +_bbfe ]|^(_fcdgg .Data [_dada +_bbfe ]);};_dada +=_fcdgg .RowStride ;
-_dacaf +=_aaecb .RowStride ;};};if _ebea {for _ggdfb =0;_ggdfb < _caafc ;_ggdfb ++{_fcdgg .Data [_cfgf ]=_fbaa (_fcdgg .Data [_cfgf ],_aaecb .Data [_ecfd ]|^(_fcdgg .Data [_cfgf ]),_aged );_cfgf +=_fcdgg .RowStride ;_ecfd +=_aaecb .RowStride ;};};case PixSrcAndNotDst :for _ggdfb =0;
-_ggdfb < _caafc ;_ggdfb ++{_fcdgg .Data [_aafc ]=_fbaa (_fcdgg .Data [_aafc ],_aaecb .Data [_fdfcg ]&^(_fcdgg .Data [_aafc ]),_dbec );_aafc +=_fcdgg .RowStride ;_fdfcg +=_aaecb .RowStride ;};if _fcaa {for _ggdfb =0;_ggdfb < _caafc ;_ggdfb ++{for _bbfe =0;
-_bbfe < _dggc ;_bbfe ++{_fcdgg .Data [_dada +_bbfe ]=_aaecb .Data [_dacaf +_bbfe ]&^(_fcdgg .Data [_dada +_bbfe ]);};_dada +=_fcdgg .RowStride ;_dacaf +=_aaecb .RowStride ;};};if _ebea {for _ggdfb =0;_ggdfb < _caafc ;_ggdfb ++{_fcdgg .Data [_cfgf ]=_fbaa (_fcdgg .Data [_cfgf ],_aaecb .Data [_ecfd ]&^(_fcdgg .Data [_cfgf ]),_aged );
-_cfgf +=_fcdgg .RowStride ;_ecfd +=_aaecb .RowStride ;};};case PixNotPixSrcOrDst :for _ggdfb =0;_ggdfb < _caafc ;_ggdfb ++{_fcdgg .Data [_aafc ]=_fbaa (_fcdgg .Data [_aafc ],^(_aaecb .Data [_fdfcg ]|_fcdgg .Data [_aafc ]),_dbec );_aafc +=_fcdgg .RowStride ;
-_fdfcg +=_aaecb .RowStride ;};if _fcaa {for _ggdfb =0;_ggdfb < _caafc ;_ggdfb ++{for _bbfe =0;_bbfe < _dggc ;_bbfe ++{_fcdgg .Data [_dada +_bbfe ]=^(_aaecb .Data [_dacaf +_bbfe ]|_fcdgg .Data [_dada +_bbfe ]);};_dada +=_fcdgg .RowStride ;_dacaf +=_aaecb .RowStride ;
-};};if _ebea {for _ggdfb =0;_ggdfb < _caafc ;_ggdfb ++{_fcdgg .Data [_cfgf ]=_fbaa (_fcdgg .Data [_cfgf ],^(_aaecb .Data [_ecfd ]|_fcdgg .Data [_cfgf ]),_aged );_cfgf +=_fcdgg .RowStride ;_ecfd +=_aaecb .RowStride ;};};case PixNotPixSrcAndDst :for _ggdfb =0;
-_ggdfb < _caafc ;_ggdfb ++{_fcdgg .Data [_aafc ]=_fbaa (_fcdgg .Data [_aafc ],^(_aaecb .Data [_fdfcg ]&_fcdgg .Data [_aafc ]),_dbec );_aafc +=_fcdgg .RowStride ;_fdfcg +=_aaecb .RowStride ;};if _fcaa {for _ggdfb =0;_ggdfb < _caafc ;_ggdfb ++{for _bbfe =0;
-_bbfe < _dggc ;_bbfe ++{_fcdgg .Data [_dada +_bbfe ]=^(_aaecb .Data [_dacaf +_bbfe ]&_fcdgg .Data [_dada +_bbfe ]);};_dada +=_fcdgg .RowStride ;_dacaf +=_aaecb .RowStride ;};};if _ebea {for _ggdfb =0;_ggdfb < _caafc ;_ggdfb ++{_fcdgg .Data [_cfgf ]=_fbaa (_fcdgg .Data [_cfgf ],^(_aaecb .Data [_ecfd ]&_fcdgg .Data [_cfgf ]),_aged );
-_cfgf +=_fcdgg .RowStride ;_ecfd +=_aaecb .RowStride ;};};case PixNotPixSrcXorDst :for _ggdfb =0;_ggdfb < _caafc ;_ggdfb ++{_fcdgg .Data [_aafc ]=_fbaa (_fcdgg .Data [_aafc ],^(_aaecb .Data [_fdfcg ]^_fcdgg .Data [_aafc ]),_dbec );_aafc +=_fcdgg .RowStride ;
-_fdfcg +=_aaecb .RowStride ;};if _fcaa {for _ggdfb =0;_ggdfb < _caafc ;_ggdfb ++{for _bbfe =0;_bbfe < _dggc ;_bbfe ++{_fcdgg .Data [_dada +_bbfe ]=^(_aaecb .Data [_dacaf +_bbfe ]^_fcdgg .Data [_dada +_bbfe ]);};_dada +=_fcdgg .RowStride ;_dacaf +=_aaecb .RowStride ;
-};};if _ebea {for _ggdfb =0;_ggdfb < _caafc ;_ggdfb ++{_fcdgg .Data [_cfgf ]=_fbaa (_fcdgg .Data [_cfgf ],^(_aaecb .Data [_ecfd ]^_fcdgg .Data [_cfgf ]),_aged );_cfgf +=_fcdgg .RowStride ;_ecfd +=_aaecb .RowStride ;};};default:_dc .Log .Debug ("I\u006e\u0076\u0061\u006c\u0069\u0064 \u0072\u0061\u0073\u0074\u0065\u0072\u0020\u006f\u0070e\u0072\u0061\u0074o\u0072:\u0020\u0025\u0064",_gebc );
-return _a .Error ("\u0072\u0061\u0073\u0074er\u004f\u0070\u0056\u0041\u006c\u0069\u0067\u006e\u0065\u0064\u004c\u006f\u0077","\u0069\u006e\u0076al\u0069\u0064\u0020\u0072\u0061\u0073\u0074\u0065\u0072\u0020\u006f\u0070\u0065\u0072\u0061\u0074\u006f\u0072");
-};return nil ;};func TstNSymbol (t *_c .T ,scale ...int )*Bitmap {_abab ,_efbcc :=NewWithData (4,5,[]byte {0x90,0xD0,0xB0,0x90,0x90});_d .NoError (t ,_efbcc );return TstGetScaledSymbol (t ,_abab ,scale ...);};func SelCreateBrick (h ,w int ,cy ,cx int ,tp SelectionValue )*Selection {_cdgca :=_bcdbc (h ,w ,"");
-_cdgca .setOrigin (cy ,cx );var _cefg ,_egfd int ;for _cefg =0;_cefg < h ;_cefg ++{for _egfd =0;_egfd < w ;_egfd ++{_cdgca .Data [_cefg ][_egfd ]=tp ;};};return _cdgca ;};func _aaa (_gafe *Bitmap )(_dcfb *Bitmap ,_bebf int ,_cbbe error ){const _ddbd ="\u0042i\u0074\u006d\u0061\u0070.\u0077\u006f\u0072\u0064\u004da\u0073k\u0042y\u0044\u0069\u006c\u0061\u0074\u0069\u006fn";
-if _gafe ==nil {return nil ,0,_a .Errorf (_ddbd ,"\u0027\u0073\u0027\u0020bi\u0074\u006d\u0061\u0070\u0020\u006e\u006f\u0074\u0020\u0064\u0065\u0066\u0069\u006ee\u0064");};var _cegb ,_agdb *Bitmap ;if _cegb ,_cbbe =_fedg (nil ,_gafe );_cbbe !=nil {return nil ,0,_a .Wrap (_cbbe ,_ddbd ,"\u0063\u006f\u0070\u0079\u0020\u0027\u0073\u0027");
-};var (_bed [13]int ;_eacd ,_ccg int ;);_feca :=12;_eeda :=_ge .NewNumSlice (_feca +1);_fbef :=_ge .NewNumSlice (_feca +1);var _cgbc *Boxes ;for _bfad :=0;_bfad <=_feca ;_bfad ++{if _bfad ==0{if _agdb ,_cbbe =_fedg (nil ,_cegb );_cbbe !=nil {return nil ,0,_a .Wrap (_cbbe ,_ddbd ,"\u0066i\u0072\u0073\u0074\u0020\u0062\u006d2");
-};}else {if _agdb ,_cbbe =_defa (_cegb ,MorphProcess {Operation :MopDilation ,Arguments :[]int {2,1}});_cbbe !=nil {return nil ,0,_a .Wrap (_cbbe ,_ddbd ,"\u0064\u0069\u006ca\u0074\u0069\u006f\u006e\u0020\u0062\u006d\u0032");};};if _cgbc ,_cbbe =_agdb .connComponentsBB (4);
-_cbbe !=nil {return nil ,0,_a .Wrap (_cbbe ,_ddbd ,"");};_bed [_bfad ]=len (*_cgbc );_eeda .AddInt (_bed [_bfad ]);switch _bfad {case 0:_eacd =_bed [0];default:_ccg =_bed [_bfad -1]-_bed [_bfad ];_fbef .AddInt (_ccg );};_cegb =_agdb ;};_eeba :=true ;_eafe :=2;
-var _fbg ,_aed int ;for _ecdgc :=1;_ecdgc < len (*_fbef );_ecdgc ++{if _fbg ,_cbbe =_eeda .GetInt (_ecdgc );_cbbe !=nil {return nil ,0,_a .Wrap (_cbbe ,_ddbd ,"\u0043\u0068\u0065\u0063ki\u006e\u0067\u0020\u0062\u0065\u0073\u0074\u0020\u0064\u0069\u006c\u0061\u0074\u0069o\u006e");
-};if _eeba &&_fbg < int (0.3*float32 (_eacd )){_eafe =_ecdgc +1;_eeba =false ;};if _ccg ,_cbbe =_fbef .GetInt (_ecdgc );_cbbe !=nil {return nil ,0,_a .Wrap (_cbbe ,_ddbd ,"\u0067\u0065\u0074\u0074\u0069\u006e\u0067\u0020\u006ea\u0044\u0069\u0066\u0066");
-};if _ccg > _aed {_aed =_ccg ;};};_efdgf :=_gafe .XResolution ;if _efdgf ==0{_efdgf =150;};if _efdgf > 110{_eafe ++;};if _eafe < 2{_dc .Log .Trace ("J\u0042\u0049\u0047\u0032\u0020\u0073\u0065\u0074\u0074\u0069\u006e\u0067\u0020\u0069\u0042\u0065\u0073\u0074 \u0074\u006f\u0020\u006d\u0069\u006e\u0069\u006d\u0075\u006d a\u006c\u006c\u006fw\u0061b\u006c\u0065");
-_eafe =2;};_bebf =_eafe +1;if _dcfb ,_cbbe =_eaad (nil ,_gafe ,_eafe +1,1);_cbbe !=nil {return nil ,0,_a .Wrap (_cbbe ,_ddbd ,"\u0067\u0065\u0074\u0074in\u0067\u0020\u006d\u0061\u0073\u006b\u0020\u0066\u0061\u0069\u006c\u0065\u0064");};return _dcfb ,_bebf ,nil ;
-};func MakePixelSumTab8 ()[]int {return _afgg ()};func (_gadcg *Bitmaps )Size ()int {return len (_gadcg .Values )};var _becg [256]uint8 ;func (_fgeb *Bitmaps )selectByIndexes (_fbgb []int )(*Bitmaps ,error ){_cfge :=&Bitmaps {};for _ ,_gegg :=range _fbgb {_ccdcd ,_dfac :=_fgeb .GetBitmap (_gegg );
-if _dfac !=nil {return nil ,_a .Wrap (_dfac ,"\u0073e\u006ce\u0063\u0074\u0042\u0079\u0049\u006e\u0064\u0065\u0078\u0065\u0073","");};_cfge .AddBitmap (_ccdcd );};return _cfge ,nil ;};func CorrelationScore (bm1 ,bm2 *Bitmap ,area1 ,area2 int ,delX ,delY float32 ,maxDiffW ,maxDiffH int ,tab []int )(_bgde float64 ,_fabba error ){const _cfdb ="\u0063\u006fr\u0072\u0065\u006ca\u0074\u0069\u006f\u006e\u0053\u0063\u006f\u0072\u0065";
-if bm1 ==nil ||bm2 ==nil {return 0,_a .Error (_cfdb ,"p\u0072o\u0076\u0069\u0064\u0065\u0064\u0020\u006e\u0069l\u0020\u0062\u0069\u0074ma\u0070\u0073");};if tab ==nil {return 0,_a .Error (_cfdb ,"\u0027\u0074\u0061\u0062\u0027\u0020\u006e\u006f\u0074\u0020\u0064\u0065f\u0069\u006e\u0065\u0064");
-};if area1 <=0||area2 <=0{return 0,_a .Error (_cfdb ,"\u0061\u0072\u0065\u0061s\u0020\u006d\u0075\u0073\u0074\u0020\u0062\u0065\u0020\u0067r\u0065a\u0074\u0065\u0072\u0020\u0074\u0068\u0061n\u0020\u0030");};_fada ,_ffbg :=bm1 .Width ,bm1 .Height ;_gffdb ,_dgcg :=bm2 .Width ,bm2 .Height ;
-_dgad :=_fgfb (_fada -_gffdb );if _dgad > maxDiffW {return 0,nil ;};_cba :=_fgfb (_ffbg -_dgcg );if _cba > maxDiffH {return 0,nil ;};var _ced ,_accd int ;if delX >=0{_ced =int (delX +0.5);}else {_ced =int (delX -0.5);};if delY >=0{_accd =int (delY +0.5);
-}else {_accd =int (delY -0.5);};_efa :=_aega (_accd ,0);_edgdg :=_efd (_dgcg +_accd ,_ffbg );_gaef :=bm1 .RowStride *_efa ;_fafe :=bm2 .RowStride *(_efa -_accd );_febc :=_aega (_ced ,0);_bgb :=_efd (_gffdb +_ced ,_fada );_deceg :=bm2 .RowStride ;var _fcdbd ,_egaca int ;
-if _ced >=8{_fcdbd =_ced >>3;_gaef +=_fcdbd ;_febc -=_fcdbd <<3;_bgb -=_fcdbd <<3;_ced &=7;}else if _ced <=-8{_egaca =-((_ced +7)>>3);_fafe +=_egaca ;_deceg -=_egaca ;_ced +=_egaca <<3;};if _febc >=_bgb ||_efa >=_edgdg {return 0,nil ;};_ebfg :=(_bgb +7)>>3;
-var (_ebed ,_gdb ,_bcg byte ;_efgg ,_gabda ,_cggg int ;);switch {case _ced ==0:for _cggg =_efa ;_cggg < _edgdg ;_cggg ,_gaef ,_fafe =_cggg +1,_gaef +bm1 .RowStride ,_fafe +bm2 .RowStride {for _gabda =0;_gabda < _ebfg ;_gabda ++{_bcg =bm1 .Data [_gaef +_gabda ]&bm2 .Data [_fafe +_gabda ];
-_efgg +=tab [_bcg ];};};case _ced > 0:if _deceg < _ebfg {for _cggg =_efa ;_cggg < _edgdg ;_cggg ,_gaef ,_fafe =_cggg +1,_gaef +bm1 .RowStride ,_fafe +bm2 .RowStride {_ebed ,_gdb =bm1 .Data [_gaef ],bm2 .Data [_fafe ]>>uint (_ced );_bcg =_ebed &_gdb ;_efgg +=tab [_bcg ];
-for _gabda =1;_gabda < _deceg ;_gabda ++{_ebed ,_gdb =bm1 .Data [_gaef +_gabda ],(bm2 .Data [_fafe +_gabda ]>>uint (_ced ))|(bm2 .Data [_fafe +_gabda -1]<<uint (8-_ced ));_bcg =_ebed &_gdb ;_efgg +=tab [_bcg ];};_ebed =bm1 .Data [_gaef +_gabda ];_gdb =bm2 .Data [_fafe +_gabda -1]<<uint (8-_ced );
-_bcg =_ebed &_gdb ;_efgg +=tab [_bcg ];};}else {for _cggg =_efa ;_cggg < _edgdg ;_cggg ,_gaef ,_fafe =_cggg +1,_gaef +bm1 .RowStride ,_fafe +bm2 .RowStride {_ebed ,_gdb =bm1 .Data [_gaef ],bm2 .Data [_fafe ]>>uint (_ced );_bcg =_ebed &_gdb ;_efgg +=tab [_bcg ];
-for _gabda =1;_gabda < _ebfg ;_gabda ++{_ebed =bm1 .Data [_gaef +_gabda ];_gdb =(bm2 .Data [_fafe +_gabda ]>>uint (_ced ))|(bm2 .Data [_fafe +_gabda -1]<<uint (8-_ced ));_bcg =_ebed &_gdb ;_efgg +=tab [_bcg ];};};};default:if _ebfg < _deceg {for _cggg =_efa ;
-_cggg < _edgdg ;_cggg ,_gaef ,_fafe =_cggg +1,_gaef +bm1 .RowStride ,_fafe +bm2 .RowStride {for _gabda =0;_gabda < _ebfg ;_gabda ++{_ebed =bm1 .Data [_gaef +_gabda ];_gdb =bm2 .Data [_fafe +_gabda ]<<uint (-_ced );_gdb |=bm2 .Data [_fafe +_gabda +1]>>uint (8+_ced );
-_bcg =_ebed &_gdb ;_efgg +=tab [_bcg ];};};}else {for _cggg =_efa ;_cggg < _edgdg ;_cggg ,_gaef ,_fafe =_cggg +1,_gaef +bm1 .RowStride ,_fafe +bm2 .RowStride {for _gabda =0;_gabda < _ebfg -1;_gabda ++{_ebed =bm1 .Data [_gaef +_gabda ];_gdb =bm2 .Data [_fafe +_gabda ]<<uint (-_ced );
-_gdb |=bm2 .Data [_fafe +_gabda +1]>>uint (8+_ced );_bcg =_ebed &_gdb ;_efgg +=tab [_bcg ];};_ebed =bm1 .Data [_gaef +_gabda ];_gdb =bm2 .Data [_fafe +_gabda ]<<uint (-_ced );_bcg =_ebed &_gdb ;_efgg +=tab [_bcg ];};};};_bgde =float64 (_efgg )*float64 (_efgg )/(float64 (area1 )*float64 (area2 ));
-return _bgde ,nil ;};
+package bitmap
+
+import (
+	_ag "encoding/binary"
+	_d "github.com/stretchr/testify/require"
+	_dc "github.com/szwede/unipdf/v4/common"
+	_f "github.com/szwede/unipdf/v4/internal/bitwise"
+	_cf "github.com/szwede/unipdf/v4/internal/imageutil"
+	_ge "github.com/szwede/unipdf/v4/internal/jbig2/basic"
+	_a "github.com/szwede/unipdf/v4/internal/jbig2/errors"
+	_bf "image"
+	_ad "math"
+	_df "sort"
+	_b "strings"
+	_c "testing"
+)
+
+type Bitmaps struct {
+	Values []*Bitmap
+	Boxes  []*_bf.Rectangle
+}
+
+func Copy(d, s *Bitmap) (*Bitmap, error) { return _fedg(d, s) }
+
+func _gaaf(_afge *_ge.Stack) (_ecbc *fillSegment, _aaff error) {
+	const _cabg = "\u0070\u006f\u0070\u0046\u0069\u006c\u006c\u0053\u0065g\u006d\u0065\u006e\u0074"
+	if _afge == nil {
+		return nil, _a.Error(_cabg, "\u006ei\u006c \u0073\u0074\u0061\u0063\u006b \u0070\u0072o\u0076\u0069\u0064\u0065\u0064")
+	}
+	if _afge.Aux == nil {
+		return nil, _a.Error(_cabg, "a\u0075x\u0053\u0074\u0061\u0063\u006b\u0020\u006e\u006ft\u0020\u0064\u0065\u0066in\u0065\u0064")
+	}
+	_gefb, _abcb := _afge.Pop()
+	if !_abcb {
+		return nil, nil
+	}
+	_acbd, _abcb := _gefb.(*fillSegment)
+	if !_abcb {
+		return nil, _a.Error(_cabg, "\u0073\u0074\u0061ck\u0020\u0064\u006f\u0065\u0073\u006e\u0027\u0074\u0020c\u006fn\u0074a\u0069n\u0020\u002a\u0066\u0069\u006c\u006c\u0053\u0065\u0067\u006d\u0065\u006e\u0074")
+	}
+	_ecbc = &fillSegment{_acbd._cdac, _acbd._afgf, _acbd._decd + _acbd._fadf, _acbd._fadf}
+	_afge.Aux.Push(_acbd)
+	return _ecbc, nil
+}
+
+type Selection struct {
+	Height, Width int
+	Cx, Cy        int
+	Name          string
+	Data          [][]SelectionValue
+}
+
+type BitmapsArray struct {
+	Values []*Bitmaps
+	Boxes  []*_bf.Rectangle
+}
+
+func (_bage *Bitmap) setEightBytes(_dfef int, _bebc uint64) error {
+	_ddc := _bage.RowStride - (_dfef % _bage.RowStride)
+	if _bage.RowStride != _bage.Width>>3 {
+		_ddc--
+	}
+	if _ddc >= 8 {
+		return _bage.setEightFullBytes(_dfef, _bebc)
+	}
+	return _bage.setEightPartlyBytes(_dfef, _ddc, _bebc)
+}
+
+func _adc(_bcf *Bitmap, _ega ...int) (_bag *Bitmap, _fde error) {
+	const _daad = "\u0072\u0065\u0064uc\u0065\u0052\u0061\u006e\u006b\u0042\u0069\u006e\u0061\u0072\u0079\u0043\u0061\u0073\u0063\u0061\u0064\u0065"
+	if _bcf == nil {
+		return nil, _a.Error(_daad, "\u0073o\u0075\u0072\u0063\u0065 \u0062\u0069\u0074\u006d\u0061p\u0020n\u006ft\u0020\u0064\u0065\u0066\u0069\u006e\u0065d")
+	}
+	if len(_ega) == 0 || len(_ega) > 4 {
+		return nil, _a.Error(_daad, "t\u0068\u0065\u0072\u0065\u0020\u006d\u0075\u0073\u0074 \u0062\u0065\u0020\u0061\u0074\u0020\u006cea\u0073\u0074\u0020\u006fn\u0065\u0020\u0061\u006e\u0064\u0020\u0061\u0074\u0020mo\u0073\u0074 \u0034\u0020\u006c\u0065\u0076\u0065\u006c\u0073")
+	}
+	if _ega[0] <= 0 {
+		_dc.Log.Debug("\u006c\u0065\u0076\u0065\u006c\u0031\u0020\u003c\u003d\u0020\u0030 \u002d\u0020\u006e\u006f\u0020\u0072\u0065\u0064\u0075\u0063t\u0069\u006f\u006e")
+		_bag, _fde = _fedg(nil, _bcf)
+		if _fde != nil {
+			return nil, _a.Wrap(_fde, _daad, "l\u0065\u0076\u0065\u006c\u0031\u0020\u003c\u003d\u0020\u0030")
+		}
+		return _bag, nil
+	}
+	_fcd := _bg()
+	_bag = _bcf
+	for _fef, _fcb := range _ega {
+		if _fcb <= 0 {
+			break
+		}
+		_bag, _fde = _ggb(_bag, _fcb, _fcd)
+		if _fde != nil {
+			return nil, _a.Wrapf(_fde, _daad, "\u006c\u0065\u0076\u0065\u006c\u0025\u0064\u0020\u0072\u0065\u0064\u0075c\u0074\u0069\u006f\u006e", _fef)
+		}
+	}
+	return _bag, nil
+}
+
+func (_fcdc *Bitmap) setBit(_efed int) { _fcdc.Data[(_efed >> 3)] |= 0x80 >> uint(_efed&7) }
+
+const (
+	PixSrc             RasterOperator = 0xc
+	PixDst             RasterOperator = 0xa
+	PixNotSrc          RasterOperator = 0x3
+	PixNotDst          RasterOperator = 0x5
+	PixClr             RasterOperator = 0x0
+	PixSet             RasterOperator = 0xf
+	PixSrcOrDst        RasterOperator = 0xe
+	PixSrcAndDst       RasterOperator = 0x8
+	PixSrcXorDst       RasterOperator = 0x6
+	PixNotSrcOrDst     RasterOperator = 0xb
+	PixNotSrcAndDst    RasterOperator = 0x2
+	PixSrcOrNotDst     RasterOperator = 0xd
+	PixSrcAndNotDst    RasterOperator = 0x4
+	PixNotPixSrcOrDst  RasterOperator = 0x1
+	PixNotPixSrcAndDst RasterOperator = 0x7
+	PixNotPixSrcXorDst RasterOperator = 0x9
+	PixPaint                          = PixSrcOrDst
+	PixSubtract                       = PixNotSrcAndDst
+	PixMask                           = PixSrcAndDst
+)
+
+func (_ccbe *Bitmap) GetBitOffset(x int) int { return x & 0x07 }
+
+func (_bgab *Bitmap) GetComponents(components Component, maxWidth, maxHeight int) (_debdg *Bitmaps, _cdgf *Boxes, _geba error) {
+	const _ceg = "B\u0069t\u006d\u0061\u0070\u002e\u0047\u0065\u0074\u0043o\u006d\u0070\u006f\u006een\u0074\u0073"
+	if _bgab == nil {
+		return nil, nil, _a.Error(_ceg, "\u0073\u006f\u0075\u0072\u0063\u0065\u0020\u0042\u0069\u0074\u006da\u0070\u0020\u006e\u006f\u0074\u0020\u0064\u0065\u0066\u0069n\u0065\u0064\u002e")
+	}
+	switch components {
+	case ComponentConn, ComponentCharacters, ComponentWords:
+	default:
+		return nil, nil, _a.Error(_ceg, "\u0069\u006e\u0076\u0061l\u0069\u0064\u0020\u0063\u006f\u006d\u0070\u006f\u006e\u0065n\u0074s\u0020\u0070\u0061\u0072\u0061\u006d\u0065t\u0065\u0072")
+	}
+	if _bgab.Zero() {
+		_cdgf = &Boxes{}
+		_debdg = &Bitmaps{}
+		return _debdg, _cdgf, nil
+	}
+	switch components {
+	case ComponentConn:
+		_debdg = &Bitmaps{}
+		if _cdgf, _geba = _bgab.ConnComponents(_debdg, 8); _geba != nil {
+			return nil, nil, _a.Wrap(_geba, _ceg, "\u006e\u006f \u0070\u0072\u0065p\u0072\u006f\u0063\u0065\u0073\u0073\u0069\u006e\u0067")
+		}
+	case ComponentCharacters:
+		_bcbd, _adcd := MorphSequence(_bgab, MorphProcess{Operation: MopClosing, Arguments: []int{1, 6}})
+		if _adcd != nil {
+			return nil, nil, _a.Wrap(_adcd, _ceg, "\u0063h\u0061\u0072\u0061\u0063\u0074\u0065\u0072\u0073\u0020\u0070\u0072e\u0070\u0072\u006f\u0063\u0065\u0073\u0073\u0069\u006e\u0067")
+		}
+		if _dc.Log.IsLogLevel(_dc.LogLevelTrace) {
+			_dc.Log.Trace("\u0043o\u006d\u0070o\u006e\u0065\u006e\u0074C\u0068\u0061\u0072a\u0063\u0074\u0065\u0072\u0073\u0020\u0062\u0069\u0074ma\u0070\u0020\u0061f\u0074\u0065r\u0020\u0063\u006c\u006f\u0073\u0069n\u0067\u003a \u0025\u0073", _bcbd.String())
+		}
+		_cga := &Bitmaps{}
+		_cdgf, _adcd = _bcbd.ConnComponents(_cga, 8)
+		if _adcd != nil {
+			return nil, nil, _a.Wrap(_adcd, _ceg, "\u0063h\u0061\u0072\u0061\u0063\u0074\u0065\u0072\u0073\u0020\u0070\u0072e\u0070\u0072\u006f\u0063\u0065\u0073\u0073\u0069\u006e\u0067")
+		}
+		if _dc.Log.IsLogLevel(_dc.LogLevelTrace) {
+			_dc.Log.Trace("\u0043\u006f\u006d\u0070\u006f\u006ee\u006e\u0074\u0043\u0068\u0061\u0072\u0061\u0063\u0074\u0065\u0072\u0073\u0020\u0062\u0069\u0074\u006d\u0061\u0070\u0020a\u0066\u0074\u0065\u0072\u0020\u0063\u006f\u006e\u006e\u0065\u0063\u0074\u0069\u0076i\u0074y\u003a\u0020\u0025\u0073", _cga.String())
+		}
+		if _debdg, _adcd = _cga.ClipToBitmap(_bgab); _adcd != nil {
+			return nil, nil, _a.Wrap(_adcd, _ceg, "\u0063h\u0061\u0072\u0061\u0063\u0074\u0065\u0072\u0073\u0020\u0070\u0072e\u0070\u0072\u006f\u0063\u0065\u0073\u0073\u0069\u006e\u0067")
+		}
+	case ComponentWords:
+		_bcfbf := 1
+		var _degc *Bitmap
+		switch {
+		case _bgab.XResolution <= 200:
+			_degc = _bgab
+		case _bgab.XResolution <= 400:
+			_bcfbf = 2
+			_degc, _geba = _adc(_bgab, 1, 0, 0, 0)
+			if _geba != nil {
+				return nil, nil, _a.Wrap(_geba, _ceg, "w\u006f\u0072\u0064\u0020\u0070\u0072e\u0070\u0072\u006f\u0063\u0065\u0073\u0073\u0020\u002d \u0078\u0072\u0065s\u003c=\u0034\u0030\u0030")
+			}
+		default:
+			_bcfbf = 4
+			_degc, _geba = _adc(_bgab, 1, 1, 0, 0)
+			if _geba != nil {
+				return nil, nil, _a.Wrap(_geba, _ceg, "\u0077\u006f\u0072\u0064 \u0070\u0072\u0065\u0070\u0072\u006f\u0063\u0065\u0073\u0073 \u002d \u0078\u0072\u0065\u0073\u0020\u003e\u00204\u0030\u0030")
+			}
+		}
+		_bccd, _, _dba := _aaa(_degc)
+		if _dba != nil {
+			return nil, nil, _a.Wrap(_dba, _ceg, "\u0077o\u0072d\u0020\u0070\u0072\u0065\u0070\u0072\u006f\u0063\u0065\u0073\u0073")
+		}
+		_ebe, _dba := _fceb(_bccd, _bcfbf)
+		if _dba != nil {
+			return nil, nil, _a.Wrap(_dba, _ceg, "\u0077o\u0072d\u0020\u0070\u0072\u0065\u0070\u0072\u006f\u0063\u0065\u0073\u0073")
+		}
+		_efdg := &Bitmaps{}
+		if _cdgf, _dba = _ebe.ConnComponents(_efdg, 4); _dba != nil {
+			return nil, nil, _a.Wrap(_dba, _ceg, "\u0077\u006f\u0072\u0064\u0020\u0070r\u0065\u0070\u0072\u006f\u0063\u0065\u0073\u0073\u002c\u0020\u0063\u006f\u006en\u0065\u0063\u0074\u0020\u0065\u0078\u0070a\u006e\u0064\u0065\u0064")
+		}
+		if _debdg, _dba = _efdg.ClipToBitmap(_bgab); _dba != nil {
+			return nil, nil, _a.Wrap(_dba, _ceg, "\u0077o\u0072d\u0020\u0070\u0072\u0065\u0070\u0072\u006f\u0063\u0065\u0073\u0073")
+		}
+	}
+	_debdg, _geba = _debdg.SelectBySize(maxWidth, maxHeight, LocSelectIfBoth, SizeSelectIfLTE)
+	if _geba != nil {
+		return nil, nil, _a.Wrap(_geba, _ceg, "")
+	}
+	_cdgf, _geba = _cdgf.SelectBySize(maxWidth, maxHeight, LocSelectIfBoth, SizeSelectIfLTE)
+	if _geba != nil {
+		return nil, nil, _a.Wrap(_geba, _ceg, "")
+	}
+	return _debdg, _cdgf, nil
+}
+
+func (_bcdba *Bitmaps) makeSizeIndicator(_eeed, _bdgde int, _aacac LocationFilter, _fdabb SizeComparison) (_eacba *_ge.NumSlice, _gefc error) {
+	const _bcec = "\u0042i\u0074\u006d\u0061\u0070s\u002e\u006d\u0061\u006b\u0065S\u0069z\u0065I\u006e\u0064\u0069\u0063\u0061\u0074\u006fr"
+	if _bcdba == nil {
+		return nil, _a.Error(_bcec, "\u0062\u0069\u0074ma\u0070\u0073\u0020\u0027\u0062\u0027\u0020\u006e\u006f\u0074\u0020\u0064\u0065\u0066\u0069\u006e\u0065\u0064")
+	}
+	switch _aacac {
+	case LocSelectWidth, LocSelectHeight, LocSelectIfEither, LocSelectIfBoth:
+	default:
+		return nil, _a.Errorf(_bcec, "\u0070\u0072\u006f\u0076\u0069d\u0065\u0064\u0020\u0069\u006e\u0076\u0061\u006c\u0069\u0064\u0020\u006c\u006fc\u0061\u0074\u0069\u006f\u006e\u0020\u0066\u0069\u006c\u0074\u0065\u0072\u0020\u0074\u0079\u0070\u0065\u003a\u0020\u0025\u0064", _aacac)
+	}
+	switch _fdabb {
+	case SizeSelectIfLT, SizeSelectIfGT, SizeSelectIfLTE, SizeSelectIfGTE, SizeSelectIfEQ:
+	default:
+		return nil, _a.Errorf(_bcec, "\u0069\u006e\u0076\u0061li\u0064\u0020\u0072\u0065\u006c\u0061\u0074\u0069\u006f\u006e\u003a\u0020\u0027\u0025d\u0027", _fdabb)
+	}
+	_eacba = &_ge.NumSlice{}
+	var (
+		_cddfe, _afaf, _faef int
+		_ccdgg               *Bitmap
+	)
+	for _, _ccdgg = range _bcdba.Values {
+		_cddfe = 0
+		_afaf, _faef = _ccdgg.Width, _ccdgg.Height
+		switch _aacac {
+		case LocSelectWidth:
+			if (_fdabb == SizeSelectIfLT && _afaf < _eeed) || (_fdabb == SizeSelectIfGT && _afaf > _eeed) || (_fdabb == SizeSelectIfLTE && _afaf <= _eeed) || (_fdabb == SizeSelectIfGTE && _afaf >= _eeed) || (_fdabb == SizeSelectIfEQ && _afaf == _eeed) {
+				_cddfe = 1
+			}
+		case LocSelectHeight:
+			if (_fdabb == SizeSelectIfLT && _faef < _bdgde) || (_fdabb == SizeSelectIfGT && _faef > _bdgde) || (_fdabb == SizeSelectIfLTE && _faef <= _bdgde) || (_fdabb == SizeSelectIfGTE && _faef >= _bdgde) || (_fdabb == SizeSelectIfEQ && _faef == _bdgde) {
+				_cddfe = 1
+			}
+		case LocSelectIfEither:
+			if (_fdabb == SizeSelectIfLT && (_afaf < _eeed || _faef < _bdgde)) || (_fdabb == SizeSelectIfGT && (_afaf > _eeed || _faef > _bdgde)) || (_fdabb == SizeSelectIfLTE && (_afaf <= _eeed || _faef <= _bdgde)) || (_fdabb == SizeSelectIfGTE && (_afaf >= _eeed || _faef >= _bdgde)) || (_fdabb == SizeSelectIfEQ && (_afaf == _eeed || _faef == _bdgde)) {
+				_cddfe = 1
+			}
+		case LocSelectIfBoth:
+			if (_fdabb == SizeSelectIfLT && (_afaf < _eeed && _faef < _bdgde)) || (_fdabb == SizeSelectIfGT && (_afaf > _eeed && _faef > _bdgde)) || (_fdabb == SizeSelectIfLTE && (_afaf <= _eeed && _faef <= _bdgde)) || (_fdabb == SizeSelectIfGTE && (_afaf >= _eeed && _faef >= _bdgde)) || (_fdabb == SizeSelectIfEQ && (_afaf == _eeed && _faef == _bdgde)) {
+				_cddfe = 1
+			}
+		}
+		_eacba.AddInt(_cddfe)
+	}
+	return _eacba, nil
+}
+
+func _bc(_gfd, _fa *Bitmap) (_bca error) {
+	const _be = "\u0065\u0078\u0070\u0061nd\u0042\u0069\u006e\u0061\u0072\u0079\u0046\u0061\u0063\u0074\u006f\u0072\u0034"
+	_eeg := _fa.RowStride
+	_eg := _gfd.RowStride
+	_bcaf := _fa.RowStride*4 - _gfd.RowStride
+	var (
+		_cc, _ec                             byte
+		_de                                  uint32
+		_fgf, _af, _bdg, _cd, _dbg, _ab, _cg int
+	)
+	for _bdg = 0; _bdg < _fa.Height; _bdg++ {
+		_fgf = _bdg * _eeg
+		_af = 4 * _bdg * _eg
+		for _cd = 0; _cd < _eeg; _cd++ {
+			_cc = _fa.Data[_fgf+_cd]
+			_de = _gbb[_cc]
+			_ab = _af + _cd*4
+			if _bcaf != 0 && (_cd+1)*4 > _gfd.RowStride {
+				for _dbg = _bcaf; _dbg > 0; _dbg-- {
+					_ec = byte((_de >> uint(_dbg*8)) & 0xff)
+					_cg = _ab + (_bcaf - _dbg)
+					if _bca = _gfd.SetByte(_cg, _ec); _bca != nil {
+						return _a.Wrapf(_bca, _be, "D\u0069\u0066\u0066\u0065\u0072\u0065n\u0074\u0020\u0072\u006f\u0077\u0073\u0074\u0072\u0069d\u0065\u0073\u002e \u004b:\u0020\u0025\u0064", _dbg)
+					}
+				}
+			} else if _bca = _gfd.setFourBytes(_ab, _de); _bca != nil {
+				return _a.Wrap(_bca, _be, "")
+			}
+			if _bca = _gfd.setFourBytes(_af+_cd*4, _gbb[_fa.Data[_fgf+_cd]]); _bca != nil {
+				return _a.Wrap(_bca, _be, "")
+			}
+		}
+		for _dbg = 1; _dbg < 4; _dbg++ {
+			for _cd = 0; _cd < _eg; _cd++ {
+				if _bca = _gfd.SetByte(_af+_dbg*_eg+_cd, _gfd.Data[_af+_cd]); _bca != nil {
+					return _a.Wrapf(_bca, _be, "\u0063\u006f\u0070\u0079\u0020\u0027\u0071\u0075\u0061\u0064\u0072\u0061\u0062l\u0065\u0027\u0020\u006c\u0069\u006ee\u003a\u0020\u0027\u0025\u0064\u0027\u002c\u0020\u0062\u0079\u0074\u0065\u003a \u0027\u0025\u0064\u0027", _dbg, _cd)
+				}
+			}
+		}
+	}
+	return nil
+}
+
+func (_fbdd *Points) AddPoint(x, y float32) { *_fbdd = append(*_fbdd, Point{x, y}) }
+
+func (_ecgc *Bitmap) AddBorderGeneral(left, right, top, bot int, val int) (*Bitmap, error) {
+	return _ecgc.addBorderGeneral(left, right, top, bot, val)
+}
+
+func (_ffb *Bitmap) Zero() bool {
+	_eeea := _ffb.Width / 8
+	_dfgc := _ffb.Width & 7
+	var _ccf byte
+	if _dfgc != 0 {
+		_ccf = byte(0xff << uint(8-_dfgc))
+	}
+	var _gdd, _ggee, _egfg int
+	for _ggee = 0; _ggee < _ffb.Height; _ggee++ {
+		_gdd = _ffb.RowStride * _ggee
+		for _egfg = 0; _egfg < _eeea; _egfg, _gdd = _egfg+1, _gdd+1 {
+			if _ffb.Data[_gdd] != 0 {
+				return false
+			}
+		}
+		if _dfgc > 0 {
+			if _ffb.Data[_gdd]&_ccf != 0 {
+				return false
+			}
+		}
+	}
+	return true
+}
+
+type SizeSelection int
+
+func init() {
+	for _gdf := 0; _gdf < 256; _gdf++ {
+		_becg[_gdf] = uint8(_gdf&0x1) + (uint8(_gdf>>1) & 0x1) + (uint8(_gdf>>2) & 0x1) + (uint8(_gdf>>3) & 0x1) + (uint8(_gdf>>4) & 0x1) + (uint8(_gdf>>5) & 0x1) + (uint8(_gdf>>6) & 0x1) + (uint8(_gdf>>7) & 0x1)
+	}
+}
+
+func (_fadc *Bitmaps) AddBox(box *_bf.Rectangle) { _fadc.Boxes = append(_fadc.Boxes, box) }
+
+func (_aagf *Bitmap) addPadBits() (_gddb error) {
+	const _cbdc = "\u0062\u0069\u0074\u006d\u0061\u0070\u002e\u0061\u0064\u0064\u0050\u0061d\u0042\u0069\u0074\u0073"
+	_bgf := _aagf.Width % 8
+	if _bgf == 0 {
+		return nil
+	}
+	_gga := _aagf.Width / 8
+	_dgd := _f.NewReader(_aagf.Data)
+	_fefc := make([]byte, _aagf.Height*_aagf.RowStride)
+	_dae := _f.NewWriterMSB(_fefc)
+	_cce := make([]byte, _gga)
+	var (
+		_abc  int
+		_efec uint64
+	)
+	for _abc = 0; _abc < _aagf.Height; _abc++ {
+		if _, _gddb = _dgd.Read(_cce); _gddb != nil {
+			return _a.Wrap(_gddb, _cbdc, "\u0066u\u006c\u006c\u0020\u0062\u0079\u0074e")
+		}
+		if _, _gddb = _dae.Write(_cce); _gddb != nil {
+			return _a.Wrap(_gddb, _cbdc, "\u0066\u0075\u006c\u006c\u0020\u0062\u0079\u0074\u0065\u0073")
+		}
+		if _efec, _gddb = _dgd.ReadBits(byte(_bgf)); _gddb != nil {
+			return _a.Wrap(_gddb, _cbdc, "\u0073\u006b\u0069\u0070\u0070\u0069\u006e\u0067\u0020\u0062\u0069\u0074\u0073")
+		}
+		if _gddb = _dae.WriteByte(byte(_efec) << uint(8-_bgf)); _gddb != nil {
+			return _a.Wrap(_gddb, _cbdc, "\u006ca\u0073\u0074\u0020\u0062\u0079\u0074e")
+		}
+	}
+	_aagf.Data = _dae.Data()
+	return nil
+}
+
+func (_gebe *ClassedPoints) ySortFunction() func(_egaf int, _dfcg int) bool {
+	return func(_ace, _fdgag int) bool { return _gebe.YAtIndex(_ace) < _gebe.YAtIndex(_fdgag) }
+}
+
+func (_ebd *Bitmap) ClipRectangle(box *_bf.Rectangle) (_dfc *Bitmap, _ebgd *_bf.Rectangle, _dbcd error) {
+	const _edg = "\u0043\u006c\u0069\u0070\u0052\u0065\u0063\u0074\u0061\u006e\u0067\u006c\u0065"
+	if box == nil {
+		return nil, nil, _a.Error(_edg, "\u0062o\u0078 \u0069\u0073\u0020\u006e\u006ft\u0020\u0064e\u0066\u0069\u006e\u0065\u0064")
+	}
+	_dgb, _eaff := _ebd.Width, _ebd.Height
+	_def := _bf.Rect(0, 0, _dgb, _eaff)
+	if !box.Overlaps(_def) {
+		return nil, nil, _a.Error(_edg, "b\u006f\u0078\u0020\u0064oe\u0073n\u0027\u0074\u0020\u006f\u0076e\u0072\u006c\u0061\u0070\u0020\u0062")
+	}
+	_eef := box.Intersect(_def)
+	_gbc, _cdef := _eef.Min.X, _eef.Min.Y
+	_dcbb, _gab := _eef.Dx(), _eef.Dy()
+	_dfc = New(_dcbb, _gab)
+	_dfc.Text = _ebd.Text
+	if _dbcd = _dfc.RasterOperation(0, 0, _dcbb, _gab, PixSrc, _ebd, _gbc, _cdef); _dbcd != nil {
+		return nil, nil, _a.Wrap(_dbcd, _edg, "\u0050\u0069\u0078\u0053\u0072\u0063\u0020\u0074\u006f\u0020\u0063\u006ci\u0070\u0070\u0065\u0064")
+	}
+	_ebgd = &_eef
+	return _dfc, _ebgd, nil
+}
+
+func (_gag *Bitmap) thresholdPixelSum(_bbb int) bool {
+	var (
+		_bfgb int
+		_dgef uint8
+		_eag  byte
+		_bcb  int
+	)
+	_dfcf := _gag.RowStride
+	_aeb := uint(_gag.Width & 0x07)
+	if _aeb != 0 {
+		_dgef = uint8((0xff << (8 - _aeb)) & 0xff)
+		_dfcf--
+	}
+	for _gbaa := 0; _gbaa < _gag.Height; _gbaa++ {
+		for _bcb = 0; _bcb < _dfcf; _bcb++ {
+			_eag = _gag.Data[_gbaa*_gag.RowStride+_bcb]
+			_bfgb += int(_becg[_eag])
+		}
+		if _aeb != 0 {
+			_eag = _gag.Data[_gbaa*_gag.RowStride+_bcb] & _dgef
+			_bfgb += int(_becg[_eag])
+		}
+		if _bfgb > _bbb {
+			return true
+		}
+	}
+	return false
+}
+
+func (_ggc *Bitmap) GetByte(index int) (byte, error) {
+	if index > len(_ggc.Data)-1 || index < 0 {
+		return 0, _a.Errorf("\u0047e\u0074\u0042\u0079\u0074\u0065", "\u0069\u006e\u0064\u0065x:\u0020\u0025\u0064\u0020\u006f\u0075\u0074\u0020\u006f\u0066\u0020\u0072\u0061\u006eg\u0065", index)
+	}
+	return _ggc.Data[index], nil
+}
+
+func (_caf *Bitmap) removeBorderGeneral(_gaf, _ffcc, _ccef, _bagfe int) (*Bitmap, error) {
+	const _agbg = "\u0072\u0065\u006d\u006fve\u0042\u006f\u0072\u0064\u0065\u0072\u0047\u0065\u006e\u0065\u0072\u0061\u006c"
+	if _gaf < 0 || _ffcc < 0 || _ccef < 0 || _bagfe < 0 {
+		return nil, _a.Error(_agbg, "\u006e\u0065g\u0061\u0074\u0069\u0076\u0065\u0020\u0062\u0072\u006f\u0064\u0065\u0072\u0020\u0072\u0065\u006d\u006f\u0076\u0065\u0020\u0076\u0061lu\u0065\u0073")
+	}
+	_fdga, _geb := _caf.Width, _caf.Height
+	_daaa := _fdga - _gaf - _ffcc
+	_eddg := _geb - _ccef - _bagfe
+	if _daaa <= 0 {
+		return nil, _a.Errorf(_agbg, "w\u0069\u0064\u0074\u0068: \u0025d\u0020\u006d\u0075\u0073\u0074 \u0062\u0065\u0020\u003e\u0020\u0030", _daaa)
+	}
+	if _eddg <= 0 {
+		return nil, _a.Errorf(_agbg, "\u0068\u0065\u0069\u0067ht\u003a\u0020\u0025\u0064\u0020\u006d\u0075\u0073\u0074\u0020\u0062\u0065\u0020\u003e \u0030", _eddg)
+	}
+	_acd := New(_daaa, _eddg)
+	_acd.Color = _caf.Color
+	_cddb := _acd.RasterOperation(0, 0, _daaa, _eddg, PixSrc, _caf, _gaf, _ccef)
+	if _cddb != nil {
+		return nil, _a.Wrap(_cddb, _agbg, "")
+	}
+	return _acd, nil
+}
+
+func New(width, height int) *Bitmap {
+	_dgg := _dad(width, height)
+	_dgg.Data = make([]byte, height*_dgg.RowStride)
+	return _dgg
+}
+
+func _fad(_edgd, _dcbd *Bitmap, _cafc, _cea, _abeb, _cccg, _gcfa, _fae, _ddgc, _dffb int, _bcdd CombinationOperator) error {
+	var _cee int
+	_bgdd := func() { _cee++; _abeb += _dcbd.RowStride; _cccg += _edgd.RowStride; _gcfa += _edgd.RowStride }
+	for _cee = _cafc; _cee < _cea; _bgdd() {
+		var _fcae uint16
+		_agdc := _abeb
+		for _cfgc := _cccg; _cfgc <= _gcfa; _cfgc++ {
+			_ffbb, _aecb := _dcbd.GetByte(_agdc)
+			if _aecb != nil {
+				return _aecb
+			}
+			_cafgb, _aecb := _edgd.GetByte(_cfgc)
+			if _aecb != nil {
+				return _aecb
+			}
+			_fcae = (_fcae | uint16(_cafgb)) << uint(_dffb)
+			_cafgb = byte(_fcae >> 8)
+			if _cfgc == _gcfa {
+				_cafgb = _ffed(uint(_fae), _cafgb)
+			}
+			if _aecb = _dcbd.SetByte(_agdc, _ccecc(_ffbb, _cafgb, _bcdd)); _aecb != nil {
+				return _aecb
+			}
+			_agdc++
+			_fcae <<= uint(_ddgc)
+		}
+	}
+	return nil
+}
+
+func (_dbgf *Bitmap) setEightFullBytes(_gdgg int, _dbgfc uint64) error {
+	if _gdgg+7 > len(_dbgf.Data)-1 {
+		return _a.Error("\u0073\u0065\u0074\u0045\u0069\u0067\u0068\u0074\u0042\u0079\u0074\u0065\u0073", "\u0069n\u0064e\u0078\u0020\u006f\u0075\u0074 \u006f\u0066 \u0072\u0061\u006e\u0067\u0065")
+	}
+	_dbgf.Data[_gdgg] = byte((_dbgfc & 0xff00000000000000) >> 56)
+	_dbgf.Data[_gdgg+1] = byte((_dbgfc & 0xff000000000000) >> 48)
+	_dbgf.Data[_gdgg+2] = byte((_dbgfc & 0xff0000000000) >> 40)
+	_dbgf.Data[_gdgg+3] = byte((_dbgfc & 0xff00000000) >> 32)
+	_dbgf.Data[_gdgg+4] = byte((_dbgfc & 0xff000000) >> 24)
+	_dbgf.Data[_gdgg+5] = byte((_dbgfc & 0xff0000) >> 16)
+	_dbgf.Data[_gdgg+6] = byte((_dbgfc & 0xff00) >> 8)
+	_dbgf.Data[_gdgg+7] = byte(_dbgfc & 0xff)
+	return nil
+}
+
+func _bdd(_bddc, _ebgfe *Bitmap, _fdgg, _bafc, _ccad uint, _fdab, _egbf int, _fgdbd bool, _fcc, _aee int) error {
+	for _dfdc := _fdab; _dfdc < _egbf; _dfdc++ {
+		if _fcc+1 < len(_bddc.Data) {
+			_fbf := _dfdc+1 == _egbf
+			_gfeb, _eggg := _bddc.GetByte(_fcc)
+			if _eggg != nil {
+				return _eggg
+			}
+			_fcc++
+			_gfeb <<= _fdgg
+			_gabdf, _eggg := _bddc.GetByte(_fcc)
+			if _eggg != nil {
+				return _eggg
+			}
+			_gabdf >>= _bafc
+			_gcgf := _gfeb | _gabdf
+			if _fbf && !_fgdbd {
+				_gcgf = _ffed(_ccad, _gcgf)
+			}
+			_eggg = _ebgfe.SetByte(_aee, _gcgf)
+			if _eggg != nil {
+				return _eggg
+			}
+			_aee++
+			if _fbf && _fgdbd {
+				_edcc, _dabf := _bddc.GetByte(_fcc)
+				if _dabf != nil {
+					return _dabf
+				}
+				_edcc <<= _fdgg
+				_gcgf = _ffed(_ccad, _edcc)
+				if _dabf = _ebgfe.SetByte(_aee, _gcgf); _dabf != nil {
+					return _dabf
+				}
+			}
+			continue
+		}
+		_affc, _fabbd := _bddc.GetByte(_fcc)
+		if _fabbd != nil {
+			_dc.Log.Debug("G\u0065\u0074\u0074\u0069\u006e\u0067 \u0074\u0068\u0065\u0020\u0076\u0061l\u0075\u0065\u0020\u0061\u0074\u003a\u0020%\u0064\u0020\u0066\u0061\u0069\u006c\u0065\u0064\u003a\u0020%\u0073", _fcc, _fabbd)
+			return _fabbd
+		}
+		_affc <<= _fdgg
+		_fcc++
+		_fabbd = _ebgfe.SetByte(_aee, _affc)
+		if _fabbd != nil {
+			return _fabbd
+		}
+		_aee++
+	}
+	return nil
+}
+
+func (_edcf Points) GetGeometry(i int) (_gfdf, _bddfg float32, _abfg error) {
+	if i > len(_edcf)-1 {
+		return 0, 0, _a.Errorf("\u0050\u006f\u0069\u006e\u0074\u0073\u002e\u0047\u0065\u0074", "\u0069n\u0064\u0065\u0078\u003a\u0020\u0027\u0025\u0064\u0027\u0020\u006fu\u0074\u0020\u006f\u0066\u0020\u0072\u0061\u006e\u0067\u0065", i)
+	}
+	_cbec := _edcf[i]
+	return _cbec.X, _cbec.Y, nil
+}
+
+func Blit(src *Bitmap, dst *Bitmap, x, y int, op CombinationOperator) error {
+	var _gccc, _cdgd int
+	_aad := src.RowStride - 1
+	if x < 0 {
+		_cdgd = -x
+		x = 0
+	} else if x+src.Width > dst.Width {
+		_aad -= src.Width + x - dst.Width
+	}
+	if y < 0 {
+		_gccc = -y
+		y = 0
+		_cdgd += src.RowStride
+		_aad += src.RowStride
+	} else if y+src.Height > dst.Height {
+		_gccc = src.Height + y - dst.Height
+	}
+	var (
+		_bbef int
+		_agce error
+	)
+	_dece := x & 0x07
+	_eeca := 8 - _dece
+	_aab := src.Width & 0x07
+	_cafg := _eeca - _aab
+	_cbff := _eeca&0x07 != 0
+	_aadf := src.Width <= ((_aad-_cdgd)<<3)+_eeca
+	_gcdb := dst.GetByteIndex(x, y)
+	_beca := _gccc + dst.Height
+	if src.Height > _beca {
+		_bbef = _beca
+	} else {
+		_bbef = src.Height
+	}
+	switch {
+	case !_cbff:
+		_agce = _ggdc(src, dst, _gccc, _bbef, _gcdb, _cdgd, _aad, op)
+	case _aadf:
+		_agce = _fad(src, dst, _gccc, _bbef, _gcdb, _cdgd, _aad, _cafg, _dece, _eeca, op)
+	default:
+		_agce = _fdgab(src, dst, _gccc, _bbef, _gcdb, _cdgd, _aad, _cafg, _dece, _eeca, op, _aab)
+	}
+	return _agce
+}
+
+func (_abad *Bitmap) ConnComponents(bms *Bitmaps, connectivity int) (_cdgdd *Boxes, _cbfe error) {
+	const _eecb = "B\u0069\u0074\u006d\u0061p.\u0043o\u006e\u006e\u0043\u006f\u006dp\u006f\u006e\u0065\u006e\u0074\u0073"
+	if _abad == nil {
+		return nil, _a.Error(_eecb, "\u0070r\u006f\u0076\u0069\u0064e\u0064\u0020\u0065\u006d\u0070t\u0079 \u0027b\u0027\u0020\u0062\u0069\u0074\u006d\u0061p")
+	}
+	if connectivity != 4 && connectivity != 8 {
+		return nil, _a.Error(_eecb, "\u0063\u006f\u006ene\u0063\u0074\u0069\u0076\u0069\u0074\u0079\u0020\u006e\u006f\u0074\u0020\u0034\u0020\u006f\u0072\u0020\u0038")
+	}
+	if bms == nil {
+		if _cdgdd, _cbfe = _abad.connComponentsBB(connectivity); _cbfe != nil {
+			return nil, _a.Wrap(_cbfe, _eecb, "")
+		}
+	} else {
+		if _cdgdd, _cbfe = _abad.connComponentsBitmapsBB(bms, connectivity); _cbfe != nil {
+			return nil, _a.Wrap(_cbfe, _eecb, "")
+		}
+	}
+	return _cdgdd, nil
+}
+
+func (_fgbg *Boxes) selectWithIndicator(_abd *_ge.NumSlice) (_deba *Boxes, _bfgc error) {
+	const _ada = "\u0042o\u0078\u0065\u0073\u002es\u0065\u006c\u0065\u0063\u0074W\u0069t\u0068I\u006e\u0064\u0069\u0063\u0061\u0074\u006fr"
+	if _fgbg == nil {
+		return nil, _a.Error(_ada, "b\u006f\u0078\u0065\u0073 '\u0062'\u0020\u006e\u006f\u0074\u0020d\u0065\u0066\u0069\u006e\u0065\u0064")
+	}
+	if _abd == nil {
+		return nil, _a.Error(_ada, "\u0027\u006ea\u0027\u0020\u006eo\u0074\u0020\u0064\u0065\u0066\u0069\u006e\u0065\u0064")
+	}
+	if len(*_abd) != len(*_fgbg) {
+		return nil, _a.Error(_ada, "\u0062\u006f\u0078\u0065\u0073\u0020\u0027\u0062\u0027\u0020\u0068\u0061\u0073\u0020\u0064\u0069\u0066\u0066\u0065\u0072\u0065\u006e\u0074\u0020s\u0069\u007a\u0065\u0020\u0074h\u0061\u006e \u0027\u006e\u0061\u0027")
+	}
+	var _cbc, _agg int
+	for _dea := 0; _dea < len(*_abd); _dea++ {
+		if _cbc, _bfgc = _abd.GetInt(_dea); _bfgc != nil {
+			return nil, _a.Wrap(_bfgc, _ada, "\u0063\u0068\u0065\u0063\u006b\u0069\u006e\u0067\u0020c\u006f\u0075\u006e\u0074")
+		}
+		if _cbc == 1 {
+			_agg++
+		}
+	}
+	if _agg == len(*_fgbg) {
+		return _fgbg, nil
+	}
+	_gccf := Boxes{}
+	for _dacb := 0; _dacb < len(*_abd); _dacb++ {
+		_cbc = int((*_abd)[_dacb])
+		if _cbc == 0 {
+			continue
+		}
+		_gccf = append(_gccf, (*_fgbg)[_dacb])
+	}
+	_deba = &_gccf
+	return _deba, nil
+}
+
+func (_fbdc *Bitmap) clipRectangle(_cbdf, _ebda *_bf.Rectangle) (_cdff *Bitmap, _abg error) {
+	const _aegb = "\u0063\u006c\u0069\u0070\u0052\u0065\u0063\u0074\u0061\u006e\u0067\u006c\u0065"
+	if _cbdf == nil {
+		return nil, _a.Error(_aegb, "\u0070r\u006fv\u0069\u0064\u0065\u0064\u0020n\u0069\u006c \u0027\u0062\u006f\u0078\u0027")
+	}
+	_egad, _eedg := _fbdc.Width, _fbdc.Height
+	_dee, _abg := ClipBoxToRectangle(_cbdf, _egad, _eedg)
+	if _abg != nil {
+		_dc.Log.Warning("\u0027\u0062ox\u0027\u0020\u0064o\u0065\u0073\u006e\u0027t o\u0076er\u006c\u0061\u0070\u0020\u0062\u0069\u0074ma\u0070\u0020\u0027\u0062\u0027\u003a\u0020%\u0076", _abg)
+		return nil, nil
+	}
+	_fgdb, _aecc := _dee.Min.X, _dee.Min.Y
+	_geg, _fede := _dee.Max.X-_dee.Min.X, _dee.Max.Y-_dee.Min.Y
+	_cdff = New(_geg, _fede)
+	_cdff.Text = _fbdc.Text
+	if _abg = _cdff.RasterOperation(0, 0, _geg, _fede, PixSrc, _fbdc, _fgdb, _aecc); _abg != nil {
+		return nil, _a.Wrap(_abg, _aegb, "")
+	}
+	if _ebda != nil {
+		*_ebda = *_dee
+	}
+	return _cdff, nil
+}
+
+func (_aebd *byWidth) Less(i, j int) bool { return _aebd.Values[i].Width < _aebd.Values[j].Width }
+
+func _efaa(_ffea, _bfeb *Bitmap, _ebgc, _eeab int) (_fdda error) {
+	const _ddafe = "\u0073e\u0065d\u0066\u0069\u006c\u006c\u0042i\u006e\u0061r\u0079\u004c\u006f\u0077\u0038"
+	var (
+		_dbbf, _fgde, _edbg, _cfc                                  int
+		_eedda, _fddae, _cegd, _cbdab, _abgc, _agcb, _efbb, _aadbd byte
+	)
+	for _dbbf = 0; _dbbf < _ebgc; _dbbf++ {
+		_edbg = _dbbf * _ffea.RowStride
+		_cfc = _dbbf * _bfeb.RowStride
+		for _fgde = 0; _fgde < _eeab; _fgde++ {
+			if _eedda, _fdda = _ffea.GetByte(_edbg + _fgde); _fdda != nil {
+				return _a.Wrap(_fdda, _ddafe, "\u0067e\u0074 \u0073\u006f\u0075\u0072\u0063\u0065\u0020\u0062\u0079\u0074\u0065")
+			}
+			if _fddae, _fdda = _bfeb.GetByte(_cfc + _fgde); _fdda != nil {
+				return _a.Wrap(_fdda, _ddafe, "\u0067\u0065\u0074\u0020\u006d\u0061\u0073\u006b\u0020\u0062\u0079\u0074\u0065")
+			}
+			if _dbbf > 0 {
+				if _cegd, _fdda = _ffea.GetByte(_edbg - _ffea.RowStride + _fgde); _fdda != nil {
+					return _a.Wrap(_fdda, _ddafe, "\u0069\u0020\u003e\u0020\u0030\u0020\u0062\u0079\u0074\u0065")
+				}
+				_eedda |= _cegd | (_cegd << 1) | (_cegd >> 1)
+				if _fgde > 0 {
+					if _aadbd, _fdda = _ffea.GetByte(_edbg - _ffea.RowStride + _fgde - 1); _fdda != nil {
+						return _a.Wrap(_fdda, _ddafe, "\u0069\u0020\u003e\u00200 \u0026\u0026\u0020\u006a\u0020\u003e\u0020\u0030\u0020\u0062\u0079\u0074\u0065")
+					}
+					_eedda |= _aadbd << 7
+				}
+				if _fgde < _eeab-1 {
+					if _aadbd, _fdda = _ffea.GetByte(_edbg - _ffea.RowStride + _fgde + 1); _fdda != nil {
+						return _a.Wrap(_fdda, _ddafe, "\u006a\u0020<\u0020\u0077\u0070l\u0020\u002d\u0020\u0031\u0020\u0062\u0079\u0074\u0065")
+					}
+					_eedda |= _aadbd >> 7
+				}
+			}
+			if _fgde > 0 {
+				if _cbdab, _fdda = _ffea.GetByte(_edbg + _fgde - 1); _fdda != nil {
+					return _a.Wrap(_fdda, _ddafe, "\u006a\u0020\u003e \u0030")
+				}
+				_eedda |= _cbdab << 7
+			}
+			_eedda &= _fddae
+			if _eedda == 0 || ^_eedda == 0 {
+				if _fdda = _ffea.SetByte(_edbg+_fgde, _eedda); _fdda != nil {
+					return _a.Wrap(_fdda, _ddafe, "\u0073e\u0074t\u0069\u006e\u0067\u0020\u0065m\u0070\u0074y\u0020\u0062\u0079\u0074\u0065")
+				}
+			}
+			for {
+				_efbb = _eedda
+				_eedda = (_eedda | (_eedda >> 1) | (_eedda << 1)) & _fddae
+				if (_eedda ^ _efbb) == 0 {
+					if _fdda = _ffea.SetByte(_edbg+_fgde, _eedda); _fdda != nil {
+						return _a.Wrap(_fdda, _ddafe, "\u0073\u0065\u0074\u0074\u0069\u006e\u0067\u0020\u0070\u0072\u0065\u0076 \u0062\u0079\u0074\u0065")
+					}
+					break
+				}
+			}
+		}
+	}
+	for _dbbf = _ebgc - 1; _dbbf >= 0; _dbbf-- {
+		_edbg = _dbbf * _ffea.RowStride
+		_cfc = _dbbf * _bfeb.RowStride
+		for _fgde = _eeab - 1; _fgde >= 0; _fgde-- {
+			if _eedda, _fdda = _ffea.GetByte(_edbg + _fgde); _fdda != nil {
+				return _a.Wrap(_fdda, _ddafe, "\u0072\u0065\u0076er\u0073\u0065\u0020\u0067\u0065\u0074\u0020\u0073\u006f\u0075\u0072\u0063\u0065\u0020\u0062\u0079\u0074\u0065")
+			}
+			if _fddae, _fdda = _bfeb.GetByte(_cfc + _fgde); _fdda != nil {
+				return _a.Wrap(_fdda, _ddafe, "r\u0065\u0076\u0065\u0072se\u0020g\u0065\u0074\u0020\u006d\u0061s\u006b\u0020\u0062\u0079\u0074\u0065")
+			}
+			if _dbbf < _ebgc-1 {
+				if _abgc, _fdda = _ffea.GetByte(_edbg + _ffea.RowStride + _fgde); _fdda != nil {
+					return _a.Wrap(_fdda, _ddafe, "\u0069\u0020\u003c\u0020h\u0020\u002d\u0020\u0031\u0020\u002d\u003e\u0020\u0067\u0065t\u0020s\u006f\u0075\u0072\u0063\u0065\u0020\u0062y\u0074\u0065")
+				}
+				_eedda |= _abgc | (_abgc << 1) | _abgc>>1
+				if _fgde > 0 {
+					if _aadbd, _fdda = _ffea.GetByte(_edbg + _ffea.RowStride + _fgde - 1); _fdda != nil {
+						return _a.Wrap(_fdda, _ddafe, "\u0069\u0020\u003c h\u002d\u0031\u0020\u0026\u0020\u006a\u0020\u003e\u00200\u0020-\u003e \u0067e\u0074\u0020\u0073\u006f\u0075\u0072\u0063\u0065\u0020\u0062\u0079\u0074\u0065")
+					}
+					_eedda |= _aadbd << 7
+				}
+				if _fgde < _eeab-1 {
+					if _aadbd, _fdda = _ffea.GetByte(_edbg + _ffea.RowStride + _fgde + 1); _fdda != nil {
+						return _a.Wrap(_fdda, _ddafe, "\u0069\u0020\u003c\u0020\u0068\u002d\u0031\u0020\u0026\u0026\u0020\u006a\u0020\u003c\u0077\u0070\u006c\u002d\u0031\u0020\u002d\u003e\u0020\u0067e\u0074\u0020\u0073\u006f\u0075r\u0063\u0065 \u0062\u0079\u0074\u0065")
+					}
+					_eedda |= _aadbd >> 7
+				}
+			}
+			if _fgde < _eeab-1 {
+				if _agcb, _fdda = _ffea.GetByte(_edbg + _fgde + 1); _fdda != nil {
+					return _a.Wrap(_fdda, _ddafe, "\u006a\u0020<\u0020\u0077\u0070\u006c\u0020\u002d\u0031\u0020\u002d\u003e\u0020\u0067\u0065\u0074\u0020\u0073\u006f\u0075\u0072\u0063\u0065\u0020by\u0074\u0065")
+				}
+				_eedda |= _agcb >> 7
+			}
+			_eedda &= _fddae
+			if _eedda == 0 || (^_eedda) == 0 {
+				if _fdda = _ffea.SetByte(_edbg+_fgde, _eedda); _fdda != nil {
+					return _a.Wrap(_fdda, _ddafe, "\u0073e\u0074 \u006d\u0061\u0073\u006b\u0065\u0064\u0020\u0062\u0079\u0074\u0065")
+				}
+			}
+			for {
+				_efbb = _eedda
+				_eedda = (_eedda | (_eedda >> 1) | (_eedda << 1)) & _fddae
+				if (_eedda ^ _efbb) == 0 {
+					if _fdda = _ffea.SetByte(_edbg+_fgde, _eedda); _fdda != nil {
+						return _a.Wrap(_fdda, _ddafe, "r\u0065\u0076\u0065\u0072se\u0020s\u0065\u0074\u0020\u0070\u0072e\u0076\u0020\u0062\u0079\u0074\u0065")
+					}
+					break
+				}
+			}
+		}
+	}
+	return nil
+}
+
+func _ece(_gbad *Bitmap, _cbdd, _gbff, _fece, _gebef int, _cgeb RasterOperator, _fdeba *Bitmap, _gdea, _dgbc int) error {
+	const _cacgg = "\u0072a\u0073t\u0065\u0072\u004f\u0070\u0065\u0072\u0061\u0074\u0069\u006f\u006e"
+	if _gbad == nil {
+		return _a.Error(_cacgg, "\u006e\u0069\u006c\u0020\u0027\u0064\u0065\u0073\u0074\u0027\u0020\u0042i\u0074\u006d\u0061\u0070")
+	}
+	if _cgeb == PixDst {
+		return nil
+	}
+	switch _cgeb {
+	case PixClr, PixSet, PixNotDst:
+		_daadf(_gbad, _cbdd, _gbff, _fece, _gebef, _cgeb)
+		return nil
+	}
+	if _fdeba == nil {
+		_dc.Log.Debug("\u0052a\u0073\u0074e\u0072\u004f\u0070\u0065r\u0061\u0074\u0069o\u006e\u0020\u0073\u006f\u0075\u0072\u0063\u0065\u0020bi\u0074\u006d\u0061p\u0020\u0069s\u0020\u006e\u006f\u0074\u0020\u0064e\u0066\u0069n\u0065\u0064")
+		return _a.Error(_cacgg, "\u006e\u0069l\u0020\u0027\u0073r\u0063\u0027\u0020\u0062\u0069\u0074\u006d\u0061\u0070")
+	}
+	if _gcca := _gbed(_gbad, _cbdd, _gbff, _fece, _gebef, _cgeb, _fdeba, _gdea, _dgbc); _gcca != nil {
+		return _a.Wrap(_gcca, _cacgg, "")
+	}
+	return nil
+}
+
+func _da(_eea *Bitmap, _ccb int) (*Bitmap, error) {
+	const _dbc = "\u0065x\u0070a\u006e\u0064\u0042\u0069\u006ea\u0072\u0079P\u006f\u0077\u0065\u0072\u0032"
+	if _eea == nil {
+		return nil, _a.Error(_dbc, "\u0073o\u0075r\u0063\u0065\u0020\u006e\u006ft\u0020\u0064e\u0066\u0069\u006e\u0065\u0064")
+	}
+	if _ccb == 1 {
+		return _fedg(nil, _eea)
+	}
+	if _ccb != 2 && _ccb != 4 && _ccb != 8 {
+		return nil, _a.Error(_dbc, "\u0066\u0061\u0063t\u006f\u0072\u0020\u006du\u0073\u0074\u0020\u0062\u0065\u0020\u0069n\u0020\u007b\u0032\u002c\u0034\u002c\u0038\u007d\u0020\u0072\u0061\u006e\u0067\u0065")
+	}
+	_gb := _ccb * _eea.Width
+	_edd := _ccb * _eea.Height
+	_cfd := New(_gb, _edd)
+	var _ef error
+	switch _ccb {
+	case 2:
+		_ef = _bb(_cfd, _eea)
+	case 4:
+		_ef = _bc(_cfd, _eea)
+	case 8:
+		_ef = _ea(_cfd, _eea)
+	}
+	if _ef != nil {
+		return nil, _a.Wrap(_ef, _dbc, "")
+	}
+	return _cfd, nil
+}
+
+func (_fade *ClassedPoints) SortByY() { _fade._ggfg = _fade.ySortFunction(); _df.Sort(_fade) }
+
+func (_fdaa *Boxes) Add(box *_bf.Rectangle) error {
+	if _fdaa == nil {
+		return _a.Error("\u0042o\u0078\u0065\u0073\u002e\u0041\u0064d", "\u0027\u0042\u006f\u0078es\u0027\u0020\u006e\u006f\u0074\u0020\u0064\u0065\u0066\u0069\u006e\u0065\u0064")
+	}
+	*_fdaa = append(*_fdaa, box)
+	return nil
+}
+
+func _bad(_caaa, _abf *Bitmap, _ int, _ae []byte, _egac int) (_gfe error) {
+	const _gec = "\u0072\u0065\u0064uc\u0065\u0052\u0061\u006e\u006b\u0042\u0069\u006e\u0061\u0072\u0079\u0032\u004c\u0065\u0076\u0065\u006c\u0032"
+	var (
+		_afb, _bfge, _abe, _gcb, _gce, _bab, _dfd, _egf int
+		_gac, _fdb, _afaa, _egg                         uint32
+		_gbg, _gfc                                      byte
+		_bbd                                            uint16
+	)
+	_efce := make([]byte, 4)
+	_eae := make([]byte, 4)
+	for _abe = 0; _abe < _caaa.Height-1; _abe, _gcb = _abe+2, _gcb+1 {
+		_afb = _abe * _caaa.RowStride
+		_bfge = _gcb * _abf.RowStride
+		for _gce, _bab = 0, 0; _gce < _egac; _gce, _bab = _gce+4, _bab+1 {
+			for _dfd = 0; _dfd < 4; _dfd++ {
+				_egf = _afb + _gce + _dfd
+				if _egf <= len(_caaa.Data)-1 && _egf < _afb+_caaa.RowStride {
+					_efce[_dfd] = _caaa.Data[_egf]
+				} else {
+					_efce[_dfd] = 0x00
+				}
+				_egf = _afb + _caaa.RowStride + _gce + _dfd
+				if _egf <= len(_caaa.Data)-1 && _egf < _afb+(2*_caaa.RowStride) {
+					_eae[_dfd] = _caaa.Data[_egf]
+				} else {
+					_eae[_dfd] = 0x00
+				}
+			}
+			_gac = _ag.BigEndian.Uint32(_efce)
+			_fdb = _ag.BigEndian.Uint32(_eae)
+			_afaa = _gac & _fdb
+			_afaa |= _afaa << 1
+			_egg = _gac | _fdb
+			_egg &= _egg << 1
+			_fdb = _afaa | _egg
+			_fdb &= 0xaaaaaaaa
+			_gac = _fdb | (_fdb << 7)
+			_gbg = byte(_gac >> 24)
+			_gfc = byte((_gac >> 8) & 0xff)
+			_egf = _bfge + _bab
+			if _egf+1 == len(_abf.Data)-1 || _egf+1 >= _bfge+_abf.RowStride {
+				if _gfe = _abf.SetByte(_egf, _ae[_gbg]); _gfe != nil {
+					return _a.Wrapf(_gfe, _gec, "\u0069n\u0064\u0065\u0078\u003a\u0020\u0025d", _egf)
+				}
+			} else {
+				_bbd = (uint16(_ae[_gbg]) << 8) | uint16(_ae[_gfc])
+				if _gfe = _abf.setTwoBytes(_egf, _bbd); _gfe != nil {
+					return _a.Wrapf(_gfe, _gec, "s\u0065\u0074\u0074\u0069\u006e\u0067 \u0074\u0077\u006f\u0020\u0062\u0079t\u0065\u0073\u0020\u0066\u0061\u0069\u006ce\u0064\u002c\u0020\u0069\u006e\u0064\u0065\u0078\u003a\u0020%\u0064", _egf)
+				}
+				_bab++
+			}
+		}
+	}
+	return nil
+}
+
+func _afgg() []int {
+	_dega := make([]int, 256)
+	for _afcd := 0; _afcd <= 0xff; _afcd++ {
+		_fdcf := byte(_afcd)
+		_dega[_fdcf] = int(_fdcf&0x1) + (int(_fdcf>>1) & 0x1) + (int(_fdcf>>2) & 0x1) + (int(_fdcf>>3) & 0x1) + (int(_fdcf>>4) & 0x1) + (int(_fdcf>>5) & 0x1) + (int(_fdcf>>6) & 0x1) + (int(_fdcf>>7) & 0x1)
+	}
+	return _dega
+}
+
+func (_gabd *Bitmap) setPadBits(_dgf int) {
+	_eec := 8 - _gabd.Width%8
+	if _eec == 8 {
+		return
+	}
+	_abffa := _gabd.Width / 8
+	_ebc := _beeb[_eec]
+	if _dgf == 0 {
+		_ebc ^= _ebc
+	}
+	var _bfgdc int
+	for _fabb := 0; _fabb < _gabd.Height; _fabb++ {
+		_bfgdc = _fabb*_gabd.RowStride + _abffa
+		if _dgf == 0 {
+			_gabd.Data[_bfgdc] &= _ebc
+		} else {
+			_gabd.Data[_bfgdc] |= _ebc
+		}
+	}
+}
+
+type CombinationOperator int
+
+func TstImageBitmap() *Bitmap { return _bceg.Copy() }
+
+func (_addd *Bitmap) countPixels() int {
+	var (
+		_dcf  int
+		_fcac uint8
+		_adf  byte
+		_gaca int
+	)
+	_gcea := _addd.RowStride
+	_gcd := uint(_addd.Width & 0x07)
+	if _gcd != 0 {
+		_fcac = uint8((0xff << (8 - _gcd)) & 0xff)
+		_gcea--
+	}
+	for _efecf := 0; _efecf < _addd.Height; _efecf++ {
+		for _gaca = 0; _gaca < _gcea; _gaca++ {
+			_adf = _addd.Data[_efecf*_addd.RowStride+_gaca]
+			_dcf += int(_becg[_adf])
+		}
+		if _gcd != 0 {
+			_dcf += int(_becg[_addd.Data[_efecf*_addd.RowStride+_gaca]&_fcac])
+		}
+	}
+	return _dcf
+}
+
+func (_fed *Bitmap) SetPadBits(value int) { _fed.setPadBits(value) }
+
+func _gbae(_adef, _dcaf *Bitmap, _baeb *Selection) (*Bitmap, error) {
+	const _dabcd = "c\u006c\u006f\u0073\u0065\u0042\u0069\u0074\u006d\u0061\u0070"
+	var _gdcf error
+	if _adef, _gdcf = _ebac(_adef, _dcaf, _baeb); _gdcf != nil {
+		return nil, _gdcf
+	}
+	_eabf, _gdcf := _acga(nil, _dcaf, _baeb)
+	if _gdcf != nil {
+		return nil, _a.Wrap(_gdcf, _dabcd, "")
+	}
+	if _, _gdcf = _bfcc(_adef, _eabf, _baeb); _gdcf != nil {
+		return nil, _a.Wrap(_gdcf, _dabcd, "")
+	}
+	return _adef, nil
+}
+
+func (_afee *Bitmap) createTemplate() *Bitmap {
+	return &Bitmap{Width: _afee.Width, Height: _afee.Height, RowStride: _afee.RowStride, Color: _afee.Color, Text: _afee.Text, BitmapNumber: _afee.BitmapNumber, Special: _afee.Special, Data: make([]byte, len(_afee.Data))}
+}
+
+type shift int
+
+func TstDSymbol(t *_c.T, scale ...int) *Bitmap {
+	_aadg, _bcega := NewWithData(4, 5, []byte{0xf0, 0x90, 0x90, 0x90, 0xE0})
+	_d.NoError(t, _bcega)
+	return TstGetScaledSymbol(t, _aadg, scale...)
+}
+
+func (_efef Points) GetIntX(i int) (int, error) {
+	if i >= len(_efef) {
+		return 0, _a.Errorf("\u0050\u006f\u0069\u006e\u0074\u0073\u002e\u0047\u0065t\u0049\u006e\u0074\u0058", "\u0069n\u0064\u0065\u0078\u003a\u0020\u0027\u0025\u0064\u0027\u0020\u006fu\u0074\u0020\u006f\u0066\u0020\u0072\u0061\u006e\u0067\u0065", i)
+	}
+	return int(_efef[i].X), nil
+}
+
+func _eaad(_ecf, _fbgd *Bitmap, _fcaeb, _aaca int) (*Bitmap, error) {
+	const _ffcg = "\u0063\u006c\u006f\u0073\u0065\u0042\u0072\u0069\u0063\u006b"
+	if _fbgd == nil {
+		return nil, _a.Error(_ffcg, "\u0073o\u0075r\u0063\u0065\u0020\u006e\u006ft\u0020\u0064e\u0066\u0069\u006e\u0065\u0064")
+	}
+	if _fcaeb < 1 || _aaca < 1 {
+		return nil, _a.Error(_ffcg, "\u0068S\u0069\u007a\u0065\u0020\u0061\u006e\u0064\u0020\u0076\u0053\u0069z\u0065\u0020\u006e\u006f\u0074\u0020\u003e\u003d\u0020\u0031")
+	}
+	if _fcaeb == 1 && _aaca == 1 {
+		return _fbgd.Copy(), nil
+	}
+	if _fcaeb == 1 || _aaca == 1 {
+		_baegf := SelCreateBrick(_aaca, _fcaeb, _aaca/2, _fcaeb/2, SelHit)
+		var _dbad error
+		_ecf, _dbad = _gbae(_ecf, _fbgd, _baegf)
+		if _dbad != nil {
+			return nil, _a.Wrap(_dbad, _ffcg, "\u0068S\u0069\u007a\u0065\u0020\u003d\u003d\u0020\u0031\u0020\u007c\u007c \u0076\u0053\u0069\u007a\u0065\u0020\u003d\u003d\u0020\u0031")
+		}
+		return _ecf, nil
+	}
+	_cdc := SelCreateBrick(1, _fcaeb, 0, _fcaeb/2, SelHit)
+	_gdffa := SelCreateBrick(_aaca, 1, _aaca/2, 0, SelHit)
+	_edb, _ebaf := _acga(nil, _fbgd, _cdc)
+	if _ebaf != nil {
+		return nil, _a.Wrap(_ebaf, _ffcg, "\u0031\u0073\u0074\u0020\u0064\u0069\u006c\u0061\u0074\u0065")
+	}
+	if _ecf, _ebaf = _acga(_ecf, _edb, _gdffa); _ebaf != nil {
+		return nil, _a.Wrap(_ebaf, _ffcg, "\u0032\u006e\u0064\u0020\u0064\u0069\u006c\u0061\u0074\u0065")
+	}
+	if _, _ebaf = _bfcc(_edb, _ecf, _cdc); _ebaf != nil {
+		return nil, _a.Wrap(_ebaf, _ffcg, "\u0031s\u0074\u0020\u0065\u0072\u006f\u0064e")
+	}
+	if _, _ebaf = _bfcc(_ecf, _edb, _gdffa); _ebaf != nil {
+		return nil, _a.Wrap(_ebaf, _ffcg, "\u0032n\u0064\u0020\u0065\u0072\u006f\u0064e")
+	}
+	return _ecf, nil
+}
+
+func _ea(_egd, _dcc *Bitmap) (_ecg error) {
+	const _gg = "\u0065\u0078\u0070\u0061nd\u0042\u0069\u006e\u0061\u0072\u0079\u0046\u0061\u0063\u0074\u006f\u0072\u0038"
+	_caa := _dcc.RowStride
+	_ege := _egd.RowStride
+	var _afa, _ed, _bdb, _ff, _dbgg int
+	for _bdb = 0; _bdb < _dcc.Height; _bdb++ {
+		_afa = _bdb * _caa
+		_ed = 8 * _bdb * _ege
+		for _ff = 0; _ff < _caa; _ff++ {
+			if _ecg = _egd.setEightBytes(_ed+_ff*8, _ceba[_dcc.Data[_afa+_ff]]); _ecg != nil {
+				return _a.Wrap(_ecg, _gg, "")
+			}
+		}
+		for _dbgg = 1; _dbgg < 8; _dbgg++ {
+			for _ff = 0; _ff < _ege; _ff++ {
+				if _ecg = _egd.SetByte(_ed+_dbgg*_ege+_ff, _egd.Data[_ed+_ff]); _ecg != nil {
+					return _a.Wrap(_ecg, _gg, "")
+				}
+			}
+		}
+	}
+	return nil
+}
+
+type Boxes []*_bf.Rectangle
+
+func (_gedd *Bitmap) And(s *Bitmap) (_bbeb *Bitmap, _gba error) {
+	const _dbb = "\u0042\u0069\u0074\u006d\u0061\u0070\u002e\u0041\u006e\u0064"
+	if _gedd == nil {
+		return nil, _a.Error(_dbb, "\u0027b\u0069t\u006d\u0061\u0070\u0020\u0027b\u0027\u0020i\u0073\u0020\u006e\u0069\u006c")
+	}
+	if s == nil {
+		return nil, _a.Error(_dbb, "\u0062\u0069\u0074\u006d\u0061\u0070\u0020\u0027\u0073\u0027\u0020\u0069s\u0020\u006e\u0069\u006c")
+	}
+	if !_gedd.SizesEqual(s) {
+		_dc.Log.Debug("\u0025\u0073\u0020-\u0020\u0042\u0069\u0074\u006d\u0061\u0070\u0020\u0027\u0073\u0027\u0020\u0069\u0073\u0020\u006e\u006f\u0074\u0020\u0065\u0071\u0075\u0061\u006c\u0020\u0073\u0069\u007a\u0065 \u0077\u0069\u0074\u0068\u0020\u0027\u0062\u0027", _dbb)
+	}
+	if _bbeb, _gba = _fedg(_bbeb, _gedd); _gba != nil {
+		return nil, _a.Wrap(_gba, _dbb, "\u0063\u0061\u006e't\u0020\u0063\u0072\u0065\u0061\u0074\u0065\u0020\u0027\u0064\u0027\u0020\u0062\u0069\u0074\u006d\u0061\u0070")
+	}
+	if _gba = _bbeb.RasterOperation(0, 0, _bbeb.Width, _bbeb.Height, PixSrcAndDst, s, 0, 0); _gba != nil {
+		return nil, _a.Wrap(_gba, _dbb, "")
+	}
+	return _bbeb, nil
+}
+
+var _dbcb = []byte{0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x3E, 0x78, 0x27, 0xC2, 0x27, 0x91, 0x00, 0x22, 0x48, 0x21, 0x03, 0x24, 0x91, 0x00, 0x22, 0x48, 0x21, 0x02, 0xA4, 0x95, 0x00, 0x22, 0x48, 0x21, 0x02, 0x64, 0x9B, 0x00, 0x3C, 0x78, 0x21, 0x02, 0x27, 0x91, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x7F, 0xF8, 0x00, 0x00, 0x00, 0x00, 0x00, 0x7F, 0xF8, 0x00, 0x00, 0x00, 0x00, 0x00, 0x63, 0x18, 0x00, 0x00, 0x00, 0x00, 0x00, 0x63, 0x18, 0x00, 0x00, 0x00, 0x00, 0x00, 0x63, 0x18, 0x00, 0x00, 0x00, 0x00, 0x00, 0x7F, 0xF8, 0x00, 0x00, 0x00, 0x00, 0x00, 0x15, 0x50, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00}
+
+func _bfcce() []int {
+	_dcab := make([]int, 256)
+	_dcab[0] = 0
+	_dcab[1] = 7
+	var _acge int
+	for _acge = 2; _acge < 4; _acge++ {
+		_dcab[_acge] = _dcab[_acge-2] + 6
+	}
+	for _acge = 4; _acge < 8; _acge++ {
+		_dcab[_acge] = _dcab[_acge-4] + 5
+	}
+	for _acge = 8; _acge < 16; _acge++ {
+		_dcab[_acge] = _dcab[_acge-8] + 4
+	}
+	for _acge = 16; _acge < 32; _acge++ {
+		_dcab[_acge] = _dcab[_acge-16] + 3
+	}
+	for _acge = 32; _acge < 64; _acge++ {
+		_dcab[_acge] = _dcab[_acge-32] + 2
+	}
+	for _acge = 64; _acge < 128; _acge++ {
+		_dcab[_acge] = _dcab[_acge-64] + 1
+	}
+	for _acge = 128; _acge < 256; _acge++ {
+		_dcab[_acge] = _dcab[_acge-128]
+	}
+	return _dcab
+}
+
+func _gbed(_edbf *Bitmap, _dacg, _bbec int, _bcae, _eade int, _bedb RasterOperator, _fdce *Bitmap, _baed, _dceb int) error {
+	var _bdedb, _ccbec, _cgdaf, _acdf int
+	if _dacg < 0 {
+		_baed -= _dacg
+		_bcae += _dacg
+		_dacg = 0
+	}
+	if _baed < 0 {
+		_dacg -= _baed
+		_bcae += _baed
+		_baed = 0
+	}
+	_bdedb = _dacg + _bcae - _edbf.Width
+	if _bdedb > 0 {
+		_bcae -= _bdedb
+	}
+	_ccbec = _baed + _bcae - _fdce.Width
+	if _ccbec > 0 {
+		_bcae -= _ccbec
+	}
+	if _bbec < 0 {
+		_dceb -= _bbec
+		_eade += _bbec
+		_bbec = 0
+	}
+	if _dceb < 0 {
+		_bbec -= _dceb
+		_eade += _dceb
+		_dceb = 0
+	}
+	_cgdaf = _bbec + _eade - _edbf.Height
+	if _cgdaf > 0 {
+		_eade -= _cgdaf
+	}
+	_acdf = _dceb + _eade - _fdce.Height
+	if _acdf > 0 {
+		_eade -= _acdf
+	}
+	if _bcae <= 0 || _eade <= 0 {
+		return nil
+	}
+	var _bdee error
+	switch {
+	case _dacg&7 == 0 && _baed&7 == 0:
+		_bdee = _gccd(_edbf, _dacg, _bbec, _bcae, _eade, _bedb, _fdce, _baed, _dceb)
+	case _dacg&7 == _baed&7:
+		_bdee = _dead(_edbf, _dacg, _bbec, _bcae, _eade, _bedb, _fdce, _baed, _dceb)
+	default:
+		_bdee = _gfde(_edbf, _dacg, _bbec, _bcae, _eade, _bedb, _fdce, _baed, _dceb)
+	}
+	if _bdee != nil {
+		return _a.Wrap(_bdee, "r\u0061\u0073\u0074\u0065\u0072\u004f\u0070\u004c\u006f\u0077", "")
+	}
+	return nil
+}
+
+func (_gfgf *Bitmaps) GetBitmap(i int) (*Bitmap, error) {
+	const _bedc = "\u0047e\u0074\u0042\u0069\u0074\u006d\u0061p"
+	if _gfgf == nil {
+		return nil, _a.Error(_bedc, "p\u0072o\u0076\u0069\u0064\u0065\u0064\u0020\u006e\u0069l\u0020\u0042\u0069\u0074ma\u0070\u0073")
+	}
+	if i > len(_gfgf.Values)-1 {
+		return nil, _a.Errorf(_bedc, "\u0069n\u0064\u0065\u0078\u003a\u0020\u0027\u0025\u0064\u0027\u0020\u006fu\u0074\u0020\u006f\u0066\u0020\u0072\u0061\u006e\u0067\u0065", i)
+	}
+	return _gfgf.Values[i], nil
+}
+
+func TstESymbol(t *_c.T, scale ...int) *Bitmap {
+	_fbdg, _eeaba := NewWithData(4, 5, []byte{0xF0, 0x80, 0xE0, 0x80, 0xF0})
+	_d.NoError(t, _eeaba)
+	return TstGetScaledSymbol(t, _fbdg, scale...)
+}
+
+type RasterOperator int
+
+const (
+	_ LocationFilter = iota
+	LocSelectWidth
+	LocSelectHeight
+	LocSelectXVal
+	LocSelectYVal
+	LocSelectIfEither
+	LocSelectIfBoth
+)
+
+func _bfbb(_eacf *Bitmap, _fdgb *Bitmap, _feba *Selection, _fdeb **Bitmap) (*Bitmap, error) {
+	const _acbac = "\u0070\u0072\u006f\u0063\u0065\u0073\u0073\u004d\u006f\u0072\u0070\u0068A\u0072\u0067\u0073\u0031"
+	if _fdgb == nil {
+		return nil, _a.Error(_acbac, "\u004d\u006f\u0072\u0070\u0068\u0041\u0072\u0067\u0073\u0031\u0020'\u0073\u0027\u0020\u006e\u006f\u0074\u0020\u0064\u0065\u0066i\u006e\u0065\u0064")
+	}
+	if _feba == nil {
+		return nil, _a.Error(_acbac, "\u004d\u006f\u0072\u0068p\u0041\u0072\u0067\u0073\u0031\u0020\u0027\u0073\u0065\u006c'\u0020n\u006f\u0074\u0020\u0064\u0065\u0066\u0069n\u0065\u0064")
+	}
+	_abgf, _cccd := _feba.Height, _feba.Width
+	if _abgf == 0 || _cccd == 0 {
+		return nil, _a.Error(_acbac, "\u0073\u0065\u006c\u0065ct\u0069\u006f\u006e\u0020\u006f\u0066\u0020\u0073\u0069\u007a\u0065\u0020\u0030")
+	}
+	if _eacf == nil {
+		_eacf = _fdgb.createTemplate()
+		*_fdeb = _fdgb
+		return _eacf, nil
+	}
+	_eacf.Width = _fdgb.Width
+	_eacf.Height = _fdgb.Height
+	_eacf.RowStride = _fdgb.RowStride
+	_eacf.Color = _fdgb.Color
+	_eacf.Data = make([]byte, _fdgb.RowStride*_fdgb.Height)
+	if _eacf == _fdgb {
+		*_fdeb = _fdgb.Copy()
+	} else {
+		*_fdeb = _fdgb
+	}
+	return _eacf, nil
+}
+
+func (_bcab *Bitmap) setEightPartlyBytes(_cbe, _gfga int, _fdee uint64) (_ecdg error) {
+	var (
+		_ccfe byte
+		_ffaf int
+	)
+	const _bge = "\u0073\u0065\u0074\u0045ig\u0068\u0074\u0050\u0061\u0072\u0074\u006c\u0079\u0042\u0079\u0074\u0065\u0073"
+	for _ceb := 1; _ceb <= _gfga; _ceb++ {
+		_ffaf = 64 - _ceb*8
+		_ccfe = byte(_fdee >> uint(_ffaf) & 0xff)
+		_dc.Log.Trace("\u0074\u0065\u006d\u0070\u003a\u0020\u0025\u0030\u0038\u0062\u002c\u0020\u0069\u006e\u0064\u0065\u0078\u003a %\u0064,\u0020\u0069\u0064\u0078\u003a\u0020\u0025\u0064\u002c\u0020\u0066\u0075l\u006c\u0042\u0079\u0074\u0065\u0073\u004e\u0075\u006d\u0062\u0065\u0072\u003a\u0020\u0025\u0064\u002c \u0073\u0068\u0069\u0066\u0074\u003a\u0020\u0025\u0064", _ccfe, _cbe, _cbe+_ceb-1, _gfga, _ffaf)
+		if _ecdg = _bcab.SetByte(_cbe+_ceb-1, _ccfe); _ecdg != nil {
+			return _a.Wrap(_ecdg, _bge, "\u0066\u0075\u006c\u006c\u0042\u0079\u0074\u0065")
+		}
+	}
+	_gfb := _bcab.RowStride*8 - _bcab.Width
+	if _gfb == 0 {
+		return nil
+	}
+	_ffaf -= 8
+	_ccfe = byte(_fdee>>uint(_ffaf)&0xff) << uint(_gfb)
+	if _ecdg = _bcab.SetByte(_cbe+_gfga, _ccfe); _ecdg != nil {
+		return _a.Wrap(_ecdg, _bge, "\u0070\u0061\u0064\u0064\u0065\u0064")
+	}
+	return nil
+}
+
+func _ga(_ffc, _ged *Bitmap, _ int, _bee []byte, _cb int) (_bbg error) {
+	const _dge = "\u0072\u0065\u0064uc\u0065\u0052\u0061\u006e\u006b\u0042\u0069\u006e\u0061\u0072\u0079\u0032\u004c\u0065\u0076\u0065\u006c\u0031"
+	var (
+		_dgc, _ffd, _bbed, _dga, _agc, _baf, _dff, _cdgb int
+		_bcc, _efc                                       uint32
+		_bec, _eegd                                      byte
+		_cdf                                             uint16
+	)
+	_dgee := make([]byte, 4)
+	_dda := make([]byte, 4)
+	for _bbed = 0; _bbed < _ffc.Height-1; _bbed, _dga = _bbed+2, _dga+1 {
+		_dgc = _bbed * _ffc.RowStride
+		_ffd = _dga * _ged.RowStride
+		for _agc, _baf = 0, 0; _agc < _cb; _agc, _baf = _agc+4, _baf+1 {
+			for _dff = 0; _dff < 4; _dff++ {
+				_cdgb = _dgc + _agc + _dff
+				if _cdgb <= len(_ffc.Data)-1 && _cdgb < _dgc+_ffc.RowStride {
+					_dgee[_dff] = _ffc.Data[_cdgb]
+				} else {
+					_dgee[_dff] = 0x00
+				}
+				_cdgb = _dgc + _ffc.RowStride + _agc + _dff
+				if _cdgb <= len(_ffc.Data)-1 && _cdgb < _dgc+(2*_ffc.RowStride) {
+					_dda[_dff] = _ffc.Data[_cdgb]
+				} else {
+					_dda[_dff] = 0x00
+				}
+			}
+			_bcc = _ag.BigEndian.Uint32(_dgee)
+			_efc = _ag.BigEndian.Uint32(_dda)
+			_efc |= _bcc
+			_efc |= _efc << 1
+			_efc &= 0xaaaaaaaa
+			_bcc = _efc | (_efc << 7)
+			_bec = byte(_bcc >> 24)
+			_eegd = byte((_bcc >> 8) & 0xff)
+			_cdgb = _ffd + _baf
+			if _cdgb+1 == len(_ged.Data)-1 || _cdgb+1 >= _ffd+_ged.RowStride {
+				_ged.Data[_cdgb] = _bee[_bec]
+			} else {
+				_cdf = (uint16(_bee[_bec]) << 8) | uint16(_bee[_eegd])
+				if _bbg = _ged.setTwoBytes(_cdgb, _cdf); _bbg != nil {
+					return _a.Wrapf(_bbg, _dge, "s\u0065\u0074\u0074\u0069\u006e\u0067 \u0074\u0077\u006f\u0020\u0062\u0079t\u0065\u0073\u0020\u0066\u0061\u0069\u006ce\u0064\u002c\u0020\u0069\u006e\u0064\u0065\u0078\u003a\u0020%\u0064", _cdgb)
+				}
+				_baf++
+			}
+		}
+	}
+	return nil
+}
+
+const (
+	CmbOpOr CombinationOperator = iota
+	CmbOpAnd
+	CmbOpXor
+	CmbOpXNor
+	CmbOpReplace
+	CmbOpNot
+)
+
+const (
+	Vanilla Color = iota
+	Chocolate
+)
+
+func NewWithUnpaddedData(width, height int, data []byte) (*Bitmap, error) {
+	const _egbg = "\u004e\u0065\u0077\u0057it\u0068\u0055\u006e\u0070\u0061\u0064\u0064\u0065\u0064\u0044\u0061\u0074\u0061"
+	_aeg := _dad(width, height)
+	_aeg.Data = data
+	if _egc := ((width * height) + 7) >> 3; len(data) < _egc {
+		return nil, _a.Errorf(_egbg, "\u0069\u006e\u0076\u0061\u006c\u0069\u0064\u0020\u0064a\u0074\u0061\u0020\u006c\u0065\u006e\u0067\u0074\u0068\u003a\u0020\u0027\u0025\u0064\u0027\u002e\u0020\u0054\u0068\u0065\u0020\u0064\u0061t\u0061\u0020s\u0068\u006fu\u006c\u0064\u0020\u0063\u006f\u006e\u0074\u0061\u0069\u006e\u0020\u0061\u0074 l\u0065\u0061\u0073\u0074\u003a\u0020\u0027\u0025\u0064'\u0020\u0062\u0079\u0074\u0065\u0073", len(data), _egc)
+	}
+	if _efe := _aeg.addPadBits(); _efe != nil {
+		return nil, _a.Wrap(_efe, _egbg, "")
+	}
+	return _aeg, nil
+}
+
+func _fdgab(_dfcag, _eabb *Bitmap, _fbb, _bfbg, _eeec, _edac, _fgfga, _bcfe, _cddg, _gfgc int, _gbf CombinationOperator, _caec int) error {
+	var _eagd int
+	_ffaa := func() { _eagd++; _eeec += _eabb.RowStride; _edac += _dfcag.RowStride; _fgfga += _dfcag.RowStride }
+	for _eagd = _fbb; _eagd < _bfbg; _ffaa() {
+		var _gdcd uint16
+		_dabg := _eeec
+		for _ebf := _edac; _ebf <= _fgfga; _ebf++ {
+			_efb, _eddbf := _eabb.GetByte(_dabg)
+			if _eddbf != nil {
+				return _eddbf
+			}
+			_bceaf, _eddbf := _dfcag.GetByte(_ebf)
+			if _eddbf != nil {
+				return _eddbf
+			}
+			_gdcd = (_gdcd | (uint16(_bceaf) & 0xff)) << uint(_gfgc)
+			_bceaf = byte(_gdcd >> 8)
+			if _eddbf = _eabb.SetByte(_dabg, _ccecc(_efb, _bceaf, _gbf)); _eddbf != nil {
+				return _eddbf
+			}
+			_dabg++
+			_gdcd <<= uint(_cddg)
+			if _ebf == _fgfga {
+				_bceaf = byte(_gdcd >> (8 - uint8(_gfgc)))
+				if _caec != 0 {
+					_bceaf = _ffed(uint(8+_bcfe), _bceaf)
+				}
+				_efb, _eddbf = _eabb.GetByte(_dabg)
+				if _eddbf != nil {
+					return _eddbf
+				}
+				if _eddbf = _eabb.SetByte(_dabg, _ccecc(_efb, _bceaf, _gbf)); _eddbf != nil {
+					return _eddbf
+				}
+			}
+		}
+	}
+	return nil
+}
+
+func (_begb *Bitmap) ToImage() _bf.Image {
+	_ggecg, _afbg := _cf.NewImage(_begb.Width, _begb.Height, 1, 1, _begb.Data, nil, nil)
+	if _afbg != nil {
+		_dc.Log.Error("\u0043\u006f\u006e\u0076\u0065\u0072\u0074\u0069\u006e\u0067\u0020j\u0062\u0069\u0067\u0032\u002e\u0042\u0069\u0074m\u0061p\u0020\u0074\u006f\u0020\u0069\u006d\u0061\u0067\u0065\u0075\u0074\u0069\u006c\u002e\u0049\u006d\u0061\u0067e\u0020\u0066\u0061\u0069\u006c\u0065\u0064\u003a\u0020\u0025\u0076", _afbg)
+	}
+	return _ggecg
+}
+
+func (_fagca *Bitmap) RasterOperation(dx, dy, dw, dh int, op RasterOperator, src *Bitmap, sx, sy int) error {
+	return _ece(_fagca, dx, dy, dw, dh, op, src, sx, sy)
+}
+
+const (
+	MopDilation MorphOperation = iota
+	MopErosion
+	MopOpening
+	MopClosing
+	MopRankBinaryReduction
+	MopReplicativeBinaryExpansion
+	MopAddBorder
+)
+
+func _defa(_ebfd *Bitmap, _gcbdc ...MorphProcess) (_dfcef *Bitmap, _faed error) {
+	const _fcebg = "\u006d\u006f\u0072\u0070\u0068\u0053\u0065\u0071\u0075\u0065\u006e\u0063\u0065"
+	if _ebfd == nil {
+		return nil, _a.Error(_fcebg, "\u006d\u006f\u0072\u0070\u0068\u0053\u0065\u0071\u0075\u0065\u006e\u0063\u0065 \u0073\u006f\u0075\u0072\u0063\u0065 \u0062\u0069\u0074\u006d\u0061\u0070\u0020\u006e\u006f\u0074\u0020\u0064\u0065f\u0069\u006e\u0065\u0064")
+	}
+	if len(_gcbdc) == 0 {
+		return nil, _a.Error(_fcebg, "m\u006f\u0072\u0070\u0068\u0053\u0065q\u0075\u0065\u006e\u0063\u0065\u002c \u0073\u0065\u0071\u0075\u0065\u006e\u0063e\u0020\u006e\u006f\u0074\u0020\u0064\u0065\u0066\u0069\u006ee\u0064")
+	}
+	if _faed = _aegcc(_gcbdc...); _faed != nil {
+		return nil, _a.Wrap(_faed, _fcebg, "")
+	}
+	var _adeeg, _ffde, _cgae int
+	_dfcef = _ebfd.Copy()
+	for _, _cdge := range _gcbdc {
+		switch _cdge.Operation {
+		case MopDilation:
+			_adeeg, _ffde = _cdge.getWidthHeight()
+			_dfcef, _faed = DilateBrick(nil, _dfcef, _adeeg, _ffde)
+			if _faed != nil {
+				return nil, _a.Wrap(_faed, _fcebg, "")
+			}
+		case MopErosion:
+			_adeeg, _ffde = _cdge.getWidthHeight()
+			_dfcef, _faed = _dfdg(nil, _dfcef, _adeeg, _ffde)
+			if _faed != nil {
+				return nil, _a.Wrap(_faed, _fcebg, "")
+			}
+		case MopOpening:
+			_adeeg, _ffde = _cdge.getWidthHeight()
+			_dfcef, _faed = _dage(nil, _dfcef, _adeeg, _ffde)
+			if _faed != nil {
+				return nil, _a.Wrap(_faed, _fcebg, "")
+			}
+		case MopClosing:
+			_adeeg, _ffde = _cdge.getWidthHeight()
+			_dfcef, _faed = _cgad(nil, _dfcef, _adeeg, _ffde)
+			if _faed != nil {
+				return nil, _a.Wrap(_faed, _fcebg, "")
+			}
+		case MopRankBinaryReduction:
+			_dfcef, _faed = _adc(_dfcef, _cdge.Arguments...)
+			if _faed != nil {
+				return nil, _a.Wrap(_faed, _fcebg, "")
+			}
+		case MopReplicativeBinaryExpansion:
+			_dfcef, _faed = _fceb(_dfcef, _cdge.Arguments[0])
+			if _faed != nil {
+				return nil, _a.Wrap(_faed, _fcebg, "")
+			}
+		case MopAddBorder:
+			_cgae = _cdge.Arguments[0]
+			_dfcef, _faed = _dfcef.AddBorder(_cgae, 0)
+			if _faed != nil {
+				return nil, _a.Wrap(_faed, _fcebg, "")
+			}
+		default:
+			return nil, _a.Error(_fcebg, "i\u006e\u0076\u0061\u006c\u0069\u0064\u0020\u006d\u006fr\u0070\u0068\u004f\u0070\u0065\u0072\u0061ti\u006f\u006e\u0020\u0070r\u006f\u0076\u0069\u0064\u0065\u0064\u0020\u0074\u006f t\u0068\u0065 \u0073\u0065\u0071\u0075\u0065\u006e\u0063\u0065")
+		}
+	}
+	if _cgae > 0 {
+		_dfcef, _faed = _dfcef.RemoveBorder(_cgae)
+		if _faed != nil {
+			return nil, _a.Wrap(_faed, _fcebg, "\u0062\u006f\u0072\u0064\u0065\u0072\u0020\u003e\u0020\u0030")
+		}
+	}
+	return _dfcef, nil
+}
+
+func TstTSymbol(t *_c.T, scale ...int) *Bitmap {
+	_fcgd, _gbadd := NewWithData(5, 5, []byte{0xF8, 0x20, 0x20, 0x20, 0x20})
+	_d.NoError(t, _gbadd)
+	return TstGetScaledSymbol(t, _fcgd, scale...)
+}
+
+func NewWithData(width, height int, data []byte) (*Bitmap, error) {
+	const _becd = "N\u0065\u0077\u0057\u0069\u0074\u0068\u0044\u0061\u0074\u0061"
+	_age := _dad(width, height)
+	_age.Data = data
+	if len(data) < height*_age.RowStride {
+		return nil, _a.Errorf(_becd, "\u0069\u006e\u0076\u0061\u006c\u0069\u0064\u0020\u0064\u0061\u0074\u0061\u0020l\u0065\u006e\u0067\u0074\u0068\u003a \u0025\u0064\u0020\u002d\u0020\u0073\u0068\u006f\u0075\u006c\u0064\u0020\u0062e\u003a\u0020\u0025\u0064", len(data), height*_age.RowStride)
+	}
+	return _age, nil
+}
+
+func (_cacd *byHeight) Swap(i, j int) {
+	_cacd.Values[i], _cacd.Values[j] = _cacd.Values[j], _cacd.Values[i]
+	if _cacd.Boxes != nil {
+		_cacd.Boxes[i], _cacd.Boxes[j] = _cacd.Boxes[j], _cacd.Boxes[i]
+	}
+}
+
+func (_dfga *Bitmap) connComponentsBB(_cbgc int) (_fagc *Boxes, _gcbf error) {
+	const _edfgc = "\u0042\u0069\u0074ma\u0070\u002e\u0063\u006f\u006e\u006e\u0043\u006f\u006d\u0070\u006f\u006e\u0065\u006e\u0074\u0073\u0042\u0042"
+	if _cbgc != 4 && _cbgc != 8 {
+		return nil, _a.Error(_edfgc, "\u0063\u006f\u006e\u006e\u0065\u0063t\u0069\u0076\u0069\u0074\u0079\u0020\u006d\u0075\u0073\u0074\u0020\u0062\u0065 \u0061\u0020\u0027\u0034\u0027\u0020\u006fr\u0020\u0027\u0038\u0027")
+	}
+	if _dfga.Zero() {
+		return &Boxes{}, nil
+	}
+	_dfga.setPadBits(0)
+	_fbcf, _gcbf := _fedg(nil, _dfga)
+	if _gcbf != nil {
+		return nil, _a.Wrap(_gcbf, _edfgc, "\u0062\u006d\u0031")
+	}
+	_deeb := &_ge.Stack{}
+	_deeb.Aux = &_ge.Stack{}
+	_fagc = &Boxes{}
+	var (
+		_aegc, _cadg int
+		_egbd        _bf.Point
+		_cadf        bool
+		_gabg        *_bf.Rectangle
+	)
+	for {
+		if _egbd, _cadf, _gcbf = _fbcf.nextOnPixel(_cadg, _aegc); _gcbf != nil {
+			return nil, _a.Wrap(_gcbf, _edfgc, "")
+		}
+		if !_cadf {
+			break
+		}
+		if _gabg, _gcbf = _dgeba(_fbcf, _deeb, _egbd.X, _egbd.Y, _cbgc); _gcbf != nil {
+			return nil, _a.Wrap(_gcbf, _edfgc, "")
+		}
+		if _gcbf = _fagc.Add(_gabg); _gcbf != nil {
+			return nil, _a.Wrap(_gcbf, _edfgc, "")
+		}
+		_cadg = _egbd.X
+		_aegc = _egbd.Y
+	}
+	return _fagc, nil
+}
+
+func (_cfcb *Bitmaps) AddBitmap(bm *Bitmap) { _cfcb.Values = append(_cfcb.Values, bm) }
+
+const (
+	_dgfb shift = iota
+	_acce
+)
+
+func _dage(_gdgc, _abea *Bitmap, _cgge, _bggb int) (*Bitmap, error) {
+	const _debcd = "\u006fp\u0065\u006e\u0042\u0072\u0069\u0063k"
+	if _abea == nil {
+		return nil, _a.Error(_debcd, "\u0073o\u0075\u0072\u0063\u0065 \u0062\u0069\u0074\u006d\u0061p\u0020n\u006ft\u0020\u0064\u0065\u0066\u0069\u006e\u0065d")
+	}
+	if _cgge < 1 && _bggb < 1 {
+		return nil, _a.Error(_debcd, "\u0068\u0053\u0069\u007ae \u003c\u0020\u0031\u0020\u0026\u0026\u0020\u0076\u0053\u0069\u007a\u0065\u0020\u003c \u0031")
+	}
+	if _cgge == 1 && _bggb == 1 {
+		return _abea.Copy(), nil
+	}
+	if _cgge == 1 || _bggb == 1 {
+		var _fafb error
+		_faa := SelCreateBrick(_bggb, _cgge, _bggb/2, _cgge/2, SelHit)
+		_gdgc, _fafb = _fff(_gdgc, _abea, _faa)
+		if _fafb != nil {
+			return nil, _a.Wrap(_fafb, _debcd, "\u0068S\u0069\u007a\u0065\u0020\u003d\u003d\u0020\u0031\u0020\u007c\u007c \u0076\u0053\u0069\u007a\u0065\u0020\u003d\u003d\u0020\u0031")
+		}
+		return _gdgc, nil
+	}
+	_agcc := SelCreateBrick(1, _cgge, 0, _cgge/2, SelHit)
+	_cgdc := SelCreateBrick(_bggb, 1, _bggb/2, 0, SelHit)
+	_ccdc, _bcfg := _bfcc(nil, _abea, _agcc)
+	if _bcfg != nil {
+		return nil, _a.Wrap(_bcfg, _debcd, "\u0031s\u0074\u0020\u0065\u0072\u006f\u0064e")
+	}
+	_gdgc, _bcfg = _bfcc(_gdgc, _ccdc, _cgdc)
+	if _bcfg != nil {
+		return nil, _a.Wrap(_bcfg, _debcd, "\u0032n\u0064\u0020\u0065\u0072\u006f\u0064e")
+	}
+	_, _bcfg = _acga(_ccdc, _gdgc, _agcc)
+	if _bcfg != nil {
+		return nil, _a.Wrap(_bcfg, _debcd, "\u0031\u0073\u0074\u0020\u0064\u0069\u006c\u0061\u0074\u0065")
+	}
+	_, _bcfg = _acga(_gdgc, _ccdc, _cgdc)
+	if _bcfg != nil {
+		return nil, _a.Wrap(_bcfg, _debcd, "\u0032\u006e\u0064\u0020\u0064\u0069\u006c\u0061\u0074\u0065")
+	}
+	return _gdgc, nil
+}
+
+func _dfdg(_abcg, _gca *Bitmap, _feag, _gfec int) (*Bitmap, error) {
+	const _dddc = "\u0065\u0072\u006f\u0064\u0065\u0042\u0072\u0069\u0063\u006b"
+	if _gca == nil {
+		return nil, _a.Error(_dddc, "\u0073o\u0075r\u0063\u0065\u0020\u006e\u006ft\u0020\u0064e\u0066\u0069\u006e\u0065\u0064")
+	}
+	if _feag < 1 || _gfec < 1 {
+		return nil, _a.Error(_dddc, "\u0068\u0073\u0069\u007a\u0065\u0020\u0061\u006e\u0064\u0020\u0076\u0073\u0069\u007a\u0065\u0020\u0061\u0072e\u0020\u006e\u006f\u0074\u0020\u0067\u0072e\u0061\u0074\u0065\u0072\u0020\u0074\u0068\u0061\u006e\u0020\u006fr\u0020\u0065\u0071\u0075\u0061\u006c\u0020\u0074\u006f\u0020\u0031")
+	}
+	if _feag == 1 && _gfec == 1 {
+		_edacf, _afef := _fedg(_abcg, _gca)
+		if _afef != nil {
+			return nil, _a.Wrap(_afef, _dddc, "\u0068S\u0069\u007a\u0065\u0020\u003d\u003d\u0020\u0031\u0020\u0026\u0026 \u0076\u0053\u0069\u007a\u0065\u0020\u003d\u003d\u0020\u0031")
+		}
+		return _edacf, nil
+	}
+	if _feag == 1 || _gfec == 1 {
+		_babg := SelCreateBrick(_gfec, _feag, _gfec/2, _feag/2, SelHit)
+		_deea, _ecag := _bfcc(_abcg, _gca, _babg)
+		if _ecag != nil {
+			return nil, _a.Wrap(_ecag, _dddc, "\u0068S\u0069\u007a\u0065\u0020\u003d\u003d\u0020\u0031\u0020\u007c\u007c \u0076\u0053\u0069\u007a\u0065\u0020\u003d\u003d\u0020\u0031")
+		}
+		return _deea, nil
+	}
+	_cddf := SelCreateBrick(1, _feag, 0, _feag/2, SelHit)
+	_aaaaa := SelCreateBrick(_gfec, 1, _gfec/2, 0, SelHit)
+	_bdbed, _egca := _bfcc(nil, _gca, _cddf)
+	if _egca != nil {
+		return nil, _a.Wrap(_egca, _dddc, "\u0031s\u0074\u0020\u0065\u0072\u006f\u0064e")
+	}
+	_abcg, _egca = _bfcc(_abcg, _bdbed, _aaaaa)
+	if _egca != nil {
+		return nil, _a.Wrap(_egca, _dddc, "\u0032n\u0064\u0020\u0065\u0072\u006f\u0064e")
+	}
+	return _abcg, nil
+}
+
+type Getter interface{ GetBitmap() *Bitmap }
+
+type Color int
+
+func CorrelationScoreThresholded(bm1, bm2 *Bitmap, area1, area2 int, delX, delY float32, maxDiffW, maxDiffH int, tab, downcount []int, scoreThreshold float32) (bool, error) {
+	const _gfda = "C\u006f\u0072\u0072\u0065\u006c\u0061t\u0069\u006f\u006e\u0053\u0063\u006f\u0072\u0065\u0054h\u0072\u0065\u0073h\u006fl\u0064\u0065\u0064"
+	if bm1 == nil {
+		return false, _a.Error(_gfda, "\u0063\u006f\u0072\u0072\u0065\u006c\u0061\u0074\u0069\u006f\u006e\u0053\u0063\u006f\u0072\u0065\u0054\u0068\u0072\u0065\u0073\u0068\u006f\u006cd\u0065\u0064\u0020\u0062\u006d1\u0020\u0069s\u0020\u006e\u0069\u006c")
+	}
+	if bm2 == nil {
+		return false, _a.Error(_gfda, "\u0063\u006f\u0072\u0072\u0065\u006c\u0061\u0074\u0069\u006f\u006e\u0053\u0063\u006f\u0072\u0065\u0054\u0068\u0072\u0065\u0073\u0068\u006f\u006cd\u0065\u0064\u0020\u0062\u006d2\u0020\u0069s\u0020\u006e\u0069\u006c")
+	}
+	if area1 <= 0 || area2 <= 0 {
+		return false, _a.Error(_gfda, "c\u006f\u0072\u0072\u0065\u006c\u0061\u0074\u0069\u006fn\u0053\u0063\u006f\u0072\u0065\u0054\u0068re\u0073\u0068\u006f\u006cd\u0065\u0064\u0020\u002d\u0020\u0061\u0072\u0065\u0061s \u006d\u0075s\u0074\u0020\u0062\u0065\u0020\u003e\u0020\u0030")
+	}
+	if downcount == nil {
+		return false, _a.Error(_gfda, "\u0070\u0072\u006fvi\u0064\u0065\u0064\u0020\u006e\u006f\u0020\u0027\u0064\u006f\u0077\u006e\u0063\u006f\u0075\u006e\u0074\u0027")
+	}
+	if tab == nil {
+		return false, _a.Error(_gfda, "p\u0072\u006f\u0076\u0069de\u0064 \u006e\u0069\u006c\u0020\u0027s\u0075\u006d\u0074\u0061\u0062\u0027")
+	}
+	_aecf, _ceaf := bm1.Width, bm1.Height
+	_fcad, _ccbea := bm2.Width, bm2.Height
+	if _ge.Abs(_aecf-_fcad) > maxDiffW {
+		return false, nil
+	}
+	if _ge.Abs(_ceaf-_ccbea) > maxDiffH {
+		return false, nil
+	}
+	_gedb := int(delX + _ge.Sign(delX)*0.5)
+	_dbcda := int(delY + _ge.Sign(delY)*0.5)
+	_ggab := int(_ad.Ceil(_ad.Sqrt(float64(scoreThreshold) * float64(area1) * float64(area2))))
+	_gdff := bm2.RowStride
+	_cacge := _aega(_dbcda, 0)
+	_egegg := _efd(_ccbea+_dbcda, _ceaf)
+	_adg := bm1.RowStride * _cacge
+	_ffg := bm2.RowStride * (_cacge - _dbcda)
+	var _fecf int
+	if _egegg <= _ceaf {
+		_fecf = downcount[_egegg-1]
+	}
+	_dfge := _aega(_gedb, 0)
+	_fbcb := _efd(_fcad+_gedb, _aecf)
+	var _ebcd, _cdga int
+	if _gedb >= 8 {
+		_ebcd = _gedb >> 3
+		_adg += _ebcd
+		_dfge -= _ebcd << 3
+		_fbcb -= _ebcd << 3
+		_gedb &= 7
+	} else if _gedb <= -8 {
+		_cdga = -((_gedb + 7) >> 3)
+		_ffg += _cdga
+		_gdff -= _cdga
+		_gedb += _cdga << 3
+	}
+	var (
+		_adde, _geag, _adfca int
+		_fafc, _dfa, _bddf   byte
+	)
+	if _dfge >= _fbcb || _cacge >= _egegg {
+		return false, nil
+	}
+	_cbdfg := (_fbcb + 7) >> 3
+	switch {
+	case _gedb == 0:
+		for _geag = _cacge; _geag < _egegg; _geag, _adg, _ffg = _geag+1, _adg+bm1.RowStride, _ffg+bm2.RowStride {
+			for _adfca = 0; _adfca < _cbdfg; _adfca++ {
+				_fafc = bm1.Data[_adg+_adfca] & bm2.Data[_ffg+_adfca]
+				_adde += tab[_fafc]
+			}
+			if _adde >= _ggab {
+				return true, nil
+			}
+			if _bfbc := _adde + downcount[_geag] - _fecf; _bfbc < _ggab {
+				return false, nil
+			}
+		}
+	case _gedb > 0 && _gdff < _cbdfg:
+		for _geag = _cacge; _geag < _egegg; _geag, _adg, _ffg = _geag+1, _adg+bm1.RowStride, _ffg+bm2.RowStride {
+			_dfa = bm1.Data[_adg]
+			_bddf = bm2.Data[_ffg] >> uint(_gedb)
+			_fafc = _dfa & _bddf
+			_adde += tab[_fafc]
+			for _adfca = 1; _adfca < _gdff; _adfca++ {
+				_dfa = bm1.Data[_adg+_adfca]
+				_bddf = bm2.Data[_ffg+_adfca]>>uint(_gedb) | bm2.Data[_ffg+_adfca-1]<<uint(8-_gedb)
+				_fafc = _dfa & _bddf
+				_adde += tab[_fafc]
+			}
+			_dfa = bm1.Data[_adg+_adfca]
+			_bddf = bm2.Data[_ffg+_adfca-1] << uint(8-_gedb)
+			_fafc = _dfa & _bddf
+			_adde += tab[_fafc]
+			if _adde >= _ggab {
+				return true, nil
+			} else if _adde+downcount[_geag]-_fecf < _ggab {
+				return false, nil
+			}
+		}
+	case _gedb > 0 && _gdff >= _cbdfg:
+		for _geag = _cacge; _geag < _egegg; _geag, _adg, _ffg = _geag+1, _adg+bm1.RowStride, _ffg+bm2.RowStride {
+			_dfa = bm1.Data[_adg]
+			_bddf = bm2.Data[_ffg] >> uint(_gedb)
+			_fafc = _dfa & _bddf
+			_adde += tab[_fafc]
+			for _adfca = 1; _adfca < _cbdfg; _adfca++ {
+				_dfa = bm1.Data[_adg+_adfca]
+				_bddf = bm2.Data[_ffg+_adfca] >> uint(_gedb)
+				_bddf |= bm2.Data[_ffg+_adfca-1] << uint(8-_gedb)
+				_fafc = _dfa & _bddf
+				_adde += tab[_fafc]
+			}
+			if _adde >= _ggab {
+				return true, nil
+			} else if _adde+downcount[_geag]-_fecf < _ggab {
+				return false, nil
+			}
+		}
+	case _cbdfg < _gdff:
+		for _geag = _cacge; _geag < _egegg; _geag, _adg, _ffg = _geag+1, _adg+bm1.RowStride, _ffg+bm2.RowStride {
+			for _adfca = 0; _adfca < _cbdfg; _adfca++ {
+				_dfa = bm1.Data[_adg+_adfca]
+				_bddf = bm2.Data[_ffg+_adfca] << uint(-_gedb)
+				_bddf |= bm2.Data[_ffg+_adfca+1] >> uint(8+_gedb)
+				_fafc = _dfa & _bddf
+				_adde += tab[_fafc]
+			}
+			if _adde >= _ggab {
+				return true, nil
+			} else if _bcce := _adde + downcount[_geag] - _fecf; _bcce < _ggab {
+				return false, nil
+			}
+		}
+	case _gdff >= _cbdfg:
+		for _geag = _cacge; _geag < _egegg; _geag, _adg, _ffg = _geag+1, _adg+bm1.RowStride, _ffg+bm2.RowStride {
+			for _adfca = 0; _adfca < _cbdfg; _adfca++ {
+				_dfa = bm1.Data[_adg+_adfca]
+				_bddf = bm2.Data[_ffg+_adfca] << uint(-_gedb)
+				_bddf |= bm2.Data[_ffg+_adfca+1] >> uint(8+_gedb)
+				_fafc = _dfa & _bddf
+				_adde += tab[_fafc]
+			}
+			_dfa = bm1.Data[_adg+_adfca]
+			_bddf = bm2.Data[_ffg+_adfca] << uint(-_gedb)
+			_fafc = _dfa & _bddf
+			_adde += tab[_fafc]
+			if _adde >= _ggab {
+				return true, nil
+			} else if _adde+downcount[_geag]-_fecf < _ggab {
+				return false, nil
+			}
+		}
+	}
+	_debc := float32(_adde) * float32(_adde) / (float32(area1) * float32(area2))
+	if _debc >= scoreThreshold {
+		_dc.Log.Trace("\u0063\u006f\u0075\u006e\u0074\u003a\u0020\u0025\u0064\u0020\u003c\u0020\u0074\u0068\u0072\u0065\u0073\u0068\u006f\u006cd\u0020\u0025\u0064\u0020\u0062\u0075\u0074\u0020\u0073c\u006f\u0072\u0065\u0020\u0025\u0066\u0020\u003e\u003d\u0020\u0073\u0063\u006fr\u0065\u0054\u0068\u0072\u0065\u0073h\u006f\u006c\u0064 \u0025\u0066", _adde, _ggab, _debc, scoreThreshold)
+	}
+	return false, nil
+}
+
+func _bfcc(_eebaa, _ffbd *Bitmap, _cfdd *Selection) (*Bitmap, error) {
+	const _afbbd = "\u0065\u0072\u006fd\u0065"
+	var (
+		_bdbe error
+		_ebdf *Bitmap
+	)
+	_eebaa, _bdbe = _bfbb(_eebaa, _ffbd, _cfdd, &_ebdf)
+	if _bdbe != nil {
+		return nil, _a.Wrap(_bdbe, _afbbd, "")
+	}
+	if _bdbe = _eebaa.setAll(); _bdbe != nil {
+		return nil, _a.Wrap(_bdbe, _afbbd, "")
+	}
+	var _bbf SelectionValue
+	for _dcbg := 0; _dcbg < _cfdd.Height; _dcbg++ {
+		for _dgadb := 0; _dgadb < _cfdd.Width; _dgadb++ {
+			_bbf = _cfdd.Data[_dcbg][_dgadb]
+			if _bbf == SelHit {
+				_bdbe = _ece(_eebaa, _cfdd.Cx-_dgadb, _cfdd.Cy-_dcbg, _ffbd.Width, _ffbd.Height, PixSrcAndDst, _ebdf, 0, 0)
+				if _bdbe != nil {
+					return nil, _a.Wrap(_bdbe, _afbbd, "")
+				}
+			}
+		}
+	}
+	if MorphBC == SymmetricMorphBC {
+		return _eebaa, nil
+	}
+	_bfe, _gcfg, _gcde, _bcgg := _cfdd.findMaxTranslations()
+	if _bfe > 0 {
+		if _bdbe = _eebaa.RasterOperation(0, 0, _bfe, _ffbd.Height, PixClr, nil, 0, 0); _bdbe != nil {
+			return nil, _a.Wrap(_bdbe, _afbbd, "\u0078\u0070\u0020\u003e\u0020\u0030")
+		}
+	}
+	if _gcde > 0 {
+		if _bdbe = _eebaa.RasterOperation(_ffbd.Width-_gcde, 0, _gcde, _ffbd.Height, PixClr, nil, 0, 0); _bdbe != nil {
+			return nil, _a.Wrap(_bdbe, _afbbd, "\u0078\u006e\u0020\u003e\u0020\u0030")
+		}
+	}
+	if _gcfg > 0 {
+		if _bdbe = _eebaa.RasterOperation(0, 0, _ffbd.Width, _gcfg, PixClr, nil, 0, 0); _bdbe != nil {
+			return nil, _a.Wrap(_bdbe, _afbbd, "\u0079\u0070\u0020\u003e\u0020\u0030")
+		}
+	}
+	if _bcgg > 0 {
+		if _bdbe = _eebaa.RasterOperation(0, _ffbd.Height-_bcgg, _ffbd.Width, _bcgg, PixClr, nil, 0, 0); _bdbe != nil {
+			return nil, _a.Wrap(_bdbe, _afbbd, "\u0079\u006e\u0020\u003e\u0020\u0030")
+		}
+	}
+	return _eebaa, nil
+}
+
+func TstRSymbol(t *_c.T, scale ...int) *Bitmap {
+	_geggg, _badcf := NewWithData(4, 5, []byte{0xF0, 0x90, 0xF0, 0xA0, 0x90})
+	_d.NoError(t, _badcf)
+	return TstGetScaledSymbol(t, _geggg, scale...)
+}
+
+func DilateBrick(d, s *Bitmap, hSize, vSize int) (*Bitmap, error) {
+	return _edacg(d, s, hSize, vSize)
+}
+
+func (_ggdcd *Boxes) makeSizeIndicator(_dcg, _daea int, _baeg LocationFilter, _edcd SizeComparison) *_ge.NumSlice {
+	_gcgb := &_ge.NumSlice{}
+	var _becf, _dbd, _gbcd int
+	for _, _acfa := range *_ggdcd {
+		_becf = 0
+		_dbd, _gbcd = _acfa.Dx(), _acfa.Dy()
+		switch _baeg {
+		case LocSelectWidth:
+			if (_edcd == SizeSelectIfLT && _dbd < _dcg) || (_edcd == SizeSelectIfGT && _dbd > _dcg) || (_edcd == SizeSelectIfLTE && _dbd <= _dcg) || (_edcd == SizeSelectIfGTE && _dbd >= _dcg) {
+				_becf = 1
+			}
+		case LocSelectHeight:
+			if (_edcd == SizeSelectIfLT && _gbcd < _daea) || (_edcd == SizeSelectIfGT && _gbcd > _daea) || (_edcd == SizeSelectIfLTE && _gbcd <= _daea) || (_edcd == SizeSelectIfGTE && _gbcd >= _daea) {
+				_becf = 1
+			}
+		case LocSelectIfEither:
+			if (_edcd == SizeSelectIfLT && (_gbcd < _daea || _dbd < _dcg)) || (_edcd == SizeSelectIfGT && (_gbcd > _daea || _dbd > _dcg)) || (_edcd == SizeSelectIfLTE && (_gbcd <= _daea || _dbd <= _dcg)) || (_edcd == SizeSelectIfGTE && (_gbcd >= _daea || _dbd >= _dcg)) {
+				_becf = 1
+			}
+		case LocSelectIfBoth:
+			if (_edcd == SizeSelectIfLT && (_gbcd < _daea && _dbd < _dcg)) || (_edcd == SizeSelectIfGT && (_gbcd > _daea && _dbd > _dcg)) || (_edcd == SizeSelectIfLTE && (_gbcd <= _daea && _dbd <= _dcg)) || (_edcd == SizeSelectIfGTE && (_gbcd >= _daea && _dbd >= _dcg)) {
+				_becf = 1
+			}
+		}
+		_gcgb.AddInt(_becf)
+	}
+	return _gcgb
+}
+
+func _ebac(_gaabf, _dfgd *Bitmap, _gegb *Selection) (*Bitmap, error) {
+	const _baff = "\u0070\u0072\u006f\u0063\u0065\u0073\u0073\u004d\u006f\u0072\u0070\u0068A\u0072\u0067\u0073\u0032"
+	var _fbda, _gfbdd int
+	if _dfgd == nil {
+		return nil, _a.Error(_baff, "s\u006fu\u0072\u0063\u0065\u0020\u0062\u0069\u0074\u006da\u0070\u0020\u0069\u0073 n\u0069\u006c")
+	}
+	if _gegb == nil {
+		return nil, _a.Error(_baff, "\u0073e\u006c \u006e\u006f\u0074\u0020\u0064\u0065\u0066\u0069\u006e\u0065\u0064")
+	}
+	_fbda = _gegb.Width
+	_gfbdd = _gegb.Height
+	if _fbda == 0 || _gfbdd == 0 {
+		return nil, _a.Error(_baff, "\u0073\u0065\u006c\u0020\u006f\u0066\u0020\u0073\u0069\u007a\u0065\u0020\u0030")
+	}
+	if _gaabf == nil {
+		return _dfgd.createTemplate(), nil
+	}
+	if _agdd := _gaabf.resizeImageData(_dfgd); _agdd != nil {
+		return nil, _agdd
+	}
+	return _gaabf, nil
+}
+
+func _aega(_bfb, _fag int) int {
+	if _bfb > _fag {
+		return _bfb
+	}
+	return _fag
+}
+
+func (_gdg *Bitmap) GetByteIndex(x, y int) int { return y*_gdg.RowStride + (x >> 3) }
+
+type ClassedPoints struct {
+	*Points
+	_ge.IntSlice
+	_ggfg func(_cfb, _ebaff int) bool
+}
+
+type LocationFilter int
+
+func (_bgdec *BitmapsArray) AddBox(box *_bf.Rectangle) { _bgdec.Boxes = append(_bgdec.Boxes, box) }
+
+func (_cef *Bitmap) RemoveBorder(borderSize int) (*Bitmap, error) {
+	if borderSize == 0 {
+		return _cef.Copy(), nil
+	}
+	_bfd, _bgc := _cef.removeBorderGeneral(borderSize, borderSize, borderSize, borderSize)
+	if _bgc != nil {
+		return nil, _a.Wrap(_bgc, "\u0052\u0065\u006do\u0076\u0065\u0042\u006f\u0072\u0064\u0065\u0072", "")
+	}
+	return _bfd, nil
+}
+
+func Centroids(bms []*Bitmap) (*Points, error) {
+	_cded := make([]Point, len(bms))
+	_bcfc := _bfcce()
+	_fcce := _afgg()
+	var _adfcc error
+	for _bccec, _cccgg := range bms {
+		_cded[_bccec], _adfcc = _cccgg.centroid(_bcfc, _fcce)
+		if _adfcc != nil {
+			return nil, _adfcc
+		}
+	}
+	_gfbd := Points(_cded)
+	return &_gfbd, nil
+}
+
+func _abb() (_dca [256]uint64) {
+	for _cdd := 0; _cdd < 256; _cdd++ {
+		if _cdd&0x01 != 0 {
+			_dca[_cdd] |= 0xff
+		}
+		if _cdd&0x02 != 0 {
+			_dca[_cdd] |= 0xff00
+		}
+		if _cdd&0x04 != 0 {
+			_dca[_cdd] |= 0xff0000
+		}
+		if _cdd&0x08 != 0 {
+			_dca[_cdd] |= 0xff000000
+		}
+		if _cdd&0x10 != 0 {
+			_dca[_cdd] |= 0xff00000000
+		}
+		if _cdd&0x20 != 0 {
+			_dca[_cdd] |= 0xff0000000000
+		}
+		if _cdd&0x40 != 0 {
+			_dca[_cdd] |= 0xff000000000000
+		}
+		if _cdd&0x80 != 0 {
+			_dca[_cdd] |= 0xff00000000000000
+		}
+	}
+	return _dca
+}
+
+func (_ffee *Bitmap) String() string {
+	var _bagf = "\u000a"
+	for _gde := 0; _gde < _ffee.Height; _gde++ {
+		var _fca string
+		for _fgd := 0; _fgd < _ffee.Width; _fgd++ {
+			_daac := _ffee.GetPixel(_fgd, _gde)
+			if _daac {
+				_fca += "\u0031"
+			} else {
+				_fca += "\u0030"
+			}
+		}
+		_bagf += _fca + "\u000a"
+	}
+	return _bagf
+}
+
+func (_bda CombinationOperator) String() string {
+	var _adea string
+	switch _bda {
+	case CmbOpOr:
+		_adea = "\u004f\u0052"
+	case CmbOpAnd:
+		_adea = "\u0041\u004e\u0044"
+	case CmbOpXor:
+		_adea = "\u0058\u004f\u0052"
+	case CmbOpXNor:
+		_adea = "\u0058\u004e\u004f\u0052"
+	case CmbOpReplace:
+		_adea = "\u0052E\u0050\u004c\u0041\u0043\u0045"
+	case CmbOpNot:
+		_adea = "\u004e\u004f\u0054"
+	}
+	return _adea
+}
+
+func TstWSymbol(t *_c.T, scale ...int) *Bitmap {
+	_badcc, _ccab := NewWithData(5, 5, []byte{0x88, 0x88, 0xA8, 0xD8, 0x88})
+	_d.NoError(t, _ccab)
+	return TstGetScaledSymbol(t, _badcc, scale...)
+}
+
+func (_fcdgc *Bitmaps) selectByIndicator(_bfcf *_ge.NumSlice) (_fcgab *Bitmaps, _gceb error) {
+	const _gefg = "\u0042i\u0074\u006d\u0061\u0070s\u002e\u0073\u0065\u006c\u0065c\u0074B\u0079I\u006e\u0064\u0069\u0063\u0061\u0074\u006fr"
+	if _fcdgc == nil {
+		return nil, _a.Error(_gefg, "\u0027\u0062\u0027 b\u0069\u0074\u006d\u0061\u0070\u0073\u0020\u006e\u006f\u0074\u0020\u0064\u0065\u0066\u0069\u006e\u0065\u0064")
+	}
+	if _bfcf == nil {
+		return nil, _a.Error(_gefg, "'\u006e\u0061\u0027\u0020\u0069\u006ed\u0069\u0063\u0061\u0074\u006f\u0072\u0073\u0020\u006eo\u0074\u0020\u0064e\u0066i\u006e\u0065\u0064")
+	}
+	if len(_fcdgc.Values) == 0 {
+		return _fcdgc, nil
+	}
+	if len(*_bfcf) != len(_fcdgc.Values) {
+		return nil, _a.Errorf(_gefg, "\u006ea\u0020\u006ce\u006e\u0067\u0074\u0068:\u0020\u0025\u0064,\u0020\u0069\u0073\u0020\u0064\u0069\u0066\u0066\u0065re\u006e\u0074\u0020t\u0068\u0061n\u0020\u0062\u0069\u0074\u006d\u0061p\u0073\u003a \u0025\u0064", len(*_bfcf), len(_fcdgc.Values))
+	}
+	var _bgbdd, _agfd, _ffbgdd int
+	for _agfd = 0; _agfd < len(*_bfcf); _agfd++ {
+		if _bgbdd, _gceb = _bfcf.GetInt(_agfd); _gceb != nil {
+			return nil, _a.Wrap(_gceb, _gefg, "f\u0069\u0072\u0073\u0074\u0020\u0063\u0068\u0065\u0063\u006b")
+		}
+		if _bgbdd == 1 {
+			_ffbgdd++
+		}
+	}
+	if _ffbgdd == len(_fcdgc.Values) {
+		return _fcdgc, nil
+	}
+	_fcgab = &Bitmaps{}
+	_dcgf := len(_fcdgc.Values) == len(_fcdgc.Boxes)
+	for _agfd = 0; _agfd < len(*_bfcf); _agfd++ {
+		if _bgbdd = int((*_bfcf)[_agfd]); _bgbdd == 0 {
+			continue
+		}
+		_fcgab.Values = append(_fcgab.Values, _fcdgc.Values[_agfd])
+		if _dcgf {
+			_fcgab.Boxes = append(_fcgab.Boxes, _fcdgc.Boxes[_agfd])
+		}
+	}
+	return _fcgab, nil
+}
+
+func (_gfg *Bitmap) resizeImageData(_cagb *Bitmap) error {
+	if _cagb == nil {
+		return _a.Error("\u0072e\u0073i\u007a\u0065\u0049\u006d\u0061\u0067\u0065\u0044\u0061\u0074\u0061", "\u0073r\u0063 \u0069\u0073\u0020\u006e\u006ft\u0020\u0064e\u0066\u0069\u006e\u0065\u0064")
+	}
+	if _gfg.SizesEqual(_cagb) {
+		return nil
+	}
+	_gfg.Data = make([]byte, len(_cagb.Data))
+	_gfg.Width = _cagb.Width
+	_gfg.Height = _cagb.Height
+	_gfg.RowStride = _cagb.RowStride
+	return nil
+}
+
+func _fff(_aedc, _ggdb *Bitmap, _dbdc *Selection) (*Bitmap, error) {
+	const _afad = "\u006f\u0070\u0065\u006e"
+	var _ffgb error
+	_aedc, _ffgb = _ebac(_aedc, _ggdb, _dbdc)
+	if _ffgb != nil {
+		return nil, _a.Wrap(_ffgb, _afad, "")
+	}
+	_edaf, _ffgb := _bfcc(nil, _ggdb, _dbdc)
+	if _ffgb != nil {
+		return nil, _a.Wrap(_ffgb, _afad, "")
+	}
+	_, _ffgb = _acga(_aedc, _edaf, _dbdc)
+	if _ffgb != nil {
+		return nil, _a.Wrap(_ffgb, _afad, "")
+	}
+	return _aedc, nil
+}
+
+type Component int
+
+func (_dcfa *Bitmap) connComponentsBitmapsBB(_afae *Bitmaps, _cfdg int) (_fge *Boxes, _gbe error) {
+	const _gffd = "\u0063\u006f\u006enC\u006f\u006d\u0070\u006f\u006e\u0065\u006e\u0074\u0073\u0042\u0069\u0074\u006d\u0061\u0070\u0073\u0042\u0042"
+	if _cfdg != 4 && _cfdg != 8 {
+		return nil, _a.Error(_gffd, "\u0063\u006f\u006e\u006e\u0065\u0063t\u0069\u0076\u0069\u0074\u0079\u0020\u006d\u0075\u0073\u0074\u0020\u0062\u0065 \u0061\u0020\u0027\u0034\u0027\u0020\u006fr\u0020\u0027\u0038\u0027")
+	}
+	if _afae == nil {
+		return nil, _a.Error(_gffd, "p\u0072o\u0076\u0069\u0064\u0065\u0064\u0020\u006e\u0069l\u0020\u0042\u0069\u0074ma\u0070\u0073")
+	}
+	if len(_afae.Values) > 0 {
+		return nil, _a.Error(_gffd, "\u0070\u0072\u006f\u0076\u0069\u0064\u0065\u0064\u0020\u006e\u006fn\u002d\u0065\u006d\u0070\u0074\u0079\u0020\u0042\u0069\u0074m\u0061\u0070\u0073")
+	}
+	if _dcfa.Zero() {
+		return &Boxes{}, nil
+	}
+	var (
+		_edgg, _edcde, _bef, _becaf *Bitmap
+	)
+	_dcfa.setPadBits(0)
+	if _edgg, _gbe = _fedg(nil, _dcfa); _gbe != nil {
+		return nil, _a.Wrap(_gbe, _gffd, "\u0062\u006d\u0031")
+	}
+	if _edcde, _gbe = _fedg(nil, _dcfa); _gbe != nil {
+		return nil, _a.Wrap(_gbe, _gffd, "\u0062\u006d\u0032")
+	}
+	_fbfc := &_ge.Stack{}
+	_fbfc.Aux = &_ge.Stack{}
+	_fge = &Boxes{}
+	var (
+		_edgde, _ecbf int
+		_gae          _bf.Point
+		_acbg         bool
+		_bfca         *_bf.Rectangle
+	)
+	for {
+		if _gae, _acbg, _gbe = _edgg.nextOnPixel(_edgde, _ecbf); _gbe != nil {
+			return nil, _a.Wrap(_gbe, _gffd, "")
+		}
+		if !_acbg {
+			break
+		}
+		if _bfca, _gbe = _dgeba(_edgg, _fbfc, _gae.X, _gae.Y, _cfdg); _gbe != nil {
+			return nil, _a.Wrap(_gbe, _gffd, "")
+		}
+		if _gbe = _fge.Add(_bfca); _gbe != nil {
+			return nil, _a.Wrap(_gbe, _gffd, "")
+		}
+		if _bef, _gbe = _edgg.clipRectangle(_bfca, nil); _gbe != nil {
+			return nil, _a.Wrap(_gbe, _gffd, "\u0062\u006d\u0033")
+		}
+		if _becaf, _gbe = _edcde.clipRectangle(_bfca, nil); _gbe != nil {
+			return nil, _a.Wrap(_gbe, _gffd, "\u0062\u006d\u0034")
+		}
+		if _, _gbe = _dedg(_bef, _bef, _becaf); _gbe != nil {
+			return nil, _a.Wrap(_gbe, _gffd, "\u0062m\u0033\u0020\u005e\u0020\u0062\u006d4")
+		}
+		if _gbe = _edcde.RasterOperation(_bfca.Min.X, _bfca.Min.Y, _bfca.Dx(), _bfca.Dy(), PixSrcXorDst, _bef, 0, 0); _gbe != nil {
+			return nil, _a.Wrap(_gbe, _gffd, "\u0062\u006d\u0032\u0020\u002d\u0058\u004f\u0052\u002d>\u0020\u0062\u006d\u0033")
+		}
+		_afae.AddBitmap(_bef)
+		_edgde = _gae.X
+		_ecbf = _gae.Y
+	}
+	_afae.Boxes = *_fge
+	return _fge, nil
+}
+
+func TstFrameBitmap() *Bitmap { return _ggbf.Copy() }
+
+func (_dcdb *ClassedPoints) GroupByY() ([]*ClassedPoints, error) {
+	const _cdfef = "\u0043\u006c\u0061\u0073se\u0064\u0050\u006f\u0069\u006e\u0074\u0073\u002e\u0047\u0072\u006f\u0075\u0070\u0042y\u0059"
+	if _faga := _dcdb.validateIntSlice(); _faga != nil {
+		return nil, _a.Wrap(_faga, _cdfef, "")
+	}
+	if _dcdb.IntSlice.Size() == 0 {
+		return nil, _a.Error(_cdfef, "\u004e\u006f\u0020\u0063la\u0073\u0073\u0065\u0073\u0020\u0070\u0072\u006f\u0076\u0069\u0064\u0065\u0064")
+	}
+	_dcdb.SortByY()
+	var (
+		_cgda []*ClassedPoints
+		_edda int
+	)
+	_ebec := -1
+	var _eaec *ClassedPoints
+	for _cdcd := 0; _cdcd < len(_dcdb.IntSlice); _cdcd++ {
+		_edda = int(_dcdb.YAtIndex(_cdcd))
+		if _edda != _ebec {
+			_eaec = &ClassedPoints{Points: _dcdb.Points}
+			_ebec = _edda
+			_cgda = append(_cgda, _eaec)
+		}
+		_eaec.IntSlice = append(_eaec.IntSlice, _dcdb.IntSlice[_cdcd])
+	}
+	for _, _dgeb := range _cgda {
+		_dgeb.SortByX()
+	}
+	return _cgda, nil
+}
+
+func _efd(_gaa, _bcfb int) int {
+	if _gaa < _bcfb {
+		return _gaa
+	}
+	return _bcfb
+}
+
+func _dedb(_bggf, _fecdb *Bitmap, _deff, _cbda int) (_bba error) {
+	const _fbefe = "\u0073e\u0065d\u0066\u0069\u006c\u006c\u0042i\u006e\u0061r\u0079\u004c\u006f\u0077\u0034"
+	var (
+		_bbdf, _cabe, _eefe, _gaed                         int
+		_cfec, _cbdeb, _defad, _ccadc, _dgaf, _gegd, _fbdf byte
+	)
+	for _bbdf = 0; _bbdf < _deff; _bbdf++ {
+		_eefe = _bbdf * _bggf.RowStride
+		_gaed = _bbdf * _fecdb.RowStride
+		for _cabe = 0; _cabe < _cbda; _cabe++ {
+			_cfec, _bba = _bggf.GetByte(_eefe + _cabe)
+			if _bba != nil {
+				return _a.Wrap(_bba, _fbefe, "\u0066i\u0072\u0073\u0074\u0020\u0067\u0065t")
+			}
+			_cbdeb, _bba = _fecdb.GetByte(_gaed + _cabe)
+			if _bba != nil {
+				return _a.Wrap(_bba, _fbefe, "\u0073\u0065\u0063\u006f\u006e\u0064\u0020\u0067\u0065\u0074")
+			}
+			if _bbdf > 0 {
+				_defad, _bba = _bggf.GetByte(_eefe - _bggf.RowStride + _cabe)
+				if _bba != nil {
+					return _a.Wrap(_bba, _fbefe, "\u0069\u0020\u003e \u0030")
+				}
+				_cfec |= _defad
+			}
+			if _cabe > 0 {
+				_ccadc, _bba = _bggf.GetByte(_eefe + _cabe - 1)
+				if _bba != nil {
+					return _a.Wrap(_bba, _fbefe, "\u006a\u0020\u003e \u0030")
+				}
+				_cfec |= _ccadc << 7
+			}
+			_cfec &= _cbdeb
+			if _cfec == 0 || (^_cfec) == 0 {
+				if _bba = _bggf.SetByte(_eefe+_cabe, _cfec); _bba != nil {
+					return _a.Wrap(_bba, _fbefe, "b\u0074\u0020\u003d\u003d 0\u0020|\u007c\u0020\u0028\u005e\u0062t\u0029\u0020\u003d\u003d\u0020\u0030")
+				}
+				continue
+			}
+			for {
+				_fbdf = _cfec
+				_cfec = (_cfec | (_cfec >> 1) | (_cfec << 1)) & _cbdeb
+				if (_cfec ^ _fbdf) == 0 {
+					if _bba = _bggf.SetByte(_eefe+_cabe, _cfec); _bba != nil {
+						return _a.Wrap(_bba, _fbefe, "\u0073\u0065\u0074\u0074\u0069\u006e\u0067\u0020\u0070\u0072\u0065\u0076 \u0062\u0079\u0074\u0065")
+					}
+					break
+				}
+			}
+		}
+	}
+	for _bbdf = _deff - 1; _bbdf >= 0; _bbdf-- {
+		_eefe = _bbdf * _bggf.RowStride
+		_gaed = _bbdf * _fecdb.RowStride
+		for _cabe = _cbda - 1; _cabe >= 0; _cabe-- {
+			if _cfec, _bba = _bggf.GetByte(_eefe + _cabe); _bba != nil {
+				return _a.Wrap(_bba, _fbefe, "\u0072\u0065\u0076\u0065\u0072\u0073\u0065\u0020\u0066\u0069\u0072\u0073t\u0020\u0067\u0065\u0074")
+			}
+			if _cbdeb, _bba = _fecdb.GetByte(_gaed + _cabe); _bba != nil {
+				return _a.Wrap(_bba, _fbefe, "r\u0065\u0076\u0065\u0072se\u0020g\u0065\u0074\u0020\u006d\u0061s\u006b\u0020\u0062\u0079\u0074\u0065")
+			}
+			if _bbdf < _deff-1 {
+				if _dgaf, _bba = _bggf.GetByte(_eefe + _bggf.RowStride + _cabe); _bba != nil {
+					return _a.Wrap(_bba, _fbefe, "\u0072\u0065v\u0065\u0072\u0073e\u0020\u0069\u0020\u003c\u0020\u0068\u0020\u002d\u0031")
+				}
+				_cfec |= _dgaf
+			}
+			if _cabe < _cbda-1 {
+				if _gegd, _bba = _bggf.GetByte(_eefe + _cabe + 1); _bba != nil {
+					return _a.Wrap(_bba, _fbefe, "\u0072\u0065\u0076\u0065rs\u0065\u0020\u006a\u0020\u003c\u0020\u0077\u0070\u006c\u0020\u002d\u0020\u0031")
+				}
+				_cfec |= _gegd >> 7
+			}
+			_cfec &= _cbdeb
+			if _cfec == 0 || (^_cfec) == 0 {
+				if _bba = _bggf.SetByte(_eefe+_cabe, _cfec); _bba != nil {
+					return _a.Wrap(_bba, _fbefe, "\u0073\u0065\u0074\u0074\u0069\u006e\u0067\u0020\u006d\u0061\u0073k\u0065\u0064\u0020\u0062\u0079\u0074\u0065\u0020\u0066\u0061i\u006c\u0065\u0064")
+				}
+				continue
+			}
+			for {
+				_fbdf = _cfec
+				_cfec = (_cfec | (_cfec >> 1) | (_cfec << 1)) & _cbdeb
+				if (_cfec ^ _fbdf) == 0 {
+					if _bba = _bggf.SetByte(_eefe+_cabe, _cfec); _bba != nil {
+						return _a.Wrap(_bba, _fbefe, "\u0072e\u0076\u0065\u0072\u0073e\u0020\u0073\u0065\u0074\u0074i\u006eg\u0020p\u0072\u0065\u0076\u0020\u0062\u0079\u0074e")
+					}
+					break
+				}
+			}
+		}
+	}
+	return nil
+}
+
+func (_cbf *Bitmap) Equals(s *Bitmap) bool {
+	if len(_cbf.Data) != len(s.Data) || _cbf.Width != s.Width || _cbf.Height != s.Height {
+		return false
+	}
+	for _cca := 0; _cca < _cbf.Height; _cca++ {
+		_ggec := _cca * _cbf.RowStride
+		for _gbgc := 0; _gbgc < _cbf.RowStride; _gbgc++ {
+			if _cbf.Data[_ggec+_gbgc] != s.Data[_ggec+_gbgc] {
+				return false
+			}
+		}
+	}
+	return true
+}
+
+func (_fgba *Bitmap) setTwoBytes(_cbg int, _dcbf uint16) error {
+	if _cbg+1 > len(_fgba.Data)-1 {
+		return _a.Errorf("s\u0065\u0074\u0054\u0077\u006f\u0042\u0079\u0074\u0065\u0073", "\u0069n\u0064\u0065\u0078\u003a\u0020\u0027\u0025\u0064\u0027\u0020\u006fu\u0074\u0020\u006f\u0066\u0020\u0072\u0061\u006e\u0067\u0065", _cbg)
+	}
+	_fgba.Data[_cbg] = byte((_dcbf & 0xff00) >> 8)
+	_fgba.Data[_cbg+1] = byte(_dcbf & 0xff)
+	return nil
+}
+
+func TstImageBitmapInverseData() []byte {
+	_geed := _bceg.Copy()
+	_geed.InverseData()
+	return _geed.Data
+}
+
+func _aegcc(_bcdb ...MorphProcess) (_bcgc error) {
+	const _fafbd = "v\u0065r\u0069\u0066\u0079\u004d\u006f\u0072\u0070\u0068P\u0072\u006f\u0063\u0065ss\u0065\u0073"
+	var _gaff, _gaba int
+	for _aegf, _gebf := range _bcdb {
+		if _bcgc = _gebf.verify(_aegf, &_gaff, &_gaba); _bcgc != nil {
+			return _a.Wrap(_bcgc, _fafbd, "")
+		}
+	}
+	if _gaba != 0 && _gaff != 0 {
+		return _a.Error(_fafbd, "\u004d\u006f\u0072\u0070\u0068\u0020\u0073\u0065\u0071\u0075\u0065n\u0063\u0065\u0020\u002d\u0020\u0062\u006f\u0072d\u0065r\u0020\u0061\u0064\u0064\u0065\u0064\u0020\u0062\u0075\u0074\u0020\u006e\u0065\u0074\u0020\u0072\u0065\u0064u\u0063\u0074\u0069\u006f\u006e\u0020\u006e\u006f\u0074\u0020\u0030")
+	}
+	return nil
+}
+
+func TstPSymbol(t *_c.T) *Bitmap {
+	t.Helper()
+	_afeed := New(5, 8)
+	_d.NoError(t, _afeed.SetPixel(0, 0, 1))
+	_d.NoError(t, _afeed.SetPixel(1, 0, 1))
+	_d.NoError(t, _afeed.SetPixel(2, 0, 1))
+	_d.NoError(t, _afeed.SetPixel(3, 0, 1))
+	_d.NoError(t, _afeed.SetPixel(4, 1, 1))
+	_d.NoError(t, _afeed.SetPixel(0, 1, 1))
+	_d.NoError(t, _afeed.SetPixel(4, 2, 1))
+	_d.NoError(t, _afeed.SetPixel(0, 2, 1))
+	_d.NoError(t, _afeed.SetPixel(4, 3, 1))
+	_d.NoError(t, _afeed.SetPixel(0, 3, 1))
+	_d.NoError(t, _afeed.SetPixel(0, 4, 1))
+	_d.NoError(t, _afeed.SetPixel(1, 4, 1))
+	_d.NoError(t, _afeed.SetPixel(2, 4, 1))
+	_d.NoError(t, _afeed.SetPixel(3, 4, 1))
+	_d.NoError(t, _afeed.SetPixel(0, 5, 1))
+	_d.NoError(t, _afeed.SetPixel(0, 6, 1))
+	_d.NoError(t, _afeed.SetPixel(0, 7, 1))
+	return _afeed
+}
+
+func MakePixelCentroidTab8() []int { return _bfcce() }
+
+type MorphProcess struct {
+	Operation MorphOperation
+	Arguments []int
+}
+
+func _cggb() (_dab [256]uint16) {
+	for _gff := 0; _gff < 256; _gff++ {
+		if _gff&0x01 != 0 {
+			_dab[_gff] |= 0x3
+		}
+		if _gff&0x02 != 0 {
+			_dab[_gff] |= 0xc
+		}
+		if _gff&0x04 != 0 {
+			_dab[_gff] |= 0x30
+		}
+		if _gff&0x08 != 0 {
+			_dab[_gff] |= 0xc0
+		}
+		if _gff&0x10 != 0 {
+			_dab[_gff] |= 0x300
+		}
+		if _gff&0x20 != 0 {
+			_dab[_gff] |= 0xc00
+		}
+		if _gff&0x40 != 0 {
+			_dab[_gff] |= 0x3000
+		}
+		if _gff&0x80 != 0 {
+			_dab[_gff] |= 0xc000
+		}
+	}
+	return _dab
+}
+
+func (_fgbe *Bitmaps) SortByWidth() { _egdbe := (*byWidth)(_fgbe); _df.Sort(_egdbe) }
+
+func MorphSequence(src *Bitmap, sequence ...MorphProcess) (*Bitmap, error) {
+	return _defa(src, sequence...)
+}
+
+func _dbfb(_efgc *Bitmap, _addg, _bcac int, _begf, _gfge int, _ceaa RasterOperator) {
+	var (
+		_aafbf bool
+		_fffc  bool
+		_accb  int
+		_bbgd  int
+		_aabed int
+		_fadg  int
+		_caedf bool
+		_dgcc  byte
+	)
+	_ddagd := 8 - (_addg & 7)
+	_adeg := _beeb[_ddagd]
+	_dacc := _efgc.RowStride*_bcac + (_addg >> 3)
+	if _begf < _ddagd {
+		_aafbf = true
+		_adeg &= _dcga[8-_ddagd+_begf]
+	}
+	if !_aafbf {
+		_accb = (_begf - _ddagd) >> 3
+		if _accb != 0 {
+			_fffc = true
+			_bbgd = _dacc + 1
+		}
+	}
+	_aabed = (_addg + _begf) & 7
+	if !_aafbf && _aabed != 0 {
+		_caedf = true
+		_dgcc = _dcga[_aabed]
+		_fadg = _dacc + 1 + _accb
+	}
+	var _fcff, _deeg int
+	switch _ceaa {
+	case PixClr:
+		for _fcff = 0; _fcff < _gfge; _fcff++ {
+			_efgc.Data[_dacc] = _fbaa(_efgc.Data[_dacc], 0x0, _adeg)
+			_dacc += _efgc.RowStride
+		}
+		if _fffc {
+			for _fcff = 0; _fcff < _gfge; _fcff++ {
+				for _deeg = 0; _deeg < _accb; _deeg++ {
+					_efgc.Data[_bbgd+_deeg] = 0x0
+				}
+				_bbgd += _efgc.RowStride
+			}
+		}
+		if _caedf {
+			for _fcff = 0; _fcff < _gfge; _fcff++ {
+				_efgc.Data[_fadg] = _fbaa(_efgc.Data[_fadg], 0x0, _dgcc)
+				_fadg += _efgc.RowStride
+			}
+		}
+	case PixSet:
+		for _fcff = 0; _fcff < _gfge; _fcff++ {
+			_efgc.Data[_dacc] = _fbaa(_efgc.Data[_dacc], 0xff, _adeg)
+			_dacc += _efgc.RowStride
+		}
+		if _fffc {
+			for _fcff = 0; _fcff < _gfge; _fcff++ {
+				for _deeg = 0; _deeg < _accb; _deeg++ {
+					_efgc.Data[_bbgd+_deeg] = 0xff
+				}
+				_bbgd += _efgc.RowStride
+			}
+		}
+		if _caedf {
+			for _fcff = 0; _fcff < _gfge; _fcff++ {
+				_efgc.Data[_fadg] = _fbaa(_efgc.Data[_fadg], 0xff, _dgcc)
+				_fadg += _efgc.RowStride
+			}
+		}
+	case PixNotDst:
+		for _fcff = 0; _fcff < _gfge; _fcff++ {
+			_efgc.Data[_dacc] = _fbaa(_efgc.Data[_dacc], ^_efgc.Data[_dacc], _adeg)
+			_dacc += _efgc.RowStride
+		}
+		if _fffc {
+			for _fcff = 0; _fcff < _gfge; _fcff++ {
+				for _deeg = 0; _deeg < _accb; _deeg++ {
+					_efgc.Data[_bbgd+_deeg] = ^(_efgc.Data[_bbgd+_deeg])
+				}
+				_bbgd += _efgc.RowStride
+			}
+		}
+		if _caedf {
+			for _fcff = 0; _fcff < _gfge; _fcff++ {
+				_efgc.Data[_fadg] = _fbaa(_efgc.Data[_fadg], ^_efgc.Data[_fadg], _dgcc)
+				_fadg += _efgc.RowStride
+			}
+		}
+	}
+}
+
+func (_bfgd *Bitmap) GetVanillaData() []byte {
+	if _bfgd.Color == Chocolate {
+		_bfgd.inverseData()
+	}
+	return _bfgd.Data
+}
+
+func TstImageBitmapData() []byte { return _bceg.Data }
+
+func TstFrameBitmapData() []byte { return _ggbf.Data }
+
+func _bb(_db, _ca *Bitmap) (_gf error) {
+	const _ade = "\u0065\u0078\u0070\u0061nd\u0042\u0069\u006e\u0061\u0072\u0079\u0046\u0061\u0063\u0074\u006f\u0072\u0032"
+	_fe := _ca.RowStride
+	_fb := _db.RowStride
+	var (
+		_ba                    byte
+		_fg                    uint16
+		_fc, _e, _bd, _ee, _ce int
+	)
+	for _bd = 0; _bd < _ca.Height; _bd++ {
+		_fc = _bd * _fe
+		_e = 2 * _bd * _fb
+		for _ee = 0; _ee < _fe; _ee++ {
+			_ba = _ca.Data[_fc+_ee]
+			_fg = _cece[_ba]
+			_ce = _e + _ee*2
+			if _db.RowStride != _ca.RowStride*2 && (_ee+1)*2 > _db.RowStride {
+				_gf = _db.SetByte(_ce, byte(_fg>>8))
+			} else {
+				_gf = _db.setTwoBytes(_ce, _fg)
+			}
+			if _gf != nil {
+				return _a.Wrap(_gf, _ade, "")
+			}
+		}
+		for _ee = 0; _ee < _fb; _ee++ {
+			_ce = _e + _fb + _ee
+			_ba = _db.Data[_e+_ee]
+			if _gf = _db.SetByte(_ce, _ba); _gf != nil {
+				return _a.Wrapf(_gf, _ade, "c\u006f\u0070\u0079\u0020\u0064\u006fu\u0062\u006c\u0065\u0064\u0020\u006ci\u006e\u0065\u003a\u0020\u0027\u0025\u0064'\u002c\u0020\u0042\u0079\u0074\u0065\u003a\u0020\u0027\u0025d\u0027", _e+_ee, _e+_fb+_ee)
+			}
+		}
+	}
+	return nil
+}
+
+func (_cbge *ClassedPoints) Less(i, j int) bool { return _cbge._ggfg(i, j) }
+
+func _fga(_cge *Bitmap, _cac, _ccd int) (*Bitmap, error) {
+	const _aa = "e\u0078\u0070\u0061\u006edB\u0069n\u0061\u0072\u0079\u0052\u0065p\u006c\u0069\u0063\u0061\u0074\u0065"
+	if _cge == nil {
+		return nil, _a.Error(_aa, "\u0073o\u0075r\u0063\u0065\u0020\u006e\u006ft\u0020\u0064e\u0066\u0069\u006e\u0065\u0064")
+	}
+	if _cac <= 0 || _ccd <= 0 {
+		return nil, _a.Error(_aa, "\u0069\u006e\u0076\u0061\u006c\u0069\u0064\u0020\u0073\u0063\u0061l\u0065\u0020\u0066\u0061\u0063\u0074\u006f\u0072\u003a\u0020<\u003d\u0020\u0030")
+	}
+	if _cac == _ccd {
+		if _cac == 1 {
+			_cff, _cfg := _fedg(nil, _cge)
+			if _cfg != nil {
+				return nil, _a.Wrap(_cfg, _aa, "\u0078\u0046\u0061\u0063\u0074\u0020\u003d\u003d\u0020y\u0046\u0061\u0063\u0074")
+			}
+			return _cff, nil
+		}
+		if _cac == 2 || _cac == 4 || _cac == 8 {
+			_deb, _eaf := _da(_cge, _cac)
+			if _eaf != nil {
+				return nil, _a.Wrap(_eaf, _aa, "\u0078\u0046a\u0063\u0074\u0020i\u006e\u0020\u007b\u0032\u002c\u0034\u002c\u0038\u007d")
+			}
+			return _deb, nil
+		}
+	}
+	_gd := _cac * _cge.Width
+	_cffd := _ccd * _cge.Height
+	_cgg := New(_gd, _cffd)
+	_dcdg := _cgg.RowStride
+	var (
+		_dg, _faf, _bfg, _gdc, _egec int
+		_bfc                         byte
+		_edf                         error
+	)
+	for _faf = 0; _faf < _cge.Height; _faf++ {
+		_dg = _ccd * _faf * _dcdg
+		for _bfg = 0; _bfg < _cge.Width; _bfg++ {
+			if _dd := _cge.GetPixel(_bfg, _faf); _dd {
+				_egec = _cac * _bfg
+				for _gdc = 0; _gdc < _cac; _gdc++ {
+					_cgg.setBit(_dg*8 + _egec + _gdc)
+				}
+			}
+		}
+		for _gdc = 1; _gdc < _ccd; _gdc++ {
+			_dcb := _dg + _gdc*_dcdg
+			for _beb := 0; _beb < _dcdg; _beb++ {
+				if _bfc, _edf = _cgg.GetByte(_dg + _beb); _edf != nil {
+					return nil, _a.Wrapf(_edf, _aa, "\u0072\u0065\u0070\u006cic\u0061\u0074\u0069\u006e\u0067\u0020\u006c\u0069\u006e\u0065\u003a\u0020\u0027\u0025d\u0027", _gdc)
+				}
+				if _edf = _cgg.SetByte(_dcb+_beb, _bfc); _edf != nil {
+					return nil, _a.Wrap(_edf, _aa, "\u0053\u0065\u0074\u0074in\u0067\u0020\u0062\u0079\u0074\u0065\u0020\u0066\u0061\u0069\u006c\u0065\u0064")
+				}
+			}
+		}
+	}
+	return _cgg, nil
+}
+
+func HausTest(p1, p2, p3, p4 *Bitmap, delX, delY float32, maxDiffW, maxDiffH int) (bool, error) {
+	const _cbfaf = "\u0048\u0061\u0075\u0073\u0054\u0065\u0073\u0074"
+	_bebg, _eege := p1.Width, p1.Height
+	_eff, _bdec := p3.Width, p3.Height
+	if _ge.Abs(_bebg-_eff) > maxDiffW {
+		return false, nil
+	}
+	if _ge.Abs(_eege-_bdec) > maxDiffH {
+		return false, nil
+	}
+	_aaab := int(delX + _ge.Sign(delX)*0.5)
+	_dacbb := int(delY + _ge.Sign(delY)*0.5)
+	var _cdb error
+	_defd := p1.CreateTemplate()
+	if _cdb = _defd.RasterOperation(0, 0, _bebg, _eege, PixSrc, p1, 0, 0); _cdb != nil {
+		return false, _a.Wrap(_cdb, _cbfaf, "p\u0031\u0020\u002d\u0053\u0052\u0043\u002d\u003e\u0020\u0074")
+	}
+	if _cdb = _defd.RasterOperation(_aaab, _dacbb, _bebg, _eege, PixNotSrcAndDst, p4, 0, 0); _cdb != nil {
+		return false, _a.Wrap(_cdb, _cbfaf, "\u0021p\u0034\u0020\u0026\u0020\u0074")
+	}
+	if _defd.Zero() {
+		return false, nil
+	}
+	if _cdb = _defd.RasterOperation(_aaab, _dacbb, _eff, _bdec, PixSrc, p3, 0, 0); _cdb != nil {
+		return false, _a.Wrap(_cdb, _cbfaf, "p\u0033\u0020\u002d\u0053\u0052\u0043\u002d\u003e\u0020\u0074")
+	}
+	if _cdb = _defd.RasterOperation(0, 0, _eff, _bdec, PixNotSrcAndDst, p2, 0, 0); _cdb != nil {
+		return false, _a.Wrap(_cdb, _cbfaf, "\u0021p\u0032\u0020\u0026\u0020\u0074")
+	}
+	return _defd.Zero(), nil
+}
+
+func _agf(_ccc, _bfa *Bitmap, _babf int, _gge []byte, _aag int) (_edc error) {
+	const _eb = "\u0072\u0065\u0064uc\u0065\u0052\u0061\u006e\u006b\u0042\u0069\u006e\u0061\u0072\u0079\u0032\u004c\u0065\u0076\u0065\u006c\u0033"
+	var (
+		_ebg, _eda, _beed, _eega, _adee, _gea, _agd, _ffa int
+		_cgd, _fda, _add, _eee                            uint32
+		_ffe, _cgde                                       byte
+		_cdfb                                             uint16
+	)
+	_aae := make([]byte, 4)
+	_egb := make([]byte, 4)
+	for _beed = 0; _beed < _ccc.Height-1; _beed, _eega = _beed+2, _eega+1 {
+		_ebg = _beed * _ccc.RowStride
+		_eda = _eega * _bfa.RowStride
+		for _adee, _gea = 0, 0; _adee < _aag; _adee, _gea = _adee+4, _gea+1 {
+			for _agd = 0; _agd < 4; _agd++ {
+				_ffa = _ebg + _adee + _agd
+				if _ffa <= len(_ccc.Data)-1 && _ffa < _ebg+_ccc.RowStride {
+					_aae[_agd] = _ccc.Data[_ffa]
+				} else {
+					_aae[_agd] = 0x00
+				}
+				_ffa = _ebg + _ccc.RowStride + _adee + _agd
+				if _ffa <= len(_ccc.Data)-1 && _ffa < _ebg+(2*_ccc.RowStride) {
+					_egb[_agd] = _ccc.Data[_ffa]
+				} else {
+					_egb[_agd] = 0x00
+				}
+			}
+			_cgd = _ag.BigEndian.Uint32(_aae)
+			_fda = _ag.BigEndian.Uint32(_egb)
+			_add = _cgd & _fda
+			_add |= _add << 1
+			_eee = _cgd | _fda
+			_eee &= _eee << 1
+			_fda = _add & _eee
+			_fda &= 0xaaaaaaaa
+			_cgd = _fda | (_fda << 7)
+			_ffe = byte(_cgd >> 24)
+			_cgde = byte((_cgd >> 8) & 0xff)
+			_ffa = _eda + _gea
+			if _ffa+1 == len(_bfa.Data)-1 || _ffa+1 >= _eda+_bfa.RowStride {
+				if _edc = _bfa.SetByte(_ffa, _gge[_ffe]); _edc != nil {
+					return _a.Wrapf(_edc, _eb, "\u0069n\u0064\u0065\u0078\u003a\u0020\u0025d", _ffa)
+				}
+			} else {
+				_cdfb = (uint16(_gge[_ffe]) << 8) | uint16(_gge[_cgde])
+				if _edc = _bfa.setTwoBytes(_ffa, _cdfb); _edc != nil {
+					return _a.Wrapf(_edc, _eb, "s\u0065\u0074\u0074\u0069\u006e\u0067 \u0074\u0077\u006f\u0020\u0062\u0079t\u0065\u0073\u0020\u0066\u0061\u0069\u006ce\u0064\u002c\u0020\u0069\u006e\u0064\u0065\u0078\u003a\u0020%\u0064", _ffa)
+				}
+				_gea++
+			}
+		}
+	}
+	return nil
+}
+
+type Points []Point
+
+func (_bff *Points) Add(pt *Points) error {
+	const _ggbc = "\u0050\u006f\u0069\u006e\u0074\u0073\u002e\u0041\u0064\u0064"
+	if _bff == nil {
+		return _a.Error(_ggbc, "\u0070o\u0069n\u0074\u0073\u0020\u006e\u006ft\u0020\u0064e\u0066\u0069\u006e\u0065\u0064")
+	}
+	if pt == nil {
+		return _a.Error(_ggbc, "a\u0072\u0067\u0075\u006d\u0065\u006et\u0020\u0070\u006f\u0069\u006e\u0074\u0073\u0020\u006eo\u0074\u0020\u0064e\u0066i\u006e\u0065\u0064")
+	}
+	*_bff = append(*_bff, *pt...)
+	return nil
+}
+
+func _eab(_fdbf, _aaggb, _edfg *Bitmap) (*Bitmap, error) {
+	const _eca = "\u0073\u0075\u0062\u0074\u0072\u0061\u0063\u0074"
+	if _aaggb == nil {
+		return nil, _a.Error(_eca, "'\u0073\u0031\u0027\u0020\u0069\u0073\u0020\u006e\u0069\u006c")
+	}
+	if _edfg == nil {
+		return nil, _a.Error(_eca, "'\u0073\u0032\u0027\u0020\u0069\u0073\u0020\u006e\u0069\u006c")
+	}
+	var _ccec error
+	switch _fdbf {
+	case _aaggb:
+		if _ccec = _fdbf.RasterOperation(0, 0, _aaggb.Width, _aaggb.Height, PixNotSrcAndDst, _edfg, 0, 0); _ccec != nil {
+			return nil, _a.Wrap(_ccec, _eca, "\u0064 \u003d\u003d\u0020\u0073\u0031")
+		}
+	case _edfg:
+		if _ccec = _fdbf.RasterOperation(0, 0, _aaggb.Width, _aaggb.Height, PixNotSrcAndDst, _aaggb, 0, 0); _ccec != nil {
+			return nil, _a.Wrap(_ccec, _eca, "\u0064 \u003d\u003d\u0020\u0073\u0032")
+		}
+	default:
+		_fdbf, _ccec = _fedg(_fdbf, _aaggb)
+		if _ccec != nil {
+			return nil, _a.Wrap(_ccec, _eca, "")
+		}
+		if _ccec = _fdbf.RasterOperation(0, 0, _aaggb.Width, _aaggb.Height, PixNotSrcAndDst, _edfg, 0, 0); _ccec != nil {
+			return nil, _a.Wrap(_ccec, _eca, "\u0064e\u0066\u0061\u0075\u006c\u0074")
+		}
+	}
+	return _fdbf, nil
+}
+
+func _cgad(_aggc, _bgbd *Bitmap, _gggcb, _cda int) (*Bitmap, error) {
+	const _eadb = "\u0063\u006c\u006f\u0073\u0065\u0053\u0061\u0066\u0065B\u0072\u0069\u0063\u006b"
+	if _bgbd == nil {
+		return nil, _a.Error(_eadb, "\u0073\u006f\u0075\u0072\u0063\u0065\u0020\u0069\u0073\u0020\u006e\u0069\u006c")
+	}
+	if _gggcb < 1 || _cda < 1 {
+		return nil, _a.Error(_eadb, "\u0068s\u0069\u007a\u0065\u0020\u0061\u006e\u0064\u0020\u0076\u0073\u0069z\u0065\u0020\u006e\u006f\u0074\u0020\u003e\u003d\u0020\u0031")
+	}
+	if _gggcb == 1 && _cda == 1 {
+		return _fedg(_aggc, _bgbd)
+	}
+	if MorphBC == SymmetricMorphBC {
+		_ffcga, _cgf := _eaad(_aggc, _bgbd, _gggcb, _cda)
+		if _cgf != nil {
+			return nil, _a.Wrap(_cgf, _eadb, "\u0053\u0079m\u006d\u0065\u0074r\u0069\u0063\u004d\u006f\u0072\u0070\u0068\u0042\u0043")
+		}
+		return _ffcga, nil
+	}
+	_aacc := _aega(_gggcb/2, _cda/2)
+	_ceef := 8 * ((_aacc + 7) / 8)
+	_gebg, _dggdd := _bgbd.AddBorder(_ceef, 0)
+	if _dggdd != nil {
+		return nil, _a.Wrapf(_dggdd, _eadb, "\u0042\u006f\u0072\u0064\u0065\u0072\u0053\u0069\u007ae\u003a\u0020\u0025\u0064", _ceef)
+	}
+	var _edag, _ddd *Bitmap
+	if _gggcb == 1 || _cda == 1 {
+		_acba := SelCreateBrick(_cda, _gggcb, _cda/2, _gggcb/2, SelHit)
+		_edag, _dggdd = _gbae(nil, _gebg, _acba)
+		if _dggdd != nil {
+			return nil, _a.Wrap(_dggdd, _eadb, "\u0068S\u0069\u007a\u0065\u0020\u003d\u003d\u0020\u0031\u0020\u007c\u007c \u0076\u0053\u0069\u007a\u0065\u0020\u003d\u003d\u0020\u0031")
+		}
+	} else {
+		_eeeb := SelCreateBrick(1, _gggcb, 0, _gggcb/2, SelHit)
+		_dfce, _baee := _acga(nil, _gebg, _eeeb)
+		if _baee != nil {
+			return nil, _a.Wrap(_baee, _eadb, "\u0072\u0065\u0067\u0075la\u0072\u0020\u002d\u0020\u0066\u0069\u0072\u0073\u0074\u0020\u0064\u0069\u006c\u0061t\u0065")
+		}
+		_dbgc := SelCreateBrick(_cda, 1, _cda/2, 0, SelHit)
+		_edag, _baee = _acga(nil, _dfce, _dbgc)
+		if _baee != nil {
+			return nil, _a.Wrap(_baee, _eadb, "\u0072\u0065\u0067ul\u0061\u0072\u0020\u002d\u0020\u0073\u0065\u0063\u006f\u006e\u0064\u0020\u0064\u0069\u006c\u0061\u0074\u0065")
+		}
+		if _, _baee = _bfcc(_dfce, _edag, _eeeb); _baee != nil {
+			return nil, _a.Wrap(_baee, _eadb, "r\u0065\u0067\u0075\u006car\u0020-\u0020\u0066\u0069\u0072\u0073t\u0020\u0065\u0072\u006f\u0064\u0065")
+		}
+		if _, _baee = _bfcc(_edag, _dfce, _dbgc); _baee != nil {
+			return nil, _a.Wrap(_baee, _eadb, "\u0072\u0065\u0067\u0075la\u0072\u0020\u002d\u0020\u0073\u0065\u0063\u006f\u006e\u0064\u0020\u0065\u0072\u006fd\u0065")
+		}
+	}
+	if _ddd, _dggdd = _edag.RemoveBorder(_ceef); _dggdd != nil {
+		return nil, _a.Wrap(_dggdd, _eadb, "\u0072e\u0067\u0075\u006c\u0061\u0072")
+	}
+	if _aggc == nil {
+		return _ddd, nil
+	}
+	if _, _dggdd = _fedg(_aggc, _ddd); _dggdd != nil {
+		return nil, _dggdd
+	}
+	return _aggc, nil
+}
+
+func (_ggef *Bitmap) RemoveBorderGeneral(left, right, top, bot int) (*Bitmap, error) {
+	return _ggef.removeBorderGeneral(left, right, top, bot)
+}
+
+func (_aaae *Bitmap) centroid(_fefe, _dbf []int) (Point, error) {
+	_bccde := Point{}
+	_aaae.setPadBits(0)
+	if len(_fefe) == 0 {
+		_fefe = _bfcce()
+	}
+	if len(_dbf) == 0 {
+		_dbf = _afgg()
+	}
+	var _ddcd, _gbfeb, _eaaf, _cgeg, _adag, _ccfc int
+	var _fcdg byte
+	for _adag = 0; _adag < _aaae.Height; _adag++ {
+		_ceed := _aaae.RowStride * _adag
+		_cgeg = 0
+		for _ccfc = 0; _ccfc < _aaae.RowStride; _ccfc++ {
+			_fcdg = _aaae.Data[_ceed+_ccfc]
+			if _fcdg != 0 {
+				_cgeg += _dbf[_fcdg]
+				_ddcd += _fefe[_fcdg] + _ccfc*8*_dbf[_fcdg]
+			}
+		}
+		_eaaf += _cgeg
+		_gbfeb += _cgeg * _adag
+	}
+	if _eaaf != 0 {
+		_bccde.X = float32(_ddcd) / float32(_eaaf)
+		_bccde.Y = float32(_gbfeb) / float32(_eaaf)
+	}
+	return _bccde, nil
+}
+
+var MorphBC BoundaryCondition
+
+type BoundaryCondition int
+
+func TstWordBitmapWithSpaces(t *_c.T, scale ...int) *Bitmap {
+	_aeed := 1
+	if len(scale) > 0 {
+		_aeed = scale[0]
+	}
+	_fafec := 3
+	_abbf := 9 + 7 + 15 + 2*_fafec + 2*_fafec
+	_edbfe := 5 + _fafec + 5 + 2*_fafec
+	_dafda := New(_abbf*_aeed, _edbfe*_aeed)
+	_cdce := &Bitmaps{}
+	var _gefba *int
+	_fafec *= _aeed
+	_eddd := _fafec
+	_gefba = &_eddd
+	_gdbg := _fafec
+	_gdgb := TstDSymbol(t, scale...)
+	TstAddSymbol(t, _cdce, _gdgb, _gefba, _gdbg, 1*_aeed)
+	_gdgb = TstOSymbol(t, scale...)
+	TstAddSymbol(t, _cdce, _gdgb, _gefba, _gdbg, _fafec)
+	_gdgb = TstISymbol(t, scale...)
+	TstAddSymbol(t, _cdce, _gdgb, _gefba, _gdbg, 1*_aeed)
+	_gdgb = TstTSymbol(t, scale...)
+	TstAddSymbol(t, _cdce, _gdgb, _gefba, _gdbg, _fafec)
+	_gdgb = TstNSymbol(t, scale...)
+	TstAddSymbol(t, _cdce, _gdgb, _gefba, _gdbg, 1*_aeed)
+	_gdgb = TstOSymbol(t, scale...)
+	TstAddSymbol(t, _cdce, _gdgb, _gefba, _gdbg, 1*_aeed)
+	_gdgb = TstWSymbol(t, scale...)
+	TstAddSymbol(t, _cdce, _gdgb, _gefba, _gdbg, 0)
+	*_gefba = _fafec
+	_gdbg = 5*_aeed + _fafec
+	_gdgb = TstOSymbol(t, scale...)
+	TstAddSymbol(t, _cdce, _gdgb, _gefba, _gdbg, 1*_aeed)
+	_gdgb = TstRSymbol(t, scale...)
+	TstAddSymbol(t, _cdce, _gdgb, _gefba, _gdbg, _fafec)
+	_gdgb = TstNSymbol(t, scale...)
+	TstAddSymbol(t, _cdce, _gdgb, _gefba, _gdbg, 1*_aeed)
+	_gdgb = TstESymbol(t, scale...)
+	TstAddSymbol(t, _cdce, _gdgb, _gefba, _gdbg, 1*_aeed)
+	_gdgb = TstVSymbol(t, scale...)
+	TstAddSymbol(t, _cdce, _gdgb, _gefba, _gdbg, 1*_aeed)
+	_gdgb = TstESymbol(t, scale...)
+	TstAddSymbol(t, _cdce, _gdgb, _gefba, _gdbg, 1*_aeed)
+	_gdgb = TstRSymbol(t, scale...)
+	TstAddSymbol(t, _cdce, _gdgb, _gefba, _gdbg, 0)
+	TstWriteSymbols(t, _cdce, _dafda)
+	return _dafda
+}
+
+func (_caaf *ClassedPoints) validateIntSlice() error {
+	const _fdfc = "\u0076\u0061l\u0069\u0064\u0061t\u0065\u0049\u006e\u0074\u0053\u006c\u0069\u0063\u0065"
+	for _, _fdgde := range _caaf.IntSlice {
+		if _fdgde >= (_caaf.Points.Size()) {
+			return _a.Errorf(_fdfc, "c\u006c\u0061\u0073\u0073\u0020\u0069\u0064\u003a\u0020\u0027\u0025\u0064\u0027\u0020\u0069\u0073\u0020\u006e\u006f\u0074\u0020\u0061\u0020\u0076\u0061\u006ci\u0064 \u0069\u006e\u0064\u0065x\u0020\u0069n\u0020\u0074\u0068\u0065\u0020\u0070\u006f\u0069\u006e\u0074\u0073\u0020\u006f\u0066\u0020\u0073\u0069\u007a\u0065\u003a\u0020\u0025\u0064", _fdgde, _caaf.Points.Size())
+		}
+	}
+	return nil
+}
+
+func (_acfe *Bitmaps) GroupByWidth() (*BitmapsArray, error) {
+	const _gggd = "\u0047\u0072\u006fu\u0070\u0042\u0079\u0057\u0069\u0064\u0074\u0068"
+	if len(_acfe.Values) == 0 {
+		return nil, _a.Error(_gggd, "\u006eo\u0020v\u0061\u006c\u0075\u0065\u0073 \u0070\u0072o\u0076\u0069\u0064\u0065\u0064")
+	}
+	_gaedc := &BitmapsArray{}
+	_acfe.SortByWidth()
+	_bcdf := -1
+	_cgegc := -1
+	for _cgaf := 0; _cgaf < len(_acfe.Values); _cgaf++ {
+		_dgafa := _acfe.Values[_cgaf].Width
+		if _dgafa > _bcdf {
+			_bcdf = _dgafa
+			_cgegc++
+			_gaedc.Values = append(_gaedc.Values, &Bitmaps{})
+		}
+		_gaedc.Values[_cgegc].AddBitmap(_acfe.Values[_cgaf])
+	}
+	return _gaedc, nil
+}
+
+const (
+	SelDontCare SelectionValue = iota
+	SelHit
+	SelMiss
+)
+
+func _bg() (_eged []byte) {
+	_eged = make([]byte, 256)
+	for _ggdd := 0; _ggdd < 256; _ggdd++ {
+		_cecd := byte(_ggdd)
+		_eged[_cecd] = (_cecd & 0x01) | ((_cecd & 0x04) >> 1) | ((_cecd & 0x10) >> 2) | ((_cecd & 0x40) >> 3) | ((_cecd & 0x02) << 3) | ((_cecd & 0x08) << 2) | ((_cecd & 0x20) << 1) | (_cecd & 0x80)
+	}
+	return _eged
+}
+
+func Rect(x, y, w, h int) (*_bf.Rectangle, error) {
+	const _fcaf = "b\u0069\u0074\u006d\u0061\u0070\u002e\u0052\u0065\u0063\u0074"
+	if x < 0 {
+		w += x
+		x = 0
+		if w <= 0 {
+			return nil, _a.Errorf(_fcaf, "x\u003a\u0027\u0025\u0064\u0027\u0020<\u0020\u0030\u0020\u0061\u006e\u0064\u0020\u0077\u003a \u0027\u0025\u0064'\u0020<\u003d\u0020\u0030", x, w)
+		}
+	}
+	if y < 0 {
+		h += y
+		y = 0
+		if h <= 0 {
+			return nil, _a.Error(_fcaf, "\u0079\u0020\u003c 0\u0020\u0061\u006e\u0064\u0020\u0062\u006f\u0078\u0020\u006f\u0066\u0066\u0020\u002b\u0071\u0075\u0061\u0064")
+		}
+	}
+	_ffad := _bf.Rect(x, y, x+w, y+h)
+	return &_ffad, nil
+}
+
+func TstGetScaledSymbol(t *_c.T, sm *Bitmap, scale ...int) *Bitmap {
+	if len(scale) == 0 {
+		return sm
+	}
+	if scale[0] == 1 {
+		return sm
+	}
+	_dgdf, _afbfd := MorphSequence(sm, MorphProcess{Operation: MopReplicativeBinaryExpansion, Arguments: scale})
+	_d.NoError(t, _afbfd)
+	return _dgdf
+}
+
+var (
+	_cece = _cggb()
+	_gbb  = _cfa()
+	_ceba = _abb()
+)
+
+func (_ddfe Points) XSorter() func(_bfcaad, _eaffda int) bool {
+	return func(_aga, _bgcb int) bool { return _ddfe[_aga].X < _ddfe[_bgcb].X }
+}
+
+func (_fdef *Bitmaps) SelectBySize(width, height int, tp LocationFilter, relation SizeComparison) (_ddeg *Bitmaps, _afda error) {
+	const _gcfgg = "B\u0069t\u006d\u0061\u0070\u0073\u002e\u0053\u0065\u006ce\u0063\u0074\u0042\u0079Si\u007a\u0065"
+	if _fdef == nil {
+		return nil, _a.Error(_gcfgg, "\u0027\u0062\u0027 B\u0069\u0074\u006d\u0061\u0070\u0073\u0020\u006e\u006f\u0074\u0020\u0064\u0065\u0066\u0069\u006e\u0065\u0064")
+	}
+	switch tp {
+	case LocSelectWidth, LocSelectHeight, LocSelectIfEither, LocSelectIfBoth:
+	default:
+		return nil, _a.Errorf(_gcfgg, "\u0070\u0072\u006f\u0076\u0069d\u0065\u0064\u0020\u0069\u006e\u0076\u0061\u006c\u0069\u0064\u0020\u006c\u006fc\u0061\u0074\u0069\u006f\u006e\u0020\u0066\u0069\u006c\u0074\u0065\u0072\u0020\u0074\u0079\u0070\u0065\u003a\u0020\u0025\u0064", tp)
+	}
+	switch relation {
+	case SizeSelectIfLT, SizeSelectIfGT, SizeSelectIfLTE, SizeSelectIfGTE, SizeSelectIfEQ:
+	default:
+		return nil, _a.Errorf(_gcfgg, "\u0069\u006e\u0076\u0061li\u0064\u0020\u0072\u0065\u006c\u0061\u0074\u0069\u006f\u006e\u003a\u0020\u0027\u0025d\u0027", relation)
+	}
+	_ddgf, _afda := _fdef.makeSizeIndicator(width, height, tp, relation)
+	if _afda != nil {
+		return nil, _a.Wrap(_afda, _gcfgg, "")
+	}
+	_ddeg, _afda = _fdef.selectByIndicator(_ddgf)
+	if _afda != nil {
+		return nil, _a.Wrap(_afda, _gcfgg, "")
+	}
+	return _ddeg, nil
+}
+
+func _fbaa(_ebce, _adadf, _dedf byte) byte { return (_ebce &^ (_dedf)) | (_adadf & _dedf) }
+
+func _fceb(_feae *Bitmap, _cddd int) (*Bitmap, error) {
+	const _afcf = "\u0065x\u0070a\u006e\u0064\u0052\u0065\u0070\u006c\u0069\u0063\u0061\u0074\u0065"
+	if _feae == nil {
+		return nil, _a.Error(_afcf, "\u0073o\u0075r\u0063\u0065\u0020\u006e\u006ft\u0020\u0064e\u0066\u0069\u006e\u0065\u0064")
+	}
+	if _cddd <= 0 {
+		return nil, _a.Error(_afcf, "i\u006e\u0076\u0061\u006cid\u0020f\u0061\u0063\u0074\u006f\u0072 \u002d\u0020\u003c\u003d\u0020\u0030")
+	}
+	if _cddd == 1 {
+		_gbgd, _fgea := _fedg(nil, _feae)
+		if _fgea != nil {
+			return nil, _a.Wrap(_fgea, _afcf, "\u0066\u0061\u0063\u0074\u006f\u0072\u0020\u003d\u0020\u0031")
+		}
+		return _gbgd, nil
+	}
+	_eedd, _afefb := _fga(_feae, _cddd, _cddd)
+	if _afefb != nil {
+		return nil, _a.Wrap(_afefb, _afcf, "")
+	}
+	return _eedd, nil
+}
+
+func (_faff *Boxes) Get(i int) (*_bf.Rectangle, error) {
+	const _gbfe = "\u0042o\u0078\u0065\u0073\u002e\u0047\u0065t"
+	if _faff == nil {
+		return nil, _a.Error(_gbfe, "\u0027\u0042\u006f\u0078es\u0027\u0020\u006e\u006f\u0074\u0020\u0064\u0065\u0066\u0069\u006e\u0065\u0064")
+	}
+	if i > len(*_faff)-1 {
+		return nil, _a.Errorf(_gbfe, "\u0069n\u0064\u0065\u0078\u003a\u0020\u0027\u0025\u0064\u0027\u0020\u006fu\u0074\u0020\u006f\u0066\u0020\u0072\u0061\u006e\u0067\u0065", i)
+	}
+	return (*_faff)[i], nil
+}
+
+type SizeComparison int
+
+type SelectionValue int
+
+func _ceac(_eaac, _eba *Bitmap, _fce CombinationOperator) *Bitmap {
+	_ecdac := New(_eaac.Width, _eaac.Height)
+	for _aabe := 0; _aabe < len(_ecdac.Data); _aabe++ {
+		_ecdac.Data[_aabe] = _ccecc(_eaac.Data[_aabe], _eba.Data[_aabe], _fce)
+	}
+	return _ecdac
+}
+
+func (_agfg *Bitmap) SetByte(index int, v byte) error {
+	if index > len(_agfg.Data)-1 || index < 0 {
+		return _a.Errorf("\u0053e\u0074\u0042\u0079\u0074\u0065", "\u0069\u006e\u0064\u0065x \u006f\u0075\u0074\u0020\u006f\u0066\u0020\u0072\u0061\u006e\u0067\u0065\u003a\u0020%\u0064", index)
+	}
+	_agfg.Data[index] = v
+	return nil
+}
+
+type fillSegment struct {
+	_cdac int
+	_afgf int
+	_decd int
+	_fadf int
+}
+
+func TstAddSymbol(t *_c.T, bms *Bitmaps, sym *Bitmap, x *int, y int, space int) {
+	bms.AddBitmap(sym)
+	_bggd := _bf.Rect(*x, y, *x+sym.Width, y+sym.Height)
+	bms.AddBox(&_bggd)
+	*x += sym.Width + space
+}
+
+var (
+	_ggbf *Bitmap
+	_bceg *Bitmap
+)
+
+func _cdeg(_fcea *Bitmap, _adeb *Bitmap, _cdgc int) (_ebdae error) {
+	const _cbcg = "\u0073\u0065\u0065\u0064\u0066\u0069\u006c\u006c\u0042\u0069\u006e\u0061r\u0079\u004c\u006f\u0077"
+	_agccc := _efd(_fcea.Height, _adeb.Height)
+	_fafa := _efd(_fcea.RowStride, _adeb.RowStride)
+	switch _cdgc {
+	case 4:
+		_ebdae = _dedb(_fcea, _adeb, _agccc, _fafa)
+	case 8:
+		_ebdae = _efaa(_fcea, _adeb, _agccc, _fafa)
+	default:
+		return _a.Errorf(_cbcg, "\u0063\u006f\u006e\u006e\u0065\u0063\u0074\u0069\u0076\u0069\u0074\u0079\u0020\u006d\u0075\u0073\u0074\u0020\u0062\u0065\u0020\u0034\u0020\u006fr\u0020\u0038\u0020\u002d\u0020i\u0073\u003a \u0027\u0025\u0064\u0027", _cdgc)
+	}
+	if _ebdae != nil {
+		return _a.Wrap(_ebdae, _cbcg, "")
+	}
+	return nil
+}
+
+func (_bgbg MorphProcess) verify(_agcg int, _cgaa, _dfae *int) error {
+	const _aaggg = "\u004d\u006f\u0072\u0070hP\u0072\u006f\u0063\u0065\u0073\u0073\u002e\u0076\u0065\u0072\u0069\u0066\u0079"
+	switch _bgbg.Operation {
+	case MopDilation, MopErosion, MopOpening, MopClosing:
+		if len(_bgbg.Arguments) != 2 {
+			return _a.Error(_aaggg, "\u004f\u0070\u0065\u0072\u0061\u0074\u0069\u006f\u006e\u003a\u0020\u0027\u0064\u0027\u002c\u0020\u0027\u0065\u0027\u002c \u0027\u006f\u0027\u002c\u0020\u0027\u0063\u0027\u0020\u0072\u0065\u0071\u0075\u0069\u0072\u0065\u0073\u0020\u0061\u0074\u0020\u006c\u0065\u0061\u0073\u0074\u0020\u0032\u0020\u0061r\u0067\u0075\u006d\u0065\u006et\u0073")
+		}
+		_fcbb, _dcba := _bgbg.getWidthHeight()
+		if _fcbb <= 0 || _dcba <= 0 {
+			return _a.Error(_aaggg, "O\u0070er\u0061t\u0069o\u006e\u003a\u0020\u0027\u0064'\u002c\u0020\u0027e\u0027\u002c\u0020\u0027\u006f'\u002c\u0020\u0027c\u0027\u0020\u0020\u0072\u0065\u0071\u0075\u0069\u0072\u0065\u0073 \u0062\u006f\u0074h w\u0069\u0064\u0074\u0068\u0020\u0061n\u0064\u0020\u0068\u0065\u0069\u0067\u0068\u0074\u0020\u0074\u006f\u0020b\u0065 \u003e\u003d\u0020\u0030")
+		}
+	case MopRankBinaryReduction:
+		_bfdb := len(_bgbg.Arguments)
+		*_cgaa += _bfdb
+		if _bfdb < 1 || _bfdb > 4 {
+			return _a.Error(_aaggg, "\u004f\u0070\u0065\u0072\u0061\u0074\u0069\u006f\u006e\u003a\u0020\u0027\u0072\u0027\u0020\u0072\u0065\u0071\u0075\u0069r\u0065\u0073\u0020\u0061\u0074\u0020\u006c\u0065\u0061s\u0074\u0020\u0031\u0020\u0061\u006e\u0064\u0020\u0061\u0074\u0020\u006d\u006fs\u0074\u0020\u0034\u0020\u0061\u0072g\u0075\u006d\u0065n\u0074\u0073")
+		}
+		for _agdcg := 0; _agdcg < _bfdb; _agdcg++ {
+			if _bgbg.Arguments[_agdcg] < 1 || _bgbg.Arguments[_agdcg] > 4 {
+				return _a.Error(_aaggg, "\u0052\u0061\u006e\u006b\u0042\u0069n\u0061\u0072\u0079\u0052\u0065\u0064\u0075\u0063\u0074\u0069\u006f\u006e\u0020\u006c\u0065\u0076\u0065\u006c\u0020\u006du\u0073\u0074\u0020\u0062\u0065\u0020\u0069\u006e\u0020\u0072\u0061\u006e\u0067\u0065 \u00280\u002c\u0020\u0034\u003e")
+			}
+		}
+	case MopReplicativeBinaryExpansion:
+		if len(_bgbg.Arguments) == 0 {
+			return _a.Error(_aaggg, "\u0052\u0065\u0070\u006c\u0069\u0063\u0061\u0074i\u0076\u0065\u0042in\u0061\u0072\u0079\u0045\u0078\u0070a\u006e\u0073\u0069\u006f\u006e\u0020\u0072\u0065\u0071\u0075\u0069\u0072\u0065\u0073\u0020o\u006e\u0065\u0020\u0061\u0072\u0067\u0075\u006de\u006e\u0074")
+		}
+		_cgc := _bgbg.Arguments[0]
+		if _cgc != 2 && _cgc != 4 && _cgc != 8 {
+			return _a.Error(_aaggg, "R\u0065\u0070\u006c\u0069\u0063\u0061\u0074\u0069\u0076\u0065\u0042\u0069\u006e\u0061\u0072\u0079\u0045\u0078\u0070\u0061\u006e\u0073\u0069\u006f\u006e\u0020m\u0075s\u0074\u0020\u0062\u0065 \u006f\u0066 \u0066\u0061\u0063\u0074\u006f\u0072\u0020\u0069\u006e\u0020\u0072\u0061\u006e\u0067\u0065\u0020\u007b\u0032\u002c\u0034\u002c\u0038\u007d")
+		}
+		*_cgaa -= _fdgd[_cgc/4]
+	case MopAddBorder:
+		if len(_bgbg.Arguments) == 0 {
+			return _a.Error(_aaggg, "\u0041\u0064\u0064B\u006f\u0072\u0064\u0065r\u0020\u0072\u0065\u0071\u0075\u0069\u0072e\u0073\u0020\u006f\u006e\u0065\u0020\u0061\u0072\u0067\u0075\u006d\u0065\u006e\u0074")
+		}
+		_dffc := _bgbg.Arguments[0]
+		if _agcg > 0 {
+			return _a.Error(_aaggg, "\u0041\u0064\u0064\u0042\u006f\u0072\u0064\u0065\u0072\u0020\u006d\u0075\u0073t\u0020\u0062\u0065\u0020\u0061\u0020f\u0069\u0072\u0073\u0074\u0020\u006d\u006f\u0072\u0070\u0068\u0020\u0070\u0072o\u0063\u0065\u0073\u0073")
+		}
+		if _dffc < 1 {
+			return _a.Error(_aaggg, "\u0041\u0064\u0064\u0042o\u0072\u0064\u0065\u0072\u0020\u0076\u0061\u006c\u0075\u0065 \u006co\u0077\u0065\u0072\u0020\u0074\u0068\u0061n\u0020\u0030")
+		}
+		*_dfae = _dffc
+	}
+	return nil
+}
+
+func (_cccf *BitmapsArray) AddBitmaps(bm *Bitmaps) { _cccf.Values = append(_cccf.Values, bm) }
+
+func _dad(_bgd, _dggf int) *Bitmap {
+	return &Bitmap{Width: _bgd, Height: _dggf, RowStride: (_bgd + 7) >> 3}
+}
+
+func _edacg(_ceceb, _ddgb *Bitmap, _edagd, _dafa int) (*Bitmap, error) {
+	const _efge = "d\u0069\u006c\u0061\u0074\u0065\u0042\u0072\u0069\u0063\u006b"
+	if _ddgb == nil {
+		_dc.Log.Debug("\u0064\u0069\u006c\u0061\u0074\u0065\u0042\u0072\u0069\u0063k\u0020\u0073\u006f\u0075\u0072\u0063\u0065 \u006e\u006f\u0074\u0020\u0064\u0065\u0066\u0069\u006e\u0065\u0064")
+		return nil, _a.Error(_efge, "\u0073o\u0075\u0072\u0063\u0065 \u0062\u0069\u0074\u006d\u0061p\u0020n\u006ft\u0020\u0064\u0065\u0066\u0069\u006e\u0065d")
+	}
+	if _edagd < 1 || _dafa < 1 {
+		return nil, _a.Error(_efge, "\u0068\u0053\u007a\u0069\u0065 \u0061\u006e\u0064\u0020\u0076\u0053\u0069\u007a\u0065\u0020\u0061\u0072\u0065 \u006e\u006f\u0020\u0067\u0072\u0065\u0061\u0074\u0065\u0072\u0020\u0065\u0071\u0075\u0061\u006c\u0020\u0074\u006f\u0020\u0031")
+	}
+	if _edagd == 1 && _dafa == 1 {
+		_fgdc, _cgbcd := _fedg(_ceceb, _ddgb)
+		if _cgbcd != nil {
+			return nil, _a.Wrap(_cgbcd, _efge, "\u0068S\u0069\u007a\u0065\u0020\u003d\u003d\u0020\u0031\u0020\u0026\u0026 \u0076\u0053\u0069\u007a\u0065\u0020\u003d\u003d\u0020\u0031")
+		}
+		return _fgdc, nil
+	}
+	if _edagd == 1 || _dafa == 1 {
+		_feef := SelCreateBrick(_dafa, _edagd, _dafa/2, _edagd/2, SelHit)
+		_fdge, _bcafb := _acga(_ceceb, _ddgb, _feef)
+		if _bcafb != nil {
+			return nil, _a.Wrap(_bcafb, _efge, "\u0068s\u0069\u007a\u0065\u0020\u003d\u003d\u0020\u0031\u0020\u007c\u007c \u0076\u0053\u0069\u007a\u0065\u0020\u003d\u003d\u0020\u0031")
+		}
+		return _fdge, nil
+	}
+	_dafd := SelCreateBrick(1, _edagd, 0, _edagd/2, SelHit)
+	_fabbag := SelCreateBrick(_dafa, 1, _dafa/2, 0, SelHit)
+	_gecf, _fdf := _acga(nil, _ddgb, _dafd)
+	if _fdf != nil {
+		return nil, _a.Wrap(_fdf, _efge, "\u0031\u0073\u0074\u0020\u0064\u0069\u006c\u0061\u0074\u0065")
+	}
+	_ceceb, _fdf = _acga(_ceceb, _gecf, _fabbag)
+	if _fdf != nil {
+		return nil, _a.Wrap(_fdf, _efge, "\u0032\u006e\u0064\u0020\u0064\u0069\u006c\u0061\u0074\u0065")
+	}
+	return _ceceb, nil
+}
+
+func (_eddgd Points) YSorter() func(_dgea, _cgbe int) bool {
+	return func(_cedfc, _gfa int) bool { return _eddgd[_cedfc].Y < _eddgd[_gfa].Y }
+}
+
+func (_bbdc Points) Get(i int) (Point, error) {
+	if i > len(_bbdc)-1 {
+		return Point{}, _a.Errorf("\u0050\u006f\u0069\u006e\u0074\u0073\u002e\u0047\u0065\u0074", "\u0069n\u0064\u0065\u0078\u003a\u0020\u0027\u0025\u0064\u0027\u0020\u006fu\u0074\u0020\u006f\u0066\u0020\u0072\u0061\u006e\u0067\u0065", i)
+	}
+	return _bbdc[i], nil
+}
+
+func (_dbbb *Selection) findMaxTranslations() (_gagf, _cfcc, _bdf, _gdcfa int) {
+	for _gbeda := 0; _gbeda < _dbbb.Height; _gbeda++ {
+		for _gdce := 0; _gdce < _dbbb.Width; _gdce++ {
+			if _dbbb.Data[_gbeda][_gdce] == SelHit {
+				_gagf = _aega(_gagf, _dbbb.Cx-_gdce)
+				_cfcc = _aega(_cfcc, _dbbb.Cy-_gbeda)
+				_bdf = _aega(_bdf, _gdce-_dbbb.Cx)
+				_gdcfa = _aega(_gdcfa, _gbeda-_dbbb.Cy)
+			}
+		}
+	}
+	return _gagf, _cfcc, _bdf, _gdcfa
+}
+
+func (_bcca *byHeight) Len() int { return len(_bcca.Values) }
+
+func (_gadg *Bitmaps) SelectByIndexes(idx []int) (*Bitmaps, error) {
+	const _abaa = "B\u0069\u0074\u006d\u0061\u0070\u0073.\u0053\u006f\u0072\u0074\u0049\u006e\u0064\u0065\u0078e\u0073\u0042\u0079H\u0065i\u0067\u0068\u0074"
+	_caef, _geee := _gadg.selectByIndexes(idx)
+	if _geee != nil {
+		return nil, _a.Wrap(_geee, _abaa, "")
+	}
+	return _caef, nil
+}
+
+func (_fefd *Bitmaps) GroupByHeight() (*BitmapsArray, error) {
+	const _fdfca = "\u0047\u0072\u006f\u0075\u0070\u0042\u0079\u0048\u0065\u0069\u0067\u0068\u0074"
+	if len(_fefd.Values) == 0 {
+		return nil, _a.Error(_fdfca, "\u006eo\u0020v\u0061\u006c\u0075\u0065\u0073 \u0070\u0072o\u0076\u0069\u0064\u0065\u0064")
+	}
+	_bcaee := &BitmapsArray{}
+	_fefd.SortByHeight()
+	_edfee := -1
+	_abcc := -1
+	for _eedc := 0; _eedc < len(_fefd.Values); _eedc++ {
+		_gfbef := _fefd.Values[_eedc].Height
+		if _gfbef > _edfee {
+			_edfee = _gfbef
+			_abcc++
+			_bcaee.Values = append(_bcaee.Values, &Bitmaps{})
+		}
+		_bcaee.Values[_abcc].AddBitmap(_fefd.Values[_eedc])
+	}
+	return _bcaee, nil
+}
+
+func (_bced *Bitmap) Copy() *Bitmap {
+	_ddb := make([]byte, len(_bced.Data))
+	copy(_ddb, _bced.Data)
+	return &Bitmap{Width: _bced.Width, Height: _bced.Height, RowStride: _bced.RowStride, Data: _ddb, Color: _bced.Color, Text: _bced.Text, BitmapNumber: _bced.BitmapNumber, Special: _bced.Special}
+}
+
+func (_aafg *ClassedPoints) Len() int { return _aafg.IntSlice.Size() }
+
+func (_gad *Bitmap) Equivalent(s *Bitmap) bool { return _gad.equivalent(s) }
+
+func (_ffgc *Bitmaps) CountPixels() *_ge.NumSlice {
+	_gbca := &_ge.NumSlice{}
+	for _, _bffd := range _ffgc.Values {
+		_gbca.AddInt(_bffd.CountPixels())
+	}
+	return _gbca
+}
+
+func _aggg(_cfac *_ge.Stack, _cdgfc, _bgac, _afggg, _cbgg, _gffb int, _ggde *_bf.Rectangle) (_becff error) {
+	const _eecf = "\u0070\u0075\u0073\u0068\u0046\u0069\u006c\u006c\u0053\u0065\u0067m\u0065\u006e\u0074\u0042\u006f\u0075\u006e\u0064\u0069\u006eg\u0042\u006f\u0078"
+	if _cfac == nil {
+		return _a.Error(_eecf, "\u006ei\u006c \u0073\u0074\u0061\u0063\u006b \u0070\u0072o\u0076\u0069\u0064\u0065\u0064")
+	}
+	if _ggde == nil {
+		return _a.Error(_eecf, "\u0070\u0072\u006f\u0076i\u0064\u0065\u0064\u0020\u006e\u0069\u006c\u0020\u0069\u006da\u0067e\u002e\u0052\u0065\u0063\u0074\u0061\u006eg\u006c\u0065")
+	}
+	_ggde.Min.X = _ge.Min(_ggde.Min.X, _cdgfc)
+	_ggde.Max.X = _ge.Max(_ggde.Max.X, _bgac)
+	_ggde.Min.Y = _ge.Min(_ggde.Min.Y, _afggg)
+	_ggde.Max.Y = _ge.Max(_ggde.Max.Y, _afggg)
+	if _afggg+_cbgg < 0 || _afggg+_cbgg > _gffb {
+		return nil
+	}
+	if _cfac.Aux == nil {
+		return _a.Error(_eecf, "a\u0075x\u0053\u0074\u0061\u0063\u006b\u0020\u006e\u006ft\u0020\u0064\u0065\u0066in\u0065\u0064")
+	}
+	var _dbcf *fillSegment
+	_ddfef, _ccac := _cfac.Aux.Pop()
+	if _ccac {
+		if _dbcf, _ccac = _ddfef.(*fillSegment); !_ccac {
+			return _a.Error(_eecf, "a\u0075\u0078\u0053\u0074\u0061\u0063k\u0020\u0064\u0061\u0074\u0061\u0020i\u0073\u0020\u006e\u006f\u0074\u0020\u0061 \u002a\u0066\u0069\u006c\u006c\u0053\u0065\u0067\u006d\u0065n\u0074")
+		}
+	} else {
+		_dbcf = &fillSegment{}
+	}
+	_dbcf._cdac = _cdgfc
+	_dbcf._afgf = _bgac
+	_dbcf._decd = _afggg
+	_dbcf._fadf = _cbgg
+	_cfac.Push(_dbcf)
+	return nil
+}
+
+func (_acbe *Bitmap) ThresholdPixelSum(thresh int, tab8 []int) (_cdda bool, _acac error) {
+	const _ccafa = "\u0042i\u0074\u006d\u0061\u0070\u002e\u0054\u0068\u0072\u0065\u0073\u0068o\u006c\u0064\u0050\u0069\u0078\u0065\u006c\u0053\u0075\u006d"
+	if tab8 == nil {
+		tab8 = _afgg()
+	}
+	_bdbd := _acbe.Width >> 3
+	_cae := _acbe.Width & 7
+	_ggg := byte(0xff << uint(8-_cae))
+	var (
+		_daca, _fcgg, _fac, _ddg int
+		_edea                    byte
+	)
+	for _daca = 0; _daca < _acbe.Height; _daca++ {
+		_fac = _acbe.RowStride * _daca
+		for _fcgg = 0; _fcgg < _bdbd; _fcgg++ {
+			_edea, _acac = _acbe.GetByte(_fac + _fcgg)
+			if _acac != nil {
+				return false, _a.Wrap(_acac, _ccafa, "\u0066\u0075\u006c\u006c\u0042\u0079\u0074\u0065")
+			}
+			_ddg += tab8[_edea]
+		}
+		if _cae != 0 {
+			_edea, _acac = _acbe.GetByte(_fac + _fcgg)
+			if _acac != nil {
+				return false, _a.Wrap(_acac, _ccafa, "p\u0061\u0072\u0074\u0069\u0061\u006c\u0042\u0079\u0074\u0065")
+			}
+			_edea &= _ggg
+			_ddg += tab8[_edea]
+		}
+		if _ddg > thresh {
+			return true, nil
+		}
+	}
+	return _cdda, nil
+}
+
+func (_gfac *BitmapsArray) GetBitmaps(i int) (*Bitmaps, error) {
+	const _dcea = "\u0042\u0069\u0074ma\u0070\u0073\u0041\u0072\u0072\u0061\u0079\u002e\u0047\u0065\u0074\u0042\u0069\u0074\u006d\u0061\u0070\u0073"
+	if _gfac == nil {
+		return nil, _a.Error(_dcea, "p\u0072\u006f\u0076\u0069\u0064\u0065d\u0020\u006e\u0069\u006c\u0020\u0027\u0042\u0069\u0074m\u0061\u0070\u0073A\u0072r\u0061\u0079\u0027")
+	}
+	if i > len(_gfac.Values)-1 {
+		return nil, _a.Errorf(_dcea, "\u0069n\u0064\u0065\u0078\u003a\u0020\u0027\u0025\u0064\u0027\u0020\u006fu\u0074\u0020\u006f\u0066\u0020\u0072\u0061\u006e\u0067\u0065", i)
+	}
+	return _gfac.Values[i], nil
+}
+
+func (_gfegae *Bitmaps) GetBox(i int) (*_bf.Rectangle, error) {
+	const _ebgdc = "\u0047\u0065\u0074\u0042\u006f\u0078"
+	if _gfegae == nil {
+		return nil, _a.Error(_ebgdc, "\u0070\u0072\u006f\u0076id\u0065\u0064\u0020\u006e\u0069\u006c\u0020\u0027\u0042\u0069\u0074\u006d\u0061\u0070s\u0027")
+	}
+	if i > len(_gfegae.Boxes)-1 {
+		return nil, _a.Errorf(_ebgdc, "\u0069n\u0064\u0065\u0078\u003a\u0020\u0027\u0025\u0064\u0027\u0020\u006fu\u0074\u0020\u006f\u0066\u0020\u0072\u0061\u006e\u0067\u0065", i)
+	}
+	return _gfegae.Boxes[i], nil
+}
+
+func (_bgddc *ClassedPoints) xSortFunction() func(_ddaf int, _bfdg int) bool {
+	return func(_gffag, _becaff int) bool { return _bgddc.XAtIndex(_gffag) < _bgddc.XAtIndex(_becaff) }
+}
+
+func (_adad *ClassedPoints) YAtIndex(i int) float32 { return (*_adad.Points)[_adad.IntSlice[i]].Y }
+
+func (_afag *Bitmap) AddBorder(borderSize, val int) (*Bitmap, error) {
+	if borderSize == 0 {
+		return _afag.Copy(), nil
+	}
+	_fab, _cdfe := _afag.addBorderGeneral(borderSize, borderSize, borderSize, borderSize, val)
+	if _cdfe != nil {
+		return nil, _a.Wrap(_cdfe, "\u0041d\u0064\u0042\u006f\u0072\u0064\u0065r", "")
+	}
+	return _fab, nil
+}
+
+func (_fdbg *Bitmap) SetDefaultPixel() {
+	for _eaag := range _fdbg.Data {
+		_fdbg.Data[_eaag] = byte(0xff)
+	}
+}
+
+func (_ceab Points) Size() int { return len(_ceab) }
+
+func CombineBytes(oldByte, newByte byte, op CombinationOperator) byte {
+	return _ccecc(oldByte, newByte, op)
+}
+
+func (_egdef *byHeight) Less(i, j int) bool {
+	return _egdef.Values[i].Height < _egdef.Values[j].Height
+}
+
+func NewClassedPoints(points *Points, classes _ge.IntSlice) (*ClassedPoints, error) {
+	const _bbdd = "\u004e\u0065w\u0043\u006c\u0061s\u0073\u0065\u0064\u0050\u006f\u0069\u006e\u0074\u0073"
+	if points == nil {
+		return nil, _a.Error(_bbdd, "\u0070\u0072\u006f\u0076id\u0065\u0064\u0020\u006e\u0069\u006c\u0020\u0070\u006f\u0069\u006e\u0074\u0073")
+	}
+	if classes == nil {
+		return nil, _a.Error(_bbdd, "p\u0072o\u0076\u0069\u0064\u0065\u0064\u0020\u006e\u0069l\u0020\u0063\u006c\u0061ss\u0065\u0073")
+	}
+	_effe := &ClassedPoints{Points: points, IntSlice: classes}
+	if _gade := _effe.validateIntSlice(); _gade != nil {
+		return nil, _a.Wrap(_gade, _bbdd, "")
+	}
+	return _effe, nil
+}
+
+type byHeight Bitmaps
+
+func (_cedf Points) GetIntY(i int) (int, error) {
+	if i >= len(_cedf) {
+		return 0, _a.Errorf("\u0050\u006f\u0069\u006e\u0074\u0073\u002e\u0047\u0065t\u0049\u006e\u0074\u0059", "\u0069n\u0064\u0065\u0078\u003a\u0020\u0027\u0025\u0064\u0027\u0020\u006fu\u0074\u0020\u006f\u0066\u0020\u0072\u0061\u006e\u0067\u0065", i)
+	}
+	return int(_cedf[i].Y), nil
+}
+
+func _cfa() (_dfg [256]uint32) {
+	for _bbe := 0; _bbe < 256; _bbe++ {
+		if _bbe&0x01 != 0 {
+			_dfg[_bbe] |= 0xf
+		}
+		if _bbe&0x02 != 0 {
+			_dfg[_bbe] |= 0xf0
+		}
+		if _bbe&0x04 != 0 {
+			_dfg[_bbe] |= 0xf00
+		}
+		if _bbe&0x08 != 0 {
+			_dfg[_bbe] |= 0xf000
+		}
+		if _bbe&0x10 != 0 {
+			_dfg[_bbe] |= 0xf0000
+		}
+		if _bbe&0x20 != 0 {
+			_dfg[_bbe] |= 0xf00000
+		}
+		if _bbe&0x40 != 0 {
+			_dfg[_bbe] |= 0xf000000
+		}
+		if _bbe&0x80 != 0 {
+			_dfg[_bbe] |= 0xf0000000
+		}
+	}
+	return _dfg
+}
+
+func (_afbf *Bitmaps) HeightSorter() func(_egega, _efbc int) bool {
+	return func(_fbeb, _bgdde int) bool {
+		_ceafc := _afbf.Values[_fbeb].Height < _afbf.Values[_bgdde].Height
+		_dc.Log.Debug("H\u0065i\u0067\u0068\u0074\u003a\u0020\u0025\u0076\u0020<\u0020\u0025\u0076\u0020= \u0025\u0076", _afbf.Values[_fbeb].Height, _afbf.Values[_bgdde].Height, _ceafc)
+		return _ceafc
+	}
+}
+
+func _dcdf(_aaccc, _gcgd, _gee *Bitmap, _gegc int) (*Bitmap, error) {
+	const _ggcb = "\u0073\u0065\u0065\u0064\u0046\u0069\u006c\u006c\u0042i\u006e\u0061\u0072\u0079"
+	if _gcgd == nil {
+		return nil, _a.Error(_ggcb, "s\u006fu\u0072\u0063\u0065\u0020\u0062\u0069\u0074\u006da\u0070\u0020\u0069\u0073 n\u0069\u006c")
+	}
+	if _gee == nil {
+		return nil, _a.Error(_ggcb, "'\u006da\u0073\u006b\u0027\u0020\u0062\u0069\u0074\u006da\u0070\u0020\u0069\u0073 n\u0069\u006c")
+	}
+	if _gegc != 4 && _gegc != 8 {
+		return nil, _a.Error(_ggcb, "\u0063\u006f\u006en\u0065\u0063\u0074\u0069v\u0069\u0074\u0079\u0020\u006e\u006f\u0074 \u0069\u006e\u0020\u0072\u0061\u006e\u0067\u0065\u0020\u007b\u0034\u002c\u0038\u007d")
+	}
+	var _gedda error
+	_aaccc, _gedda = _fedg(_aaccc, _gcgd)
+	if _gedda != nil {
+		return nil, _a.Wrap(_gedda, _ggcb, "\u0063o\u0070y\u0020\u0073\u006f\u0075\u0072c\u0065\u0020t\u006f\u0020\u0027\u0064\u0027")
+	}
+	_aefc := _gcgd.createTemplate()
+	_gee.setPadBits(0)
+	for _dced := 0; _dced < _aecca; _dced++ {
+		_aefc, _gedda = _fedg(_aefc, _aaccc)
+		if _gedda != nil {
+			return nil, _a.Wrapf(_gedda, _ggcb, "\u0069\u0074\u0065\u0072\u0061\u0074\u0069\u006f\u006e\u003a\u0020\u0025\u0064", _dced)
+		}
+		if _gedda = _cdeg(_aaccc, _gee, _gegc); _gedda != nil {
+			return nil, _a.Wrapf(_gedda, _ggcb, "\u0069\u0074\u0065\u0072\u0061\u0074\u0069\u006f\u006e\u003a\u0020\u0025\u0064", _dced)
+		}
+		if _aefc.Equals(_aaccc) {
+			break
+		}
+	}
+	return _aaccc, nil
+}
+
+func RasterOperation(dest *Bitmap, dx, dy, dw, dh int, op RasterOperator, src *Bitmap, sx, sy int) error {
+	return _ece(dest, dx, dy, dw, dh, op, src, sx, sy)
+}
+
+func (_acab *Bitmap) setFourBytes(_adfc int, _cfff uint32) error {
+	if _adfc+3 > len(_acab.Data)-1 {
+		return _a.Errorf("\u0073\u0065\u0074F\u006f\u0075\u0072\u0042\u0079\u0074\u0065\u0073", "\u0069n\u0064\u0065\u0078\u003a\u0020\u0027\u0025\u0064\u0027\u0020\u006fu\u0074\u0020\u006f\u0066\u0020\u0072\u0061\u006e\u0067\u0065", _adfc)
+	}
+	_acab.Data[_adfc] = byte((_cfff & 0xff000000) >> 24)
+	_acab.Data[_adfc+1] = byte((_cfff & 0xff0000) >> 16)
+	_acab.Data[_adfc+2] = byte((_cfff & 0xff00) >> 8)
+	_acab.Data[_adfc+3] = byte(_cfff & 0xff)
+	return nil
+}
+
+func (_dde *Bitmap) SetPixel(x, y int, pixel byte) error {
+	_aac := _dde.GetByteIndex(x, y)
+	if _aac > len(_dde.Data)-1 {
+		return _a.Errorf("\u0053\u0065\u0074\u0050\u0069\u0078\u0065\u006c", "\u0069\u006e\u0064\u0065x \u006f\u0075\u0074\u0020\u006f\u0066\u0020\u0072\u0061\u006e\u0067\u0065\u003a\u0020%\u0064", _aac)
+	}
+	_eegf := _dde.GetBitOffset(x)
+	_cbd := uint(7 - _eegf)
+	_eaa := _dde.Data[_aac]
+	var _egeg byte
+	if pixel == 1 {
+		_egeg = _eaa | (pixel & 0x01 << _cbd)
+	} else {
+		_egeg = _eaa &^ (1 << _cbd)
+	}
+	_dde.Data[_aac] = _egeg
+	return nil
+}
+
+func (_bgcd *byWidth) Swap(i, j int) {
+	_bgcd.Values[i], _bgcd.Values[j] = _bgcd.Values[j], _bgcd.Values[i]
+	if _bgcd.Boxes != nil {
+		_bgcd.Boxes[i], _bgcd.Boxes[j] = _bgcd.Boxes[j], _bgcd.Boxes[i]
+	}
+}
+
+func TstWordBitmap(t *_c.T, scale ...int) *Bitmap {
+	_ebgdcc := 1
+	if len(scale) > 0 {
+		_ebgdcc = scale[0]
+	}
+	_bdfg := 3
+	_ebfb := 9 + 7 + 15 + 2*_bdfg
+	_cffe := 5 + _bdfg + 5
+	_gfcf := New(_ebfb*_ebgdcc, _cffe*_ebgdcc)
+	_bgge := &Bitmaps{}
+	var _dcgg *int
+	_bdfg *= _ebgdcc
+	_cagf := 0
+	_dcgg = &_cagf
+	_dcbc := 0
+	_fbed := TstDSymbol(t, scale...)
+	TstAddSymbol(t, _bgge, _fbed, _dcgg, _dcbc, 1*_ebgdcc)
+	_fbed = TstOSymbol(t, scale...)
+	TstAddSymbol(t, _bgge, _fbed, _dcgg, _dcbc, _bdfg)
+	_fbed = TstISymbol(t, scale...)
+	TstAddSymbol(t, _bgge, _fbed, _dcgg, _dcbc, 1*_ebgdcc)
+	_fbed = TstTSymbol(t, scale...)
+	TstAddSymbol(t, _bgge, _fbed, _dcgg, _dcbc, _bdfg)
+	_fbed = TstNSymbol(t, scale...)
+	TstAddSymbol(t, _bgge, _fbed, _dcgg, _dcbc, 1*_ebgdcc)
+	_fbed = TstOSymbol(t, scale...)
+	TstAddSymbol(t, _bgge, _fbed, _dcgg, _dcbc, 1*_ebgdcc)
+	_fbed = TstWSymbol(t, scale...)
+	TstAddSymbol(t, _bgge, _fbed, _dcgg, _dcbc, 0)
+	*_dcgg = 0
+	_dcbc = 5*_ebgdcc + _bdfg
+	_fbed = TstOSymbol(t, scale...)
+	TstAddSymbol(t, _bgge, _fbed, _dcgg, _dcbc, 1*_ebgdcc)
+	_fbed = TstRSymbol(t, scale...)
+	TstAddSymbol(t, _bgge, _fbed, _dcgg, _dcbc, _bdfg)
+	_fbed = TstNSymbol(t, scale...)
+	TstAddSymbol(t, _bgge, _fbed, _dcgg, _dcbc, 1*_ebgdcc)
+	_fbed = TstESymbol(t, scale...)
+	TstAddSymbol(t, _bgge, _fbed, _dcgg, _dcbc, 1*_ebgdcc)
+	_fbed = TstVSymbol(t, scale...)
+	TstAddSymbol(t, _bgge, _fbed, _dcgg, _dcbc, 1*_ebgdcc)
+	_fbed = TstESymbol(t, scale...)
+	TstAddSymbol(t, _bgge, _fbed, _dcgg, _dcbc, 1*_ebgdcc)
+	_fbed = TstRSymbol(t, scale...)
+	TstAddSymbol(t, _bgge, _fbed, _dcgg, _dcbc, 0)
+	TstWriteSymbols(t, _bgge, _gfcf)
+	return _gfcf
+}
+
+func (_bded *ClassedPoints) Swap(i, j int) {
+	_bded.IntSlice[i], _bded.IntSlice[j] = _bded.IntSlice[j], _bded.IntSlice[i]
+}
+
+func (_cdgdc *Bitmaps) String() string {
+	_feg := _b.Builder{}
+	for _, _bffac := range _cdgdc.Values {
+		_feg.WriteString(_bffac.String())
+		_feg.WriteRune('\n')
+	}
+	return _feg.String()
+}
+
+func _baca(_adab *Bitmap, _deec *_ge.Stack, _efag, _dfcd int) (_defe *_bf.Rectangle, _fcbc error) {
+	const _ffbbb = "\u0073e\u0065d\u0046\u0069\u006c\u006c\u0053\u0074\u0061\u0063\u006b\u0042\u0042"
+	if _adab == nil {
+		return nil, _a.Error(_ffbbb, "\u0070\u0072\u006fvi\u0064\u0065\u0064\u0020\u006e\u0069\u006c\u0020\u0027\u0073\u0027\u0020\u0042\u0069\u0074\u006d\u0061\u0070")
+	}
+	if _deec == nil {
+		return nil, _a.Error(_ffbbb, "p\u0072o\u0076\u0069\u0064\u0065\u0064\u0020\u006e\u0069l\u0020\u0027\u0073\u0074ac\u006b\u0027")
+	}
+	_ebgad, _cgga := _adab.Width, _adab.Height
+	_daga := _ebgad - 1
+	_ffbgd := _cgga - 1
+	if _efag < 0 || _efag > _daga || _dfcd < 0 || _dfcd > _ffbgd || !_adab.GetPixel(_efag, _dfcd) {
+		return nil, nil
+	}
+	var _cabc *_bf.Rectangle
+	_cabc, _fcbc = Rect(100000, 100000, 0, 0)
+	if _fcbc != nil {
+		return nil, _a.Wrap(_fcbc, _ffbbb, "")
+	}
+	if _fcbc = _aggg(_deec, _efag, _efag, _dfcd, 1, _ffbgd, _cabc); _fcbc != nil {
+		return nil, _a.Wrap(_fcbc, _ffbbb, "\u0069\u006e\u0069t\u0069\u0061\u006c\u0020\u0070\u0075\u0073\u0068")
+	}
+	if _fcbc = _aggg(_deec, _efag, _efag, _dfcd+1, -1, _ffbgd, _cabc); _fcbc != nil {
+		return nil, _a.Wrap(_fcbc, _ffbbb, "\u0032\u006ed\u0020\u0069\u006ei\u0074\u0069\u0061\u006c\u0020\u0070\u0075\u0073\u0068")
+	}
+	_cabc.Min.X, _cabc.Max.X = _efag, _efag
+	_cabc.Min.Y, _cabc.Max.Y = _dfcd, _dfcd
+	var (
+		_eggd  *fillSegment
+		_gabag int
+	)
+	for _deec.Len() > 0 {
+		if _eggd, _fcbc = _gaaf(_deec); _fcbc != nil {
+			return nil, _a.Wrap(_fcbc, _ffbbb, "")
+		}
+		_dfcd = _eggd._decd
+		for _efag = _eggd._cdac; _efag >= 0 && _adab.GetPixel(_efag, _dfcd); _efag-- {
+			if _fcbc = _adab.SetPixel(_efag, _dfcd, 0); _fcbc != nil {
+				return nil, _a.Wrap(_fcbc, _ffbbb, "")
+			}
+		}
+		if _efag >= _eggd._cdac {
+			for _efag++; _efag <= _eggd._afgf && _efag <= _daga && !_adab.GetPixel(_efag, _dfcd); _efag++ {
+			}
+			_gabag = _efag
+			if _efag > _eggd._afgf || _efag > _daga {
+				continue
+			}
+		} else {
+			_gabag = _efag + 1
+			if _gabag < _eggd._cdac-1 {
+				if _fcbc = _aggg(_deec, _gabag, _eggd._cdac-1, _eggd._decd, -_eggd._fadf, _ffbgd, _cabc); _fcbc != nil {
+					return nil, _a.Wrap(_fcbc, _ffbbb, "\u006c\u0065\u0061\u006b\u0020\u006f\u006e\u0020\u006c\u0065\u0066\u0074 \u0073\u0069\u0064\u0065")
+				}
+			}
+			_efag = _eggd._cdac + 1
+		}
+		for {
+			for ; _efag <= _daga && _adab.GetPixel(_efag, _dfcd); _efag++ {
+				if _fcbc = _adab.SetPixel(_efag, _dfcd, 0); _fcbc != nil {
+					return nil, _a.Wrap(_fcbc, _ffbbb, "\u0032n\u0064\u0020\u0073\u0065\u0074")
+				}
+			}
+			if _fcbc = _aggg(_deec, _gabag, _efag-1, _eggd._decd, _eggd._fadf, _ffbgd, _cabc); _fcbc != nil {
+				return nil, _a.Wrap(_fcbc, _ffbbb, "n\u006f\u0072\u006d\u0061\u006c\u0020\u0070\u0075\u0073\u0068")
+			}
+			if _efag > _eggd._afgf+1 {
+				if _fcbc = _aggg(_deec, _eggd._afgf+1, _efag-1, _eggd._decd, -_eggd._fadf, _ffbgd, _cabc); _fcbc != nil {
+					return nil, _a.Wrap(_fcbc, _ffbbb, "\u006ce\u0061k\u0020\u006f\u006e\u0020\u0072i\u0067\u0068t\u0020\u0073\u0069\u0064\u0065")
+				}
+			}
+			for _efag++; _efag <= _eggd._afgf && _efag <= _daga && !_adab.GetPixel(_efag, _dfcd); _efag++ {
+			}
+			_gabag = _efag
+			if _efag > _eggd._afgf || _efag > _daga {
+				break
+			}
+		}
+	}
+	_cabc.Max.X++
+	_cabc.Max.Y++
+	return _cabc, nil
+}
+
+func TstASymbol(t *_c.T) *Bitmap {
+	t.Helper()
+	_fagg := New(6, 6)
+	_d.NoError(t, _fagg.SetPixel(1, 0, 1))
+	_d.NoError(t, _fagg.SetPixel(2, 0, 1))
+	_d.NoError(t, _fagg.SetPixel(3, 0, 1))
+	_d.NoError(t, _fagg.SetPixel(4, 0, 1))
+	_d.NoError(t, _fagg.SetPixel(5, 1, 1))
+	_d.NoError(t, _fagg.SetPixel(1, 2, 1))
+	_d.NoError(t, _fagg.SetPixel(2, 2, 1))
+	_d.NoError(t, _fagg.SetPixel(3, 2, 1))
+	_d.NoError(t, _fagg.SetPixel(4, 2, 1))
+	_d.NoError(t, _fagg.SetPixel(5, 2, 1))
+	_d.NoError(t, _fagg.SetPixel(0, 3, 1))
+	_d.NoError(t, _fagg.SetPixel(5, 3, 1))
+	_d.NoError(t, _fagg.SetPixel(0, 4, 1))
+	_d.NoError(t, _fagg.SetPixel(5, 4, 1))
+	_d.NoError(t, _fagg.SetPixel(1, 5, 1))
+	_d.NoError(t, _fagg.SetPixel(2, 5, 1))
+	_d.NoError(t, _fagg.SetPixel(3, 5, 1))
+	_d.NoError(t, _fagg.SetPixel(4, 5, 1))
+	_d.NoError(t, _fagg.SetPixel(5, 5, 1))
+	return _fagg
+}
+
+const (
+	ComponentConn Component = iota
+	ComponentCharacters
+	ComponentWords
+)
+
+var _ _df.Interface = &ClassedPoints{}
+
+const (
+	AsymmetricMorphBC BoundaryCondition = iota
+	SymmetricMorphBC
+)
+
+func _gfde(_ffbdf *Bitmap, _acacg, _bffa, _fagd, _fcee int, _abbbf RasterOperator, _abef *Bitmap, _gbeb, _gbeg int) error {
+	var (
+		_fcga          bool
+		_agdbd         bool
+		_debag         byte
+		_aeaaa         int
+		_gacc          int
+		_fddc          int
+		_decc          int
+		_feagf         bool
+		_gfaa          int
+		_cdgg          int
+		_fbdb          int
+		_eedde         bool
+		_bac           byte
+		_aaad          int
+		_fdfg          int
+		_bfbae         int
+		_degfb         byte
+		_fbee          int
+		_accg          int
+		_afefbf        uint
+		_gcdec         uint
+		_bdgd          byte
+		_gabc          shift
+		_addb          bool
+		_ebcc          bool
+		_ggdfa, _eedab int
+	)
+	if _gbeb&7 != 0 {
+		_accg = 8 - (_gbeb & 7)
+	}
+	if _acacg&7 != 0 {
+		_gacc = 8 - (_acacg & 7)
+	}
+	if _accg == 0 && _gacc == 0 {
+		_bdgd = _beeb[0]
+	} else {
+		if _gacc > _accg {
+			_afefbf = uint(_gacc - _accg)
+		} else {
+			_afefbf = uint(8 - (_accg - _gacc))
+		}
+		_gcdec = 8 - _afefbf
+		_bdgd = _beeb[_afefbf]
+	}
+	if (_acacg & 7) != 0 {
+		_fcga = true
+		_aeaaa = 8 - (_acacg & 7)
+		_debag = _beeb[_aeaaa]
+		_fddc = _ffbdf.RowStride*_bffa + (_acacg >> 3)
+		_decc = _abef.RowStride*_gbeg + (_gbeb >> 3)
+		_fbee = 8 - (_gbeb & 7)
+		if _aeaaa > _fbee {
+			_gabc = _dgfb
+			if _fagd >= _accg {
+				_addb = true
+			}
+		} else {
+			_gabc = _acce
+		}
+	}
+	if _fagd < _aeaaa {
+		_agdbd = true
+		_debag &= _dcga[8-_aeaaa+_fagd]
+	}
+	if !_agdbd {
+		_gfaa = (_fagd - _aeaaa) >> 3
+		if _gfaa != 0 {
+			_feagf = true
+			_cdgg = _ffbdf.RowStride*_bffa + ((_acacg + _gacc) >> 3)
+			_fbdb = _abef.RowStride*_gbeg + ((_gbeb + _gacc) >> 3)
+		}
+	}
+	_aaad = (_acacg + _fagd) & 7
+	if !_agdbd && _aaad != 0 {
+		_eedde = true
+		_bac = _dcga[_aaad]
+		_fdfg = _ffbdf.RowStride*_bffa + ((_acacg + _gacc) >> 3) + _gfaa
+		_bfbae = _abef.RowStride*_gbeg + ((_gbeb + _gacc) >> 3) + _gfaa
+		if _aaad > int(_gcdec) {
+			_ebcc = true
+		}
+	}
+	switch _abbbf {
+	case PixSrc:
+		if _fcga {
+			for _ggdfa = 0; _ggdfa < _fcee; _ggdfa++ {
+				if _gabc == _dgfb {
+					_degfb = _abef.Data[_decc] << _afefbf
+					if _addb {
+						_degfb = _fbaa(_degfb, _abef.Data[_decc+1]>>_gcdec, _bdgd)
+					}
+				} else {
+					_degfb = _abef.Data[_decc] >> _gcdec
+				}
+				_ffbdf.Data[_fddc] = _fbaa(_ffbdf.Data[_fddc], _degfb, _debag)
+				_fddc += _ffbdf.RowStride
+				_decc += _abef.RowStride
+			}
+		}
+		if _feagf {
+			for _ggdfa = 0; _ggdfa < _fcee; _ggdfa++ {
+				for _eedab = 0; _eedab < _gfaa; _eedab++ {
+					_degfb = _fbaa(_abef.Data[_fbdb+_eedab]<<_afefbf, _abef.Data[_fbdb+_eedab+1]>>_gcdec, _bdgd)
+					_ffbdf.Data[_cdgg+_eedab] = _degfb
+				}
+				_cdgg += _ffbdf.RowStride
+				_fbdb += _abef.RowStride
+			}
+		}
+		if _eedde {
+			for _ggdfa = 0; _ggdfa < _fcee; _ggdfa++ {
+				_degfb = _abef.Data[_bfbae] << _afefbf
+				if _ebcc {
+					_degfb = _fbaa(_degfb, _abef.Data[_bfbae+1]>>_gcdec, _bdgd)
+				}
+				_ffbdf.Data[_fdfg] = _fbaa(_ffbdf.Data[_fdfg], _degfb, _bac)
+				_fdfg += _ffbdf.RowStride
+				_bfbae += _abef.RowStride
+			}
+		}
+	case PixNotSrc:
+		if _fcga {
+			for _ggdfa = 0; _ggdfa < _fcee; _ggdfa++ {
+				if _gabc == _dgfb {
+					_degfb = _abef.Data[_decc] << _afefbf
+					if _addb {
+						_degfb = _fbaa(_degfb, _abef.Data[_decc+1]>>_gcdec, _bdgd)
+					}
+				} else {
+					_degfb = _abef.Data[_decc] >> _gcdec
+				}
+				_ffbdf.Data[_fddc] = _fbaa(_ffbdf.Data[_fddc], ^_degfb, _debag)
+				_fddc += _ffbdf.RowStride
+				_decc += _abef.RowStride
+			}
+		}
+		if _feagf {
+			for _ggdfa = 0; _ggdfa < _fcee; _ggdfa++ {
+				for _eedab = 0; _eedab < _gfaa; _eedab++ {
+					_degfb = _fbaa(_abef.Data[_fbdb+_eedab]<<_afefbf, _abef.Data[_fbdb+_eedab+1]>>_gcdec, _bdgd)
+					_ffbdf.Data[_cdgg+_eedab] = ^_degfb
+				}
+				_cdgg += _ffbdf.RowStride
+				_fbdb += _abef.RowStride
+			}
+		}
+		if _eedde {
+			for _ggdfa = 0; _ggdfa < _fcee; _ggdfa++ {
+				_degfb = _abef.Data[_bfbae] << _afefbf
+				if _ebcc {
+					_degfb = _fbaa(_degfb, _abef.Data[_bfbae+1]>>_gcdec, _bdgd)
+				}
+				_ffbdf.Data[_fdfg] = _fbaa(_ffbdf.Data[_fdfg], ^_degfb, _bac)
+				_fdfg += _ffbdf.RowStride
+				_bfbae += _abef.RowStride
+			}
+		}
+	case PixSrcOrDst:
+		if _fcga {
+			for _ggdfa = 0; _ggdfa < _fcee; _ggdfa++ {
+				if _gabc == _dgfb {
+					_degfb = _abef.Data[_decc] << _afefbf
+					if _addb {
+						_degfb = _fbaa(_degfb, _abef.Data[_decc+1]>>_gcdec, _bdgd)
+					}
+				} else {
+					_degfb = _abef.Data[_decc] >> _gcdec
+				}
+				_ffbdf.Data[_fddc] = _fbaa(_ffbdf.Data[_fddc], _degfb|_ffbdf.Data[_fddc], _debag)
+				_fddc += _ffbdf.RowStride
+				_decc += _abef.RowStride
+			}
+		}
+		if _feagf {
+			for _ggdfa = 0; _ggdfa < _fcee; _ggdfa++ {
+				for _eedab = 0; _eedab < _gfaa; _eedab++ {
+					_degfb = _fbaa(_abef.Data[_fbdb+_eedab]<<_afefbf, _abef.Data[_fbdb+_eedab+1]>>_gcdec, _bdgd)
+					_ffbdf.Data[_cdgg+_eedab] |= _degfb
+				}
+				_cdgg += _ffbdf.RowStride
+				_fbdb += _abef.RowStride
+			}
+		}
+		if _eedde {
+			for _ggdfa = 0; _ggdfa < _fcee; _ggdfa++ {
+				_degfb = _abef.Data[_bfbae] << _afefbf
+				if _ebcc {
+					_degfb = _fbaa(_degfb, _abef.Data[_bfbae+1]>>_gcdec, _bdgd)
+				}
+				_ffbdf.Data[_fdfg] = _fbaa(_ffbdf.Data[_fdfg], _degfb|_ffbdf.Data[_fdfg], _bac)
+				_fdfg += _ffbdf.RowStride
+				_bfbae += _abef.RowStride
+			}
+		}
+	case PixSrcAndDst:
+		if _fcga {
+			for _ggdfa = 0; _ggdfa < _fcee; _ggdfa++ {
+				if _gabc == _dgfb {
+					_degfb = _abef.Data[_decc] << _afefbf
+					if _addb {
+						_degfb = _fbaa(_degfb, _abef.Data[_decc+1]>>_gcdec, _bdgd)
+					}
+				} else {
+					_degfb = _abef.Data[_decc] >> _gcdec
+				}
+				_ffbdf.Data[_fddc] = _fbaa(_ffbdf.Data[_fddc], _degfb&_ffbdf.Data[_fddc], _debag)
+				_fddc += _ffbdf.RowStride
+				_decc += _abef.RowStride
+			}
+		}
+		if _feagf {
+			for _ggdfa = 0; _ggdfa < _fcee; _ggdfa++ {
+				for _eedab = 0; _eedab < _gfaa; _eedab++ {
+					_degfb = _fbaa(_abef.Data[_fbdb+_eedab]<<_afefbf, _abef.Data[_fbdb+_eedab+1]>>_gcdec, _bdgd)
+					_ffbdf.Data[_cdgg+_eedab] &= _degfb
+				}
+				_cdgg += _ffbdf.RowStride
+				_fbdb += _abef.RowStride
+			}
+		}
+		if _eedde {
+			for _ggdfa = 0; _ggdfa < _fcee; _ggdfa++ {
+				_degfb = _abef.Data[_bfbae] << _afefbf
+				if _ebcc {
+					_degfb = _fbaa(_degfb, _abef.Data[_bfbae+1]>>_gcdec, _bdgd)
+				}
+				_ffbdf.Data[_fdfg] = _fbaa(_ffbdf.Data[_fdfg], _degfb&_ffbdf.Data[_fdfg], _bac)
+				_fdfg += _ffbdf.RowStride
+				_bfbae += _abef.RowStride
+			}
+		}
+	case PixSrcXorDst:
+		if _fcga {
+			for _ggdfa = 0; _ggdfa < _fcee; _ggdfa++ {
+				if _gabc == _dgfb {
+					_degfb = _abef.Data[_decc] << _afefbf
+					if _addb {
+						_degfb = _fbaa(_degfb, _abef.Data[_decc+1]>>_gcdec, _bdgd)
+					}
+				} else {
+					_degfb = _abef.Data[_decc] >> _gcdec
+				}
+				_ffbdf.Data[_fddc] = _fbaa(_ffbdf.Data[_fddc], _degfb^_ffbdf.Data[_fddc], _debag)
+				_fddc += _ffbdf.RowStride
+				_decc += _abef.RowStride
+			}
+		}
+		if _feagf {
+			for _ggdfa = 0; _ggdfa < _fcee; _ggdfa++ {
+				for _eedab = 0; _eedab < _gfaa; _eedab++ {
+					_degfb = _fbaa(_abef.Data[_fbdb+_eedab]<<_afefbf, _abef.Data[_fbdb+_eedab+1]>>_gcdec, _bdgd)
+					_ffbdf.Data[_cdgg+_eedab] ^= _degfb
+				}
+				_cdgg += _ffbdf.RowStride
+				_fbdb += _abef.RowStride
+			}
+		}
+		if _eedde {
+			for _ggdfa = 0; _ggdfa < _fcee; _ggdfa++ {
+				_degfb = _abef.Data[_bfbae] << _afefbf
+				if _ebcc {
+					_degfb = _fbaa(_degfb, _abef.Data[_bfbae+1]>>_gcdec, _bdgd)
+				}
+				_ffbdf.Data[_fdfg] = _fbaa(_ffbdf.Data[_fdfg], _degfb^_ffbdf.Data[_fdfg], _bac)
+				_fdfg += _ffbdf.RowStride
+				_bfbae += _abef.RowStride
+			}
+		}
+	case PixNotSrcOrDst:
+		if _fcga {
+			for _ggdfa = 0; _ggdfa < _fcee; _ggdfa++ {
+				if _gabc == _dgfb {
+					_degfb = _abef.Data[_decc] << _afefbf
+					if _addb {
+						_degfb = _fbaa(_degfb, _abef.Data[_decc+1]>>_gcdec, _bdgd)
+					}
+				} else {
+					_degfb = _abef.Data[_decc] >> _gcdec
+				}
+				_ffbdf.Data[_fddc] = _fbaa(_ffbdf.Data[_fddc], ^_degfb|_ffbdf.Data[_fddc], _debag)
+				_fddc += _ffbdf.RowStride
+				_decc += _abef.RowStride
+			}
+		}
+		if _feagf {
+			for _ggdfa = 0; _ggdfa < _fcee; _ggdfa++ {
+				for _eedab = 0; _eedab < _gfaa; _eedab++ {
+					_degfb = _fbaa(_abef.Data[_fbdb+_eedab]<<_afefbf, _abef.Data[_fbdb+_eedab+1]>>_gcdec, _bdgd)
+					_ffbdf.Data[_cdgg+_eedab] |= ^_degfb
+				}
+				_cdgg += _ffbdf.RowStride
+				_fbdb += _abef.RowStride
+			}
+		}
+		if _eedde {
+			for _ggdfa = 0; _ggdfa < _fcee; _ggdfa++ {
+				_degfb = _abef.Data[_bfbae] << _afefbf
+				if _ebcc {
+					_degfb = _fbaa(_degfb, _abef.Data[_bfbae+1]>>_gcdec, _bdgd)
+				}
+				_ffbdf.Data[_fdfg] = _fbaa(_ffbdf.Data[_fdfg], ^_degfb|_ffbdf.Data[_fdfg], _bac)
+				_fdfg += _ffbdf.RowStride
+				_bfbae += _abef.RowStride
+			}
+		}
+	case PixNotSrcAndDst:
+		if _fcga {
+			for _ggdfa = 0; _ggdfa < _fcee; _ggdfa++ {
+				if _gabc == _dgfb {
+					_degfb = _abef.Data[_decc] << _afefbf
+					if _addb {
+						_degfb = _fbaa(_degfb, _abef.Data[_decc+1]>>_gcdec, _bdgd)
+					}
+				} else {
+					_degfb = _abef.Data[_decc] >> _gcdec
+				}
+				_ffbdf.Data[_fddc] = _fbaa(_ffbdf.Data[_fddc], ^_degfb&_ffbdf.Data[_fddc], _debag)
+				_fddc += _ffbdf.RowStride
+				_decc += _abef.RowStride
+			}
+		}
+		if _feagf {
+			for _ggdfa = 0; _ggdfa < _fcee; _ggdfa++ {
+				for _eedab = 0; _eedab < _gfaa; _eedab++ {
+					_degfb = _fbaa(_abef.Data[_fbdb+_eedab]<<_afefbf, _abef.Data[_fbdb+_eedab+1]>>_gcdec, _bdgd)
+					_ffbdf.Data[_cdgg+_eedab] &= ^_degfb
+				}
+				_cdgg += _ffbdf.RowStride
+				_fbdb += _abef.RowStride
+			}
+		}
+		if _eedde {
+			for _ggdfa = 0; _ggdfa < _fcee; _ggdfa++ {
+				_degfb = _abef.Data[_bfbae] << _afefbf
+				if _ebcc {
+					_degfb = _fbaa(_degfb, _abef.Data[_bfbae+1]>>_gcdec, _bdgd)
+				}
+				_ffbdf.Data[_fdfg] = _fbaa(_ffbdf.Data[_fdfg], ^_degfb&_ffbdf.Data[_fdfg], _bac)
+				_fdfg += _ffbdf.RowStride
+				_bfbae += _abef.RowStride
+			}
+		}
+	case PixSrcOrNotDst:
+		if _fcga {
+			for _ggdfa = 0; _ggdfa < _fcee; _ggdfa++ {
+				if _gabc == _dgfb {
+					_degfb = _abef.Data[_decc] << _afefbf
+					if _addb {
+						_degfb = _fbaa(_degfb, _abef.Data[_decc+1]>>_gcdec, _bdgd)
+					}
+				} else {
+					_degfb = _abef.Data[_decc] >> _gcdec
+				}
+				_ffbdf.Data[_fddc] = _fbaa(_ffbdf.Data[_fddc], _degfb|^_ffbdf.Data[_fddc], _debag)
+				_fddc += _ffbdf.RowStride
+				_decc += _abef.RowStride
+			}
+		}
+		if _feagf {
+			for _ggdfa = 0; _ggdfa < _fcee; _ggdfa++ {
+				for _eedab = 0; _eedab < _gfaa; _eedab++ {
+					_degfb = _fbaa(_abef.Data[_fbdb+_eedab]<<_afefbf, _abef.Data[_fbdb+_eedab+1]>>_gcdec, _bdgd)
+					_ffbdf.Data[_cdgg+_eedab] = _degfb | ^_ffbdf.Data[_cdgg+_eedab]
+				}
+				_cdgg += _ffbdf.RowStride
+				_fbdb += _abef.RowStride
+			}
+		}
+		if _eedde {
+			for _ggdfa = 0; _ggdfa < _fcee; _ggdfa++ {
+				_degfb = _abef.Data[_bfbae] << _afefbf
+				if _ebcc {
+					_degfb = _fbaa(_degfb, _abef.Data[_bfbae+1]>>_gcdec, _bdgd)
+				}
+				_ffbdf.Data[_fdfg] = _fbaa(_ffbdf.Data[_fdfg], _degfb|^_ffbdf.Data[_fdfg], _bac)
+				_fdfg += _ffbdf.RowStride
+				_bfbae += _abef.RowStride
+			}
+		}
+	case PixSrcAndNotDst:
+		if _fcga {
+			for _ggdfa = 0; _ggdfa < _fcee; _ggdfa++ {
+				if _gabc == _dgfb {
+					_degfb = _abef.Data[_decc] << _afefbf
+					if _addb {
+						_degfb = _fbaa(_degfb, _abef.Data[_decc+1]>>_gcdec, _bdgd)
+					}
+				} else {
+					_degfb = _abef.Data[_decc] >> _gcdec
+				}
+				_ffbdf.Data[_fddc] = _fbaa(_ffbdf.Data[_fddc], _degfb&^_ffbdf.Data[_fddc], _debag)
+				_fddc += _ffbdf.RowStride
+				_decc += _abef.RowStride
+			}
+		}
+		if _feagf {
+			for _ggdfa = 0; _ggdfa < _fcee; _ggdfa++ {
+				for _eedab = 0; _eedab < _gfaa; _eedab++ {
+					_degfb = _fbaa(_abef.Data[_fbdb+_eedab]<<_afefbf, _abef.Data[_fbdb+_eedab+1]>>_gcdec, _bdgd)
+					_ffbdf.Data[_cdgg+_eedab] = _degfb &^ _ffbdf.Data[_cdgg+_eedab]
+				}
+				_cdgg += _ffbdf.RowStride
+				_fbdb += _abef.RowStride
+			}
+		}
+		if _eedde {
+			for _ggdfa = 0; _ggdfa < _fcee; _ggdfa++ {
+				_degfb = _abef.Data[_bfbae] << _afefbf
+				if _ebcc {
+					_degfb = _fbaa(_degfb, _abef.Data[_bfbae+1]>>_gcdec, _bdgd)
+				}
+				_ffbdf.Data[_fdfg] = _fbaa(_ffbdf.Data[_fdfg], _degfb&^_ffbdf.Data[_fdfg], _bac)
+				_fdfg += _ffbdf.RowStride
+				_bfbae += _abef.RowStride
+			}
+		}
+	case PixNotPixSrcOrDst:
+		if _fcga {
+			for _ggdfa = 0; _ggdfa < _fcee; _ggdfa++ {
+				if _gabc == _dgfb {
+					_degfb = _abef.Data[_decc] << _afefbf
+					if _addb {
+						_degfb = _fbaa(_degfb, _abef.Data[_decc+1]>>_gcdec, _bdgd)
+					}
+				} else {
+					_degfb = _abef.Data[_decc] >> _gcdec
+				}
+				_ffbdf.Data[_fddc] = _fbaa(_ffbdf.Data[_fddc], ^(_degfb | _ffbdf.Data[_fddc]), _debag)
+				_fddc += _ffbdf.RowStride
+				_decc += _abef.RowStride
+			}
+		}
+		if _feagf {
+			for _ggdfa = 0; _ggdfa < _fcee; _ggdfa++ {
+				for _eedab = 0; _eedab < _gfaa; _eedab++ {
+					_degfb = _fbaa(_abef.Data[_fbdb+_eedab]<<_afefbf, _abef.Data[_fbdb+_eedab+1]>>_gcdec, _bdgd)
+					_ffbdf.Data[_cdgg+_eedab] = ^(_degfb | _ffbdf.Data[_cdgg+_eedab])
+				}
+				_cdgg += _ffbdf.RowStride
+				_fbdb += _abef.RowStride
+			}
+		}
+		if _eedde {
+			for _ggdfa = 0; _ggdfa < _fcee; _ggdfa++ {
+				_degfb = _abef.Data[_bfbae] << _afefbf
+				if _ebcc {
+					_degfb = _fbaa(_degfb, _abef.Data[_bfbae+1]>>_gcdec, _bdgd)
+				}
+				_ffbdf.Data[_fdfg] = _fbaa(_ffbdf.Data[_fdfg], ^(_degfb | _ffbdf.Data[_fdfg]), _bac)
+				_fdfg += _ffbdf.RowStride
+				_bfbae += _abef.RowStride
+			}
+		}
+	case PixNotPixSrcAndDst:
+		if _fcga {
+			for _ggdfa = 0; _ggdfa < _fcee; _ggdfa++ {
+				if _gabc == _dgfb {
+					_degfb = _abef.Data[_decc] << _afefbf
+					if _addb {
+						_degfb = _fbaa(_degfb, _abef.Data[_decc+1]>>_gcdec, _bdgd)
+					}
+				} else {
+					_degfb = _abef.Data[_decc] >> _gcdec
+				}
+				_ffbdf.Data[_fddc] = _fbaa(_ffbdf.Data[_fddc], ^(_degfb & _ffbdf.Data[_fddc]), _debag)
+				_fddc += _ffbdf.RowStride
+				_decc += _abef.RowStride
+			}
+		}
+		if _feagf {
+			for _ggdfa = 0; _ggdfa < _fcee; _ggdfa++ {
+				for _eedab = 0; _eedab < _gfaa; _eedab++ {
+					_degfb = _fbaa(_abef.Data[_fbdb+_eedab]<<_afefbf, _abef.Data[_fbdb+_eedab+1]>>_gcdec, _bdgd)
+					_ffbdf.Data[_cdgg+_eedab] = ^(_degfb & _ffbdf.Data[_cdgg+_eedab])
+				}
+				_cdgg += _ffbdf.RowStride
+				_fbdb += _abef.RowStride
+			}
+		}
+		if _eedde {
+			for _ggdfa = 0; _ggdfa < _fcee; _ggdfa++ {
+				_degfb = _abef.Data[_bfbae] << _afefbf
+				if _ebcc {
+					_degfb = _fbaa(_degfb, _abef.Data[_bfbae+1]>>_gcdec, _bdgd)
+				}
+				_ffbdf.Data[_fdfg] = _fbaa(_ffbdf.Data[_fdfg], ^(_degfb & _ffbdf.Data[_fdfg]), _bac)
+				_fdfg += _ffbdf.RowStride
+				_bfbae += _abef.RowStride
+			}
+		}
+	case PixNotPixSrcXorDst:
+		if _fcga {
+			for _ggdfa = 0; _ggdfa < _fcee; _ggdfa++ {
+				if _gabc == _dgfb {
+					_degfb = _abef.Data[_decc] << _afefbf
+					if _addb {
+						_degfb = _fbaa(_degfb, _abef.Data[_decc+1]>>_gcdec, _bdgd)
+					}
+				} else {
+					_degfb = _abef.Data[_decc] >> _gcdec
+				}
+				_ffbdf.Data[_fddc] = _fbaa(_ffbdf.Data[_fddc], ^(_degfb ^ _ffbdf.Data[_fddc]), _debag)
+				_fddc += _ffbdf.RowStride
+				_decc += _abef.RowStride
+			}
+		}
+		if _feagf {
+			for _ggdfa = 0; _ggdfa < _fcee; _ggdfa++ {
+				for _eedab = 0; _eedab < _gfaa; _eedab++ {
+					_degfb = _fbaa(_abef.Data[_fbdb+_eedab]<<_afefbf, _abef.Data[_fbdb+_eedab+1]>>_gcdec, _bdgd)
+					_ffbdf.Data[_cdgg+_eedab] = ^(_degfb ^ _ffbdf.Data[_cdgg+_eedab])
+				}
+				_cdgg += _ffbdf.RowStride
+				_fbdb += _abef.RowStride
+			}
+		}
+		if _eedde {
+			for _ggdfa = 0; _ggdfa < _fcee; _ggdfa++ {
+				_degfb = _abef.Data[_bfbae] << _afefbf
+				if _ebcc {
+					_degfb = _fbaa(_degfb, _abef.Data[_bfbae+1]>>_gcdec, _bdgd)
+				}
+				_ffbdf.Data[_fdfg] = _fbaa(_ffbdf.Data[_fdfg], ^(_degfb ^ _ffbdf.Data[_fdfg]), _bac)
+				_fdfg += _ffbdf.RowStride
+				_bfbae += _abef.RowStride
+			}
+		}
+	default:
+		_dc.Log.Debug("\u004f\u0070e\u0072\u0061\u0074\u0069\u006f\u006e\u003a\u0020\u0027\u0025\u0064\u0027\u0020\u006e\u006f\u0074\u0020\u0070\u0065\u0072\u006d\u0069tt\u0065\u0064", _abbbf)
+		return _a.Error("\u0072a\u0073t\u0065\u0072\u004f\u0070\u0047e\u006e\u0065r\u0061\u006c\u004c\u006f\u0077", "\u0072\u0061\u0073\u0074\u0065\u0072\u0020\u006f\u0070\u0065r\u0061\u0074\u0069\u006f\u006e\u0020\u006eo\u0074\u0020\u0070\u0065\u0072\u006d\u0069\u0074\u0074\u0065\u0064")
+	}
+	return nil
+}
+
+func (_cgb *Boxes) SelectBySize(width, height int, tp LocationFilter, relation SizeComparison) (_dgdg *Boxes, _baba error) {
+	const _cafb = "\u0042o\u0078e\u0073\u002e\u0053\u0065\u006ce\u0063\u0074B\u0079\u0053\u0069\u007a\u0065"
+	if _cgb == nil {
+		return nil, _a.Error(_cafb, "b\u006f\u0078\u0065\u0073 '\u0062'\u0020\u006e\u006f\u0074\u0020d\u0065\u0066\u0069\u006e\u0065\u0064")
+	}
+	if len(*_cgb) == 0 {
+		return _cgb, nil
+	}
+	switch tp {
+	case LocSelectWidth, LocSelectHeight, LocSelectIfEither, LocSelectIfBoth:
+	default:
+		return nil, _a.Errorf(_cafb, "\u0069\u006e\u0076al\u0069\u0064\u0020\u0066\u0069\u006c\u0074\u0065\u0072\u0020\u0074\u0079\u0070\u0065\u003a\u0020\u0025\u0064", tp)
+	}
+	switch relation {
+	case SizeSelectIfLT, SizeSelectIfGT, SizeSelectIfLTE, SizeSelectIfGTE:
+	default:
+		return nil, _a.Errorf(_cafb, "i\u006e\u0076\u0061\u006c\u0069\u0064 \u0072\u0065\u006c\u0061\u0074\u0069\u006f\u006e\u0020t\u0079\u0070\u0065:\u0020'\u0025\u0064\u0027", tp)
+	}
+	_ecb := _cgb.makeSizeIndicator(width, height, tp, relation)
+	_gfgd, _baba := _cgb.selectWithIndicator(_ecb)
+	if _baba != nil {
+		return nil, _a.Wrap(_baba, _cafb, "")
+	}
+	return _gfgd, nil
+}
+
+func (_fcg *Bitmap) CountPixels() int { return _fcg.countPixels() }
+
+func TstCSymbol(t *_c.T) *Bitmap {
+	t.Helper()
+	_bgbddc := New(6, 6)
+	_d.NoError(t, _bgbddc.SetPixel(1, 0, 1))
+	_d.NoError(t, _bgbddc.SetPixel(2, 0, 1))
+	_d.NoError(t, _bgbddc.SetPixel(3, 0, 1))
+	_d.NoError(t, _bgbddc.SetPixel(4, 0, 1))
+	_d.NoError(t, _bgbddc.SetPixel(0, 1, 1))
+	_d.NoError(t, _bgbddc.SetPixel(5, 1, 1))
+	_d.NoError(t, _bgbddc.SetPixel(0, 2, 1))
+	_d.NoError(t, _bgbddc.SetPixel(0, 3, 1))
+	_d.NoError(t, _bgbddc.SetPixel(0, 4, 1))
+	_d.NoError(t, _bgbddc.SetPixel(5, 4, 1))
+	_d.NoError(t, _bgbddc.SetPixel(1, 5, 1))
+	_d.NoError(t, _bgbddc.SetPixel(2, 5, 1))
+	_d.NoError(t, _bgbddc.SetPixel(3, 5, 1))
+	_d.NoError(t, _bgbddc.SetPixel(4, 5, 1))
+	return _bgbddc
+}
+
+func _ffed(_cbde uint, _aadd byte) byte { return _aadd >> _cbde << _cbde }
+
+func (_eegb *Bitmap) CreateTemplate() *Bitmap { return _eegb.createTemplate() }
+
+func (_ggdf *Bitmap) nextOnPixelLow(_fdag, _egda, _dede, _bccf, _gdec int) (_abce _bf.Point, _cbfa bool, _ebb error) {
+	const _gfeg = "B\u0069\u0074\u006d\u0061p.\u006ee\u0078\u0074\u004f\u006e\u0050i\u0078\u0065\u006c\u004c\u006f\u0077"
+	var (
+		_afgb int
+		_fbde byte
+	)
+	_cdfd := _gdec * _dede
+	_edga := _cdfd + (_bccf / 8)
+	if _fbde, _ebb = _ggdf.GetByte(_edga); _ebb != nil {
+		return _abce, false, _a.Wrap(_ebb, _gfeg, "\u0078\u0053\u0074\u0061\u0072\u0074\u0020\u0061\u006e\u0064 \u0079\u0053\u0074\u0061\u0072\u0074\u0020o\u0075\u0074\u0020\u006f\u0066\u0020\u0072\u0061\u006e\u0067\u0065")
+	}
+	if _fbde != 0 {
+		_bga := _bccf - (_bccf % 8) + 7
+		for _afgb = _bccf; _afgb <= _bga && _afgb < _fdag; _afgb++ {
+			if _ggdf.GetPixel(_afgb, _gdec) {
+				_abce.X = _afgb
+				_abce.Y = _gdec
+				return _abce, true, nil
+			}
+		}
+	}
+	_efecc := (_bccf / 8) + 1
+	_afgb = 8 * _efecc
+	var _ebbe int
+	for _edga = _cdfd + _efecc; _afgb < _fdag; _edga, _afgb = _edga+1, _afgb+8 {
+		if _fbde, _ebb = _ggdf.GetByte(_edga); _ebb != nil {
+			return _abce, false, _a.Wrap(_ebb, _gfeg, "r\u0065\u0073\u0074\u0020of\u0020t\u0068\u0065\u0020\u006c\u0069n\u0065\u0020\u0062\u0079\u0074\u0065")
+		}
+		if _fbde == 0 {
+			continue
+		}
+		for _ebbe = 0; _ebbe < 8 && _afgb < _fdag; _ebbe, _afgb = _ebbe+1, _afgb+1 {
+			if _ggdf.GetPixel(_afgb, _gdec) {
+				_abce.X = _afgb
+				_abce.Y = _gdec
+				return _abce, true, nil
+			}
+		}
+	}
+	for _eeeg := _gdec + 1; _eeeg < _egda; _eeeg++ {
+		_cdfd = _eeeg * _dede
+		for _edga, _afgb = _cdfd, 0; _afgb < _fdag; _edga, _afgb = _edga+1, _afgb+8 {
+			if _fbde, _ebb = _ggdf.GetByte(_edga); _ebb != nil {
+				return _abce, false, _a.Wrap(_ebb, _gfeg, "\u0066o\u006cl\u006f\u0077\u0069\u006e\u0067\u0020\u006c\u0069\u006e\u0065\u0073")
+			}
+			if _fbde == 0 {
+				continue
+			}
+			for _ebbe = 0; _ebbe < 8 && _afgb < _fdag; _ebbe, _afgb = _ebbe+1, _afgb+1 {
+				if _ggdf.GetPixel(_afgb, _eeeg) {
+					_abce.X = _afgb
+					_abce.Y = _eeeg
+					return _abce, true, nil
+				}
+			}
+		}
+	}
+	return _abce, false, nil
+}
+
+func TstOSymbol(t *_c.T, scale ...int) *Bitmap {
+	_egcb, _bggfd := NewWithData(4, 5, []byte{0xF0, 0x90, 0x90, 0x90, 0xF0})
+	_d.NoError(t, _bggfd)
+	return TstGetScaledSymbol(t, _egcb, scale...)
+}
+
+func (_gecd *Bitmaps) WidthSorter() func(_dadac, _ffbf int) bool {
+	return func(_adeba, _efcd int) bool { return _gecd.Values[_adeba].Width < _gecd.Values[_efcd].Width }
+}
+
+type MorphOperation int
+
+func (_agbb *Bitmap) equivalent(_bfdf *Bitmap) bool {
+	if _agbb == _bfdf {
+		return true
+	}
+	if !_agbb.SizesEqual(_bfdf) {
+		return false
+	}
+	_agea := _ceac(_agbb, _bfdf, CmbOpXor)
+	_dfeg := _agbb.countPixels()
+	_gggc := int(0.25 * float32(_dfeg))
+	if _agea.thresholdPixelSum(_gggc) {
+		return false
+	}
+	var (
+		_bfdfe [9][9]int
+		_ded   [18][9]int
+		_fefb  [9][18]int
+		_eaaa  int
+		_fcdb  int
+	)
+	_eegg := 9
+	_edad := _agbb.Height / _eegg
+	_gcc := _agbb.Width / _eegg
+	_afg, _bcea := _edad/2, _gcc/2
+	if _edad < _gcc {
+		_afg = _gcc / 2
+		_bcea = _edad / 2
+	}
+	_aaf := float64(_afg) * float64(_bcea) * _ad.Pi
+	_fec := int(float64(_edad*_gcc/2) * 0.9)
+	_daab := int(float64(_gcc*_edad/2) * 0.9)
+	for _bdc := 0; _bdc < _eegg; _bdc++ {
+		_ebdb := _gcc*_bdc + _eaaa
+		var _eddb int
+		if _bdc == _eegg-1 {
+			_eaaa = 0
+			_eddb = _agbb.Width
+		} else {
+			_eddb = _ebdb + _gcc
+			if ((_agbb.Width - _eaaa) % _eegg) > 0 {
+				_eaaa++
+				_eddb++
+			}
+		}
+		for _ggac := 0; _ggac < _eegg; _ggac++ {
+			_ggea := _edad*_ggac + _fcdb
+			var _gfcb int
+			if _ggac == _eegg-1 {
+				_fcdb = 0
+				_gfcb = _agbb.Height
+			} else {
+				_gfcb = _ggea + _edad
+				if (_agbb.Height-_fcdb)%_eegg > 0 {
+					_fcdb++
+					_gfcb++
+				}
+			}
+			var _gcf, _gcfb, _gffa, _eegfe int
+			_cced := (_ebdb + _eddb) / 2
+			_dce := (_ggea + _gfcb) / 2
+			for _aacb := _ebdb; _aacb < _eddb; _aacb++ {
+				for _ddag := _ggea; _ddag < _gfcb; _ddag++ {
+					if _agea.GetPixel(_aacb, _ddag) {
+						if _aacb < _cced {
+							_gcf++
+						} else {
+							_gcfb++
+						}
+						if _ddag < _dce {
+							_eegfe++
+						} else {
+							_gffa++
+						}
+					}
+				}
+			}
+			_bfdfe[_bdc][_ggac] = _gcf + _gcfb
+			_ded[_bdc*2][_ggac] = _gcf
+			_ded[_bdc*2+1][_ggac] = _gcfb
+			_fefb[_bdc][_ggac*2] = _eegfe
+			_fefb[_bdc][_ggac*2+1] = _gffa
+		}
+	}
+	for _geaf := 0; _geaf < _eegg*2-1; _geaf++ {
+		for _deda := 0; _deda < (_eegg - 1); _deda++ {
+			var _accf int
+			for _gbge := 0; _gbge < 2; _gbge++ {
+				for _bdcc := 0; _bdcc < 2; _bdcc++ {
+					_accf += _ded[_geaf+_gbge][_deda+_bdcc]
+				}
+			}
+			if _accf > _daab {
+				return false
+			}
+		}
+	}
+	for _fea := 0; _fea < (_eegg - 1); _fea++ {
+		for _fddfee := 0; _fddfee < ((_eegg * 2) - 1); _fddfee++ {
+			var _cbfc int
+			for _gabe := 0; _gabe < 2; _gabe++ {
+				for _efcf := 0; _efcf < 2; _efcf++ {
+					_cbfc += _fefb[_fea+_gabe][_fddfee+_efcf]
+				}
+			}
+			if _cbfc > _fec {
+				return false
+			}
+		}
+	}
+	for _aagg := 0; _aagg < (_eegg - 2); _aagg++ {
+		for _afcg := 0; _afcg < (_eegg - 2); _afcg++ {
+			var _bcff, _acca int
+			for _ead := 0; _ead < 3; _ead++ {
+				for _ccdb := 0; _ccdb < 3; _ccdb++ {
+					if _ead == _ccdb {
+						_bcff += _bfdfe[_aagg+_ead][_afcg+_ccdb]
+					}
+					if (2 - _ead) == _ccdb {
+						_acca += _bfdfe[_aagg+_ead][_afcg+_ccdb]
+					}
+				}
+			}
+			if _bcff > _daab || _acca > _daab {
+				return false
+			}
+		}
+	}
+	for _edef := 0; _edef < (_eegg - 1); _edef++ {
+		for _edca := 0; _edca < (_eegg - 1); _edca++ {
+			var _dgec int
+			for _acg := 0; _acg < 2; _acg++ {
+				for _dfca := 0; _dfca < 2; _dfca++ {
+					_dgec += _bfdfe[_edef+_acg][_edca+_dfca]
+				}
+			}
+			if float64(_dgec) > _aaf {
+				return false
+			}
+		}
+	}
+	return true
+}
+
+func (_babd *byWidth) Len() int { return len(_babd.Values) }
+
+func _bcdbc(_dfaa, _adega int, _dgbf string) *Selection {
+	_gedea := &Selection{Height: _dfaa, Width: _adega, Name: _dgbf}
+	_gedea.Data = make([][]SelectionValue, _dfaa)
+	for _beee := 0; _beee < _dfaa; _beee++ {
+		_gedea.Data[_beee] = make([]SelectionValue, _adega)
+	}
+	return _gedea
+}
+
+func (_afbb *Bitmap) setAll() error {
+	_bgg := _ece(_afbb, 0, 0, _afbb.Width, _afbb.Height, PixSet, nil, 0, 0)
+	if _bgg != nil {
+		return _a.Wrap(_bgg, "\u0073\u0065\u0074\u0041\u006c\u006c", "")
+	}
+	return nil
+}
+
+func (_ageg *BitmapsArray) GetBox(i int) (*_bf.Rectangle, error) {
+	const _cfbg = "\u0042\u0069\u0074\u006dap\u0073\u0041\u0072\u0072\u0061\u0079\u002e\u0047\u0065\u0074\u0042\u006f\u0078"
+	if _ageg == nil {
+		return nil, _a.Error(_cfbg, "p\u0072\u006f\u0076\u0069\u0064\u0065d\u0020\u006e\u0069\u006c\u0020\u0027\u0042\u0069\u0074m\u0061\u0070\u0073A\u0072r\u0061\u0079\u0027")
+	}
+	if i > len(_ageg.Boxes)-1 {
+		return nil, _a.Errorf(_cfbg, "\u0069n\u0064\u0065\u0078\u003a\u0020\u0027\u0025\u0064\u0027\u0020\u006fu\u0074\u0020\u006f\u0066\u0020\u0072\u0061\u006e\u0067\u0065", i)
+	}
+	return _ageg.Boxes[i], nil
+}
+
+func (_fgbaf *ClassedPoints) SortByX() {
+	_fgbaf._ggfg = _fgbaf.xSortFunction()
+	_df.Sort(_fgbaf)
+}
+
+func _dcd(_daa *Bitmap, _efg *Bitmap, _fd int) (_gc error) {
+	const _cdg = "e\u0078\u0070\u0061\u006edB\u0069n\u0061\u0072\u0079\u0050\u006fw\u0065\u0072\u0032\u004c\u006f\u0077"
+	switch _fd {
+	case 2:
+		_gc = _bb(_daa, _efg)
+	case 4:
+		_gc = _bc(_daa, _efg)
+	case 8:
+		_gc = _ea(_daa, _efg)
+	default:
+		return _a.Error(_cdg, "\u0065\u0078p\u0061\u006e\u0073\u0069o\u006e\u0020f\u0061\u0063\u0074\u006f\u0072\u0020\u006e\u006ft\u0020\u0069\u006e\u0020\u007b\u0032\u002c\u0034\u002c\u0038\u007d\u0020r\u0061\u006e\u0067\u0065")
+	}
+	if _gc != nil {
+		_gc = _a.Wrap(_gc, _cdg, "")
+	}
+	return _gc
+}
+
+func _ggb(_ede *Bitmap, _dcdc int, _bce []byte) (_fgg *Bitmap, _fdd error) {
+	const _ac = "\u0072\u0065\u0064\u0075\u0063\u0065\u0052\u0061\u006e\u006b\u0042\u0069n\u0061\u0072\u0079\u0032"
+	if _ede == nil {
+		return nil, _a.Error(_ac, "\u0073o\u0075\u0072\u0063\u0065 \u0062\u0069\u0074\u006d\u0061p\u0020n\u006ft\u0020\u0064\u0065\u0066\u0069\u006e\u0065d")
+	}
+	if _dcdc < 1 || _dcdc > 4 {
+		return nil, _a.Error(_ac, "\u006c\u0065\u0076\u0065\u006c\u0020\u006d\u0075\u0073\u0074 \u0062\u0065\u0020\u0069\u006e\u0020\u0073e\u0074\u0020\u007b\u0031\u002c\u0032\u002c\u0033\u002c\u0034\u007d")
+	}
+	if _ede.Height <= 1 {
+		return nil, _a.Errorf(_ac, "\u0073o\u0075\u0072c\u0065\u0020\u0068e\u0069\u0067\u0068\u0074\u0020\u006d\u0075s\u0074\u0020\u0062\u0065\u0020\u0061t\u0020\u006c\u0065\u0061\u0073\u0074\u0020\u0027\u0032\u0027\u0020-\u0020\u0069\u0073\u003a\u0020\u0027\u0025\u0064\u0027", _ede.Height)
+	}
+	_fgg = New(_ede.Width/2, _ede.Height/2)
+	if _bce == nil {
+		_bce = _bg()
+	}
+	_cec := _efd(_ede.RowStride, 2*_fgg.RowStride)
+	switch _dcdc {
+	case 1:
+		_fdd = _ga(_ede, _fgg, _dcdc, _bce, _cec)
+	case 2:
+		_fdd = _bad(_ede, _fgg, _dcdc, _bce, _cec)
+	case 3:
+		_fdd = _agf(_ede, _fgg, _dcdc, _bce, _cec)
+	case 4:
+		_fdd = _deg(_ede, _fgg, _dcdc, _bce, _cec)
+	}
+	if _fdd != nil {
+		return nil, _fdd
+	}
+	return _fgg, nil
+}
+
+func _dedg(_daef, _abeg, _egfa *Bitmap) (*Bitmap, error) {
+	const _fbdcb = "\u0062\u0069\u0074\u006d\u0061\u0070\u002e\u0078\u006f\u0072"
+	if _abeg == nil {
+		return nil, _a.Error(_fbdcb, "'\u0062\u0031\u0027\u0020\u0069\u0073\u0020\u006e\u0069\u006c")
+	}
+	if _egfa == nil {
+		return nil, _a.Error(_fbdcb, "'\u0062\u0032\u0027\u0020\u0069\u0073\u0020\u006e\u0069\u006c")
+	}
+	if _daef == _egfa {
+		return nil, _a.Error(_fbdcb, "'\u0064\u0027\u0020\u003d\u003d\u0020\u0027\u0062\u0032\u0027")
+	}
+	if !_abeg.SizesEqual(_egfa) {
+		_dc.Log.Debug("\u0025s\u0020\u002d \u0042\u0069\u0074\u006da\u0070\u0020\u0027b\u0031\u0027\u0020\u0069\u0073\u0020\u006e\u006f\u0074 e\u0071\u0075\u0061l\u0020\u0073i\u007a\u0065\u0020\u0077\u0069\u0074h\u0020\u0027b\u0032\u0027", _fbdcb)
+	}
+	var _ggeag error
+	if _daef, _ggeag = _fedg(_daef, _abeg); _ggeag != nil {
+		return nil, _a.Wrap(_ggeag, _fbdcb, "\u0063\u0061n\u0027\u0074\u0020c\u0072\u0065\u0061\u0074\u0065\u0020\u0027\u0064\u0027")
+	}
+	if _ggeag = _daef.RasterOperation(0, 0, _daef.Width, _daef.Height, PixSrcXorDst, _egfa, 0, 0); _ggeag != nil {
+		return nil, _a.Wrap(_ggeag, _fbdcb, "")
+	}
+	return _daef, nil
+}
+
+func _ggdc(_fcba, _gdga *Bitmap, _aafb, _ebbea, _eaga, _fgac, _daadc int, _bae CombinationOperator) error {
+	var _gaab int
+	_debd := func() {
+		_gaab++
+		_eaga += _gdga.RowStride
+		_fgac += _fcba.RowStride
+		_daadc += _fcba.RowStride
+	}
+	for _gaab = _aafb; _gaab < _ebbea; _debd() {
+		_gagb := _eaga
+		for _caed := _fgac; _caed <= _daadc; _caed++ {
+			_cfe, _bcda := _gdga.GetByte(_gagb)
+			if _bcda != nil {
+				return _bcda
+			}
+			_bfcb, _bcda := _fcba.GetByte(_caed)
+			if _bcda != nil {
+				return _bcda
+			}
+			if _bcda = _gdga.SetByte(_gagb, _ccecc(_cfe, _bfcb, _bae)); _bcda != nil {
+				return _bcda
+			}
+			_gagb++
+		}
+	}
+	return nil
+}
+
+func (_cada *Bitmap) addBorderGeneral(_fabd, _afc, _ggbd, _dffd int, _eeb int) (*Bitmap, error) {
+	const _dbe = "\u0061\u0064d\u0042\u006f\u0072d\u0065\u0072\u0047\u0065\u006e\u0065\u0072\u0061\u006c"
+	if _fabd < 0 || _afc < 0 || _ggbd < 0 || _dffd < 0 {
+		return nil, _a.Error(_dbe, "n\u0065\u0067\u0061\u0074iv\u0065 \u0062\u006f\u0072\u0064\u0065r\u0020\u0061\u0064\u0064\u0065\u0064")
+	}
+	_cab, _gfcc := _cada.Width, _cada.Height
+	_gbgcc := _cab + _fabd + _afc
+	_aec := _gfcc + _ggbd + _dffd
+	_acad := New(_gbgcc, _aec)
+	_acad.Color = _cada.Color
+	_fddfe := PixClr
+	if _eeb > 0 {
+		_fddfe = PixSet
+	}
+	_bagg := _acad.RasterOperation(0, 0, _fabd, _aec, _fddfe, nil, 0, 0)
+	if _bagg != nil {
+		return nil, _a.Wrap(_bagg, _dbe, "\u006c\u0065\u0066\u0074")
+	}
+	_bagg = _acad.RasterOperation(_gbgcc-_afc, 0, _afc, _aec, _fddfe, nil, 0, 0)
+	if _bagg != nil {
+		return nil, _a.Wrap(_bagg, _dbe, "\u0072\u0069\u0067h\u0074")
+	}
+	_bagg = _acad.RasterOperation(0, 0, _gbgcc, _ggbd, _fddfe, nil, 0, 0)
+	if _bagg != nil {
+		return nil, _a.Wrap(_bagg, _dbe, "\u0074\u006f\u0070")
+	}
+	_bagg = _acad.RasterOperation(0, _aec-_dffd, _gbgcc, _dffd, _fddfe, nil, 0, 0)
+	if _bagg != nil {
+		return nil, _a.Wrap(_bagg, _dbe, "\u0062\u006f\u0074\u0074\u006f\u006d")
+	}
+	_bagg = _acad.RasterOperation(_fabd, _ggbd, _cab, _gfcc, PixSrc, _cada, 0, 0)
+	if _bagg != nil {
+		return nil, _a.Wrap(_bagg, _dbe, "\u0063\u006f\u0070\u0079")
+	}
+	return _acad, nil
+}
+
+func ClipBoxToRectangle(box *_bf.Rectangle, wi, hi int) (_abde *_bf.Rectangle, _gfea error) {
+	const _ffca = "\u0043l\u0069p\u0042\u006f\u0078\u0054\u006fR\u0065\u0063t\u0061\u006e\u0067\u006c\u0065"
+	if box == nil {
+		return nil, _a.Error(_ffca, "\u0027\u0062\u006f\u0078\u0027\u0020\u006e\u006f\u0074\u0020\u0064\u0065f\u0069\u006e\u0065\u0064")
+	}
+	if box.Min.X >= wi || box.Min.Y >= hi || box.Max.X <= 0 || box.Max.Y <= 0 {
+		return nil, _a.Error(_ffca, "\u0027\u0062\u006fx'\u0020\u006f\u0075\u0074\u0073\u0069\u0064\u0065\u0020\u0072\u0065\u0063\u0074\u0061\u006e\u0067\u006c\u0065")
+	}
+	_acdc := *box
+	_abde = &_acdc
+	if _abde.Min.X < 0 {
+		_abde.Max.X += _abde.Min.X
+		_abde.Min.X = 0
+	}
+	if _abde.Min.Y < 0 {
+		_abde.Max.Y += _abde.Min.Y
+		_abde.Min.Y = 0
+	}
+	if _abde.Max.X > wi {
+		_abde.Max.X = wi
+	}
+	if _abde.Max.Y > hi {
+		_abde.Max.Y = hi
+	}
+	return _abde, nil
+}
+
+func TstVSymbol(t *_c.T, scale ...int) *Bitmap {
+	_dagb, _gaea := NewWithData(5, 5, []byte{0x88, 0x88, 0x88, 0x50, 0x20})
+	_d.NoError(t, _gaea)
+	return TstGetScaledSymbol(t, _dagb, scale...)
+}
+
+func (_aff *Bitmap) nextOnPixel(_fdba, _dgbg int) (_ccca _bf.Point, _fecd bool, _ecd error) {
+	const _cbb = "n\u0065\u0078\u0074\u004f\u006e\u0050\u0069\u0078\u0065\u006c"
+	_ccca, _fecd, _ecd = _aff.nextOnPixelLow(_aff.Width, _aff.Height, _aff.RowStride, _fdba, _dgbg)
+	if _ecd != nil {
+		return _ccca, false, _a.Wrap(_ecd, _cbb, "")
+	}
+	return _ccca, _fecd, nil
+}
+
+func (_gfbe *ClassedPoints) XAtIndex(i int) float32 { return (*_gfbe.Points)[_gfbe.IntSlice[i]].X }
+
+type byWidth Bitmaps
+
+func Dilate(d *Bitmap, s *Bitmap, sel *Selection) (*Bitmap, error) { return _acga(d, s, sel) }
+
+const (
+	_ SizeComparison = iota
+	SizeSelectIfLT
+	SizeSelectIfGT
+	SizeSelectIfLTE
+	SizeSelectIfGTE
+	SizeSelectIfEQ
+)
+
+func Extract(roi _bf.Rectangle, src *Bitmap) (*Bitmap, error) {
+	_fbdea := New(roi.Dx(), roi.Dy())
+	_bdeb := roi.Min.X & 0x07
+	_dabc := 8 - _bdeb
+	_aba := uint(8 - _fbdea.Width&0x07)
+	_ffdd := src.GetByteIndex(roi.Min.X, roi.Min.Y)
+	_eccd := src.GetByteIndex(roi.Max.X-1, roi.Min.Y)
+	_gef := _fbdea.RowStride == _eccd+1-_ffdd
+	var _bbbd int
+	for _ggbdc := roi.Min.Y; _ggbdc < roi.Max.Y; _ggbdc++ {
+		_bbbdf := _ffdd
+		_ebgf := _bbbd
+		switch {
+		case _ffdd == _eccd:
+			_eaffd, _abgg := src.GetByte(_bbbdf)
+			if _abgg != nil {
+				return nil, _abgg
+			}
+			_eaffd <<= uint(_bdeb)
+			_abgg = _fbdea.SetByte(_ebgf, _ffed(_aba, _eaffd))
+			if _abgg != nil {
+				return nil, _abgg
+			}
+		case _bdeb == 0:
+			for _fbe := _ffdd; _fbe <= _eccd; _fbe++ {
+				_gcbd, _ecda := src.GetByte(_bbbdf)
+				if _ecda != nil {
+					return nil, _ecda
+				}
+				_bbbdf++
+				if _fbe == _eccd && _gef {
+					_gcbd = _ffed(_aba, _gcbd)
+				}
+				_ecda = _fbdea.SetByte(_ebgf, _gcbd)
+				if _ecda != nil {
+					return nil, _ecda
+				}
+				_ebgf++
+			}
+		default:
+			_fadd := _bdd(src, _fbdea, uint(_bdeb), uint(_dabc), _aba, _ffdd, _eccd, _gef, _bbbdf, _ebgf)
+			if _fadd != nil {
+				return nil, _fadd
+			}
+		}
+		_ffdd += src.RowStride
+		_eccd += src.RowStride
+		_bbbd += _fbdea.RowStride
+	}
+	return _fbdea, nil
+}
+
+func (_gadc *Bitmap) clearAll() error {
+	return _gadc.RasterOperation(0, 0, _gadc.Width, _gadc.Height, PixClr, nil, 0, 0)
+}
+
+func (_dfe *Bitmap) SizesEqual(s *Bitmap) bool {
+	if _dfe == s {
+		return true
+	}
+	if _dfe.Width != s.Width || _dfe.Height != s.Height {
+		return false
+	}
+	return true
+}
+
+func CorrelationScoreSimple(bm1, bm2 *Bitmap, area1, area2 int, delX, delY float32, maxDiffW, maxDiffH int, tab []int) (_cacg float64, _efdb error) {
+	const _caee = "\u0043\u006f\u0072\u0072el\u0061\u0074\u0069\u006f\u006e\u0053\u0063\u006f\u0072\u0065\u0053\u0069\u006d\u0070l\u0065"
+	if bm1 == nil || bm2 == nil {
+		return _cacg, _a.Error(_caee, "n\u0069l\u0020\u0062\u0069\u0074\u006d\u0061\u0070\u0073 \u0070\u0072\u006f\u0076id\u0065\u0064")
+	}
+	if tab == nil {
+		return _cacg, _a.Error(_caee, "\u0074\u0061\u0062\u0020\u0075\u006e\u0064\u0065\u0066\u0069\u006e\u0065\u0064")
+	}
+	if area1 == 0 || area2 == 0 {
+		return _cacg, _a.Error(_caee, "\u0070\u0072\u006f\u0076\u0069\u0064\u0065\u0064\u0020\u0061\u0072e\u0061\u0073\u0020\u006d\u0075\u0073\u0074\u0020\u0062\u0065 \u003e\u0020\u0030")
+	}
+	_bfcaa, _gdfe := bm1.Width, bm1.Height
+	_bgfb, _fbfcd := bm2.Width, bm2.Height
+	if _fgfb(_bfcaa-_bgfb) > maxDiffW {
+		return 0, nil
+	}
+	if _fgfb(_gdfe-_fbfcd) > maxDiffH {
+		return 0, nil
+	}
+	var _bccdd, _ebga int
+	if delX >= 0 {
+		_bccdd = int(delX + 0.5)
+	} else {
+		_bccdd = int(delX - 0.5)
+	}
+	if delY >= 0 {
+		_ebga = int(delY + 0.5)
+	} else {
+		_ebga = int(delY - 0.5)
+	}
+	_cdec := bm1.createTemplate()
+	if _efdb = _cdec.RasterOperation(_bccdd, _ebga, _bgfb, _fbfcd, PixSrc, bm2, 0, 0); _efdb != nil {
+		return _cacg, _a.Wrap(_efdb, _caee, "\u0062m\u0032 \u0074\u006f\u0020\u0054\u0065\u006d\u0070\u006c\u0061\u0074\u0065")
+	}
+	if _efdb = _cdec.RasterOperation(0, 0, _bfcaa, _gdfe, PixSrcAndDst, bm1, 0, 0); _efdb != nil {
+		return _cacg, _a.Wrap(_efdb, _caee, "b\u006d\u0031\u0020\u0061\u006e\u0064\u0020\u0062\u006d\u0054")
+	}
+	_bfcg := _cdec.countPixels()
+	_cacg = float64(_bfcg) * float64(_bfcg) / (float64(area1) * float64(area2))
+	return _cacg, nil
+}
+
+var (
+	_dcga = []byte{0x00, 0x80, 0xC0, 0xE0, 0xF0, 0xF8, 0xFC, 0xFE, 0xFF}
+	_beeb = []byte{0x00, 0x01, 0x03, 0x07, 0x0F, 0x1F, 0x3F, 0x7F, 0xFF}
+)
+
+func _dgeba(_adb *Bitmap, _efeb *_ge.Stack, _ceede, _fgdd, _fgbafc int) (_dfdd *_bf.Rectangle, _gffdd error) {
+	const _gcfd = "\u0073e\u0065d\u0046\u0069\u006c\u006c\u0053\u0074\u0061\u0063\u006b\u0042\u0042"
+	if _adb == nil {
+		return nil, _a.Error(_gcfd, "\u0070\u0072\u006fvi\u0064\u0065\u0064\u0020\u006e\u0069\u006c\u0020\u0027\u0073\u0027\u0020\u0042\u0069\u0074\u006d\u0061\u0070")
+	}
+	if _efeb == nil {
+		return nil, _a.Error(_gcfd, "p\u0072o\u0076\u0069\u0064\u0065\u0064\u0020\u006e\u0069l\u0020\u0027\u0073\u0074ac\u006b\u0027")
+	}
+	switch _fgbafc {
+	case 4:
+		if _dfdd, _gffdd = _baca(_adb, _efeb, _ceede, _fgdd); _gffdd != nil {
+			return nil, _a.Wrap(_gffdd, _gcfd, "")
+		}
+		return _dfdd, nil
+	case 8:
+		if _dfdd, _gffdd = _ffbgb(_adb, _efeb, _ceede, _fgdd); _gffdd != nil {
+			return nil, _a.Wrap(_gffdd, _gcfd, "")
+		}
+		return _dfdd, nil
+	default:
+		return nil, _a.Errorf(_gcfd, "\u0063\u006f\u006e\u006e\u0065\u0063\u0074\u0069\u0076\u0069\u0074\u0079\u0020\u0069\u0073 \u006eo\u0074\u0020\u0034\u0020\u006f\u0072\u0020\u0038\u003a\u0020\u0027\u0025\u0064\u0027", _fgbafc)
+	}
+}
+
+func TstWriteSymbols(t *_c.T, bms *Bitmaps, src *Bitmap) {
+	for _bbdb := 0; _bbdb < bms.Size(); _bbdb++ {
+		_acfc := bms.Values[_bbdb]
+		_gedg := bms.Boxes[_bbdb]
+		_afca := src.RasterOperation(_gedg.Min.X, _gedg.Min.Y, _acfc.Width, _acfc.Height, PixSrc, _acfc, 0, 0)
+		_d.NoError(t, _afca)
+	}
+}
+
+func _deg(_fgfg, _aaec *Bitmap, _gcg int, _dcad []byte, _ecc int) (_bde error) {
+	const _cde = "\u0072\u0065\u0064uc\u0065\u0052\u0061\u006e\u006b\u0042\u0069\u006e\u0061\u0072\u0079\u0032\u004c\u0065\u0076\u0065\u006c\u0034"
+	var (
+		_fbd, _ceca, _abbb, _daf, _dag, _fbc, _acf, _fcf int
+		_acc, _cad                                       uint32
+		_abff, _ggf                                      byte
+		_ggd                                             uint16
+	)
+	_aea := make([]byte, 4)
+	_fddf := make([]byte, 4)
+	for _abbb = 0; _abbb < _fgfg.Height-1; _abbb, _daf = _abbb+2, _daf+1 {
+		_fbd = _abbb * _fgfg.RowStride
+		_ceca = _daf * _aaec.RowStride
+		for _dag, _fbc = 0, 0; _dag < _ecc; _dag, _fbc = _dag+4, _fbc+1 {
+			for _acf = 0; _acf < 4; _acf++ {
+				_fcf = _fbd + _dag + _acf
+				if _fcf <= len(_fgfg.Data)-1 && _fcf < _fbd+_fgfg.RowStride {
+					_aea[_acf] = _fgfg.Data[_fcf]
+				} else {
+					_aea[_acf] = 0x00
+				}
+				_fcf = _fbd + _fgfg.RowStride + _dag + _acf
+				if _fcf <= len(_fgfg.Data)-1 && _fcf < _fbd+(2*_fgfg.RowStride) {
+					_fddf[_acf] = _fgfg.Data[_fcf]
+				} else {
+					_fddf[_acf] = 0x00
+				}
+			}
+			_acc = _ag.BigEndian.Uint32(_aea)
+			_cad = _ag.BigEndian.Uint32(_fddf)
+			_cad &= _acc
+			_cad &= _cad << 1
+			_cad &= 0xaaaaaaaa
+			_acc = _cad | (_cad << 7)
+			_abff = byte(_acc >> 24)
+			_ggf = byte((_acc >> 8) & 0xff)
+			_fcf = _ceca + _fbc
+			if _fcf+1 == len(_aaec.Data)-1 || _fcf+1 >= _ceca+_aaec.RowStride {
+				_aaec.Data[_fcf] = _dcad[_abff]
+				if _bde = _aaec.SetByte(_fcf, _dcad[_abff]); _bde != nil {
+					return _a.Wrapf(_bde, _cde, "\u0069n\u0064\u0065\u0078\u003a\u0020\u0025d", _fcf)
+				}
+			} else {
+				_ggd = (uint16(_dcad[_abff]) << 8) | uint16(_dcad[_ggf])
+				if _bde = _aaec.setTwoBytes(_fcf, _ggd); _bde != nil {
+					return _a.Wrapf(_bde, _cde, "s\u0065\u0074\u0074\u0069\u006e\u0067 \u0074\u0077\u006f\u0020\u0062\u0079t\u0065\u0073\u0020\u0066\u0061\u0069\u006ce\u0064\u002c\u0020\u0069\u006e\u0064\u0065\u0078\u003a\u0020%\u0064", _fcf)
+				}
+				_fbc++
+			}
+		}
+	}
+	return nil
+}
+
+func _daadf(_eeee *Bitmap, _fbgc, _cadfa, _ecdb, _bdcf int, _dedee RasterOperator) {
+	if _fbgc < 0 {
+		_ecdb += _fbgc
+		_fbgc = 0
+	}
+	_fba := _fbgc + _ecdb - _eeee.Width
+	if _fba > 0 {
+		_ecdb -= _fba
+	}
+	if _cadfa < 0 {
+		_bdcf += _cadfa
+		_cadfa = 0
+	}
+	_gdba := _cadfa + _bdcf - _eeee.Height
+	if _gdba > 0 {
+		_bdcf -= _gdba
+	}
+	if _ecdb <= 0 || _bdcf <= 0 {
+		return
+	}
+	if (_fbgc & 7) == 0 {
+		_debe(_eeee, _fbgc, _cadfa, _ecdb, _bdcf, _dedee)
+	} else {
+		_dbfb(_eeee, _fbgc, _cadfa, _ecdb, _bdcf, _dedee)
+	}
+}
+
+func (_dacf *ClassedPoints) GetIntYByClass(i int) (int, error) {
+	const _degf = "\u0043\u006c\u0061\u0073s\u0065\u0064\u0050\u006f\u0069\u006e\u0074\u0073\u002e\u0047e\u0074I\u006e\u0074\u0059\u0042\u0079\u0043\u006ca\u0073\u0073"
+	if i >= _dacf.IntSlice.Size() {
+		return 0, _a.Errorf(_degf, "\u0069\u003a\u0020\u0027\u0025\u0064\u0027 \u0069\u0073\u0020o\u0075\u0074\u0020\u006ff\u0020\u0074\u0068\u0065\u0020\u0072\u0061\u006e\u0067\u0065\u0020\u006f\u0066\u0020\u0074\u0068\u0065\u0020\u0049\u006e\u0074\u0053\u006c\u0069\u0063\u0065", i)
+	}
+	return int(_dacf.YAtIndex(i)), nil
+}
+
+var _fdgd = [5]int{1, 2, 3, 0, 4}
+
+func (_aca *Bitmap) GetUnpaddedData() ([]byte, error) {
+	_eed := uint(_aca.Width & 0x07)
+	if _eed == 0 {
+		return _aca.Data, nil
+	}
+	_egdb := _aca.Width * _aca.Height
+	if _egdb%8 != 0 {
+		_egdb >>= 3
+		_egdb++
+	} else {
+		_egdb >>= 3
+	}
+	_dec := make([]byte, _egdb)
+	_fdg := _f.NewWriterMSB(_dec)
+	const _dadc = "\u0047e\u0074U\u006e\u0070\u0061\u0064\u0064\u0065\u0064\u0044\u0061\u0074\u0061"
+	for _ccaf := 0; _ccaf < _aca.Height; _ccaf++ {
+		for _dggd := 0; _dggd < _aca.RowStride; _dggd++ {
+			_cag := _aca.Data[_ccaf*_aca.RowStride+_dggd]
+			if _dggd != _aca.RowStride-1 {
+				_gede := _fdg.WriteByte(_cag)
+				if _gede != nil {
+					return nil, _a.Wrap(_gede, _dadc, "")
+				}
+				continue
+			}
+			for _afe := uint(0); _afe < _eed; _afe++ {
+				_ecge := _fdg.WriteBit(int(_cag >> (7 - _afe) & 0x01))
+				if _ecge != nil {
+					return nil, _a.Wrap(_ecge, _dadc, "")
+				}
+			}
+		}
+	}
+	return _dec, nil
+}
+
+func _ccecc(_abdb, _acgd byte, _eagdc CombinationOperator) byte {
+	switch _eagdc {
+	case CmbOpOr:
+		return _acgd | _abdb
+	case CmbOpAnd:
+		return _acgd & _abdb
+	case CmbOpXor:
+		return _acgd ^ _abdb
+	case CmbOpXNor:
+		return ^(_acgd ^ _abdb)
+	case CmbOpNot:
+		return ^(_acgd)
+	default:
+		return _acgd
+	}
+}
+
+func (_bfba MorphProcess) getWidthHeight() (_aaaa, _gbcg int) {
+	return _bfba.Arguments[0], _bfba.Arguments[1]
+}
+
+func _fedg(_fabf, _dagf *Bitmap) (*Bitmap, error) {
+	if _dagf == nil {
+		return nil, _a.Error("\u0063\u006f\u0070\u0079\u0042\u0069\u0074\u006d\u0061\u0070", "\u0073o\u0075r\u0063\u0065\u0020\u006e\u006ft\u0020\u0064e\u0066\u0069\u006e\u0065\u0064")
+	}
+	if _dagf == _fabf {
+		return _fabf, nil
+	}
+	if _fabf == nil {
+		_fabf = _dagf.createTemplate()
+		copy(_fabf.Data, _dagf.Data)
+		return _fabf, nil
+	}
+	_afbd := _fabf.resizeImageData(_dagf)
+	if _afbd != nil {
+		return nil, _a.Wrap(_afbd, "\u0063\u006f\u0070\u0079\u0042\u0069\u0074\u006d\u0061\u0070", "")
+	}
+	_fabf.Text = _dagf.Text
+	copy(_fabf.Data, _dagf.Data)
+	return _fabf, nil
+}
+
+func RankHausTest(p1, p2, p3, p4 *Bitmap, delX, delY float32, maxDiffW, maxDiffH, area1, area3 int, rank float32, tab8 []int) (_cadae bool, _eegaa error) {
+	const _aadc = "\u0052\u0061\u006ek\u0048\u0061\u0075\u0073\u0054\u0065\u0073\u0074"
+	_dcbe, _ecce := p1.Width, p1.Height
+	_ebbd, _fcfd := p3.Width, p3.Height
+	if _ge.Abs(_dcbe-_ebbd) > maxDiffW {
+		return false, nil
+	}
+	if _ge.Abs(_ecce-_fcfd) > maxDiffH {
+		return false, nil
+	}
+	_fdc := int(float32(area1)*(1.0-rank) + 0.5)
+	_aaba := int(float32(area3)*(1.0-rank) + 0.5)
+	var _ddgd, _cdbf int
+	if delX >= 0 {
+		_ddgd = int(delX + 0.5)
+	} else {
+		_ddgd = int(delX - 0.5)
+	}
+	if delY >= 0 {
+		_cdbf = int(delY + 0.5)
+	} else {
+		_cdbf = int(delY - 0.5)
+	}
+	_aecfe := p1.CreateTemplate()
+	if _eegaa = _aecfe.RasterOperation(0, 0, _dcbe, _ecce, PixSrc, p1, 0, 0); _eegaa != nil {
+		return false, _a.Wrap(_eegaa, _aadc, "p\u0031\u0020\u002d\u0053\u0052\u0043\u002d\u003e\u0020\u0074")
+	}
+	if _eegaa = _aecfe.RasterOperation(_ddgd, _cdbf, _dcbe, _ecce, PixNotSrcAndDst, p4, 0, 0); _eegaa != nil {
+		return false, _a.Wrap(_eegaa, _aadc, "\u0074 \u0026\u0020\u0021\u0070\u0034")
+	}
+	_cadae, _eegaa = _aecfe.ThresholdPixelSum(_fdc, tab8)
+	if _eegaa != nil {
+		return false, _a.Wrap(_eegaa, _aadc, "\u0074\u002d\u003e\u0074\u0068\u0072\u0065\u0073\u0068\u0031")
+	}
+	if _cadae {
+		return false, nil
+	}
+	if _eegaa = _aecfe.RasterOperation(_ddgd, _cdbf, _ebbd, _fcfd, PixSrc, p3, 0, 0); _eegaa != nil {
+		return false, _a.Wrap(_eegaa, _aadc, "p\u0033\u0020\u002d\u0053\u0052\u0043\u002d\u003e\u0020\u0074")
+	}
+	if _eegaa = _aecfe.RasterOperation(0, 0, _ebbd, _fcfd, PixNotSrcAndDst, p2, 0, 0); _eegaa != nil {
+		return false, _a.Wrap(_eegaa, _aadc, "\u0074 \u0026\u0020\u0021\u0070\u0032")
+	}
+	_cadae, _eegaa = _aecfe.ThresholdPixelSum(_aaba, tab8)
+	if _eegaa != nil {
+		return false, _a.Wrap(_eegaa, _aadc, "\u0074\u002d\u003e\u0074\u0068\u0072\u0065\u0073\u0068\u0033")
+	}
+	return !_cadae, nil
+}
+
+func TstISymbol(t *_c.T, scale ...int) *Bitmap {
+	_adfd, _fedf := NewWithData(1, 5, []byte{0x80, 0x80, 0x80, 0x80, 0x80})
+	_d.NoError(t, _fedf)
+	return TstGetScaledSymbol(t, _adfd, scale...)
+}
+
+func Centroid(bm *Bitmap, centTab, sumTab []int) (Point, error) {
+	return bm.centroid(centTab, sumTab)
+}
+
+const _aecca = 5000
+
+func _debe(_eacb *Bitmap, _eeag, _gacb int, _cccag, _ceeb int, _fbag RasterOperator) {
+	var (
+		_gcef        int
+		_dace        byte
+		_ffga, _edba int
+		_cecg        int
+	)
+	_ggce := _cccag >> 3
+	_gdfa := _cccag & 7
+	if _gdfa > 0 {
+		_dace = _dcga[_gdfa]
+	}
+	_gcef = _eacb.RowStride*_gacb + (_eeag >> 3)
+	switch _fbag {
+	case PixClr:
+		for _ffga = 0; _ffga < _ceeb; _ffga++ {
+			_cecg = _gcef + _ffga*_eacb.RowStride
+			for _edba = 0; _edba < _ggce; _edba++ {
+				_eacb.Data[_cecg] = 0x0
+				_cecg++
+			}
+			if _gdfa > 0 {
+				_eacb.Data[_cecg] = _fbaa(_eacb.Data[_cecg], 0x0, _dace)
+			}
+		}
+	case PixSet:
+		for _ffga = 0; _ffga < _ceeb; _ffga++ {
+			_cecg = _gcef + _ffga*_eacb.RowStride
+			for _edba = 0; _edba < _ggce; _edba++ {
+				_eacb.Data[_cecg] = 0xff
+				_cecg++
+			}
+			if _gdfa > 0 {
+				_eacb.Data[_cecg] = _fbaa(_eacb.Data[_cecg], 0xff, _dace)
+			}
+		}
+	case PixNotDst:
+		for _ffga = 0; _ffga < _ceeb; _ffga++ {
+			_cecg = _gcef + _ffga*_eacb.RowStride
+			for _edba = 0; _edba < _ggce; _edba++ {
+				_eacb.Data[_cecg] = ^_eacb.Data[_cecg]
+				_cecg++
+			}
+			if _gdfa > 0 {
+				_eacb.Data[_cecg] = _fbaa(_eacb.Data[_cecg], ^_eacb.Data[_cecg], _dace)
+			}
+		}
+	}
+}
+
+type Point struct{ X, Y float32 }
+
+func (_dac *Bitmap) GetPixel(x, y int) bool {
+	_aeaa := _dac.GetByteIndex(x, y)
+	_agb := _dac.GetBitOffset(x)
+	_ebge := uint(7 - _agb)
+	if _aeaa > len(_dac.Data)-1 {
+		_dc.Log.Debug("\u0054\u0072\u0079\u0069\u006e\u0067\u0020\u0074\u006f\u0020\u0067\u0065\u0074\u0020\u0070\u0069\u0078\u0065\u006c\u0020o\u0075\u0074\u0020\u006f\u0066\u0020\u0074\u0068\u0065\u0020\u0064\u0061\u0074\u0061\u0020\u0072\u0061\u006e\u0067\u0065\u002e \u0078\u003a\u0020\u0027\u0025\u0064\u0027\u002c\u0020\u0079\u003a\u0027\u0025\u0064'\u002c\u0020\u0062m\u003a\u0020\u0027\u0025\u0073\u0027", x, y, _dac)
+		return false
+	}
+	if (_dac.Data[_aeaa]>>_ebge)&0x01 >= 1 {
+		return true
+	}
+	return false
+}
+
+func init() {
+	const _ddcdf = "\u0062\u0069\u0074\u006dap\u0073\u002e\u0069\u006e\u0069\u0074\u0069\u0061\u006c\u0069\u007a\u0061\u0074\u0069o\u006e"
+	_ggbf = New(50, 40)
+	var _ffbdc error
+	_ggbf, _ffbdc = _ggbf.AddBorder(2, 1)
+	if _ffbdc != nil {
+		panic(_a.Wrap(_ffbdc, _ddcdf, "f\u0072\u0061\u006d\u0065\u0042\u0069\u0074\u006d\u0061\u0070"))
+	}
+	_bceg, _ffbdc = NewWithData(50, 22, _dbcb)
+	if _ffbdc != nil {
+		panic(_a.Wrap(_ffbdc, _ddcdf, "i\u006d\u0061\u0067\u0065\u0042\u0069\u0074\u006d\u0061\u0070"))
+	}
+}
+
+func (_defc *Bitmaps) ClipToBitmap(s *Bitmap) (*Bitmaps, error) {
+	const _egde = "B\u0069t\u006d\u0061\u0070\u0073\u002e\u0043\u006c\u0069p\u0054\u006f\u0042\u0069tm\u0061\u0070"
+	if _defc == nil {
+		return nil, _a.Error(_egde, "\u0042\u0069\u0074\u006dap\u0073\u0020\u006e\u006f\u0074\u0020\u0064\u0065\u0066\u0069\u006e\u0065\u0064")
+	}
+	if s == nil {
+		return nil, _a.Error(_egde, "\u0073o\u0075\u0072\u0063\u0065 \u0062\u0069\u0074\u006d\u0061p\u0020n\u006ft\u0020\u0064\u0065\u0066\u0069\u006e\u0065d")
+	}
+	_feac := len(_defc.Values)
+	_gfega := &Bitmaps{Values: make([]*Bitmap, _feac), Boxes: make([]*_bf.Rectangle, _feac)}
+	var (
+		_gcefa, _afd *Bitmap
+		_fedd        *_bf.Rectangle
+		_ggdbd       error
+	)
+	for _edce := 0; _edce < _feac; _edce++ {
+		if _gcefa, _ggdbd = _defc.GetBitmap(_edce); _ggdbd != nil {
+			return nil, _a.Wrap(_ggdbd, _egde, "")
+		}
+		if _fedd, _ggdbd = _defc.GetBox(_edce); _ggdbd != nil {
+			return nil, _a.Wrap(_ggdbd, _egde, "")
+		}
+		if _afd, _ggdbd = s.clipRectangle(_fedd, nil); _ggdbd != nil {
+			return nil, _a.Wrap(_ggdbd, _egde, "")
+		}
+		if _afd, _ggdbd = _afd.And(_gcefa); _ggdbd != nil {
+			return nil, _a.Wrap(_ggdbd, _egde, "")
+		}
+		_gfega.Values[_edce] = _afd
+		_gfega.Boxes[_edce] = _fedd
+	}
+	return _gfega, nil
+}
+
+func (_edfe *Selection) setOrigin(_afce, _gcec int) { _edfe.Cy, _edfe.Cx = _afce, _gcec }
+
+func (_feb *Bitmap) inverseData() {
+	if _fgb := _feb.RasterOperation(0, 0, _feb.Width, _feb.Height, PixNotDst, nil, 0, 0); _fgb != nil {
+		_dc.Log.Debug("\u0049n\u0076\u0065\u0072\u0073e\u0020\u0064\u0061\u0074\u0061 \u0066a\u0069l\u0065\u0064\u003a\u0020\u0027\u0025\u0076'", _fgb)
+	}
+	if _feb.Color == Chocolate {
+		_feb.Color = Vanilla
+	} else {
+		_feb.Color = Chocolate
+	}
+}
+
+func (_caad *Bitmap) InverseData() { _caad.inverseData() }
+
+func _gccd(_eefg *Bitmap, _affe, _deca, _cddfg, _cage int, _deef RasterOperator, _aagd *Bitmap, _agfe, _gacg int) error {
+	var (
+		_dddg        byte
+		_ceag        int
+		_aadb        int
+		_feab, _gbbg int
+		_aef, _gbcc  int
+	)
+	_ccfef := _cddfg >> 3
+	_fbdcg := _cddfg & 7
+	if _fbdcg > 0 {
+		_dddg = _dcga[_fbdcg]
+	}
+	_ceag = _aagd.RowStride*_gacg + (_agfe >> 3)
+	_aadb = _eefg.RowStride*_deca + (_affe >> 3)
+	switch _deef {
+	case PixSrc:
+		for _aef = 0; _aef < _cage; _aef++ {
+			_feab = _ceag + _aef*_aagd.RowStride
+			_gbbg = _aadb + _aef*_eefg.RowStride
+			for _gbcc = 0; _gbcc < _ccfef; _gbcc++ {
+				_eefg.Data[_gbbg] = _aagd.Data[_feab]
+				_gbbg++
+				_feab++
+			}
+			if _fbdcg > 0 {
+				_eefg.Data[_gbbg] = _fbaa(_eefg.Data[_gbbg], _aagd.Data[_feab], _dddg)
+			}
+		}
+	case PixNotSrc:
+		for _aef = 0; _aef < _cage; _aef++ {
+			_feab = _ceag + _aef*_aagd.RowStride
+			_gbbg = _aadb + _aef*_eefg.RowStride
+			for _gbcc = 0; _gbcc < _ccfef; _gbcc++ {
+				_eefg.Data[_gbbg] = ^(_aagd.Data[_feab])
+				_gbbg++
+				_feab++
+			}
+			if _fbdcg > 0 {
+				_eefg.Data[_gbbg] = _fbaa(_eefg.Data[_gbbg], ^_aagd.Data[_feab], _dddg)
+			}
+		}
+	case PixSrcOrDst:
+		for _aef = 0; _aef < _cage; _aef++ {
+			_feab = _ceag + _aef*_aagd.RowStride
+			_gbbg = _aadb + _aef*_eefg.RowStride
+			for _gbcc = 0; _gbcc < _ccfef; _gbcc++ {
+				_eefg.Data[_gbbg] |= _aagd.Data[_feab]
+				_gbbg++
+				_feab++
+			}
+			if _fbdcg > 0 {
+				_eefg.Data[_gbbg] = _fbaa(_eefg.Data[_gbbg], _aagd.Data[_feab]|_eefg.Data[_gbbg], _dddg)
+			}
+		}
+	case PixSrcAndDst:
+		for _aef = 0; _aef < _cage; _aef++ {
+			_feab = _ceag + _aef*_aagd.RowStride
+			_gbbg = _aadb + _aef*_eefg.RowStride
+			for _gbcc = 0; _gbcc < _ccfef; _gbcc++ {
+				_eefg.Data[_gbbg] &= _aagd.Data[_feab]
+				_gbbg++
+				_feab++
+			}
+			if _fbdcg > 0 {
+				_eefg.Data[_gbbg] = _fbaa(_eefg.Data[_gbbg], _aagd.Data[_feab]&_eefg.Data[_gbbg], _dddg)
+			}
+		}
+	case PixSrcXorDst:
+		for _aef = 0; _aef < _cage; _aef++ {
+			_feab = _ceag + _aef*_aagd.RowStride
+			_gbbg = _aadb + _aef*_eefg.RowStride
+			for _gbcc = 0; _gbcc < _ccfef; _gbcc++ {
+				_eefg.Data[_gbbg] ^= _aagd.Data[_feab]
+				_gbbg++
+				_feab++
+			}
+			if _fbdcg > 0 {
+				_eefg.Data[_gbbg] = _fbaa(_eefg.Data[_gbbg], _aagd.Data[_feab]^_eefg.Data[_gbbg], _dddg)
+			}
+		}
+	case PixNotSrcOrDst:
+		for _aef = 0; _aef < _cage; _aef++ {
+			_feab = _ceag + _aef*_aagd.RowStride
+			_gbbg = _aadb + _aef*_eefg.RowStride
+			for _gbcc = 0; _gbcc < _ccfef; _gbcc++ {
+				_eefg.Data[_gbbg] |= ^(_aagd.Data[_feab])
+				_gbbg++
+				_feab++
+			}
+			if _fbdcg > 0 {
+				_eefg.Data[_gbbg] = _fbaa(_eefg.Data[_gbbg], ^(_aagd.Data[_feab])|_eefg.Data[_gbbg], _dddg)
+			}
+		}
+	case PixNotSrcAndDst:
+		for _aef = 0; _aef < _cage; _aef++ {
+			_feab = _ceag + _aef*_aagd.RowStride
+			_gbbg = _aadb + _aef*_eefg.RowStride
+			for _gbcc = 0; _gbcc < _ccfef; _gbcc++ {
+				_eefg.Data[_gbbg] &= ^(_aagd.Data[_feab])
+				_gbbg++
+				_feab++
+			}
+			if _fbdcg > 0 {
+				_eefg.Data[_gbbg] = _fbaa(_eefg.Data[_gbbg], ^(_aagd.Data[_feab])&_eefg.Data[_gbbg], _dddg)
+			}
+		}
+	case PixSrcOrNotDst:
+		for _aef = 0; _aef < _cage; _aef++ {
+			_feab = _ceag + _aef*_aagd.RowStride
+			_gbbg = _aadb + _aef*_eefg.RowStride
+			for _gbcc = 0; _gbcc < _ccfef; _gbcc++ {
+				_eefg.Data[_gbbg] = _aagd.Data[_feab] | ^(_eefg.Data[_gbbg])
+				_gbbg++
+				_feab++
+			}
+			if _fbdcg > 0 {
+				_eefg.Data[_gbbg] = _fbaa(_eefg.Data[_gbbg], _aagd.Data[_feab]|^(_eefg.Data[_gbbg]), _dddg)
+			}
+		}
+	case PixSrcAndNotDst:
+		for _aef = 0; _aef < _cage; _aef++ {
+			_feab = _ceag + _aef*_aagd.RowStride
+			_gbbg = _aadb + _aef*_eefg.RowStride
+			for _gbcc = 0; _gbcc < _ccfef; _gbcc++ {
+				_eefg.Data[_gbbg] = _aagd.Data[_feab] &^ (_eefg.Data[_gbbg])
+				_gbbg++
+				_feab++
+			}
+			if _fbdcg > 0 {
+				_eefg.Data[_gbbg] = _fbaa(_eefg.Data[_gbbg], _aagd.Data[_feab]&^(_eefg.Data[_gbbg]), _dddg)
+			}
+		}
+	case PixNotPixSrcOrDst:
+		for _aef = 0; _aef < _cage; _aef++ {
+			_feab = _ceag + _aef*_aagd.RowStride
+			_gbbg = _aadb + _aef*_eefg.RowStride
+			for _gbcc = 0; _gbcc < _ccfef; _gbcc++ {
+				_eefg.Data[_gbbg] = ^(_aagd.Data[_feab] | _eefg.Data[_gbbg])
+				_gbbg++
+				_feab++
+			}
+			if _fbdcg > 0 {
+				_eefg.Data[_gbbg] = _fbaa(_eefg.Data[_gbbg], ^(_aagd.Data[_feab] | _eefg.Data[_gbbg]), _dddg)
+			}
+		}
+	case PixNotPixSrcAndDst:
+		for _aef = 0; _aef < _cage; _aef++ {
+			_feab = _ceag + _aef*_aagd.RowStride
+			_gbbg = _aadb + _aef*_eefg.RowStride
+			for _gbcc = 0; _gbcc < _ccfef; _gbcc++ {
+				_eefg.Data[_gbbg] = ^(_aagd.Data[_feab] & _eefg.Data[_gbbg])
+				_gbbg++
+				_feab++
+			}
+			if _fbdcg > 0 {
+				_eefg.Data[_gbbg] = _fbaa(_eefg.Data[_gbbg], ^(_aagd.Data[_feab] & _eefg.Data[_gbbg]), _dddg)
+			}
+		}
+	case PixNotPixSrcXorDst:
+		for _aef = 0; _aef < _cage; _aef++ {
+			_feab = _ceag + _aef*_aagd.RowStride
+			_gbbg = _aadb + _aef*_eefg.RowStride
+			for _gbcc = 0; _gbcc < _ccfef; _gbcc++ {
+				_eefg.Data[_gbbg] = ^(_aagd.Data[_feab] ^ _eefg.Data[_gbbg])
+				_gbbg++
+				_feab++
+			}
+			if _fbdcg > 0 {
+				_eefg.Data[_gbbg] = _fbaa(_eefg.Data[_gbbg], ^(_aagd.Data[_feab] ^ _eefg.Data[_gbbg]), _dddg)
+			}
+		}
+	default:
+		_dc.Log.Debug("\u0050\u0072ov\u0069\u0064\u0065d\u0020\u0069\u006e\u0076ali\u0064 r\u0061\u0073\u0074\u0065\u0072\u0020\u006fpe\u0072\u0061\u0074\u006f\u0072\u003a\u0020%\u0076", _deef)
+		return _a.Error("\u0072\u0061\u0073\u0074er\u004f\u0070\u0042\u0079\u0074\u0065\u0041\u006c\u0069\u0067\u006e\u0065\u0064\u004co\u0077", "\u0069\u006e\u0076al\u0069\u0064\u0020\u0072\u0061\u0073\u0074\u0065\u0072\u0020\u006f\u0070\u0065\u0072\u0061\u0074\u006f\u0072")
+	}
+	return nil
+}
+
+func _fgfb(_aegd int) int {
+	if _aegd < 0 {
+		return -_aegd
+	}
+	return _aegd
+}
+
+type Bitmap struct {
+	Width, Height            int
+	BitmapNumber             int
+	RowStride                int
+	Data                     []byte
+	Color                    Color
+	Special                  int
+	Text                     string
+	XResolution, YResolution int
+}
+
+func (_dffcb *ClassedPoints) GetIntXByClass(i int) (int, error) {
+	const _bgca = "\u0043\u006c\u0061\u0073s\u0065\u0064\u0050\u006f\u0069\u006e\u0074\u0073\u002e\u0047e\u0074I\u006e\u0074\u0059\u0042\u0079\u0043\u006ca\u0073\u0073"
+	if i >= _dffcb.IntSlice.Size() {
+		return 0, _a.Errorf(_bgca, "\u0069\u003a\u0020\u0027\u0025\u0064\u0027 \u0069\u0073\u0020o\u0075\u0074\u0020\u006ff\u0020\u0074\u0068\u0065\u0020\u0072\u0061\u006e\u0067\u0065\u0020\u006f\u0066\u0020\u0074\u0068\u0065\u0020\u0049\u006e\u0074\u0053\u006c\u0069\u0063\u0065", i)
+	}
+	return int(_dffcb.XAtIndex(i)), nil
+}
+
+func (_eaee *Bitmap) GetChocolateData() []byte {
+	if _eaee.Color == Vanilla {
+		_eaee.inverseData()
+	}
+	return _eaee.Data
+}
+
+func _ffbgb(_ecae *Bitmap, _ccdg *_ge.Stack, _cafgf, _ggbce int) (_bbgc *_bf.Rectangle, _adff error) {
+	const _ddad = "\u0073e\u0065d\u0046\u0069\u006c\u006c\u0053\u0074\u0061\u0063\u006b\u0042\u0042"
+	if _ecae == nil {
+		return nil, _a.Error(_ddad, "\u0070\u0072\u006fvi\u0064\u0065\u0064\u0020\u006e\u0069\u006c\u0020\u0027\u0073\u0027\u0020\u0042\u0069\u0074\u006d\u0061\u0070")
+	}
+	if _ccdg == nil {
+		return nil, _a.Error(_ddad, "p\u0072o\u0076\u0069\u0064\u0065\u0064\u0020\u006e\u0069l\u0020\u0027\u0073\u0074ac\u006b\u0027")
+	}
+	_aefb, _dfdde := _ecae.Width, _ecae.Height
+	_fdebe := _aefb - 1
+	_ddbe := _dfdde - 1
+	if _cafgf < 0 || _cafgf > _fdebe || _ggbce < 0 || _ggbce > _ddbe || !_ecae.GetPixel(_cafgf, _ggbce) {
+		return nil, nil
+	}
+	_dbda := _bf.Rect(100000, 100000, 0, 0)
+	if _adff = _aggg(_ccdg, _cafgf, _cafgf, _ggbce, 1, _ddbe, &_dbda); _adff != nil {
+		return nil, _a.Wrap(_adff, _ddad, "\u0069\u006e\u0069t\u0069\u0061\u006c\u0020\u0070\u0075\u0073\u0068")
+	}
+	if _adff = _aggg(_ccdg, _cafgf, _cafgf, _ggbce+1, -1, _ddbe, &_dbda); _adff != nil {
+		return nil, _a.Wrap(_adff, _ddad, "\u0032\u006ed\u0020\u0069\u006ei\u0074\u0069\u0061\u006c\u0020\u0070\u0075\u0073\u0068")
+	}
+	_dbda.Min.X, _dbda.Max.X = _cafgf, _cafgf
+	_dbda.Min.Y, _dbda.Max.Y = _ggbce, _ggbce
+	var (
+		_cbgd *fillSegment
+		_ddab int
+	)
+	for _ccdg.Len() > 0 {
+		if _cbgd, _adff = _gaaf(_ccdg); _adff != nil {
+			return nil, _a.Wrap(_adff, _ddad, "")
+		}
+		_ggbce = _cbgd._decd
+		for _cafgf = _cbgd._cdac - 1; _cafgf >= 0 && _ecae.GetPixel(_cafgf, _ggbce); _cafgf-- {
+			if _adff = _ecae.SetPixel(_cafgf, _ggbce, 0); _adff != nil {
+				return nil, _a.Wrap(_adff, _ddad, "\u0031s\u0074\u0020\u0073\u0065\u0074")
+			}
+		}
+		if _cafgf >= _cbgd._cdac-1 {
+			for {
+				for _cafgf++; _cafgf <= _cbgd._afgf+1 && _cafgf <= _fdebe && !_ecae.GetPixel(_cafgf, _ggbce); _cafgf++ {
+				}
+				_ddab = _cafgf
+				if _cafgf > _cbgd._afgf+1 || _cafgf > _fdebe {
+					break
+				}
+				for ; _cafgf <= _fdebe && _ecae.GetPixel(_cafgf, _ggbce); _cafgf++ {
+					if _adff = _ecae.SetPixel(_cafgf, _ggbce, 0); _adff != nil {
+						return nil, _a.Wrap(_adff, _ddad, "\u0032n\u0064\u0020\u0073\u0065\u0074")
+					}
+				}
+				if _adff = _aggg(_ccdg, _ddab, _cafgf-1, _cbgd._decd, _cbgd._fadf, _ddbe, &_dbda); _adff != nil {
+					return nil, _a.Wrap(_adff, _ddad, "n\u006f\u0072\u006d\u0061\u006c\u0020\u0070\u0075\u0073\u0068")
+				}
+				if _cafgf > _cbgd._afgf {
+					if _adff = _aggg(_ccdg, _cbgd._afgf+1, _cafgf-1, _cbgd._decd, -_cbgd._fadf, _ddbe, &_dbda); _adff != nil {
+						return nil, _a.Wrap(_adff, _ddad, "\u006ce\u0061k\u0020\u006f\u006e\u0020\u0072i\u0067\u0068t\u0020\u0073\u0069\u0064\u0065")
+					}
+				}
+			}
+			continue
+		}
+		_ddab = _cafgf + 1
+		if _ddab < _cbgd._cdac {
+			if _adff = _aggg(_ccdg, _ddab, _cbgd._cdac-1, _cbgd._decd, -_cbgd._fadf, _ddbe, &_dbda); _adff != nil {
+				return nil, _a.Wrap(_adff, _ddad, "\u006c\u0065\u0061\u006b\u0020\u006f\u006e\u0020\u006c\u0065\u0066\u0074 \u0073\u0069\u0064\u0065")
+			}
+		}
+		_cafgf = _cbgd._cdac
+		for {
+			for ; _cafgf <= _fdebe && _ecae.GetPixel(_cafgf, _ggbce); _cafgf++ {
+				if _adff = _ecae.SetPixel(_cafgf, _ggbce, 0); _adff != nil {
+					return nil, _a.Wrap(_adff, _ddad, "\u0032n\u0064\u0020\u0073\u0065\u0074")
+				}
+			}
+			if _adff = _aggg(_ccdg, _ddab, _cafgf-1, _cbgd._decd, _cbgd._fadf, _ddbe, &_dbda); _adff != nil {
+				return nil, _a.Wrap(_adff, _ddad, "n\u006f\u0072\u006d\u0061\u006c\u0020\u0070\u0075\u0073\u0068")
+			}
+			if _cafgf > _cbgd._afgf {
+				if _adff = _aggg(_ccdg, _cbgd._afgf+1, _cafgf-1, _cbgd._decd, -_cbgd._fadf, _ddbe, &_dbda); _adff != nil {
+					return nil, _a.Wrap(_adff, _ddad, "\u006ce\u0061k\u0020\u006f\u006e\u0020\u0072i\u0067\u0068t\u0020\u0073\u0069\u0064\u0065")
+				}
+			}
+			for _cafgf++; _cafgf <= _cbgd._afgf+1 && _cafgf <= _fdebe && !_ecae.GetPixel(_cafgf, _ggbce); _cafgf++ {
+			}
+			_ddab = _cafgf
+			if _cafgf > _cbgd._afgf+1 || _cafgf > _fdebe {
+				break
+			}
+		}
+	}
+	_dbda.Max.X++
+	_dbda.Max.Y++
+	return &_dbda, nil
+}
+
+const (
+	_ SizeSelection = iota
+	SizeSelectByWidth
+	SizeSelectByHeight
+	SizeSelectByMaxDimension
+	SizeSelectByArea
+	SizeSelectByPerimeter
+)
+
+func (_bcddc *Bitmaps) SortByHeight() { _bafd := (*byHeight)(_bcddc); _df.Sort(_bafd) }
+
+func _acga(_edcad *Bitmap, _ddf *Bitmap, _gddba *Selection) (*Bitmap, error) {
+	var (
+		_afgc *Bitmap
+		_ggfe error
+	)
+	_edcad, _ggfe = _bfbb(_edcad, _ddf, _gddba, &_afgc)
+	if _ggfe != nil {
+		return nil, _ggfe
+	}
+	if _ggfe = _edcad.clearAll(); _ggfe != nil {
+		return nil, _ggfe
+	}
+	var _ecgee SelectionValue
+	for _bcafc := 0; _bcafc < _gddba.Height; _bcafc++ {
+		for _ccea := 0; _ccea < _gddba.Width; _ccea++ {
+			_ecgee = _gddba.Data[_bcafc][_ccea]
+			if _ecgee == SelHit {
+				if _ggfe = _edcad.RasterOperation(_ccea-_gddba.Cx, _bcafc-_gddba.Cy, _ddf.Width, _ddf.Height, PixSrcOrDst, _afgc, 0, 0); _ggfe != nil {
+					return nil, _ggfe
+				}
+			}
+		}
+	}
+	return _edcad, nil
+}
+
+func _dead(_fcdgg *Bitmap, _faac, _gcfe, _ddea, _caafc int, _gebc RasterOperator, _aaecb *Bitmap, _gbfg, _fdggb int) error {
+	var (
+		_dgfc         bool
+		_fcaa         bool
+		_dggc         int
+		_dada         int
+		_dacaf        int
+		_ebea         bool
+		_aged         byte
+		_ddbdd        int
+		_cfgf         int
+		_ecfd         int
+		_ggdfb, _bbfe int
+	)
+	_gedbg := 8 - (_faac & 7)
+	_dbec := _beeb[_gedbg]
+	_aafc := _fcdgg.RowStride*_gcfe + (_faac >> 3)
+	_fdfcg := _aaecb.RowStride*_fdggb + (_gbfg >> 3)
+	if _ddea < _gedbg {
+		_dgfc = true
+		_dbec &= _dcga[8-_gedbg+_ddea]
+	}
+	if !_dgfc {
+		_dggc = (_ddea - _gedbg) >> 3
+		if _dggc > 0 {
+			_fcaa = true
+			_dada = _aafc + 1
+			_dacaf = _fdfcg + 1
+		}
+	}
+	_ddbdd = (_faac + _ddea) & 7
+	if !_dgfc && _ddbdd != 0 {
+		_ebea = true
+		_aged = _dcga[_ddbdd]
+		_cfgf = _aafc + 1 + _dggc
+		_ecfd = _fdfcg + 1 + _dggc
+	}
+	switch _gebc {
+	case PixSrc:
+		for _ggdfb = 0; _ggdfb < _caafc; _ggdfb++ {
+			_fcdgg.Data[_aafc] = _fbaa(_fcdgg.Data[_aafc], _aaecb.Data[_fdfcg], _dbec)
+			_aafc += _fcdgg.RowStride
+			_fdfcg += _aaecb.RowStride
+		}
+		if _fcaa {
+			for _ggdfb = 0; _ggdfb < _caafc; _ggdfb++ {
+				for _bbfe = 0; _bbfe < _dggc; _bbfe++ {
+					_fcdgg.Data[_dada+_bbfe] = _aaecb.Data[_dacaf+_bbfe]
+				}
+				_dada += _fcdgg.RowStride
+				_dacaf += _aaecb.RowStride
+			}
+		}
+		if _ebea {
+			for _ggdfb = 0; _ggdfb < _caafc; _ggdfb++ {
+				_fcdgg.Data[_cfgf] = _fbaa(_fcdgg.Data[_cfgf], _aaecb.Data[_ecfd], _aged)
+				_cfgf += _fcdgg.RowStride
+				_ecfd += _aaecb.RowStride
+			}
+		}
+	case PixNotSrc:
+		for _ggdfb = 0; _ggdfb < _caafc; _ggdfb++ {
+			_fcdgg.Data[_aafc] = _fbaa(_fcdgg.Data[_aafc], ^_aaecb.Data[_fdfcg], _dbec)
+			_aafc += _fcdgg.RowStride
+			_fdfcg += _aaecb.RowStride
+		}
+		if _fcaa {
+			for _ggdfb = 0; _ggdfb < _caafc; _ggdfb++ {
+				for _bbfe = 0; _bbfe < _dggc; _bbfe++ {
+					_fcdgg.Data[_dada+_bbfe] = ^_aaecb.Data[_dacaf+_bbfe]
+				}
+				_dada += _fcdgg.RowStride
+				_dacaf += _aaecb.RowStride
+			}
+		}
+		if _ebea {
+			for _ggdfb = 0; _ggdfb < _caafc; _ggdfb++ {
+				_fcdgg.Data[_cfgf] = _fbaa(_fcdgg.Data[_cfgf], ^_aaecb.Data[_ecfd], _aged)
+				_cfgf += _fcdgg.RowStride
+				_ecfd += _aaecb.RowStride
+			}
+		}
+	case PixSrcOrDst:
+		for _ggdfb = 0; _ggdfb < _caafc; _ggdfb++ {
+			_fcdgg.Data[_aafc] = _fbaa(_fcdgg.Data[_aafc], _aaecb.Data[_fdfcg]|_fcdgg.Data[_aafc], _dbec)
+			_aafc += _fcdgg.RowStride
+			_fdfcg += _aaecb.RowStride
+		}
+		if _fcaa {
+			for _ggdfb = 0; _ggdfb < _caafc; _ggdfb++ {
+				for _bbfe = 0; _bbfe < _dggc; _bbfe++ {
+					_fcdgg.Data[_dada+_bbfe] |= _aaecb.Data[_dacaf+_bbfe]
+				}
+				_dada += _fcdgg.RowStride
+				_dacaf += _aaecb.RowStride
+			}
+		}
+		if _ebea {
+			for _ggdfb = 0; _ggdfb < _caafc; _ggdfb++ {
+				_fcdgg.Data[_cfgf] = _fbaa(_fcdgg.Data[_cfgf], _aaecb.Data[_ecfd]|_fcdgg.Data[_cfgf], _aged)
+				_cfgf += _fcdgg.RowStride
+				_ecfd += _aaecb.RowStride
+			}
+		}
+	case PixSrcAndDst:
+		for _ggdfb = 0; _ggdfb < _caafc; _ggdfb++ {
+			_fcdgg.Data[_aafc] = _fbaa(_fcdgg.Data[_aafc], _aaecb.Data[_fdfcg]&_fcdgg.Data[_aafc], _dbec)
+			_aafc += _fcdgg.RowStride
+			_fdfcg += _aaecb.RowStride
+		}
+		if _fcaa {
+			for _ggdfb = 0; _ggdfb < _caafc; _ggdfb++ {
+				for _bbfe = 0; _bbfe < _dggc; _bbfe++ {
+					_fcdgg.Data[_dada+_bbfe] &= _aaecb.Data[_dacaf+_bbfe]
+				}
+				_dada += _fcdgg.RowStride
+				_dacaf += _aaecb.RowStride
+			}
+		}
+		if _ebea {
+			for _ggdfb = 0; _ggdfb < _caafc; _ggdfb++ {
+				_fcdgg.Data[_cfgf] = _fbaa(_fcdgg.Data[_cfgf], _aaecb.Data[_ecfd]&_fcdgg.Data[_cfgf], _aged)
+				_cfgf += _fcdgg.RowStride
+				_ecfd += _aaecb.RowStride
+			}
+		}
+	case PixSrcXorDst:
+		for _ggdfb = 0; _ggdfb < _caafc; _ggdfb++ {
+			_fcdgg.Data[_aafc] = _fbaa(_fcdgg.Data[_aafc], _aaecb.Data[_fdfcg]^_fcdgg.Data[_aafc], _dbec)
+			_aafc += _fcdgg.RowStride
+			_fdfcg += _aaecb.RowStride
+		}
+		if _fcaa {
+			for _ggdfb = 0; _ggdfb < _caafc; _ggdfb++ {
+				for _bbfe = 0; _bbfe < _dggc; _bbfe++ {
+					_fcdgg.Data[_dada+_bbfe] ^= _aaecb.Data[_dacaf+_bbfe]
+				}
+				_dada += _fcdgg.RowStride
+				_dacaf += _aaecb.RowStride
+			}
+		}
+		if _ebea {
+			for _ggdfb = 0; _ggdfb < _caafc; _ggdfb++ {
+				_fcdgg.Data[_cfgf] = _fbaa(_fcdgg.Data[_cfgf], _aaecb.Data[_ecfd]^_fcdgg.Data[_cfgf], _aged)
+				_cfgf += _fcdgg.RowStride
+				_ecfd += _aaecb.RowStride
+			}
+		}
+	case PixNotSrcOrDst:
+		for _ggdfb = 0; _ggdfb < _caafc; _ggdfb++ {
+			_fcdgg.Data[_aafc] = _fbaa(_fcdgg.Data[_aafc], ^(_aaecb.Data[_fdfcg])|_fcdgg.Data[_aafc], _dbec)
+			_aafc += _fcdgg.RowStride
+			_fdfcg += _aaecb.RowStride
+		}
+		if _fcaa {
+			for _ggdfb = 0; _ggdfb < _caafc; _ggdfb++ {
+				for _bbfe = 0; _bbfe < _dggc; _bbfe++ {
+					_fcdgg.Data[_dada+_bbfe] |= ^(_aaecb.Data[_dacaf+_bbfe])
+				}
+				_dada += _fcdgg.RowStride
+				_dacaf += _aaecb.RowStride
+			}
+		}
+		if _ebea {
+			for _ggdfb = 0; _ggdfb < _caafc; _ggdfb++ {
+				_fcdgg.Data[_cfgf] = _fbaa(_fcdgg.Data[_cfgf], ^(_aaecb.Data[_ecfd])|_fcdgg.Data[_cfgf], _aged)
+				_cfgf += _fcdgg.RowStride
+				_ecfd += _aaecb.RowStride
+			}
+		}
+	case PixNotSrcAndDst:
+		for _ggdfb = 0; _ggdfb < _caafc; _ggdfb++ {
+			_fcdgg.Data[_aafc] = _fbaa(_fcdgg.Data[_aafc], ^(_aaecb.Data[_fdfcg])&_fcdgg.Data[_aafc], _dbec)
+			_aafc += _fcdgg.RowStride
+			_fdfcg += _aaecb.RowStride
+		}
+		if _fcaa {
+			for _ggdfb = 0; _ggdfb < _caafc; _ggdfb++ {
+				for _bbfe = 0; _bbfe < _dggc; _bbfe++ {
+					_fcdgg.Data[_dada+_bbfe] &= ^_aaecb.Data[_dacaf+_bbfe]
+				}
+				_dada += _fcdgg.RowStride
+				_dacaf += _aaecb.RowStride
+			}
+		}
+		if _ebea {
+			for _ggdfb = 0; _ggdfb < _caafc; _ggdfb++ {
+				_fcdgg.Data[_cfgf] = _fbaa(_fcdgg.Data[_cfgf], ^(_aaecb.Data[_ecfd])&_fcdgg.Data[_cfgf], _aged)
+				_cfgf += _fcdgg.RowStride
+				_ecfd += _aaecb.RowStride
+			}
+		}
+	case PixSrcOrNotDst:
+		for _ggdfb = 0; _ggdfb < _caafc; _ggdfb++ {
+			_fcdgg.Data[_aafc] = _fbaa(_fcdgg.Data[_aafc], _aaecb.Data[_fdfcg]|^(_fcdgg.Data[_aafc]), _dbec)
+			_aafc += _fcdgg.RowStride
+			_fdfcg += _aaecb.RowStride
+		}
+		if _fcaa {
+			for _ggdfb = 0; _ggdfb < _caafc; _ggdfb++ {
+				for _bbfe = 0; _bbfe < _dggc; _bbfe++ {
+					_fcdgg.Data[_dada+_bbfe] = _aaecb.Data[_dacaf+_bbfe] | ^(_fcdgg.Data[_dada+_bbfe])
+				}
+				_dada += _fcdgg.RowStride
+				_dacaf += _aaecb.RowStride
+			}
+		}
+		if _ebea {
+			for _ggdfb = 0; _ggdfb < _caafc; _ggdfb++ {
+				_fcdgg.Data[_cfgf] = _fbaa(_fcdgg.Data[_cfgf], _aaecb.Data[_ecfd]|^(_fcdgg.Data[_cfgf]), _aged)
+				_cfgf += _fcdgg.RowStride
+				_ecfd += _aaecb.RowStride
+			}
+		}
+	case PixSrcAndNotDst:
+		for _ggdfb = 0; _ggdfb < _caafc; _ggdfb++ {
+			_fcdgg.Data[_aafc] = _fbaa(_fcdgg.Data[_aafc], _aaecb.Data[_fdfcg]&^(_fcdgg.Data[_aafc]), _dbec)
+			_aafc += _fcdgg.RowStride
+			_fdfcg += _aaecb.RowStride
+		}
+		if _fcaa {
+			for _ggdfb = 0; _ggdfb < _caafc; _ggdfb++ {
+				for _bbfe = 0; _bbfe < _dggc; _bbfe++ {
+					_fcdgg.Data[_dada+_bbfe] = _aaecb.Data[_dacaf+_bbfe] &^ (_fcdgg.Data[_dada+_bbfe])
+				}
+				_dada += _fcdgg.RowStride
+				_dacaf += _aaecb.RowStride
+			}
+		}
+		if _ebea {
+			for _ggdfb = 0; _ggdfb < _caafc; _ggdfb++ {
+				_fcdgg.Data[_cfgf] = _fbaa(_fcdgg.Data[_cfgf], _aaecb.Data[_ecfd]&^(_fcdgg.Data[_cfgf]), _aged)
+				_cfgf += _fcdgg.RowStride
+				_ecfd += _aaecb.RowStride
+			}
+		}
+	case PixNotPixSrcOrDst:
+		for _ggdfb = 0; _ggdfb < _caafc; _ggdfb++ {
+			_fcdgg.Data[_aafc] = _fbaa(_fcdgg.Data[_aafc], ^(_aaecb.Data[_fdfcg] | _fcdgg.Data[_aafc]), _dbec)
+			_aafc += _fcdgg.RowStride
+			_fdfcg += _aaecb.RowStride
+		}
+		if _fcaa {
+			for _ggdfb = 0; _ggdfb < _caafc; _ggdfb++ {
+				for _bbfe = 0; _bbfe < _dggc; _bbfe++ {
+					_fcdgg.Data[_dada+_bbfe] = ^(_aaecb.Data[_dacaf+_bbfe] | _fcdgg.Data[_dada+_bbfe])
+				}
+				_dada += _fcdgg.RowStride
+				_dacaf += _aaecb.RowStride
+			}
+		}
+		if _ebea {
+			for _ggdfb = 0; _ggdfb < _caafc; _ggdfb++ {
+				_fcdgg.Data[_cfgf] = _fbaa(_fcdgg.Data[_cfgf], ^(_aaecb.Data[_ecfd] | _fcdgg.Data[_cfgf]), _aged)
+				_cfgf += _fcdgg.RowStride
+				_ecfd += _aaecb.RowStride
+			}
+		}
+	case PixNotPixSrcAndDst:
+		for _ggdfb = 0; _ggdfb < _caafc; _ggdfb++ {
+			_fcdgg.Data[_aafc] = _fbaa(_fcdgg.Data[_aafc], ^(_aaecb.Data[_fdfcg] & _fcdgg.Data[_aafc]), _dbec)
+			_aafc += _fcdgg.RowStride
+			_fdfcg += _aaecb.RowStride
+		}
+		if _fcaa {
+			for _ggdfb = 0; _ggdfb < _caafc; _ggdfb++ {
+				for _bbfe = 0; _bbfe < _dggc; _bbfe++ {
+					_fcdgg.Data[_dada+_bbfe] = ^(_aaecb.Data[_dacaf+_bbfe] & _fcdgg.Data[_dada+_bbfe])
+				}
+				_dada += _fcdgg.RowStride
+				_dacaf += _aaecb.RowStride
+			}
+		}
+		if _ebea {
+			for _ggdfb = 0; _ggdfb < _caafc; _ggdfb++ {
+				_fcdgg.Data[_cfgf] = _fbaa(_fcdgg.Data[_cfgf], ^(_aaecb.Data[_ecfd] & _fcdgg.Data[_cfgf]), _aged)
+				_cfgf += _fcdgg.RowStride
+				_ecfd += _aaecb.RowStride
+			}
+		}
+	case PixNotPixSrcXorDst:
+		for _ggdfb = 0; _ggdfb < _caafc; _ggdfb++ {
+			_fcdgg.Data[_aafc] = _fbaa(_fcdgg.Data[_aafc], ^(_aaecb.Data[_fdfcg] ^ _fcdgg.Data[_aafc]), _dbec)
+			_aafc += _fcdgg.RowStride
+			_fdfcg += _aaecb.RowStride
+		}
+		if _fcaa {
+			for _ggdfb = 0; _ggdfb < _caafc; _ggdfb++ {
+				for _bbfe = 0; _bbfe < _dggc; _bbfe++ {
+					_fcdgg.Data[_dada+_bbfe] = ^(_aaecb.Data[_dacaf+_bbfe] ^ _fcdgg.Data[_dada+_bbfe])
+				}
+				_dada += _fcdgg.RowStride
+				_dacaf += _aaecb.RowStride
+			}
+		}
+		if _ebea {
+			for _ggdfb = 0; _ggdfb < _caafc; _ggdfb++ {
+				_fcdgg.Data[_cfgf] = _fbaa(_fcdgg.Data[_cfgf], ^(_aaecb.Data[_ecfd] ^ _fcdgg.Data[_cfgf]), _aged)
+				_cfgf += _fcdgg.RowStride
+				_ecfd += _aaecb.RowStride
+			}
+		}
+	default:
+		_dc.Log.Debug("I\u006e\u0076\u0061\u006c\u0069\u0064 \u0072\u0061\u0073\u0074\u0065\u0072\u0020\u006f\u0070e\u0072\u0061\u0074o\u0072:\u0020\u0025\u0064", _gebc)
+		return _a.Error("\u0072\u0061\u0073\u0074er\u004f\u0070\u0056\u0041\u006c\u0069\u0067\u006e\u0065\u0064\u004c\u006f\u0077", "\u0069\u006e\u0076al\u0069\u0064\u0020\u0072\u0061\u0073\u0074\u0065\u0072\u0020\u006f\u0070\u0065\u0072\u0061\u0074\u006f\u0072")
+	}
+	return nil
+}
+
+func TstNSymbol(t *_c.T, scale ...int) *Bitmap {
+	_abab, _efbcc := NewWithData(4, 5, []byte{0x90, 0xD0, 0xB0, 0x90, 0x90})
+	_d.NoError(t, _efbcc)
+	return TstGetScaledSymbol(t, _abab, scale...)
+}
+
+func SelCreateBrick(h, w int, cy, cx int, tp SelectionValue) *Selection {
+	_cdgca := _bcdbc(h, w, "")
+	_cdgca.setOrigin(cy, cx)
+	var _cefg, _egfd int
+	for _cefg = 0; _cefg < h; _cefg++ {
+		for _egfd = 0; _egfd < w; _egfd++ {
+			_cdgca.Data[_cefg][_egfd] = tp
+		}
+	}
+	return _cdgca
+}
+
+func _aaa(_gafe *Bitmap) (_dcfb *Bitmap, _bebf int, _cbbe error) {
+	const _ddbd = "\u0042i\u0074\u006d\u0061\u0070.\u0077\u006f\u0072\u0064\u004da\u0073k\u0042y\u0044\u0069\u006c\u0061\u0074\u0069\u006fn"
+	if _gafe == nil {
+		return nil, 0, _a.Errorf(_ddbd, "\u0027\u0073\u0027\u0020bi\u0074\u006d\u0061\u0070\u0020\u006e\u006f\u0074\u0020\u0064\u0065\u0066\u0069\u006ee\u0064")
+	}
+	var _cegb, _agdb *Bitmap
+	if _cegb, _cbbe = _fedg(nil, _gafe); _cbbe != nil {
+		return nil, 0, _a.Wrap(_cbbe, _ddbd, "\u0063\u006f\u0070\u0079\u0020\u0027\u0073\u0027")
+	}
+	var (
+		_bed        [13]int
+		_eacd, _ccg int
+	)
+	_feca := 12
+	_eeda := _ge.NewNumSlice(_feca + 1)
+	_fbef := _ge.NewNumSlice(_feca + 1)
+	var _cgbc *Boxes
+	for _bfad := 0; _bfad <= _feca; _bfad++ {
+		if _bfad == 0 {
+			if _agdb, _cbbe = _fedg(nil, _cegb); _cbbe != nil {
+				return nil, 0, _a.Wrap(_cbbe, _ddbd, "\u0066i\u0072\u0073\u0074\u0020\u0062\u006d2")
+			}
+		} else {
+			if _agdb, _cbbe = _defa(_cegb, MorphProcess{Operation: MopDilation, Arguments: []int{2, 1}}); _cbbe != nil {
+				return nil, 0, _a.Wrap(_cbbe, _ddbd, "\u0064\u0069\u006ca\u0074\u0069\u006f\u006e\u0020\u0062\u006d\u0032")
+			}
+		}
+		if _cgbc, _cbbe = _agdb.connComponentsBB(4); _cbbe != nil {
+			return nil, 0, _a.Wrap(_cbbe, _ddbd, "")
+		}
+		_bed[_bfad] = len(*_cgbc)
+		_eeda.AddInt(_bed[_bfad])
+		switch _bfad {
+		case 0:
+			_eacd = _bed[0]
+		default:
+			_ccg = _bed[_bfad-1] - _bed[_bfad]
+			_fbef.AddInt(_ccg)
+		}
+		_cegb = _agdb
+	}
+	_eeba := true
+	_eafe := 2
+	var _fbg, _aed int
+	for _ecdgc := 1; _ecdgc < len(*_fbef); _ecdgc++ {
+		if _fbg, _cbbe = _eeda.GetInt(_ecdgc); _cbbe != nil {
+			return nil, 0, _a.Wrap(_cbbe, _ddbd, "\u0043\u0068\u0065\u0063ki\u006e\u0067\u0020\u0062\u0065\u0073\u0074\u0020\u0064\u0069\u006c\u0061\u0074\u0069o\u006e")
+		}
+		if _eeba && _fbg < int(0.3*float32(_eacd)) {
+			_eafe = _ecdgc + 1
+			_eeba = false
+		}
+		if _ccg, _cbbe = _fbef.GetInt(_ecdgc); _cbbe != nil {
+			return nil, 0, _a.Wrap(_cbbe, _ddbd, "\u0067\u0065\u0074\u0074\u0069\u006e\u0067\u0020\u006ea\u0044\u0069\u0066\u0066")
+		}
+		if _ccg > _aed {
+			_aed = _ccg
+		}
+	}
+	_efdgf := _gafe.XResolution
+	if _efdgf == 0 {
+		_efdgf = 150
+	}
+	if _efdgf > 110 {
+		_eafe++
+	}
+	if _eafe < 2 {
+		_dc.Log.Trace("J\u0042\u0049\u0047\u0032\u0020\u0073\u0065\u0074\u0074\u0069\u006e\u0067\u0020\u0069\u0042\u0065\u0073\u0074 \u0074\u006f\u0020\u006d\u0069\u006e\u0069\u006d\u0075\u006d a\u006c\u006c\u006fw\u0061b\u006c\u0065")
+		_eafe = 2
+	}
+	_bebf = _eafe + 1
+	if _dcfb, _cbbe = _eaad(nil, _gafe, _eafe+1, 1); _cbbe != nil {
+		return nil, 0, _a.Wrap(_cbbe, _ddbd, "\u0067\u0065\u0074\u0074in\u0067\u0020\u006d\u0061\u0073\u006b\u0020\u0066\u0061\u0069\u006c\u0065\u0064")
+	}
+	return _dcfb, _bebf, nil
+}
+
+func MakePixelSumTab8() []int { return _afgg() }
+
+func (_gadcg *Bitmaps) Size() int { return len(_gadcg.Values) }
+
+var _becg [256]uint8
+
+func (_fgeb *Bitmaps) selectByIndexes(_fbgb []int) (*Bitmaps, error) {
+	_cfge := &Bitmaps{}
+	for _, _gegg := range _fbgb {
+		_ccdcd, _dfac := _fgeb.GetBitmap(_gegg)
+		if _dfac != nil {
+			return nil, _a.Wrap(_dfac, "\u0073e\u006ce\u0063\u0074\u0042\u0079\u0049\u006e\u0064\u0065\u0078\u0065\u0073", "")
+		}
+		_cfge.AddBitmap(_ccdcd)
+	}
+	return _cfge, nil
+}
+
+func CorrelationScore(bm1, bm2 *Bitmap, area1, area2 int, delX, delY float32, maxDiffW, maxDiffH int, tab []int) (_bgde float64, _fabba error) {
+	const _cfdb = "\u0063\u006fr\u0072\u0065\u006ca\u0074\u0069\u006f\u006e\u0053\u0063\u006f\u0072\u0065"
+	if bm1 == nil || bm2 == nil {
+		return 0, _a.Error(_cfdb, "p\u0072o\u0076\u0069\u0064\u0065\u0064\u0020\u006e\u0069l\u0020\u0062\u0069\u0074ma\u0070\u0073")
+	}
+	if tab == nil {
+		return 0, _a.Error(_cfdb, "\u0027\u0074\u0061\u0062\u0027\u0020\u006e\u006f\u0074\u0020\u0064\u0065f\u0069\u006e\u0065\u0064")
+	}
+	if area1 <= 0 || area2 <= 0 {
+		return 0, _a.Error(_cfdb, "\u0061\u0072\u0065\u0061s\u0020\u006d\u0075\u0073\u0074\u0020\u0062\u0065\u0020\u0067r\u0065a\u0074\u0065\u0072\u0020\u0074\u0068\u0061n\u0020\u0030")
+	}
+	_fada, _ffbg := bm1.Width, bm1.Height
+	_gffdb, _dgcg := bm2.Width, bm2.Height
+	_dgad := _fgfb(_fada - _gffdb)
+	if _dgad > maxDiffW {
+		return 0, nil
+	}
+	_cba := _fgfb(_ffbg - _dgcg)
+	if _cba > maxDiffH {
+		return 0, nil
+	}
+	var _ced, _accd int
+	if delX >= 0 {
+		_ced = int(delX + 0.5)
+	} else {
+		_ced = int(delX - 0.5)
+	}
+	if delY >= 0 {
+		_accd = int(delY + 0.5)
+	} else {
+		_accd = int(delY - 0.5)
+	}
+	_efa := _aega(_accd, 0)
+	_edgdg := _efd(_dgcg+_accd, _ffbg)
+	_gaef := bm1.RowStride * _efa
+	_fafe := bm2.RowStride * (_efa - _accd)
+	_febc := _aega(_ced, 0)
+	_bgb := _efd(_gffdb+_ced, _fada)
+	_deceg := bm2.RowStride
+	var _fcdbd, _egaca int
+	if _ced >= 8 {
+		_fcdbd = _ced >> 3
+		_gaef += _fcdbd
+		_febc -= _fcdbd << 3
+		_bgb -= _fcdbd << 3
+		_ced &= 7
+	} else if _ced <= -8 {
+		_egaca = -((_ced + 7) >> 3)
+		_fafe += _egaca
+		_deceg -= _egaca
+		_ced += _egaca << 3
+	}
+	if _febc >= _bgb || _efa >= _edgdg {
+		return 0, nil
+	}
+	_ebfg := (_bgb + 7) >> 3
+	var (
+		_ebed, _gdb, _bcg    byte
+		_efgg, _gabda, _cggg int
+	)
+	switch {
+	case _ced == 0:
+		for _cggg = _efa; _cggg < _edgdg; _cggg, _gaef, _fafe = _cggg+1, _gaef+bm1.RowStride, _fafe+bm2.RowStride {
+			for _gabda = 0; _gabda < _ebfg; _gabda++ {
+				_bcg = bm1.Data[_gaef+_gabda] & bm2.Data[_fafe+_gabda]
+				_efgg += tab[_bcg]
+			}
+		}
+	case _ced > 0:
+		if _deceg < _ebfg {
+			for _cggg = _efa; _cggg < _edgdg; _cggg, _gaef, _fafe = _cggg+1, _gaef+bm1.RowStride, _fafe+bm2.RowStride {
+				_ebed, _gdb = bm1.Data[_gaef], bm2.Data[_fafe]>>uint(_ced)
+				_bcg = _ebed & _gdb
+				_efgg += tab[_bcg]
+				for _gabda = 1; _gabda < _deceg; _gabda++ {
+					_ebed, _gdb = bm1.Data[_gaef+_gabda], (bm2.Data[_fafe+_gabda]>>uint(_ced))|(bm2.Data[_fafe+_gabda-1]<<uint(8-_ced))
+					_bcg = _ebed & _gdb
+					_efgg += tab[_bcg]
+				}
+				_ebed = bm1.Data[_gaef+_gabda]
+				_gdb = bm2.Data[_fafe+_gabda-1] << uint(8-_ced)
+				_bcg = _ebed & _gdb
+				_efgg += tab[_bcg]
+			}
+		} else {
+			for _cggg = _efa; _cggg < _edgdg; _cggg, _gaef, _fafe = _cggg+1, _gaef+bm1.RowStride, _fafe+bm2.RowStride {
+				_ebed, _gdb = bm1.Data[_gaef], bm2.Data[_fafe]>>uint(_ced)
+				_bcg = _ebed & _gdb
+				_efgg += tab[_bcg]
+				for _gabda = 1; _gabda < _ebfg; _gabda++ {
+					_ebed = bm1.Data[_gaef+_gabda]
+					_gdb = (bm2.Data[_fafe+_gabda] >> uint(_ced)) | (bm2.Data[_fafe+_gabda-1] << uint(8-_ced))
+					_bcg = _ebed & _gdb
+					_efgg += tab[_bcg]
+				}
+			}
+		}
+	default:
+		if _ebfg < _deceg {
+			for _cggg = _efa; _cggg < _edgdg; _cggg, _gaef, _fafe = _cggg+1, _gaef+bm1.RowStride, _fafe+bm2.RowStride {
+				for _gabda = 0; _gabda < _ebfg; _gabda++ {
+					_ebed = bm1.Data[_gaef+_gabda]
+					_gdb = bm2.Data[_fafe+_gabda] << uint(-_ced)
+					_gdb |= bm2.Data[_fafe+_gabda+1] >> uint(8+_ced)
+					_bcg = _ebed & _gdb
+					_efgg += tab[_bcg]
+				}
+			}
+		} else {
+			for _cggg = _efa; _cggg < _edgdg; _cggg, _gaef, _fafe = _cggg+1, _gaef+bm1.RowStride, _fafe+bm2.RowStride {
+				for _gabda = 0; _gabda < _ebfg-1; _gabda++ {
+					_ebed = bm1.Data[_gaef+_gabda]
+					_gdb = bm2.Data[_fafe+_gabda] << uint(-_ced)
+					_gdb |= bm2.Data[_fafe+_gabda+1] >> uint(8+_ced)
+					_bcg = _ebed & _gdb
+					_efgg += tab[_bcg]
+				}
+				_ebed = bm1.Data[_gaef+_gabda]
+				_gdb = bm2.Data[_fafe+_gabda] << uint(-_ced)
+				_bcg = _ebed & _gdb
+				_efgg += tab[_bcg]
+			}
+		}
+	}
+	_bgde = float64(_efgg) * float64(_efgg) / (float64(area1) * float64(area2))
+	return _bgde, nil
+}

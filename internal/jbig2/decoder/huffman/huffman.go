@@ -9,35 +9,402 @@
 // Use of this source code is governed by the UniDoc End User License Agreement
 // terms that can be accessed at https://unidoc.io/eula/
 
-package huffman ;import (_fe "errors";_ga "fmt";_b "github.com/unidoc/unipdf/v4/internal/bitwise";_g "github.com/unidoc/unipdf/v4/internal/jbig2/internal";_cg "math";_f "strings";);func GetStandardTable (number int )(Tabler ,error ){if number <=0||number > len (_cgf ){return nil ,_fe .New ("\u0049n\u0064e\u0078\u0020\u006f\u0075\u0074 \u006f\u0066 \u0072\u0061\u006e\u0067\u0065");
-};_fefg :=_cgf [number -1];if _fefg ==nil {var _fec error ;_fefg ,_fec =_feaa (_fgbc [number -1]);if _fec !=nil {return nil ,_fec ;};_cgf [number -1]=_fefg ;};return _fefg ,nil ;};func _cdg (_gaa int32 )*InternalNode {return &InternalNode {_bfd :_gaa }};
-func (_aeg *FixedSizeTable )String ()string {return _aeg ._eb .String ()+"\u000a"};func (_cc *ValueNode )String ()string {return _ga .Sprintf ("\u0025\u0064\u002f%\u0064",_cc ._cf ,_cc ._gb );};func _feaa (_ceb [][]int32 )(*StandardTable ,error ){var _ad []*Code ;
-for _dgb :=0;_dgb < len (_ceb );_dgb ++{_gbb :=_ceb [_dgb ][0];_fd :=_ceb [_dgb ][1];_cfb :=_ceb [_dgb ][2];var _bea bool ;if len (_ceb [_dgb ])> 3{_bea =true ;};_ad =append (_ad ,NewCode (_gbb ,_fd ,_cfb ,_bea ));};_cdf :=&StandardTable {_ee :_cdg (0)};
-if _ccd :=_cdf .InitTree (_ad );_ccd !=nil {return nil ,_ccd ;};return _cdf ,nil ;};func _bg (_gbe *Code )*ValueNode {return &ValueNode {_cf :_gbe ._ace ,_gb :_gbe ._afea ,_feg :_gbe ._eda }};func (_cd *EncodedTable )InitTree (codeTable []*Code )error {_df (codeTable );
-for _ ,_a :=range codeTable {if _ba :=_cd ._e .append (_a );_ba !=nil {return _ba ;};};return nil ;};type Node interface{Decode (_fef *_b .Reader )(int64 ,error );String ()string ;};var _ Tabler =&EncodedTable {};func (_ffe *FixedSizeTable )Decode (r *_b .Reader )(int64 ,error ){return _ffe ._eb .Decode (r )};
-type StandardTable struct{_ee *InternalNode };type FixedSizeTable struct{_eb *InternalNode };func (_af *EncodedTable )RootNode ()*InternalNode {return _af ._e };var _ Node =&InternalNode {};func (_cee *StandardTable )String ()string {return _cee ._ee .String ()+"\u000a"};
-type OutOfBandNode struct{};func (_gcb *OutOfBandNode )String ()string {return _ga .Sprintf ("\u0025\u0030\u00364\u0062",int64 (_cg .MaxInt64 ));};func NewFixedSizeTable (codeTable []*Code )(*FixedSizeTable ,error ){_bd :=&FixedSizeTable {_eb :&InternalNode {}};
-if _gfc :=_bd .InitTree (codeTable );_gfc !=nil {return nil ,_gfc ;};return _bd ,nil ;};type Tabler interface{Decode (_ebf *_b .Reader )(int64 ,error );InitTree (_ged []*Code )error ;String ()string ;RootNode ()*InternalNode ;};func (_bb *FixedSizeTable )RootNode ()*InternalNode {return _bb ._eb };
-func (_gffb *OutOfBandNode )Decode (r *_b .Reader )(int64 ,error ){return 0,_g .ErrOOB };func (_dc *EncodedTable )String ()string {return _dc ._e .String ()+"\u000a"};func (_ab *InternalNode )Decode (r *_b .Reader )(int64 ,error ){_cbb ,_cdb :=r .ReadBit ();
-if _cdb !=nil {return 0,_cdb ;};if _cbb ==0{return _ab ._fa .Decode (r );};return _ab ._ge .Decode (r );};func (_bbg *Code )String ()string {var _gad string ;if _bbg ._gdd !=-1{_gad =_gce (_bbg ._gdd ,_bbg ._abd );}else {_gad ="\u003f";};return _ga .Sprintf ("%\u0073\u002f\u0025\u0064\u002f\u0025\u0064\u002f\u0025\u0064",_gad ,_bbg ._abd ,_bbg ._ace ,_bbg ._afea );
-};func _gce (_ccc ,_dgg int32 )string {var _bcc int32 ;_eaa :=make ([]rune ,_dgg );for _ddc :=int32 (1);_ddc <=_dgg ;_ddc ++{_bcc =_ccc >>uint (_dgg -_ddc )&1;if _bcc !=0{_eaa [_ddc -1]='1';}else {_eaa [_ddc -1]='0';};};return string (_eaa );};type ValueNode struct{_cf int32 ;
-_gb int32 ;_feg bool ;};func (_bcb *EncodedTable )parseTable ()error {var (_cb []*Code ;_afe ,_gf ,_gff int32 ;_fgb uint64 ;_bf error ;);_gae :=_bcb .StreamReader ();_ff :=_bcb .HtLow ();for _ff < _bcb .HtHigh (){_fgb ,_bf =_gae .ReadBits (byte (_bcb .HtPS ()));
-if _bf !=nil {return _bf ;};_afe =int32 (_fgb );_fgb ,_bf =_gae .ReadBits (byte (_bcb .HtRS ()));if _bf !=nil {return _bf ;};_gf =int32 (_fgb );_cb =append (_cb ,NewCode (_afe ,_gf ,_gff ,false ));_ff +=1<<uint (_gf );};_fgb ,_bf =_gae .ReadBits (byte (_bcb .HtPS ()));
-if _bf !=nil {return _bf ;};_afe =int32 (_fgb );_gf =32;_gff =_bcb .HtLow ()-1;_cb =append (_cb ,NewCode (_afe ,_gf ,_gff ,true ));_fgb ,_bf =_gae .ReadBits (byte (_bcb .HtPS ()));if _bf !=nil {return _bf ;};_afe =int32 (_fgb );_gf =32;_gff =_bcb .HtHigh ();
-_cb =append (_cb ,NewCode (_afe ,_gf ,_gff ,false ));if _bcb .HtOOB ()==1{_fgb ,_bf =_gae .ReadBits (byte (_bcb .HtPS ()));if _bf !=nil {return _bf ;};_afe =int32 (_fgb );_cb =append (_cb ,NewCode (_afe ,-1,-1,false ));};if _bf =_bcb .InitTree (_cb );_bf !=nil {return _bf ;
-};return nil ;};func (_ef *EncodedTable )Decode (r *_b .Reader )(int64 ,error ){return _ef ._e .Decode (r )};var _cgf =make ([]Tabler ,len (_fgbc ));var _fgbc =[][][]int32 {{{1,4,0},{2,8,16},{3,16,272},{3,32,65808}},{{1,0,0},{2,0,1},{3,0,2},{4,3,3},{5,6,11},{6,32,75},{6,-1,0}},{{8,8,-256},{1,0,0},{2,0,1},{3,0,2},{4,3,3},{5,6,11},{8,32,-257,999},{7,32,75},{6,-1,0}},{{1,0,1},{2,0,2},{3,0,3},{4,3,4},{5,6,12},{5,32,76}},{{7,8,-255},{1,0,1},{2,0,2},{3,0,3},{4,3,4},{5,6,12},{7,32,-256,999},{6,32,76}},{{5,10,-2048},{4,9,-1024},{4,8,-512},{4,7,-256},{5,6,-128},{5,5,-64},{4,5,-32},{2,7,0},{3,7,128},{3,8,256},{4,9,512},{4,10,1024},{6,32,-2049,999},{6,32,2048}},{{4,9,-1024},{3,8,-512},{4,7,-256},{5,6,-128},{5,5,-64},{4,5,-32},{4,5,0},{5,5,32},{5,6,64},{4,7,128},{3,8,256},{3,9,512},{3,10,1024},{5,32,-1025,999},{5,32,2048}},{{8,3,-15},{9,1,-7},{8,1,-5},{9,0,-3},{7,0,-2},{4,0,-1},{2,1,0},{5,0,2},{6,0,3},{3,4,4},{6,1,20},{4,4,22},{4,5,38},{5,6,70},{5,7,134},{6,7,262},{7,8,390},{6,10,646},{9,32,-16,999},{9,32,1670},{2,-1,0}},{{8,4,-31},{9,2,-15},{8,2,-11},{9,1,-7},{7,1,-5},{4,1,-3},{3,1,-1},{3,1,1},{5,1,3},{6,1,5},{3,5,7},{6,2,39},{4,5,43},{4,6,75},{5,7,139},{5,8,267},{6,8,523},{7,9,779},{6,11,1291},{9,32,-32,999},{9,32,3339},{2,-1,0}},{{7,4,-21},{8,0,-5},{7,0,-4},{5,0,-3},{2,2,-2},{5,0,2},{6,0,3},{7,0,4},{8,0,5},{2,6,6},{5,5,70},{6,5,102},{6,6,134},{6,7,198},{6,8,326},{6,9,582},{6,10,1094},{7,11,2118},{8,32,-22,999},{8,32,4166},{2,-1,0}},{{1,0,1},{2,1,2},{4,0,4},{4,1,5},{5,1,7},{5,2,9},{6,2,13},{7,2,17},{7,3,21},{7,4,29},{7,5,45},{7,6,77},{7,32,141}},{{1,0,1},{2,0,2},{3,1,3},{5,0,5},{5,1,6},{6,1,8},{7,0,10},{7,1,11},{7,2,13},{7,3,17},{7,4,25},{8,5,41},{8,32,73}},{{1,0,1},{3,0,2},{4,0,3},{5,0,4},{4,1,5},{3,3,7},{6,1,15},{6,2,17},{6,3,21},{6,4,29},{6,5,45},{7,6,77},{7,32,141}},{{3,0,-2},{3,0,-1},{1,0,0},{3,0,1},{3,0,2}},{{7,4,-24},{6,2,-8},{5,1,-4},{4,0,-2},{3,0,-1},{1,0,0},{3,0,1},{4,0,2},{5,1,3},{6,2,5},{7,4,9},{7,32,-25,999},{7,32,25}}};
-type Code struct{_abd int32 ;_ace int32 ;_afea int32 ;_eda bool ;_gdd int32 ;};var _ Node =&OutOfBandNode {};type EncodedTable struct{BasicTabler ;_e *InternalNode ;};func (_gc *FixedSizeTable )InitTree (codeTable []*Code )error {_df (codeTable );for _ ,_dg :=range codeTable {_ea :=_gc ._eb .append (_dg );
-if _ea !=nil {return _ea ;};};return nil ;};func _be (_aege *Code )*OutOfBandNode {return &OutOfBandNode {}};func (_ce *StandardTable )Decode (r *_b .Reader )(int64 ,error ){return _ce ._ee .Decode (r )};func (_fff *InternalNode )String ()string {_ac :=&_f .Builder {};
-_ac .WriteString ("\u000a");_fff .pad (_ac );_ac .WriteString ("\u0030\u003a\u0020");_ac .WriteString (_fff ._fa .String ()+"\u000a");_fff .pad (_ac );_ac .WriteString ("\u0031\u003a\u0020");_ac .WriteString (_fff ._ge .String ()+"\u000a");return _ac .String ();
-};func NewCode (prefixLength ,rangeLength ,rangeLow int32 ,isLowerRange bool )*Code {return &Code {_abd :prefixLength ,_ace :rangeLength ,_afea :rangeLow ,_eda :isLowerRange ,_gdd :-1};};func (_aea *ValueNode )Decode (r *_b .Reader )(int64 ,error ){_gfb ,_fea :=r .ReadBits (byte (_aea ._cf ));
-if _fea !=nil {return 0,_fea ;};if _aea ._feg {_gfb =-_gfb ;};return int64 (_aea ._gb )+int64 (_gfb ),nil ;};func (_ca *StandardTable )InitTree (codeTable []*Code )error {_df (codeTable );for _ ,_ed :=range codeTable {if _fbb :=_ca ._ee .append (_ed );
-_fbb !=nil {return _fbb ;};};return nil ;};func _df (_abc []*Code ){var _cfe int32 ;for _ ,_faa :=range _abc {_cfe =_cdff (_cfe ,_faa ._abd );};_gced :=make ([]int32 ,_cfe +1);for _ ,_aa :=range _abc {_gced [_aa ._abd ]++;};var _bbc int32 ;_dgc :=make ([]int32 ,len (_gced )+1);
-_gced [0]=0;for _gfa :=int32 (1);_gfa <=int32 (len (_gced ));_gfa ++{_dgc [_gfa ]=(_dgc [_gfa -1]+(_gced [_gfa -1]))<<1;_bbc =_dgc [_gfa ];for _ ,_ebd :=range _abc {if _ebd ._abd ==_gfa {_ebd ._gdd =_bbc ;_bbc ++;};};};};func NewEncodedTable (table BasicTabler )(*EncodedTable ,error ){_d :=&EncodedTable {_e :&InternalNode {},BasicTabler :table };
-if _gd :=_d .parseTable ();_gd !=nil {return nil ,_gd ;};return _d ,nil ;};type InternalNode struct{_bfd int32 ;_fa Node ;_ge Node ;};func _cdff (_fad ,_cfbc int32 )int32 {if _fad > _cfbc {return _fad ;};return _cfbc ;};var _ Node =&ValueNode {};func (_ffd *InternalNode )pad (_fb *_f .Builder ){for _aee :=int32 (0);
-_aee < _ffd ._bfd ;_aee ++{_fb .WriteString ("\u0020\u0020\u0020");};};func (_cba *StandardTable )RootNode ()*InternalNode {return _cba ._ee };func (_gba *InternalNode )append (_fac *Code )(_ebc error ){if _fac ._abd ==0{return nil ;};_bae :=_fac ._abd -1-_gba ._bfd ;
-if _bae < 0{return _fe .New ("\u006e\u0065\u0067\u0061\u0074\u0069\u0076\u0065\u0020\u0073\u0068\u0069\u0066\u0074\u0069n\u0067 \u0069\u0073\u0020\u006e\u006f\u0074\u0020\u0061\u006c\u006c\u006f\u0077\u0065\u0064");};_acc :=(_fac ._gdd >>uint (_bae ))&0x1;
-if _bae ==0{if _fac ._ace ==-1{if _acc ==1{if _gba ._ge !=nil {return _ga .Errorf ("O\u004f\u0042\u0020\u0061\u006c\u0072e\u0061\u0064\u0079\u0020\u0073\u0065\u0074\u0020\u0066o\u0072\u0020\u0063o\u0064e\u0020\u0025\u0073",_fac );};_gba ._ge =_be (_fac );
-}else {if _gba ._fa !=nil {return _ga .Errorf ("O\u004f\u0042\u0020\u0061\u006c\u0072e\u0061\u0064\u0079\u0020\u0073\u0065\u0074\u0020\u0066o\u0072\u0020\u0063o\u0064e\u0020\u0025\u0073",_fac );};_gba ._fa =_be (_fac );};}else {if _acc ==1{if _gba ._ge !=nil {return _ga .Errorf ("\u0076\u0061\u006cue\u0020\u004e\u006f\u0064\u0065\u0020\u0061\u006c\u0072e\u0061d\u0079 \u0073e\u0074\u0020\u0066\u006f\u0072\u0020\u0063\u006f\u0064\u0065\u0020\u0025\u0073",_fac );
-};_gba ._ge =_bg (_fac );}else {if _gba ._fa !=nil {return _ga .Errorf ("\u0076\u0061\u006cue\u0020\u004e\u006f\u0064\u0065\u0020\u0061\u006c\u0072e\u0061d\u0079 \u0073e\u0074\u0020\u0066\u006f\u0072\u0020\u0063\u006f\u0064\u0065\u0020\u0025\u0073",_fac );
-};_gba ._fa =_bg (_fac );};};}else {if _acc ==1{if _gba ._ge ==nil {_gba ._ge =_cdg (_gba ._bfd +1);};if _ebc =_gba ._ge .(*InternalNode ).append (_fac );_ebc !=nil {return _ebc ;};}else {if _gba ._fa ==nil {_gba ._fa =_cdg (_gba ._bfd +1);};if _ebc =_gba ._fa .(*InternalNode ).append (_fac );
-_ebc !=nil {return _ebc ;};};};return nil ;};type BasicTabler interface{HtHigh ()int32 ;HtLow ()int32 ;StreamReader ()*_b .Reader ;HtPS ()int32 ;HtRS ()int32 ;HtOOB ()int32 ;};
+package huffman
+
+import (
+	_fe "errors"
+	_ga "fmt"
+	_b "github.com/szwede/unipdf/v4/internal/bitwise"
+	_g "github.com/szwede/unipdf/v4/internal/jbig2/internal"
+	_cg "math"
+	_f "strings"
+)
+
+func GetStandardTable(number int) (Tabler, error) {
+	if number <= 0 || number > len(_cgf) {
+		return nil, _fe.New("\u0049n\u0064e\u0078\u0020\u006f\u0075\u0074 \u006f\u0066 \u0072\u0061\u006e\u0067\u0065")
+	}
+	_fefg := _cgf[number-1]
+	if _fefg == nil {
+		var _fec error
+		_fefg, _fec = _feaa(_fgbc[number-1])
+		if _fec != nil {
+			return nil, _fec
+		}
+		_cgf[number-1] = _fefg
+	}
+	return _fefg, nil
+}
+
+func _cdg(_gaa int32) *InternalNode { return &InternalNode{_bfd: _gaa} }
+
+func (_aeg *FixedSizeTable) String() string { return _aeg._eb.String() + "\u000a" }
+
+func (_cc *ValueNode) String() string {
+	return _ga.Sprintf("\u0025\u0064\u002f%\u0064", _cc._cf, _cc._gb)
+}
+
+func _feaa(_ceb [][]int32) (*StandardTable, error) {
+	var _ad []*Code
+	for _dgb := 0; _dgb < len(_ceb); _dgb++ {
+		_gbb := _ceb[_dgb][0]
+		_fd := _ceb[_dgb][1]
+		_cfb := _ceb[_dgb][2]
+		var _bea bool
+		if len(_ceb[_dgb]) > 3 {
+			_bea = true
+		}
+		_ad = append(_ad, NewCode(_gbb, _fd, _cfb, _bea))
+	}
+	_cdf := &StandardTable{_ee: _cdg(0)}
+	if _ccd := _cdf.InitTree(_ad); _ccd != nil {
+		return nil, _ccd
+	}
+	return _cdf, nil
+}
+
+func _bg(_gbe *Code) *ValueNode {
+	return &ValueNode{_cf: _gbe._ace, _gb: _gbe._afea, _feg: _gbe._eda}
+}
+
+func (_cd *EncodedTable) InitTree(codeTable []*Code) error {
+	_df(codeTable)
+	for _, _a := range codeTable {
+		if _ba := _cd._e.append(_a); _ba != nil {
+			return _ba
+		}
+	}
+	return nil
+}
+
+type Node interface {
+	Decode(_fef *_b.Reader) (int64, error)
+	String() string
+}
+
+var _ Tabler = &EncodedTable{}
+
+func (_ffe *FixedSizeTable) Decode(r *_b.Reader) (int64, error) { return _ffe._eb.Decode(r) }
+
+type StandardTable struct{ _ee *InternalNode }
+
+type FixedSizeTable struct{ _eb *InternalNode }
+
+func (_af *EncodedTable) RootNode() *InternalNode { return _af._e }
+
+var _ Node = &InternalNode{}
+
+func (_cee *StandardTable) String() string { return _cee._ee.String() + "\u000a" }
+
+type OutOfBandNode struct{}
+
+func (_gcb *OutOfBandNode) String() string {
+	return _ga.Sprintf("\u0025\u0030\u00364\u0062", int64(_cg.MaxInt64))
+}
+
+func NewFixedSizeTable(codeTable []*Code) (*FixedSizeTable, error) {
+	_bd := &FixedSizeTable{_eb: &InternalNode{}}
+	if _gfc := _bd.InitTree(codeTable); _gfc != nil {
+		return nil, _gfc
+	}
+	return _bd, nil
+}
+
+type Tabler interface {
+	Decode(_ebf *_b.Reader) (int64, error)
+	InitTree(_ged []*Code) error
+	String() string
+	RootNode() *InternalNode
+}
+
+func (_bb *FixedSizeTable) RootNode() *InternalNode { return _bb._eb }
+
+func (_gffb *OutOfBandNode) Decode(r *_b.Reader) (int64, error) { return 0, _g.ErrOOB }
+
+func (_dc *EncodedTable) String() string { return _dc._e.String() + "\u000a" }
+
+func (_ab *InternalNode) Decode(r *_b.Reader) (int64, error) {
+	_cbb, _cdb := r.ReadBit()
+	if _cdb != nil {
+		return 0, _cdb
+	}
+	if _cbb == 0 {
+		return _ab._fa.Decode(r)
+	}
+	return _ab._ge.Decode(r)
+}
+
+func (_bbg *Code) String() string {
+	var _gad string
+	if _bbg._gdd != -1 {
+		_gad = _gce(_bbg._gdd, _bbg._abd)
+	} else {
+		_gad = "\u003f"
+	}
+	return _ga.Sprintf("%\u0073\u002f\u0025\u0064\u002f\u0025\u0064\u002f\u0025\u0064", _gad, _bbg._abd, _bbg._ace, _bbg._afea)
+}
+
+func _gce(_ccc, _dgg int32) string {
+	var _bcc int32
+	_eaa := make([]rune, _dgg)
+	for _ddc := int32(1); _ddc <= _dgg; _ddc++ {
+		_bcc = _ccc >> uint(_dgg-_ddc) & 1
+		if _bcc != 0 {
+			_eaa[_ddc-1] = '1'
+		} else {
+			_eaa[_ddc-1] = '0'
+		}
+	}
+	return string(_eaa)
+}
+
+type ValueNode struct {
+	_cf  int32
+	_gb  int32
+	_feg bool
+}
+
+func (_bcb *EncodedTable) parseTable() error {
+	var (
+		_cb             []*Code
+		_afe, _gf, _gff int32
+		_fgb            uint64
+		_bf             error
+	)
+	_gae := _bcb.StreamReader()
+	_ff := _bcb.HtLow()
+	for _ff < _bcb.HtHigh() {
+		_fgb, _bf = _gae.ReadBits(byte(_bcb.HtPS()))
+		if _bf != nil {
+			return _bf
+		}
+		_afe = int32(_fgb)
+		_fgb, _bf = _gae.ReadBits(byte(_bcb.HtRS()))
+		if _bf != nil {
+			return _bf
+		}
+		_gf = int32(_fgb)
+		_cb = append(_cb, NewCode(_afe, _gf, _gff, false))
+		_ff += 1 << uint(_gf)
+	}
+	_fgb, _bf = _gae.ReadBits(byte(_bcb.HtPS()))
+	if _bf != nil {
+		return _bf
+	}
+	_afe = int32(_fgb)
+	_gf = 32
+	_gff = _bcb.HtLow() - 1
+	_cb = append(_cb, NewCode(_afe, _gf, _gff, true))
+	_fgb, _bf = _gae.ReadBits(byte(_bcb.HtPS()))
+	if _bf != nil {
+		return _bf
+	}
+	_afe = int32(_fgb)
+	_gf = 32
+	_gff = _bcb.HtHigh()
+	_cb = append(_cb, NewCode(_afe, _gf, _gff, false))
+	if _bcb.HtOOB() == 1 {
+		_fgb, _bf = _gae.ReadBits(byte(_bcb.HtPS()))
+		if _bf != nil {
+			return _bf
+		}
+		_afe = int32(_fgb)
+		_cb = append(_cb, NewCode(_afe, -1, -1, false))
+	}
+	if _bf = _bcb.InitTree(_cb); _bf != nil {
+		return _bf
+	}
+	return nil
+}
+
+func (_ef *EncodedTable) Decode(r *_b.Reader) (int64, error) { return _ef._e.Decode(r) }
+
+var _cgf = make([]Tabler, len(_fgbc))
+
+var _fgbc = [][][]int32{{{1, 4, 0}, {2, 8, 16}, {3, 16, 272}, {3, 32, 65808}}, {{1, 0, 0}, {2, 0, 1}, {3, 0, 2}, {4, 3, 3}, {5, 6, 11}, {6, 32, 75}, {6, -1, 0}}, {{8, 8, -256}, {1, 0, 0}, {2, 0, 1}, {3, 0, 2}, {4, 3, 3}, {5, 6, 11}, {8, 32, -257, 999}, {7, 32, 75}, {6, -1, 0}}, {{1, 0, 1}, {2, 0, 2}, {3, 0, 3}, {4, 3, 4}, {5, 6, 12}, {5, 32, 76}}, {{7, 8, -255}, {1, 0, 1}, {2, 0, 2}, {3, 0, 3}, {4, 3, 4}, {5, 6, 12}, {7, 32, -256, 999}, {6, 32, 76}}, {{5, 10, -2048}, {4, 9, -1024}, {4, 8, -512}, {4, 7, -256}, {5, 6, -128}, {5, 5, -64}, {4, 5, -32}, {2, 7, 0}, {3, 7, 128}, {3, 8, 256}, {4, 9, 512}, {4, 10, 1024}, {6, 32, -2049, 999}, {6, 32, 2048}}, {{4, 9, -1024}, {3, 8, -512}, {4, 7, -256}, {5, 6, -128}, {5, 5, -64}, {4, 5, -32}, {4, 5, 0}, {5, 5, 32}, {5, 6, 64}, {4, 7, 128}, {3, 8, 256}, {3, 9, 512}, {3, 10, 1024}, {5, 32, -1025, 999}, {5, 32, 2048}}, {{8, 3, -15}, {9, 1, -7}, {8, 1, -5}, {9, 0, -3}, {7, 0, -2}, {4, 0, -1}, {2, 1, 0}, {5, 0, 2}, {6, 0, 3}, {3, 4, 4}, {6, 1, 20}, {4, 4, 22}, {4, 5, 38}, {5, 6, 70}, {5, 7, 134}, {6, 7, 262}, {7, 8, 390}, {6, 10, 646}, {9, 32, -16, 999}, {9, 32, 1670}, {2, -1, 0}}, {{8, 4, -31}, {9, 2, -15}, {8, 2, -11}, {9, 1, -7}, {7, 1, -5}, {4, 1, -3}, {3, 1, -1}, {3, 1, 1}, {5, 1, 3}, {6, 1, 5}, {3, 5, 7}, {6, 2, 39}, {4, 5, 43}, {4, 6, 75}, {5, 7, 139}, {5, 8, 267}, {6, 8, 523}, {7, 9, 779}, {6, 11, 1291}, {9, 32, -32, 999}, {9, 32, 3339}, {2, -1, 0}}, {{7, 4, -21}, {8, 0, -5}, {7, 0, -4}, {5, 0, -3}, {2, 2, -2}, {5, 0, 2}, {6, 0, 3}, {7, 0, 4}, {8, 0, 5}, {2, 6, 6}, {5, 5, 70}, {6, 5, 102}, {6, 6, 134}, {6, 7, 198}, {6, 8, 326}, {6, 9, 582}, {6, 10, 1094}, {7, 11, 2118}, {8, 32, -22, 999}, {8, 32, 4166}, {2, -1, 0}}, {{1, 0, 1}, {2, 1, 2}, {4, 0, 4}, {4, 1, 5}, {5, 1, 7}, {5, 2, 9}, {6, 2, 13}, {7, 2, 17}, {7, 3, 21}, {7, 4, 29}, {7, 5, 45}, {7, 6, 77}, {7, 32, 141}}, {{1, 0, 1}, {2, 0, 2}, {3, 1, 3}, {5, 0, 5}, {5, 1, 6}, {6, 1, 8}, {7, 0, 10}, {7, 1, 11}, {7, 2, 13}, {7, 3, 17}, {7, 4, 25}, {8, 5, 41}, {8, 32, 73}}, {{1, 0, 1}, {3, 0, 2}, {4, 0, 3}, {5, 0, 4}, {4, 1, 5}, {3, 3, 7}, {6, 1, 15}, {6, 2, 17}, {6, 3, 21}, {6, 4, 29}, {6, 5, 45}, {7, 6, 77}, {7, 32, 141}}, {{3, 0, -2}, {3, 0, -1}, {1, 0, 0}, {3, 0, 1}, {3, 0, 2}}, {{7, 4, -24}, {6, 2, -8}, {5, 1, -4}, {4, 0, -2}, {3, 0, -1}, {1, 0, 0}, {3, 0, 1}, {4, 0, 2}, {5, 1, 3}, {6, 2, 5}, {7, 4, 9}, {7, 32, -25, 999}, {7, 32, 25}}}
+
+type Code struct {
+	_abd  int32
+	_ace  int32
+	_afea int32
+	_eda  bool
+	_gdd  int32
+}
+
+var _ Node = &OutOfBandNode{}
+
+type EncodedTable struct {
+	BasicTabler
+	_e *InternalNode
+}
+
+func (_gc *FixedSizeTable) InitTree(codeTable []*Code) error {
+	_df(codeTable)
+	for _, _dg := range codeTable {
+		_ea := _gc._eb.append(_dg)
+		if _ea != nil {
+			return _ea
+		}
+	}
+	return nil
+}
+
+func _be(_aege *Code) *OutOfBandNode { return &OutOfBandNode{} }
+
+func (_ce *StandardTable) Decode(r *_b.Reader) (int64, error) { return _ce._ee.Decode(r) }
+
+func (_fff *InternalNode) String() string {
+	_ac := &_f.Builder{}
+	_ac.WriteString("\u000a")
+	_fff.pad(_ac)
+	_ac.WriteString("\u0030\u003a\u0020")
+	_ac.WriteString(_fff._fa.String() + "\u000a")
+	_fff.pad(_ac)
+	_ac.WriteString("\u0031\u003a\u0020")
+	_ac.WriteString(_fff._ge.String() + "\u000a")
+	return _ac.String()
+}
+
+func NewCode(prefixLength, rangeLength, rangeLow int32, isLowerRange bool) *Code {
+	return &Code{_abd: prefixLength, _ace: rangeLength, _afea: rangeLow, _eda: isLowerRange, _gdd: -1}
+}
+
+func (_aea *ValueNode) Decode(r *_b.Reader) (int64, error) {
+	_gfb, _fea := r.ReadBits(byte(_aea._cf))
+	if _fea != nil {
+		return 0, _fea
+	}
+	if _aea._feg {
+		_gfb = -_gfb
+	}
+	return int64(_aea._gb) + int64(_gfb), nil
+}
+
+func (_ca *StandardTable) InitTree(codeTable []*Code) error {
+	_df(codeTable)
+	for _, _ed := range codeTable {
+		if _fbb := _ca._ee.append(_ed); _fbb != nil {
+			return _fbb
+		}
+	}
+	return nil
+}
+
+func _df(_abc []*Code) {
+	var _cfe int32
+	for _, _faa := range _abc {
+		_cfe = _cdff(_cfe, _faa._abd)
+	}
+	_gced := make([]int32, _cfe+1)
+	for _, _aa := range _abc {
+		_gced[_aa._abd]++
+	}
+	var _bbc int32
+	_dgc := make([]int32, len(_gced)+1)
+	_gced[0] = 0
+	for _gfa := int32(1); _gfa <= int32(len(_gced)); _gfa++ {
+		_dgc[_gfa] = (_dgc[_gfa-1] + (_gced[_gfa-1])) << 1
+		_bbc = _dgc[_gfa]
+		for _, _ebd := range _abc {
+			if _ebd._abd == _gfa {
+				_ebd._gdd = _bbc
+				_bbc++
+			}
+		}
+	}
+}
+
+func NewEncodedTable(table BasicTabler) (*EncodedTable, error) {
+	_d := &EncodedTable{_e: &InternalNode{}, BasicTabler: table}
+	if _gd := _d.parseTable(); _gd != nil {
+		return nil, _gd
+	}
+	return _d, nil
+}
+
+type InternalNode struct {
+	_bfd int32
+	_fa  Node
+	_ge  Node
+}
+
+func _cdff(_fad, _cfbc int32) int32 {
+	if _fad > _cfbc {
+		return _fad
+	}
+	return _cfbc
+}
+
+var _ Node = &ValueNode{}
+
+func (_ffd *InternalNode) pad(_fb *_f.Builder) {
+	for _aee := int32(0); _aee < _ffd._bfd; _aee++ {
+		_fb.WriteString("\u0020\u0020\u0020")
+	}
+}
+
+func (_cba *StandardTable) RootNode() *InternalNode { return _cba._ee }
+
+func (_gba *InternalNode) append(_fac *Code) (_ebc error) {
+	if _fac._abd == 0 {
+		return nil
+	}
+	_bae := _fac._abd - 1 - _gba._bfd
+	if _bae < 0 {
+		return _fe.New("\u006e\u0065\u0067\u0061\u0074\u0069\u0076\u0065\u0020\u0073\u0068\u0069\u0066\u0074\u0069n\u0067 \u0069\u0073\u0020\u006e\u006f\u0074\u0020\u0061\u006c\u006c\u006f\u0077\u0065\u0064")
+	}
+	_acc := (_fac._gdd >> uint(_bae)) & 0x1
+	if _bae == 0 {
+		if _fac._ace == -1 {
+			if _acc == 1 {
+				if _gba._ge != nil {
+					return _ga.Errorf("O\u004f\u0042\u0020\u0061\u006c\u0072e\u0061\u0064\u0079\u0020\u0073\u0065\u0074\u0020\u0066o\u0072\u0020\u0063o\u0064e\u0020\u0025\u0073", _fac)
+				}
+				_gba._ge = _be(_fac)
+			} else {
+				if _gba._fa != nil {
+					return _ga.Errorf("O\u004f\u0042\u0020\u0061\u006c\u0072e\u0061\u0064\u0079\u0020\u0073\u0065\u0074\u0020\u0066o\u0072\u0020\u0063o\u0064e\u0020\u0025\u0073", _fac)
+				}
+				_gba._fa = _be(_fac)
+			}
+		} else {
+			if _acc == 1 {
+				if _gba._ge != nil {
+					return _ga.Errorf("\u0076\u0061\u006cue\u0020\u004e\u006f\u0064\u0065\u0020\u0061\u006c\u0072e\u0061d\u0079 \u0073e\u0074\u0020\u0066\u006f\u0072\u0020\u0063\u006f\u0064\u0065\u0020\u0025\u0073", _fac)
+				}
+				_gba._ge = _bg(_fac)
+			} else {
+				if _gba._fa != nil {
+					return _ga.Errorf("\u0076\u0061\u006cue\u0020\u004e\u006f\u0064\u0065\u0020\u0061\u006c\u0072e\u0061d\u0079 \u0073e\u0074\u0020\u0066\u006f\u0072\u0020\u0063\u006f\u0064\u0065\u0020\u0025\u0073", _fac)
+				}
+				_gba._fa = _bg(_fac)
+			}
+		}
+	} else {
+		if _acc == 1 {
+			if _gba._ge == nil {
+				_gba._ge = _cdg(_gba._bfd + 1)
+			}
+			if _ebc = _gba._ge.(*InternalNode).append(_fac); _ebc != nil {
+				return _ebc
+			}
+		} else {
+			if _gba._fa == nil {
+				_gba._fa = _cdg(_gba._bfd + 1)
+			}
+			if _ebc = _gba._fa.(*InternalNode).append(_fac); _ebc != nil {
+				return _ebc
+			}
+		}
+	}
+	return nil
+}
+
+type BasicTabler interface {
+	HtHigh() int32
+	HtLow() int32
+	StreamReader() *_b.Reader
+	HtPS() int32
+	HtRS() int32
+	HtOOB() int32
+}

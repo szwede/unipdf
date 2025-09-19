@@ -9,46 +9,478 @@
 // Use of this source code is governed by the UniDoc End User License Agreement
 // terms that can be accessed at https://unidoc.io/eula/
 
-package docutil ;import (_c "errors";_f "fmt";_b "github.com/unidoc/unipdf/v4/common";_d "github.com/unidoc/unipdf/v4/core";);func (_af *Catalog )SetMetadata (data []byte )error {_eec ,_ecc :=_d .MakeStream (data ,nil );if _ecc !=nil {return _ecc ;};_eec .Set ("\u0054\u0079\u0070\u0065",_d .MakeName ("\u004d\u0065\u0074\u0061\u0064\u0061\u0074\u0061"));
-_eec .Set ("\u0053u\u0062\u0074\u0079\u0070\u0065",_d .MakeName ("\u0058\u004d\u004c"));_af .Object .Set ("\u004d\u0065\u0074\u0061\u0064\u0061\u0074\u0061",_eec );_af ._ce .Objects =append (_af ._ce .Objects ,_eec );return nil ;};func (_fbb Page )FindXObjectImages ()([]*Image ,error ){_dc ,_ccd :=_fbb .GetResourcesXObject ();
-if !_ccd {return nil ,nil ;};var _eag []*Image ;var _bbe error ;_fdb :=map[*_d .PdfObjectStream ]int {};_cffb :=map[*_d .PdfObjectStream ]struct{}{};var _gg int ;for _ ,_cbe :=range _dc .Keys (){_bdc ,_ccf :=_d .GetStream (_dc .Get (_cbe ));if !_ccf {continue ;
-};if _ ,_ceb :=_fdb [_bdc ];_ceb {continue ;};_acf ,_egg :=_d .GetName (_bdc .Get ("\u0053u\u0062\u0074\u0079\u0070\u0065"));if !_egg ||_acf .String ()!="\u0049\u006d\u0061g\u0065"{continue ;};_caebf :=Image {BitsPerComponent :8,Stream :_bdc ,Name :string (_cbe )};
-if _caebf .Colorspace ,_bbe =_dd (_bdc .Get ("\u0043\u006f\u006c\u006f\u0072\u0053\u0070\u0061\u0063\u0065"));_bbe !=nil {_b .Log .Error ("\u0045\u0072\u0072\u006f\u0072\u0020\u0064\u0065\u0074\u0065r\u006d\u0069\u006e\u0065\u0020\u0063\u006fl\u006f\u0072\u0020\u0073\u0070\u0061\u0063\u0065\u0020\u0025\u0073",_bbe );
-continue ;};if _feb ,_cfd :=_d .GetIntVal (_bdc .Get ("\u0042\u0069t\u0073\u0050\u0065r\u0043\u006f\u006d\u0070\u006f\u006e\u0065\u006e\u0074"));_cfd {_caebf .BitsPerComponent =_feb ;};if _acgd ,_ae :=_d .GetIntVal (_bdc .Get ("\u0057\u0069\u0064t\u0068"));
-_ae {_caebf .Width =_acgd ;};if _eca ,_ecac :=_d .GetIntVal (_bdc .Get ("\u0048\u0065\u0069\u0067\u0068\u0074"));_ecac {_caebf .Height =_eca ;};if _fce ,_dbf :=_d .GetStream (_bdc .Get ("\u0053\u004d\u0061s\u006b"));_dbf {_caebf .SMask =&ImageSMask {Image :&_caebf ,Stream :_fce };
-_cffb [_fce ]=struct{}{};};switch _caebf .Colorspace {case "\u0044e\u0076\u0069\u0063\u0065\u0052\u0047B":_caebf .ColorComponents =3;case "\u0044\u0065\u0076\u0069\u0063\u0065\u0047\u0072\u0061\u0079":_caebf .ColorComponents =1;case "\u0044\u0065\u0076\u0069\u0063\u0065\u0043\u004d\u0059\u004b":_caebf .ColorComponents =4;
-default:_caebf .ColorComponents =-1;};_fdb [_bdc ]=_gg ;_eag =append (_eag ,&_caebf );_gg ++;};var _dcc []int ;for _ ,_ddf :=range _eag {if _ddf .SMask !=nil {_baa ,_afg :=_fdb [_ddf .SMask .Stream ];if _afg {_dcc =append (_dcc ,_baa );};};};_ge :=make ([]*Image ,len (_eag )-len (_dcc ));
-_gg =0;_fge :for _efce ,_gfd :=range _eag {for _ ,_ggb :=range _dcc {if _efce ==_ggb {continue _fge ;};};_ge [_gg ]=_gfd ;_gg ++;};return _eag ,nil ;};func (_daaa *Catalog )SetOutputIntents (outputIntents *OutputIntents ){if _gc :=_daaa .Object .Get ("\u004f\u0075\u0074\u0070\u0075\u0074\u0049\u006e\u0074\u0065\u006e\u0074\u0073");
-_gc !=nil {for _gf ,_ad :=range _daaa ._ce .Objects {if _ad ==_gc {if outputIntents ._dg ==_gc {return ;};_daaa ._ce .Objects =append (_daaa ._ce .Objects [:_gf ],_daaa ._ce .Objects [_gf +1:]...);break ;};};};_cg :=outputIntents ._dg ;if _cg ==nil {_cg =_d .MakeIndirectObject (outputIntents ._ba );
-};_daaa .Object .Set ("\u004f\u0075\u0074\u0070\u0075\u0074\u0049\u006e\u0074\u0065\u006e\u0074\u0073",_cg );_daaa ._ce .Objects =append (_daaa ._ce .Objects ,_cg );};type ImageSMask struct{Image *Image ;Stream *_d .PdfObjectStream ;};type Image struct{Name string ;
-Width int ;Height int ;Colorspace _d .PdfObjectName ;ColorComponents int ;BitsPerComponent int ;SMask *ImageSMask ;Stream *_d .PdfObjectStream ;};type Page struct{_gce int ;Object *_d .PdfObjectDictionary ;_bbb *Document ;};func (_db *Catalog )SetStructTreeRoot (structTreeRoot _d .PdfObject ){if structTreeRoot ==nil {_db .Object .Remove ("\u0053\u0074\u0072\u0075\u0063\u0074\u0054\u0072\u0065e\u0052\u006f\u006f\u0074");
-return ;};_cbc :=_d .MakeIndirectObject (structTreeRoot );_db .Object .Set ("\u0053\u0074\u0072\u0075\u0063\u0074\u0054\u0072\u0065e\u0052\u006f\u006f\u0074",_cbc );_db ._ce .Objects =append (_db ._ce .Objects ,_cbc );};func (_be *Catalog )GetMarkInfo ()(*_d .PdfObjectDictionary ,bool ){_ef ,_fb :=_d .GetDict (_be .Object .Get ("\u004d\u0061\u0072\u006b\u0049\u006e\u0066\u006f"));
-return _ef ,_fb ;};func (_bf *Document )FindCatalog ()(*Catalog ,bool ){var _de *_d .PdfObjectDictionary ;for _ ,_ag :=range _bf .Objects {_fe ,_aag :=_d .GetDict (_ag );if !_aag {continue ;};if _fbc ,_ffa :=_d .GetName (_fe .Get ("\u0054\u0079\u0070\u0065"));
-_ffa &&*_fbc =="\u0043a\u0074\u0061\u006c\u006f\u0067"{_de =_fe ;break ;};};if _de ==nil {return nil ,false ;};return &Catalog {Object :_de ,_ce :_bf },true ;};func (_gb *OutputIntents )Len ()int {return _gb ._ba .Len ()};func (_eeca *Document )AddStream (stream *_d .PdfObjectStream ){for _ ,_age :=range _eeca .Objects {if _age ==stream {return ;
-};};_eeca .Objects =append (_eeca .Objects ,stream );};func (_da *Catalog )SetVersion (){_da .Object .Set ("\u0056e\u0072\u0073\u0069\u006f\u006e",_d .MakeName (_f .Sprintf ("\u0025\u0064\u002e%\u0064",_da ._ce .Version .Major ,_da ._ce .Version .Minor )));
-};type OutputIntent struct{Object *_d .PdfObjectDictionary ;};func (_dee Page )GetResources ()(*_d .PdfObjectDictionary ,bool ){return _d .GetDict (_dee .Object .Get ("\u0052e\u0073\u006f\u0075\u0072\u0063\u0065s"));};func (_efc *OutputIntents )Add (oi _d .PdfObject )error {_ac ,_afb :=oi .(*_d .PdfObjectDictionary );
-if !_afb {return _c .New ("\u0069\u006e\u0070\u0075\u0074\u0020\u006f\u0075\u0074\u0070\u0075\u0074\u0020\u0069\u006e\u0074\u0065\u006et\u0020\u0073\u0068\u006f\u0075\u006c\u0064 \u0062\u0065\u0020\u0061\u006e\u0020\u006f\u0062\u006a\u0065\u0063t\u0020\u0064\u0069\u0063\u0074\u0069\u006f\u006e\u0061\u0072\u0079");
-};if _ea ,_ed :=_d .GetStream (_ac .Get ("\u0044\u0065\u0073\u0074\u004f\u0075\u0074\u0070\u0075\u0074\u0050\u0072o\u0066\u0069\u006c\u0065"));_ed {_efc ._fgd .Objects =append (_efc ._fgd .Objects ,_ea );};_aa ,_bc :=oi .(*_d .PdfIndirectObject );if !_bc {_aa =_d .MakeIndirectObject (oi );
-};if _efc ._ba ==nil {_efc ._ba =_d .MakeArray (_aa );}else {_efc ._ba .Append (_aa );};_efc ._fgd .Objects =append (_efc ._fgd .Objects ,_aa );return nil ;};type Catalog struct{Object *_d .PdfObjectDictionary ;_ce *Document ;};func (_eee Page )GetContents ()([]Content ,bool ){_fbce ,_bfg :=_d .GetArray (_eee .Object .Get ("\u0043\u006f\u006e\u0074\u0065\u006e\u0074\u0073"));
-if !_bfg {_fgda ,_faf :=_d .GetStream (_eee .Object .Get ("\u0043\u006f\u006e\u0074\u0065\u006e\u0074\u0073"));if !_faf {return nil ,false ;};return []Content {{Stream :_fgda ,_ebe :_eee ,_eeea :0}},true ;};_gbb :=make ([]Content ,_fbce .Len ());for _caeb ,_fdd :=range _fbce .Elements (){_gaa ,_agea :=_d .GetStream (_fdd );
-if !_agea {continue ;};_gbb [_caeb ]=Content {Stream :_gaa ,_ebe :_eee ,_eeea :_caeb };};return _gbb ,true ;};func (_ee *Catalog )HasMetadata ()bool {_gd :=_ee .Object .Get ("\u004d\u0065\u0074\u0061\u0064\u0061\u0074\u0061");return _gd !=nil ;};func (_fd *Document )AddIndirectObject (indirect *_d .PdfIndirectObject ){for _ ,_fba :=range _fd .Objects {if _fba ==indirect {return ;
-};};_fd .Objects =append (_fd .Objects ,indirect );};type Document struct{ID [2]string ;Version _d .Version ;Objects []_d .PdfObject ;Info _d .PdfObject ;Crypt *_d .PdfCrypt ;UseHashBasedID bool ;};func (_efa Page )GetResourcesXObject ()(*_d .PdfObjectDictionary ,bool ){_abe ,_eg :=_efa .GetResources ();
-if !_eg {return nil ,false ;};return _d .GetDict (_abe .Get ("\u0058O\u0062\u006a\u0065\u0063\u0074"));};func (_aed Content )GetData ()([]byte ,error ){_daf ,_acge :=_d .NewEncoderFromStream (_aed .Stream );if _acge !=nil {return nil ,_acge ;};_eccg ,_acge :=_daf .DecodeStream (_aed .Stream );
-if _acge !=nil {return nil ,_acge ;};return _eccg ,nil ;};func (_debc *Page )Number ()int {return _debc ._gce };func (_cgc *OutputIntents )Get (i int )(OutputIntent ,bool ){if _cgc ._ba ==nil {return OutputIntent {},false ;};if i >=_cgc ._ba .Len (){return OutputIntent {},false ;
-};_cc :=_cgc ._ba .Get (i );_gcg ,_fbd :=_d .GetIndirect (_cc );if !_fbd {_cff ,_gda :=_d .GetDict (_cc );return OutputIntent {Object :_cff },_gda ;};_dbe ,_ca :=_d .GetDict (_gcg .PdfObject );return OutputIntent {Object :_dbe },_ca ;};func (_fc *Catalog )SetMarkInfo (mi _d .PdfObject ){if mi ==nil {_fc .Object .Remove ("\u004d\u0061\u0072\u006b\u0049\u006e\u0066\u006f");
-return ;};_fg :=_d .MakeIndirectObject (mi );_fc .Object .Set ("\u004d\u0061\u0072\u006b\u0049\u006e\u0066\u006f",_fg );_fc ._ce .Objects =append (_fc ._ce .Objects ,_fg );};func (_ecd *Document )GetPages ()([]Page ,bool ){_dbg ,_ffc :=_ecd .FindCatalog ();
-if !_ffc {return nil ,false ;};return _dbg .GetPages ();};func (_cd *Catalog )GetPages ()([]Page ,bool ){_cb ,_a :=_d .GetDict (_cd .Object .Get ("\u0050\u0061\u0067e\u0073"));if !_a {return nil ,false ;};_cf ,_ff :=_d .GetArray (_cb .Get ("\u004b\u0069\u0064\u0073"));
-if !_ff {return nil ,false ;};_g :=make ([]Page ,_cf .Len ());for _daa ,_ec :=range _cf .Elements (){_ga ,_bd :=_d .GetDict (_ec );if !_bd {continue ;};_g [_daa ]=Page {Object :_ga ,_gce :_daa +1,_bbb :_cd ._ce };};return _g ,true ;};func (_daag *Catalog )GetMetadata ()(*_d .PdfObjectStream ,bool ){return _d .GetStream (_daag .Object .Get ("\u004d\u0065\u0074\u0061\u0064\u0061\u0074\u0061"));
-};type Content struct{Stream *_d .PdfObjectStream ;_eeea int ;_ebe Page ;};func _dd (_deb _d .PdfObject )(_d .PdfObjectName ,error ){var _dgb *_d .PdfObjectName ;var _ede *_d .PdfObjectArray ;if _acg ,_aged :=_deb .(*_d .PdfIndirectObject );_aged {if _ecb ,_aad :=_acg .PdfObject .(*_d .PdfObjectArray );
-_aad {_ede =_ecb ;}else if _bb ,_cag :=_acg .PdfObject .(*_d .PdfObjectName );_cag {_dgb =_bb ;};}else if _dae ,_eb :=_deb .(*_d .PdfObjectArray );_eb {_ede =_dae ;}else if _fbcb ,_dgg :=_deb .(*_d .PdfObjectName );_dgg {_dgb =_fbcb ;};if _dgb !=nil {switch *_dgb {case "\u0044\u0065\u0076\u0069\u0063\u0065\u0047\u0072\u0061\u0079","\u0044e\u0076\u0069\u0063\u0065\u0052\u0047B","\u0044\u0065\u0076\u0069\u0063\u0065\u0043\u004d\u0059\u004b":return *_dgb ,nil ;
-case "\u0050a\u0074\u0074\u0065\u0072\u006e":return *_dgb ,nil ;};};if _ede !=nil &&_ede .Len ()> 0{if _aba ,_fca :=_ede .Get (0).(*_d .PdfObjectName );_fca {switch *_aba {case "\u0044\u0065\u0076\u0069\u0063\u0065\u0047\u0072\u0061\u0079","\u0044e\u0076\u0069\u0063\u0065\u0052\u0047B","\u0044\u0065\u0076\u0069\u0063\u0065\u0043\u004d\u0059\u004b":if _ede .Len ()==1{return *_aba ,nil ;
-};case "\u0043a\u006c\u0047\u0072\u0061\u0079","\u0043\u0061\u006c\u0052\u0047\u0042","\u004c\u0061\u0062":return *_aba ,nil ;case "\u0049\u0043\u0043\u0042\u0061\u0073\u0065\u0064","\u0050a\u0074\u0074\u0065\u0072\u006e","\u0049n\u0064\u0065\u0078\u0065\u0064":return *_aba ,nil ;
-case "\u0053\u0065\u0070\u0061\u0072\u0061\u0074\u0069\u006f\u006e","\u0044e\u0076\u0069\u0063\u0065\u004e":return *_aba ,nil ;};};};return "",nil ;};func (_fbe *Content )SetData (data []byte )error {_ggg ,_bba :=_d .MakeStream (data ,_d .NewFlateEncoder ());
-if _bba !=nil {return _bba ;};_ded ,_aab :=_d .GetArray (_fbe ._ebe .Object .Get ("\u0043\u006f\u006e\u0074\u0065\u006e\u0074\u0073"));if !_aab &&_fbe ._eeea ==0{_fbe ._ebe .Object .Set ("\u0043\u006f\u006e\u0074\u0065\u006e\u0074\u0073",_ggg );}else {if _bba =_ded .Set (_fbe ._eeea ,_ggg );
-_bba !=nil {return _bba ;};};_fbe ._ebe ._bbb .Objects =append (_fbe ._ebe ._bbb .Objects ,_ggg );return nil ;};type OutputIntents struct{_ba *_d .PdfObjectArray ;_fgd *Document ;_dg *_d .PdfIndirectObject ;};func (_edf Page )FindXObjectForms ()[]*_d .PdfObjectStream {_aac ,_fde :=_edf .GetResourcesXObject ();
-if !_fde {return nil ;};_bce :=map[*_d .PdfObjectStream ]struct{}{};var _fag func (_effg *_d .PdfObjectDictionary ,_fcf map[*_d .PdfObjectStream ]struct{});_fag =func (_ega *_d .PdfObjectDictionary ,_bbbb map[*_d .PdfObjectStream ]struct{}){for _ ,_gab :=range _ega .Keys (){_egb ,_adc :=_d .GetStream (_ega .Get (_gab ));
-if !_adc {continue ;};if _ ,_gbbf :=_bbbb [_egb ];_gbbf {continue ;};_adg ,_ccc :=_d .GetName (_egb .Get ("\u0053u\u0062\u0074\u0079\u0070\u0065"));if !_ccc ||_adg .String ()!="\u0046\u006f\u0072\u006d"{continue ;};_bbbb [_egb ]=struct{}{};_ebd ,_ccc :=_d .GetDict (_egb .Get ("\u0052e\u0073\u006f\u0075\u0072\u0063\u0065s"));
-if !_ccc {continue ;};_df ,_cdb :=_d .GetDict (_ebd .Get ("\u0058O\u0062\u006a\u0065\u0063\u0074"));if _cdb {_fag (_df ,_bbbb );};};};_fag (_aac ,_bce );var _fded []*_d .PdfObjectStream ;for _eabe :=range _bce {_fded =append (_fded ,_eabe );};return _fded ;
-};func (_eff *Catalog )NewOutputIntents ()*OutputIntents {return &OutputIntents {_fgd :_eff ._ce }};func (_ecf *Catalog )GetStructTreeRoot ()(*_d .PdfObjectDictionary ,bool ){return _d .GetDict (_ecf .Object .Get ("\u0053\u0074\u0072\u0075\u0063\u0074\u0054\u0072\u0065e\u0052\u006f\u006f\u0074"));
-};func (_gcd *Catalog )GetOutputIntents ()(*OutputIntents ,bool ){_fa :=_gcd .Object .Get ("\u004f\u0075\u0074\u0070\u0075\u0074\u0049\u006e\u0074\u0065\u006e\u0074\u0073");if _fa ==nil {return nil ,false ;};_gaf ,_bdg :=_d .GetIndirect (_fa );if !_bdg {return nil ,false ;
-};_gfa ,_cgg :=_d .GetArray (_gaf .PdfObject );if !_cgg {return nil ,false ;};return &OutputIntents {_dg :_gaf ,_ba :_gfa ,_fgd :_gcd ._ce },true ;};
+package docutil
+
+import (
+	_c "errors"
+	_f "fmt"
+	_b "github.com/szwede/unipdf/v4/common"
+	_d "github.com/szwede/unipdf/v4/core"
+)
+
+func (_af *Catalog) SetMetadata(data []byte) error {
+	_eec, _ecc := _d.MakeStream(data, nil)
+	if _ecc != nil {
+		return _ecc
+	}
+	_eec.Set("\u0054\u0079\u0070\u0065", _d.MakeName("\u004d\u0065\u0074\u0061\u0064\u0061\u0074\u0061"))
+	_eec.Set("\u0053u\u0062\u0074\u0079\u0070\u0065", _d.MakeName("\u0058\u004d\u004c"))
+	_af.Object.Set("\u004d\u0065\u0074\u0061\u0064\u0061\u0074\u0061", _eec)
+	_af._ce.Objects = append(_af._ce.Objects, _eec)
+	return nil
+}
+
+func (_fbb Page) FindXObjectImages() ([]*Image, error) {
+	_dc, _ccd := _fbb.GetResourcesXObject()
+	if !_ccd {
+		return nil, nil
+	}
+	var _eag []*Image
+	var _bbe error
+	_fdb := map[*_d.PdfObjectStream]int{}
+	_cffb := map[*_d.PdfObjectStream]struct{}{}
+	var _gg int
+	for _, _cbe := range _dc.Keys() {
+		_bdc, _ccf := _d.GetStream(_dc.Get(_cbe))
+		if !_ccf {
+			continue
+		}
+		if _, _ceb := _fdb[_bdc]; _ceb {
+			continue
+		}
+		_acf, _egg := _d.GetName(_bdc.Get("\u0053u\u0062\u0074\u0079\u0070\u0065"))
+		if !_egg || _acf.String() != "\u0049\u006d\u0061g\u0065" {
+			continue
+		}
+		_caebf := Image{BitsPerComponent: 8, Stream: _bdc, Name: string(_cbe)}
+		if _caebf.Colorspace, _bbe = _dd(_bdc.Get("\u0043\u006f\u006c\u006f\u0072\u0053\u0070\u0061\u0063\u0065")); _bbe != nil {
+			_b.Log.Error("\u0045\u0072\u0072\u006f\u0072\u0020\u0064\u0065\u0074\u0065r\u006d\u0069\u006e\u0065\u0020\u0063\u006fl\u006f\u0072\u0020\u0073\u0070\u0061\u0063\u0065\u0020\u0025\u0073", _bbe)
+			continue
+		}
+		if _feb, _cfd := _d.GetIntVal(_bdc.Get("\u0042\u0069t\u0073\u0050\u0065r\u0043\u006f\u006d\u0070\u006f\u006e\u0065\u006e\u0074")); _cfd {
+			_caebf.BitsPerComponent = _feb
+		}
+		if _acgd, _ae := _d.GetIntVal(_bdc.Get("\u0057\u0069\u0064t\u0068")); _ae {
+			_caebf.Width = _acgd
+		}
+		if _eca, _ecac := _d.GetIntVal(_bdc.Get("\u0048\u0065\u0069\u0067\u0068\u0074")); _ecac {
+			_caebf.Height = _eca
+		}
+		if _fce, _dbf := _d.GetStream(_bdc.Get("\u0053\u004d\u0061s\u006b")); _dbf {
+			_caebf.SMask = &ImageSMask{Image: &_caebf, Stream: _fce}
+			_cffb[_fce] = struct{}{}
+		}
+		switch _caebf.Colorspace {
+		case "\u0044e\u0076\u0069\u0063\u0065\u0052\u0047B":
+			_caebf.ColorComponents = 3
+		case "\u0044\u0065\u0076\u0069\u0063\u0065\u0047\u0072\u0061\u0079":
+			_caebf.ColorComponents = 1
+		case "\u0044\u0065\u0076\u0069\u0063\u0065\u0043\u004d\u0059\u004b":
+			_caebf.ColorComponents = 4
+		default:
+			_caebf.ColorComponents = -1
+		}
+		_fdb[_bdc] = _gg
+		_eag = append(_eag, &_caebf)
+		_gg++
+	}
+	var _dcc []int
+	for _, _ddf := range _eag {
+		if _ddf.SMask != nil {
+			_baa, _afg := _fdb[_ddf.SMask.Stream]
+			if _afg {
+				_dcc = append(_dcc, _baa)
+			}
+		}
+	}
+	_ge := make([]*Image, len(_eag)-len(_dcc))
+	_gg = 0
+_fge:
+	for _efce, _gfd := range _eag {
+		for _, _ggb := range _dcc {
+			if _efce == _ggb {
+				continue _fge
+			}
+		}
+		_ge[_gg] = _gfd
+		_gg++
+	}
+	return _eag, nil
+}
+
+func (_daaa *Catalog) SetOutputIntents(outputIntents *OutputIntents) {
+	if _gc := _daaa.Object.Get("\u004f\u0075\u0074\u0070\u0075\u0074\u0049\u006e\u0074\u0065\u006e\u0074\u0073"); _gc != nil {
+		for _gf, _ad := range _daaa._ce.Objects {
+			if _ad == _gc {
+				if outputIntents._dg == _gc {
+					return
+				}
+				_daaa._ce.Objects = append(_daaa._ce.Objects[:_gf], _daaa._ce.Objects[_gf+1:]...)
+				break
+			}
+		}
+	}
+	_cg := outputIntents._dg
+	if _cg == nil {
+		_cg = _d.MakeIndirectObject(outputIntents._ba)
+	}
+	_daaa.Object.Set("\u004f\u0075\u0074\u0070\u0075\u0074\u0049\u006e\u0074\u0065\u006e\u0074\u0073", _cg)
+	_daaa._ce.Objects = append(_daaa._ce.Objects, _cg)
+}
+
+type ImageSMask struct {
+	Image  *Image
+	Stream *_d.PdfObjectStream
+}
+
+type Image struct {
+	Name             string
+	Width            int
+	Height           int
+	Colorspace       _d.PdfObjectName
+	ColorComponents  int
+	BitsPerComponent int
+	SMask            *ImageSMask
+	Stream           *_d.PdfObjectStream
+}
+
+type Page struct {
+	_gce   int
+	Object *_d.PdfObjectDictionary
+	_bbb   *Document
+}
+
+func (_db *Catalog) SetStructTreeRoot(structTreeRoot _d.PdfObject) {
+	if structTreeRoot == nil {
+		_db.Object.Remove("\u0053\u0074\u0072\u0075\u0063\u0074\u0054\u0072\u0065e\u0052\u006f\u006f\u0074")
+		return
+	}
+	_cbc := _d.MakeIndirectObject(structTreeRoot)
+	_db.Object.Set("\u0053\u0074\u0072\u0075\u0063\u0074\u0054\u0072\u0065e\u0052\u006f\u006f\u0074", _cbc)
+	_db._ce.Objects = append(_db._ce.Objects, _cbc)
+}
+
+func (_be *Catalog) GetMarkInfo() (*_d.PdfObjectDictionary, bool) {
+	_ef, _fb := _d.GetDict(_be.Object.Get("\u004d\u0061\u0072\u006b\u0049\u006e\u0066\u006f"))
+	return _ef, _fb
+}
+
+func (_bf *Document) FindCatalog() (*Catalog, bool) {
+	var _de *_d.PdfObjectDictionary
+	for _, _ag := range _bf.Objects {
+		_fe, _aag := _d.GetDict(_ag)
+		if !_aag {
+			continue
+		}
+		if _fbc, _ffa := _d.GetName(_fe.Get("\u0054\u0079\u0070\u0065")); _ffa && *_fbc == "\u0043a\u0074\u0061\u006c\u006f\u0067" {
+			_de = _fe
+			break
+		}
+	}
+	if _de == nil {
+		return nil, false
+	}
+	return &Catalog{Object: _de, _ce: _bf}, true
+}
+
+func (_gb *OutputIntents) Len() int { return _gb._ba.Len() }
+
+func (_eeca *Document) AddStream(stream *_d.PdfObjectStream) {
+	for _, _age := range _eeca.Objects {
+		if _age == stream {
+			return
+		}
+	}
+	_eeca.Objects = append(_eeca.Objects, stream)
+}
+
+func (_da *Catalog) SetVersion() {
+	_da.Object.Set("\u0056e\u0072\u0073\u0069\u006f\u006e", _d.MakeName(_f.Sprintf("\u0025\u0064\u002e%\u0064", _da._ce.Version.Major, _da._ce.Version.Minor)))
+}
+
+type OutputIntent struct{ Object *_d.PdfObjectDictionary }
+
+func (_dee Page) GetResources() (*_d.PdfObjectDictionary, bool) {
+	return _d.GetDict(_dee.Object.Get("\u0052e\u0073\u006f\u0075\u0072\u0063\u0065s"))
+}
+
+func (_efc *OutputIntents) Add(oi _d.PdfObject) error {
+	_ac, _afb := oi.(*_d.PdfObjectDictionary)
+	if !_afb {
+		return _c.New("\u0069\u006e\u0070\u0075\u0074\u0020\u006f\u0075\u0074\u0070\u0075\u0074\u0020\u0069\u006e\u0074\u0065\u006et\u0020\u0073\u0068\u006f\u0075\u006c\u0064 \u0062\u0065\u0020\u0061\u006e\u0020\u006f\u0062\u006a\u0065\u0063t\u0020\u0064\u0069\u0063\u0074\u0069\u006f\u006e\u0061\u0072\u0079")
+	}
+	if _ea, _ed := _d.GetStream(_ac.Get("\u0044\u0065\u0073\u0074\u004f\u0075\u0074\u0070\u0075\u0074\u0050\u0072o\u0066\u0069\u006c\u0065")); _ed {
+		_efc._fgd.Objects = append(_efc._fgd.Objects, _ea)
+	}
+	_aa, _bc := oi.(*_d.PdfIndirectObject)
+	if !_bc {
+		_aa = _d.MakeIndirectObject(oi)
+	}
+	if _efc._ba == nil {
+		_efc._ba = _d.MakeArray(_aa)
+	} else {
+		_efc._ba.Append(_aa)
+	}
+	_efc._fgd.Objects = append(_efc._fgd.Objects, _aa)
+	return nil
+}
+
+type Catalog struct {
+	Object *_d.PdfObjectDictionary
+	_ce    *Document
+}
+
+func (_eee Page) GetContents() ([]Content, bool) {
+	_fbce, _bfg := _d.GetArray(_eee.Object.Get("\u0043\u006f\u006e\u0074\u0065\u006e\u0074\u0073"))
+	if !_bfg {
+		_fgda, _faf := _d.GetStream(_eee.Object.Get("\u0043\u006f\u006e\u0074\u0065\u006e\u0074\u0073"))
+		if !_faf {
+			return nil, false
+		}
+		return []Content{{Stream: _fgda, _ebe: _eee, _eeea: 0}}, true
+	}
+	_gbb := make([]Content, _fbce.Len())
+	for _caeb, _fdd := range _fbce.Elements() {
+		_gaa, _agea := _d.GetStream(_fdd)
+		if !_agea {
+			continue
+		}
+		_gbb[_caeb] = Content{Stream: _gaa, _ebe: _eee, _eeea: _caeb}
+	}
+	return _gbb, true
+}
+
+func (_ee *Catalog) HasMetadata() bool {
+	_gd := _ee.Object.Get("\u004d\u0065\u0074\u0061\u0064\u0061\u0074\u0061")
+	return _gd != nil
+}
+
+func (_fd *Document) AddIndirectObject(indirect *_d.PdfIndirectObject) {
+	for _, _fba := range _fd.Objects {
+		if _fba == indirect {
+			return
+		}
+	}
+	_fd.Objects = append(_fd.Objects, indirect)
+}
+
+type Document struct {
+	ID             [2]string
+	Version        _d.Version
+	Objects        []_d.PdfObject
+	Info           _d.PdfObject
+	Crypt          *_d.PdfCrypt
+	UseHashBasedID bool
+}
+
+func (_efa Page) GetResourcesXObject() (*_d.PdfObjectDictionary, bool) {
+	_abe, _eg := _efa.GetResources()
+	if !_eg {
+		return nil, false
+	}
+	return _d.GetDict(_abe.Get("\u0058O\u0062\u006a\u0065\u0063\u0074"))
+}
+
+func (_aed Content) GetData() ([]byte, error) {
+	_daf, _acge := _d.NewEncoderFromStream(_aed.Stream)
+	if _acge != nil {
+		return nil, _acge
+	}
+	_eccg, _acge := _daf.DecodeStream(_aed.Stream)
+	if _acge != nil {
+		return nil, _acge
+	}
+	return _eccg, nil
+}
+
+func (_debc *Page) Number() int { return _debc._gce }
+
+func (_cgc *OutputIntents) Get(i int) (OutputIntent, bool) {
+	if _cgc._ba == nil {
+		return OutputIntent{}, false
+	}
+	if i >= _cgc._ba.Len() {
+		return OutputIntent{}, false
+	}
+	_cc := _cgc._ba.Get(i)
+	_gcg, _fbd := _d.GetIndirect(_cc)
+	if !_fbd {
+		_cff, _gda := _d.GetDict(_cc)
+		return OutputIntent{Object: _cff}, _gda
+	}
+	_dbe, _ca := _d.GetDict(_gcg.PdfObject)
+	return OutputIntent{Object: _dbe}, _ca
+}
+
+func (_fc *Catalog) SetMarkInfo(mi _d.PdfObject) {
+	if mi == nil {
+		_fc.Object.Remove("\u004d\u0061\u0072\u006b\u0049\u006e\u0066\u006f")
+		return
+	}
+	_fg := _d.MakeIndirectObject(mi)
+	_fc.Object.Set("\u004d\u0061\u0072\u006b\u0049\u006e\u0066\u006f", _fg)
+	_fc._ce.Objects = append(_fc._ce.Objects, _fg)
+}
+
+func (_ecd *Document) GetPages() ([]Page, bool) {
+	_dbg, _ffc := _ecd.FindCatalog()
+	if !_ffc {
+		return nil, false
+	}
+	return _dbg.GetPages()
+}
+
+func (_cd *Catalog) GetPages() ([]Page, bool) {
+	_cb, _a := _d.GetDict(_cd.Object.Get("\u0050\u0061\u0067e\u0073"))
+	if !_a {
+		return nil, false
+	}
+	_cf, _ff := _d.GetArray(_cb.Get("\u004b\u0069\u0064\u0073"))
+	if !_ff {
+		return nil, false
+	}
+	_g := make([]Page, _cf.Len())
+	for _daa, _ec := range _cf.Elements() {
+		_ga, _bd := _d.GetDict(_ec)
+		if !_bd {
+			continue
+		}
+		_g[_daa] = Page{Object: _ga, _gce: _daa + 1, _bbb: _cd._ce}
+	}
+	return _g, true
+}
+
+func (_daag *Catalog) GetMetadata() (*_d.PdfObjectStream, bool) {
+	return _d.GetStream(_daag.Object.Get("\u004d\u0065\u0074\u0061\u0064\u0061\u0074\u0061"))
+}
+
+type Content struct {
+	Stream *_d.PdfObjectStream
+	_eeea  int
+	_ebe   Page
+}
+
+func _dd(_deb _d.PdfObject) (_d.PdfObjectName, error) {
+	var _dgb *_d.PdfObjectName
+	var _ede *_d.PdfObjectArray
+	if _acg, _aged := _deb.(*_d.PdfIndirectObject); _aged {
+		if _ecb, _aad := _acg.PdfObject.(*_d.PdfObjectArray); _aad {
+			_ede = _ecb
+		} else if _bb, _cag := _acg.PdfObject.(*_d.PdfObjectName); _cag {
+			_dgb = _bb
+		}
+	} else if _dae, _eb := _deb.(*_d.PdfObjectArray); _eb {
+		_ede = _dae
+	} else if _fbcb, _dgg := _deb.(*_d.PdfObjectName); _dgg {
+		_dgb = _fbcb
+	}
+	if _dgb != nil {
+		switch *_dgb {
+		case "\u0044\u0065\u0076\u0069\u0063\u0065\u0047\u0072\u0061\u0079", "\u0044e\u0076\u0069\u0063\u0065\u0052\u0047B", "\u0044\u0065\u0076\u0069\u0063\u0065\u0043\u004d\u0059\u004b":
+			return *_dgb, nil
+		case "\u0050a\u0074\u0074\u0065\u0072\u006e":
+			return *_dgb, nil
+		}
+	}
+	if _ede != nil && _ede.Len() > 0 {
+		if _aba, _fca := _ede.Get(0).(*_d.PdfObjectName); _fca {
+			switch *_aba {
+			case "\u0044\u0065\u0076\u0069\u0063\u0065\u0047\u0072\u0061\u0079", "\u0044e\u0076\u0069\u0063\u0065\u0052\u0047B", "\u0044\u0065\u0076\u0069\u0063\u0065\u0043\u004d\u0059\u004b":
+				if _ede.Len() == 1 {
+					return *_aba, nil
+				}
+			case "\u0043a\u006c\u0047\u0072\u0061\u0079", "\u0043\u0061\u006c\u0052\u0047\u0042", "\u004c\u0061\u0062":
+				return *_aba, nil
+			case "\u0049\u0043\u0043\u0042\u0061\u0073\u0065\u0064", "\u0050a\u0074\u0074\u0065\u0072\u006e", "\u0049n\u0064\u0065\u0078\u0065\u0064":
+				return *_aba, nil
+			case "\u0053\u0065\u0070\u0061\u0072\u0061\u0074\u0069\u006f\u006e", "\u0044e\u0076\u0069\u0063\u0065\u004e":
+				return *_aba, nil
+			}
+		}
+	}
+	return "", nil
+}
+
+func (_fbe *Content) SetData(data []byte) error {
+	_ggg, _bba := _d.MakeStream(data, _d.NewFlateEncoder())
+	if _bba != nil {
+		return _bba
+	}
+	_ded, _aab := _d.GetArray(_fbe._ebe.Object.Get("\u0043\u006f\u006e\u0074\u0065\u006e\u0074\u0073"))
+	if !_aab && _fbe._eeea == 0 {
+		_fbe._ebe.Object.Set("\u0043\u006f\u006e\u0074\u0065\u006e\u0074\u0073", _ggg)
+	} else {
+		if _bba = _ded.Set(_fbe._eeea, _ggg); _bba != nil {
+			return _bba
+		}
+	}
+	_fbe._ebe._bbb.Objects = append(_fbe._ebe._bbb.Objects, _ggg)
+	return nil
+}
+
+type OutputIntents struct {
+	_ba  *_d.PdfObjectArray
+	_fgd *Document
+	_dg  *_d.PdfIndirectObject
+}
+
+func (_edf Page) FindXObjectForms() []*_d.PdfObjectStream {
+	_aac, _fde := _edf.GetResourcesXObject()
+	if !_fde {
+		return nil
+	}
+	_bce := map[*_d.PdfObjectStream]struct{}{}
+	var _fag func(_effg *_d.PdfObjectDictionary, _fcf map[*_d.PdfObjectStream]struct{})
+	_fag = func(_ega *_d.PdfObjectDictionary, _bbbb map[*_d.PdfObjectStream]struct{}) {
+		for _, _gab := range _ega.Keys() {
+			_egb, _adc := _d.GetStream(_ega.Get(_gab))
+			if !_adc {
+				continue
+			}
+			if _, _gbbf := _bbbb[_egb]; _gbbf {
+				continue
+			}
+			_adg, _ccc := _d.GetName(_egb.Get("\u0053u\u0062\u0074\u0079\u0070\u0065"))
+			if !_ccc || _adg.String() != "\u0046\u006f\u0072\u006d" {
+				continue
+			}
+			_bbbb[_egb] = struct{}{}
+			_ebd, _ccc := _d.GetDict(_egb.Get("\u0052e\u0073\u006f\u0075\u0072\u0063\u0065s"))
+			if !_ccc {
+				continue
+			}
+			_df, _cdb := _d.GetDict(_ebd.Get("\u0058O\u0062\u006a\u0065\u0063\u0074"))
+			if _cdb {
+				_fag(_df, _bbbb)
+			}
+		}
+	}
+	_fag(_aac, _bce)
+	var _fded []*_d.PdfObjectStream
+	for _eabe := range _bce {
+		_fded = append(_fded, _eabe)
+	}
+	return _fded
+}
+
+func (_eff *Catalog) NewOutputIntents() *OutputIntents { return &OutputIntents{_fgd: _eff._ce} }
+
+func (_ecf *Catalog) GetStructTreeRoot() (*_d.PdfObjectDictionary, bool) {
+	return _d.GetDict(_ecf.Object.Get("\u0053\u0074\u0072\u0075\u0063\u0074\u0054\u0072\u0065e\u0052\u006f\u006f\u0074"))
+}
+
+func (_gcd *Catalog) GetOutputIntents() (*OutputIntents, bool) {
+	_fa := _gcd.Object.Get("\u004f\u0075\u0074\u0070\u0075\u0074\u0049\u006e\u0074\u0065\u006e\u0074\u0073")
+	if _fa == nil {
+		return nil, false
+	}
+	_gaf, _bdg := _d.GetIndirect(_fa)
+	if !_bdg {
+		return nil, false
+	}
+	_gfa, _cgg := _d.GetArray(_gaf.PdfObject)
+	if !_cgg {
+		return nil, false
+	}
+	return &OutputIntents{_dg: _gaf, _ba: _gfa, _fgd: _gcd._ce}, true
+}

@@ -9,202 +9,1479 @@
 // Use of this source code is governed by the UniDoc End User License Agreement
 // terms that can be accessed at https://unidoc.io/eula/
 
-package render ;import (_e "errors";_b "fmt";_gf "github.com/adrg/sysfont";_eb "github.com/unidoc/unipdf/v4/annotator";_fd "github.com/unidoc/unipdf/v4/common";_df "github.com/unidoc/unipdf/v4/contentstream";_ad "github.com/unidoc/unipdf/v4/contentstream/draw";
-_ac "github.com/unidoc/unipdf/v4/core";_eg "github.com/unidoc/unipdf/v4/internal/license";_efg "github.com/unidoc/unipdf/v4/internal/transform";_bb "github.com/unidoc/unipdf/v4/model";_ef "github.com/unidoc/unipdf/v4/render/internal/context";_ga "github.com/unidoc/unipdf/v4/render/internal/context/imagerender";
-_eeg "golang.org/x/image/draw";_da "image";_aa "image/color";_a "image/draw";_g "image/jpeg";_c "image/png";_d "math";_fe "os";_ec "path/filepath";_ee "strings";);
+package render
+
+import (
+	_e "errors"
+	_b "fmt"
+	_gf "github.com/adrg/sysfont"
+	_eb "github.com/szwede/unipdf/v4/annotator"
+	_fd "github.com/szwede/unipdf/v4/common"
+	_df "github.com/szwede/unipdf/v4/contentstream"
+	_ad "github.com/szwede/unipdf/v4/contentstream/draw"
+	_ac "github.com/szwede/unipdf/v4/core"
+	_eg "github.com/szwede/unipdf/v4/internal/license"
+	_efg "github.com/szwede/unipdf/v4/internal/transform"
+	_bb "github.com/szwede/unipdf/v4/model"
+	_ef "github.com/szwede/unipdf/v4/render/internal/context"
+	_ga "github.com/szwede/unipdf/v4/render/internal/context/imagerender"
+	_eeg "golang.org/x/image/draw"
+	_da "image"
+	_aa "image/color"
+	_a "image/draw"
+	_g "image/jpeg"
+	_c "image/png"
+	_d "math"
+	_fe "os"
+	_ec "path/filepath"
+	_ee "strings"
+)
 
 // NewImageDevice returns a new image device.
-func NewImageDevice ()*ImageDevice {const _ca ="r\u0065\u006e\u0064\u0065r.\u004ee\u0077\u0049\u006d\u0061\u0067e\u0044\u0065\u0076\u0069\u0063\u0065";_eg .TrackUse (_ca );return &ImageDevice {};};func (_bebe renderer )processRadialShading (_eceb _ef .Context ,_cbgf *_bb .PdfShading )(_ef .Gradient ,*_ac .PdfObjectArray ,error ){_daed :=_cbgf .GetContext ().(*_bb .PdfShadingType3 );
-if len (_daed .Function )==0{return nil ,nil ,_e .New ("\u006e\u006f\u0020\u0067\u0072\u0061\u0064i\u0065\u006e\u0074 \u0066\u0075\u006e\u0063t\u0069\u006f\u006e\u0020\u0066\u006f\u0075\u006e\u0064\u002c\u0020\u0073\u006b\u0069\u0070\u0020\u0063\u006f\u006e\u0076\u0065\u0072\u0073\u0069\u006f\u006e");
-};_gef ,_bcf :=_daed .Coords .ToFloat64Array ();if _bcf !=nil {return nil ,nil ,_e .New ("\u0066\u0061\u0069l\u0065\u0064\u0020\u0067e\u0074\u0074\u0069\u006e\u0067\u0020\u0073h\u0061\u0064\u0069\u006e\u0067\u0020\u0070\u006f\u0073\u0069\u0074\u0069\u006f\u006e");
-};_bgda :=_cbgf .ColorSpace ;_faa :=_ac .MakeArrayFromFloats ([]float64 {0,0,1,1});var _cfcb ,_fddg ,_age ,_ebcc ,_ecbb ,_dbb float64 ;_cfcb ,_fddg =_eceb .Matrix ().Transform (_gef [0],_gef [1]);_age ,_ebcc =_eceb .Matrix ().Transform (_gef [3],_gef [4]);
-_ecbb ,_ =_eceb .Matrix ().Transform (_gef [2],0);_dbb ,_ =_eceb .Matrix ().Transform (_gef [5],0);_ffgc ,_ :=_eceb .Matrix ().Translation ();_ecbb -=_ffgc ;_dbb -=_ffgc ;for _afbdg ,_cfee :=range _gef {if _afbdg ==2||_afbdg ==5{continue ;};if _cfee > 1.0{_adcc :=_d .Min (_cfcb -_ecbb ,_age -_dbb );
-_cddf :=_d .Min (_fddg -_ecbb ,_ebcc -_dbb );_ebf :=_d .Max (_cfcb +_ecbb ,_age +_dbb );_gedc :=_d .Max (_fddg +_ecbb ,_ebcc +_dbb );_bab :=_ebf -_adcc ;_ggg :=_cddf -_gedc ;_faa =_ac .MakeArrayFromFloats ([]float64 {_adcc ,_cddf ,_bab ,_ggg });break ;
-};};_bdd :=_ga .NewRadialGradient (_cfcb ,_fddg ,_ecbb ,_age ,_ebcc ,_dbb );if _dafb ,_fbb :=_daed .Function [0].(*_bb .PdfFunctionType2 );_fbb {_bdd ,_bcf =_fcda (_bdd ,_dafb ,_bgda ,1.0,true );}else if _adbc ,_edfb :=_daed .Function [0].(*_bb .PdfFunctionType3 );
-_edfb {_dcf :=append ([]float64 {0},_adbc .Bounds ...);_dcf =append (_dcf ,1.0);_bdd ,_bcf =_caff (_bdd ,_adbc ,_bgda ,_dcf );};if _bcf !=nil {return nil ,nil ,_bcf ;};return _bdd ,_faa ,nil ;};
+func NewImageDevice() *ImageDevice {
+	const _ca = "r\u0065\u006e\u0064\u0065r.\u004ee\u0077\u0049\u006d\u0061\u0067e\u0044\u0065\u0076\u0069\u0063\u0065"
+	_eg.TrackUse(_ca)
+	return &ImageDevice{}
+}
+
+func (_bebe renderer) processRadialShading(_eceb _ef.Context, _cbgf *_bb.PdfShading) (_ef.Gradient, *_ac.PdfObjectArray, error) {
+	_daed := _cbgf.GetContext().(*_bb.PdfShadingType3)
+	if len(_daed.Function) == 0 {
+		return nil, nil, _e.New("\u006e\u006f\u0020\u0067\u0072\u0061\u0064i\u0065\u006e\u0074 \u0066\u0075\u006e\u0063t\u0069\u006f\u006e\u0020\u0066\u006f\u0075\u006e\u0064\u002c\u0020\u0073\u006b\u0069\u0070\u0020\u0063\u006f\u006e\u0076\u0065\u0072\u0073\u0069\u006f\u006e")
+	}
+	_gef, _bcf := _daed.Coords.ToFloat64Array()
+	if _bcf != nil {
+		return nil, nil, _e.New("\u0066\u0061\u0069l\u0065\u0064\u0020\u0067e\u0074\u0074\u0069\u006e\u0067\u0020\u0073h\u0061\u0064\u0069\u006e\u0067\u0020\u0070\u006f\u0073\u0069\u0074\u0069\u006f\u006e")
+	}
+	_bgda := _cbgf.ColorSpace
+	_faa := _ac.MakeArrayFromFloats([]float64{0, 0, 1, 1})
+	var _cfcb, _fddg, _age, _ebcc, _ecbb, _dbb float64
+	_cfcb, _fddg = _eceb.Matrix().Transform(_gef[0], _gef[1])
+	_age, _ebcc = _eceb.Matrix().Transform(_gef[3], _gef[4])
+	_ecbb, _ = _eceb.Matrix().Transform(_gef[2], 0)
+	_dbb, _ = _eceb.Matrix().Transform(_gef[5], 0)
+	_ffgc, _ := _eceb.Matrix().Translation()
+	_ecbb -= _ffgc
+	_dbb -= _ffgc
+	for _afbdg, _cfee := range _gef {
+		if _afbdg == 2 || _afbdg == 5 {
+			continue
+		}
+		if _cfee > 1.0 {
+			_adcc := _d.Min(_cfcb-_ecbb, _age-_dbb)
+			_cddf := _d.Min(_fddg-_ecbb, _ebcc-_dbb)
+			_ebf := _d.Max(_cfcb+_ecbb, _age+_dbb)
+			_gedc := _d.Max(_fddg+_ecbb, _ebcc+_dbb)
+			_bab := _ebf - _adcc
+			_ggg := _cddf - _gedc
+			_faa = _ac.MakeArrayFromFloats([]float64{_adcc, _cddf, _bab, _ggg})
+			break
+		}
+	}
+	_bdd := _ga.NewRadialGradient(_cfcb, _fddg, _ecbb, _age, _ebcc, _dbb)
+	if _dafb, _fbb := _daed.Function[0].(*_bb.PdfFunctionType2); _fbb {
+		_bdd, _bcf = _fcda(_bdd, _dafb, _bgda, 1.0, true)
+	} else if _adbc, _edfb := _daed.Function[0].(*_bb.PdfFunctionType3); _edfb {
+		_dcf := append([]float64{0}, _adbc.Bounds...)
+		_dcf = append(_dcf, 1.0)
+		_bdd, _bcf = _caff(_bdd, _adbc, _bgda, _dcf)
+	}
+	if _bcf != nil {
+		return nil, nil, _bcf
+	}
+	return _bdd, _faa, nil
+}
 
 // ImageDevice is used to render PDF pages to image targets.
-type ImageDevice struct{renderer ;
+type ImageDevice struct {
+	renderer
 
-// OutputWidth represents the width of the rendered images in pixels.
-// The heights of the output images are calculated based on the selected
-// width and the original height of each rendered page.
-OutputWidth int ;};func _caff (_fgcd _ef .Gradient ,_aace *_bb .PdfFunctionType3 ,_aeae _bb .PdfColorspace ,_beda []float64 )(_ef .Gradient ,error ){var _gdbf error ;for _edc :=0;_edc < len (_aace .Functions );_edc ++{if _dfa ,_bde :=_aace .Functions [_edc ].(*_bb .PdfFunctionType2 );
-_bde {_fgcd ,_gdbf =_fcda (_fgcd ,_dfa ,_aeae ,_beda [_edc +1],_edc ==0);if _gdbf !=nil {return nil ,_gdbf ;};};};return _fgcd ,nil ;};type renderer struct{_aca float64 };const (ShadingTypeFunctionBased PdfShadingType =1;ShadingTypeAxial PdfShadingType =2;
-ShadingTypeRadial PdfShadingType =3;ShadingTypeFreeForm PdfShadingType =4;ShadingTypeLatticeForm PdfShadingType =5;ShadingTypeCoons PdfShadingType =6;ShadingTypeTensorProduct PdfShadingType =7;);func (_aec renderer )renderPage (_bca _ef .Context ,_eeb *_bb .PdfPage ,_aaa _efg .Matrix ,_ggeg bool )error {if !_ggeg {_fda :=_bb .FieldFlattenOpts {AnnotFilterFunc :func (_gab *_bb .PdfAnnotation )bool {switch _gab .GetContext ().(type ){case *_bb .PdfAnnotationLine :return true ;
-case *_bb .PdfAnnotationSquare :return true ;case *_bb .PdfAnnotationCircle :return true ;case *_bb .PdfAnnotationPolygon :return true ;case *_bb .PdfAnnotationPolyLine :return true ;};return false ;}};_ada :=_eb .FieldAppearance {};_dg :=_eeb .FlattenFieldsWithOpts (_ada ,&_fda );
-if _dg !=nil {_fd .Log .Debug ("\u0045\u0072r\u006f\u0072\u0020\u0064u\u0072\u0069n\u0067\u0020\u0061\u006e\u006e\u006f\u0074\u0061t\u0069\u006f\u006e\u0020\u0066\u006c\u0061\u0074\u0074\u0065\u006e\u0069n\u0067\u0020\u0025\u0076",_dg );};};_egd ,_egg :=_eeb .GetAllContentStreams ();
-if _egg !=nil {return _egg ;};if _ed :=_aaa ;!_ed .Identity (){_egd =_b .Sprintf ("%\u002e\u0032\u0066\u0020\u0025\u002e2\u0066\u0020\u0025\u002e\u0032\u0066 \u0025\u002e\u0032\u0066\u0020\u0025\u002e2\u0066\u0020\u0025\u002e\u0032\u0066\u0020\u0063\u006d\u0020%\u0073",_ed [0],_ed [1],_ed [3],_ed [4],_ed [6],_ed [7],_egd );
-};_bca .Translate (0,float64 (_bca .Height ()));_bca .Scale (1,-1);_bca .Push ();_bca .SetRGBA (1,1,1,1);_bca .DrawRectangle (0,0,float64 (_bca .Width ()),float64 (_bca .Height ()));_bca .Fill ();_bca .Pop ();_bca .SetLineWidth (1.0);_bca .SetRGBA (0,0,0,1);
-return _aec .renderContentStream (_bca ,_egd ,_eeb .Resources );};func (_bbcg renderer )processLinearShading (_aaae _ef .Context ,_bcab *_bb .PdfShading )(_ef .Gradient ,*_ac .PdfObjectArray ,error ){_cacd :=_bcab .GetContext ().(*_bb .PdfShadingType2 );
-if len (_cacd .Function )==0{return nil ,nil ,_e .New ("\u006e\u006f\u0020\u0067\u0072\u0061\u0064i\u0065\u006e\u0074 \u0066\u0075\u006e\u0063t\u0069\u006f\u006e\u0020\u0066\u006f\u0075\u006e\u0064\u002c\u0020\u0073\u006b\u0069\u0070\u0020\u0063\u006f\u006e\u0076\u0065\u0072\u0073\u0069\u006f\u006e");
-};_gbfb ,_ffg :=_cacd .Coords .ToFloat64Array ();if _ffg !=nil {return nil ,nil ,_e .New ("\u0066\u0061\u0069l\u0065\u0064\u0020\u0067e\u0074\u0074\u0069\u006e\u0067\u0020\u0073h\u0061\u0064\u0069\u006e\u0067\u0020\u0070\u006f\u0073\u0069\u0074\u0069\u006f\u006e");
-};_cba :=_bcab .ColorSpace ;_fbc ,_dcag :=_aaae .Matrix ().Transform (_gbfb [0],_gbfb [1]);_gcee ,_fdfc :=_aaae .Matrix ().Transform (_gbfb [2],_gbfb [3]);_cfc :=_ga .NewLinearGradient (_fbc ,_dcag ,_gcee ,_fdfc );_egaf :=_ac .MakeArrayFromFloats ([]float64 {0,0,1,1});
-for _ ,_baa :=range _gbfb {if _baa > 1{_egaf =_cacd .Coords ;break ;};};if _fbg ,_cbd :=_cacd .Function [0].(*_bb .PdfFunctionType2 );_cbd {_cfc ,_ffg =_fcda (_cfc ,_fbg ,_cba ,1.0,true );}else if _dae ,_ebgb :=_cacd .Function [0].(*_bb .PdfFunctionType3 );
-_ebgb {_ccb :=append ([]float64 {0},_dae .Bounds ...);_ccb =append (_ccb ,1.0);_cfc ,_ffg =_caff (_cfc ,_dae ,_cba ,_ccb );};return _cfc ,_egaf ,_ffg ;};
+	// OutputWidth represents the width of the rendered images in pixels.
+	// The heights of the output images are calculated based on the selected
+	// width and the original height of each rendered page.
+	OutputWidth int
+}
+
+func _caff(_fgcd _ef.Gradient, _aace *_bb.PdfFunctionType3, _aeae _bb.PdfColorspace, _beda []float64) (_ef.Gradient, error) {
+	var _gdbf error
+	for _edc := 0; _edc < len(_aace.Functions); _edc++ {
+		if _dfa, _bde := _aace.Functions[_edc].(*_bb.PdfFunctionType2); _bde {
+			_fgcd, _gdbf = _fcda(_fgcd, _dfa, _aeae, _beda[_edc+1], _edc == 0)
+			if _gdbf != nil {
+				return nil, _gdbf
+			}
+		}
+	}
+	return _fgcd, nil
+}
+
+type renderer struct{ _aca float64 }
+
+const (
+	ShadingTypeFunctionBased PdfShadingType = 1
+	ShadingTypeAxial         PdfShadingType = 2
+	ShadingTypeRadial        PdfShadingType = 3
+	ShadingTypeFreeForm      PdfShadingType = 4
+	ShadingTypeLatticeForm   PdfShadingType = 5
+	ShadingTypeCoons         PdfShadingType = 6
+	ShadingTypeTensorProduct PdfShadingType = 7
+)
+
+func (_aec renderer) renderPage(_bca _ef.Context, _eeb *_bb.PdfPage, _aaa _efg.Matrix, _ggeg bool) error {
+	if !_ggeg {
+		_fda := _bb.FieldFlattenOpts{AnnotFilterFunc: func(_gab *_bb.PdfAnnotation) bool {
+			switch _gab.GetContext().(type) {
+			case *_bb.PdfAnnotationLine:
+				return true
+			case *_bb.PdfAnnotationSquare:
+				return true
+			case *_bb.PdfAnnotationCircle:
+				return true
+			case *_bb.PdfAnnotationPolygon:
+				return true
+			case *_bb.PdfAnnotationPolyLine:
+				return true
+			}
+			return false
+		}}
+		_ada := _eb.FieldAppearance{}
+		_dg := _eeb.FlattenFieldsWithOpts(_ada, &_fda)
+		if _dg != nil {
+			_fd.Log.Debug("\u0045\u0072r\u006f\u0072\u0020\u0064u\u0072\u0069n\u0067\u0020\u0061\u006e\u006e\u006f\u0074\u0061t\u0069\u006f\u006e\u0020\u0066\u006c\u0061\u0074\u0074\u0065\u006e\u0069n\u0067\u0020\u0025\u0076", _dg)
+		}
+	}
+	_egd, _egg := _eeb.GetAllContentStreams()
+	if _egg != nil {
+		return _egg
+	}
+	if _ed := _aaa; !_ed.Identity() {
+		_egd = _b.Sprintf("%\u002e\u0032\u0066\u0020\u0025\u002e2\u0066\u0020\u0025\u002e\u0032\u0066 \u0025\u002e\u0032\u0066\u0020\u0025\u002e2\u0066\u0020\u0025\u002e\u0032\u0066\u0020\u0063\u006d\u0020%\u0073", _ed[0], _ed[1], _ed[3], _ed[4], _ed[6], _ed[7], _egd)
+	}
+	_bca.Translate(0, float64(_bca.Height()))
+	_bca.Scale(1, -1)
+	_bca.Push()
+	_bca.SetRGBA(1, 1, 1, 1)
+	_bca.DrawRectangle(0, 0, float64(_bca.Width()), float64(_bca.Height()))
+	_bca.Fill()
+	_bca.Pop()
+	_bca.SetLineWidth(1.0)
+	_bca.SetRGBA(0, 0, 0, 1)
+	return _aec.renderContentStream(_bca, _egd, _eeb.Resources)
+}
+
+func (_bbcg renderer) processLinearShading(_aaae _ef.Context, _bcab *_bb.PdfShading) (_ef.Gradient, *_ac.PdfObjectArray, error) {
+	_cacd := _bcab.GetContext().(*_bb.PdfShadingType2)
+	if len(_cacd.Function) == 0 {
+		return nil, nil, _e.New("\u006e\u006f\u0020\u0067\u0072\u0061\u0064i\u0065\u006e\u0074 \u0066\u0075\u006e\u0063t\u0069\u006f\u006e\u0020\u0066\u006f\u0075\u006e\u0064\u002c\u0020\u0073\u006b\u0069\u0070\u0020\u0063\u006f\u006e\u0076\u0065\u0072\u0073\u0069\u006f\u006e")
+	}
+	_gbfb, _ffg := _cacd.Coords.ToFloat64Array()
+	if _ffg != nil {
+		return nil, nil, _e.New("\u0066\u0061\u0069l\u0065\u0064\u0020\u0067e\u0074\u0074\u0069\u006e\u0067\u0020\u0073h\u0061\u0064\u0069\u006e\u0067\u0020\u0070\u006f\u0073\u0069\u0074\u0069\u006f\u006e")
+	}
+	_cba := _bcab.ColorSpace
+	_fbc, _dcag := _aaae.Matrix().Transform(_gbfb[0], _gbfb[1])
+	_gcee, _fdfc := _aaae.Matrix().Transform(_gbfb[2], _gbfb[3])
+	_cfc := _ga.NewLinearGradient(_fbc, _dcag, _gcee, _fdfc)
+	_egaf := _ac.MakeArrayFromFloats([]float64{0, 0, 1, 1})
+	for _, _baa := range _gbfb {
+		if _baa > 1 {
+			_egaf = _cacd.Coords
+			break
+		}
+	}
+	if _fbg, _cbd := _cacd.Function[0].(*_bb.PdfFunctionType2); _cbd {
+		_cfc, _ffg = _fcda(_cfc, _fbg, _cba, 1.0, true)
+	} else if _dae, _ebgb := _cacd.Function[0].(*_bb.PdfFunctionType3); _ebgb {
+		_ccb := append([]float64{0}, _dae.Bounds...)
+		_ccb = append(_ccb, 1.0)
+		_cfc, _ffg = _caff(_cfc, _dae, _cba, _ccb)
+	}
+	return _cfc, _egaf, _ffg
+}
 
 // Render converts the specified PDF page into an image, flattens annotations by default and returns the result.
-func (_fb *ImageDevice )Render (page *_bb .PdfPage )(_da .Image ,error ){return _fb .RenderWithOpts (page ,false );};func _fabf (_gaf ,_gdbfb _da .Image )_da .Image {_agc ,_cab :=_gdbfb .Bounds ().Size (),_gaf .Bounds ().Size ();_cbc ,_dcbde :=_agc .X ,_agc .Y ;
-if _cab .X > _cbc {_cbc =_cab .X ;};if _cab .Y > _dcbde {_dcbde =_cab .Y ;};_bfed :=_da .Rect (0,0,_cbc ,_dcbde );if _agc .X !=_cbc ||_agc .Y !=_dcbde {_fbcc :=_da .NewRGBA (_bfed );_eeg .BiLinear .Scale (_fbcc ,_bfed ,_gdbfb ,_gdbfb .Bounds (),_eeg .Over ,nil );
-_gdbfb =_fbcc ;};if _cab .X !=_cbc ||_cab .Y !=_dcbde {_bfbe :=_da .NewRGBA (_bfed );_eeg .BiLinear .Scale (_bfbe ,_bfed ,_gaf ,_gaf .Bounds (),_eeg .Over ,nil );_gaf =_bfbe ;};_dgdd :=_da .NewRGBA (_bfed );_eeg .DrawMask (_dgdd ,_bfed ,_gaf ,_da .Point {},_gdbfb ,_da .Point {},_eeg .Over );
-return _dgdd ;};func (_cddd renderer )processGradient (_gade _ef .Context ,_bbec *_df .ContentStreamOperation ,_bgfc *_bb .PdfPageResources ,_gdcd *_ac .PdfObjectName )(_ef .Gradient ,error ){if _fge ,_fbde :=_bgfc .GetPatternByName (*_gdcd );_fbde &&_fge .IsShading (){_bff :=_fge .GetAsShadingPattern ().Shading ;
-_cfd ,_ ,_afd :=_cddd .processShading (_gade ,_bff );if _afd !=nil {return nil ,_afd ;};return _cfd ,nil ;};return nil ,nil ;};func _adcg (_fcbf *_bb .Image ,_acfe _aa .Color )_da .Image {_dgg ,_cdc :=int (_fcbf .Width ),int (_fcbf .Height );_fde :=_da .NewRGBA (_da .Rect (0,0,_dgg ,_cdc ));
-for _ceeg :=0;_ceeg < _cdc ;_ceeg ++{for _ffa :=0;_ffa < _dgg ;_ffa ++{_fbba ,_afg :=_fcbf .ColorAt (_ffa ,_ceeg );if _afg !=nil {_fd .Log .Debug ("\u0063o\u0075l\u0064\u0020\u006e\u006f\u0074\u0020\u0072\u0065\u0074\u0072\u0069e\u0076\u0065\u0020\u0069m\u0061\u0067\u0065\u0020\u006da\u0073\u006b\u0020\u0076\u0061\u006c\u0075\u0065\u0020\u0061\u0074\u0020\u0028\u0025\u0064\u002c\u0020\u0025\u0064\u0029\u002e\u0020\u004f\u0075\u0074\u0070\u0075\u0074\u0020\u006d\u0061y\u0020\u0062\u0065\u0020\u0069\u006e\u0063\u006fr\u0072\u0065\u0063\u0074\u002e",_ffa ,_ceeg );
-continue ;};_ggde ,_cdad ,_cebb ,_ :=_fbba .RGBA ();var _eebf _aa .Color ;if _ggde +_cdad +_cebb ==0{_eebf =_acfe ;}else {_eebf =_aa .Transparent ;};_fde .Set (_ffa ,_ceeg ,_eebf );};};return _fde ;};
+func (_fb *ImageDevice) Render(page *_bb.PdfPage) (_da.Image, error) {
+	return _fb.RenderWithOpts(page, false)
+}
+
+func _fabf(_gaf, _gdbfb _da.Image) _da.Image {
+	_agc, _cab := _gdbfb.Bounds().Size(), _gaf.Bounds().Size()
+	_cbc, _dcbde := _agc.X, _agc.Y
+	if _cab.X > _cbc {
+		_cbc = _cab.X
+	}
+	if _cab.Y > _dcbde {
+		_dcbde = _cab.Y
+	}
+	_bfed := _da.Rect(0, 0, _cbc, _dcbde)
+	if _agc.X != _cbc || _agc.Y != _dcbde {
+		_fbcc := _da.NewRGBA(_bfed)
+		_eeg.BiLinear.Scale(_fbcc, _bfed, _gdbfb, _gdbfb.Bounds(), _eeg.Over, nil)
+		_gdbfb = _fbcc
+	}
+	if _cab.X != _cbc || _cab.Y != _dcbde {
+		_bfbe := _da.NewRGBA(_bfed)
+		_eeg.BiLinear.Scale(_bfbe, _bfed, _gaf, _gaf.Bounds(), _eeg.Over, nil)
+		_gaf = _bfbe
+	}
+	_dgdd := _da.NewRGBA(_bfed)
+	_eeg.DrawMask(_dgdd, _bfed, _gaf, _da.Point{}, _gdbfb, _da.Point{}, _eeg.Over)
+	return _dgdd
+}
+
+func (_cddd renderer) processGradient(_gade _ef.Context, _bbec *_df.ContentStreamOperation, _bgfc *_bb.PdfPageResources, _gdcd *_ac.PdfObjectName) (_ef.Gradient, error) {
+	if _fge, _fbde := _bgfc.GetPatternByName(*_gdcd); _fbde && _fge.IsShading() {
+		_bff := _fge.GetAsShadingPattern().Shading
+		_cfd, _, _afd := _cddd.processShading(_gade, _bff)
+		if _afd != nil {
+			return nil, _afd
+		}
+		return _cfd, nil
+	}
+	return nil, nil
+}
+
+func _adcg(_fcbf *_bb.Image, _acfe _aa.Color) _da.Image {
+	_dgg, _cdc := int(_fcbf.Width), int(_fcbf.Height)
+	_fde := _da.NewRGBA(_da.Rect(0, 0, _dgg, _cdc))
+	for _ceeg := 0; _ceeg < _cdc; _ceeg++ {
+		for _ffa := 0; _ffa < _dgg; _ffa++ {
+			_fbba, _afg := _fcbf.ColorAt(_ffa, _ceeg)
+			if _afg != nil {
+				_fd.Log.Debug("\u0063o\u0075l\u0064\u0020\u006e\u006f\u0074\u0020\u0072\u0065\u0074\u0072\u0069e\u0076\u0065\u0020\u0069m\u0061\u0067\u0065\u0020\u006da\u0073\u006b\u0020\u0076\u0061\u006c\u0075\u0065\u0020\u0061\u0074\u0020\u0028\u0025\u0064\u002c\u0020\u0025\u0064\u0029\u002e\u0020\u004f\u0075\u0074\u0070\u0075\u0074\u0020\u006d\u0061y\u0020\u0062\u0065\u0020\u0069\u006e\u0063\u006fr\u0072\u0065\u0063\u0074\u002e", _ffa, _ceeg)
+				continue
+			}
+			_ggde, _cdad, _cebb, _ := _fbba.RGBA()
+			var _eebf _aa.Color
+			if _ggde+_cdad+_cebb == 0 {
+				_eebf = _acfe
+			} else {
+				_eebf = _aa.Transparent
+			}
+			_fde.Set(_ffa, _ceeg, _eebf)
+		}
+	}
+	return _fde
+}
 
 // PdfShadingType defines PDF shading types.
 // Source: PDF32000_2008.pdf. Chapter 8.7.4.5
-type PdfShadingType int64 ;func _gdf (_cca _ac .PdfObject )(_da .Image ,error ){_gebf ,_cffe :=_ac .GetStream (_cca );if !_cffe {return nil ,nil ;};_cgac ,_adage :=_bb .NewXObjectImageFromStream (_gebf );if _adage !=nil {return nil ,_adage ;};_cacf ,_adage :=_cgac .ToImage ();
-if _adage !=nil {return nil ,_adage ;};if _cacf .Width ==0||_cacf .Height ==0{_fd .Log .Debug ("\u0073o\u0066t\u0020\u006d\u0061\u0073\u006b\u0020\u0069\u006d\u0061\u0067\u0065 \u0068\u0061\u0073\u0020i\u006e\u0076\u0061\u006c\u0069d\u0020\u0064\u0069\u006d\u0065\u006e\u0073\u0069\u006f\u006e\u0073\u0020\u0028\u0025\u0064\u002c\u0020\u0025\u0064\u0029\u002e\u0020\u004f\u0075\u0074\u0070\u0075\u0074\u0020\u006d\u0061y\u0020\u0062\u0065\u0020\u0069\u006e\u0063\u006fr\u0072\u0065\u0063\u0074\u002e",_cacf .Width ,_cacf .Height );
-return nil ,nil ;};return _daeb (_cacf ),nil ;};func (_gda renderer )renderContentStream (_aag _ef .Context ,_dcd string ,_fdaf *_bb .PdfPageResources )error {_db ,_eff :=_df .NewContentStreamParser (_dcd ).Parse ();if _eff !=nil {return _eff ;};_ecc :=_aag .TextState ();
-_ecc .GlobalScale =_gda ._aca ;_aef :=map[string ]*_ef .TextFont {};_fg :=_gf .NewFinder (&_gf .FinderOpts {Extensions :[]string {"\u002e\u0074\u0074\u0066","\u002e\u0074\u0074\u0063"}});var _abc *_df .ContentStreamOperation ;var _afeb bool ;var _bg _ef .FillRule ;
-_add :=_df .NewContentStreamProcessor (*_db );_add .AddHandler (_df .HandlerConditionEnumAllOperands ,"",func (_afb *_df .ContentStreamOperation ,_ff _df .GraphicsState ,_bcc *_bb .PdfPageResources )error {_fd .Log .Debug ("\u0050\u0072\u006f\u0063\u0065\u0073\u0073\u0069\u006e\u0067\u0020\u0025\u0073",_afb .Operand );
-switch _afb .Operand {case "\u0071":_aag .Push ();case "\u0051":_aag .Pop ();_ecc =_aag .TextState ();case "\u0063\u006d":if len (_afb .Params )!=6{return _ggc ;};_adc ,_ffc :=_ac .GetNumbersAsFloat (_afb .Params );if _ffc !=nil {return _ffc ;};_gb :=_efg .NewMatrix (_adc [0],_adc [1],_adc [2],_adc [3],_adc [4],_adc [5]);
-_fd .Log .Debug ("\u0047\u0072\u0061\u0070\u0068\u0069\u0063\u0073\u0020\u0073\u0074a\u0074\u0065\u0020\u006d\u0061\u0074\u0072\u0069\u0078\u003a \u0025\u002b\u0076",_gb );_aag .SetMatrix (_aag .Matrix ().Mult (_gb ));case "\u0077":if len (_afb .Params )!=1{return _ggc ;
-};_gfa ,_fdb :=_ac .GetNumbersAsFloat (_afb .Params );if _fdb !=nil {return _fdb ;};_aag .SetLineWidth (_gfa [0]);case "\u004a":if len (_afb .Params )!=1{return _ggc ;};_fac ,_adf :=_ac .GetIntVal (_afb .Params [0]);if !_adf {return _beg ;};switch _fac {case 0:_aag .SetLineCap (_ef .LineCapButt );
-case 1:_aag .SetLineCap (_ef .LineCapRound );case 2:_aag .SetLineCap (_ef .LineCapSquare );default:_fd .Log .Debug ("\u0049\u006e\u0076\u0061\u006c\u0069\u0064\u0020\u006c\u0069\u006ee\u0020\u0063\u0061\u0070\u0020\u0073\u0074\u0079\u006c\u0065:\u0020\u0025\u0064",_fac );
-return _ggc ;};case "\u006a":if len (_afb .Params )!=1{return _ggc ;};_cdd ,_aed :=_ac .GetIntVal (_afb .Params [0]);if !_aed {return _beg ;};switch _cdd {case 0:_aag .SetLineJoin (_ef .LineJoinBevel );case 1:_aag .SetLineJoin (_ef .LineJoinRound );case 2:_aag .SetLineJoin (_ef .LineJoinBevel );
-default:_fd .Log .Debug ("I\u006e\u0076\u0061\u006c\u0069\u0064 \u006c\u0069\u006e\u0065\u0020\u006a\u006f\u0069\u006e \u0073\u0074\u0079l\u0065:\u0020\u0025\u0064",_cdd );return _ggc ;};case "\u004d":if len (_afb .Params )!=1{return _ggc ;};_aea ,_ecd :=_ac .GetNumbersAsFloat (_afb .Params );
-if _ecd !=nil {return _ecd ;};_ =_aea ;_fd .Log .Debug ("\u004di\u0074\u0065\u0072\u0020l\u0069\u006d\u0069\u0074\u0020n\u006ft\u0020s\u0075\u0070\u0070\u006f\u0072\u0074\u0065d");case "\u0064":if len (_afb .Params )!=2{return _ggc ;};_ead ,_gdb :=_ac .GetArray (_afb .Params [0]);
-if !_gdb {return _beg ;};_dbe ,_gdb :=_ac .GetIntVal (_afb .Params [1]);if !_gdb {_ ,_fed :=_ac .GetFloatVal (_afb .Params [1]);if !_fed {return _beg ;};};_aecg ,_cfg :=_ac .GetNumbersAsFloat (_ead .Elements ());if _cfg !=nil {return _cfg ;};_aag .SetDash (_aecg ...);
-_ =_dbe ;_fd .Log .Debug ("\u004c\u0069n\u0065\u0020\u0064\u0061\u0073\u0068\u0020\u0070\u0068\u0061\u0073\u0065\u0020\u006e\u006f\u0074\u0020\u0073\u0075\u0070\u0070\u006frt\u0065\u0064");case "\u0072\u0069":_fd .Log .Debug ("\u0052\u0065\u006e\u0064\u0065\u0072\u0069\u006e\u0067\u0020i\u006e\u0074\u0065\u006e\u0074\u0020\u006eo\u0074\u0020\u0073\u0075\u0070\u0070\u006f\u0072\u0074\u0065\u0064");
-case "\u0069":_fd .Log .Debug ("\u0046\u006c\u0061\u0074\u006e\u0065\u0073\u0073\u0020\u0074\u006f\u006c\u0065\u0072\u0061n\u0063e\u0020\u006e\u006f\u0074\u0020\u0073\u0075\u0070\u0070\u006f\u0072\u0074\u0065\u0064");case "\u0067\u0073":if len (_afb .Params )!=1{return _ggc ;
-};_bfe ,_ce :=_ac .GetName (_afb .Params [0]);if !_ce {return _beg ;};if _bfe ==nil {return _ggc ;};_fdbf ,_ce :=_bcc .GetExtGState (*_bfe );if !_ce {_fd .Log .Debug ("\u0045\u0052\u0052OR\u003a\u0020\u0063\u006f\u0075\u006c\u0064\u0020\u006eo\u0074 \u0066i\u006ed\u0020\u0072\u0065\u0073\u006f\u0075\u0072\u0063\u0065\u003a\u0020\u0025\u0073",*_bfe );
-return _e .New ("\u0072e\u0073o\u0075\u0072\u0063\u0065\u0020n\u006f\u0074 \u0066\u006f\u0075\u006e\u0064");};_afc ,_ce :=_ac .GetDict (_fdbf );if !_ce {_fd .Log .Debug ("\u0045\u0052RO\u0052\u003a\u0020c\u006f\u0075\u006c\u0064 ge\u0074 g\u0072\u0061\u0070\u0068\u0069\u0063\u0073 s\u0074\u0061\u0074\u0065\u0020\u0064\u0069c\u0074");
-return _beg ;};_fd .Log .Debug ("G\u0053\u0020\u0064\u0069\u0063\u0074\u003a\u0020\u0025\u0073",_afc .String ());_bea :=_afc .Get ("\u0063\u0061");if _bea !=nil {_fab ,_dge :=_ac .GetNumberAsFloat (_bea );if _dge ==nil {_efe ,_deg :=_ff .ColorspaceNonStroking .ColorToRGB (_ff .ColorNonStroking );
-if _deg !=nil {_fd .Log .Debug ("\u0045\u0072\u0072\u006f\u0072\u0020\u0063\u006f\u006e\u0076\u0065r\u0074\u0069\u006e\u0067\u0020\u0063\u006f\u006c\u006f\u0072:\u0020\u0025\u0076",_deg );return _deg ;};_gfaa ,_dac :=_efe .(*_bb .PdfColorDeviceRGB );if !_dac {_fd .Log .Debug ("\u0045\u0072\u0072\u006fr \u0063\u006f\u006e\u0076\u0065\u0072\u0074\u0069\u006e\u0067\u0020\u0063\u006f\u006co\u0072");
-return _deg ;};_aag .SetFillRGBA (_gfaa .R (),_gfaa .G (),_gfaa .B (),_fab );};};case "\u006d":if len (_afb .Params )!=2{_fd .Log .Debug ("\u0057\u0041\u0052\u004e\u003a\u0020\u0065\u0072\u0072o\u0072\u0020\u0077\u0068\u0069\u006c\u0065\u0020\u0070\u0072\u006f\u0063\u0065\u0073\u0073\u0069\u006e\u0067\u0020\u0060\u006d\u0060\u0020o\u0070\u0065r\u0061\u0074o\u0072\u003a\u0020\u0025\u0073\u002e\u0020\u004f\u0075\u0074\u0070\u0075\u0074 m\u0061\u0079\u0020\u0062\u0065\u0020\u0069\u006e\u0063o\u0072\u0072\u0065\u0063\u0074\u002e",_ggc );
-return nil ;};_dbd ,_afea :=_ac .GetNumbersAsFloat (_afb .Params );if _afea !=nil {return _afea ;};_fd .Log .Debug ("M\u006f\u0076\u0065\u0020\u0074\u006f\u003a\u0020\u0025\u0076",_dbd );_aag .NewSubPath ();_aag .MoveTo (_dbd [0],_dbd [1]);case "\u006c":if len (_afb .Params )!=2{_fd .Log .Debug ("\u0057\u0041\u0052\u004e\u003a\u0020\u0065\u0072\u0072o\u0072\u0020\u0077\u0068\u0069\u006c\u0065\u0020\u0070\u0072\u006f\u0063\u0065\u0073\u0073\u0069\u006e\u0067\u0020\u0060\u006c\u0060\u0020o\u0070\u0065r\u0061\u0074o\u0072\u003a\u0020\u0025\u0073\u002e\u0020\u004f\u0075\u0074\u0070\u0075\u0074 m\u0061\u0079\u0020\u0062\u0065\u0020\u0069\u006e\u0063o\u0072\u0072\u0065\u0063\u0074\u002e",_ggc );
-return nil ;};_ge ,_afa :=_ac .GetNumbersAsFloat (_afb .Params );if _afa !=nil {return _afa ;};_aag .LineTo (_ge [0],_ge [1]);case "\u0063":if len (_afb .Params )!=6{return _ggc ;};_dde ,_cfe :=_ac .GetNumbersAsFloat (_afb .Params );if _cfe !=nil {return _cfe ;
-};_fd .Log .Debug ("\u0043u\u0062\u0069\u0063\u0020\u0062\u0065\u007a\u0069\u0065\u0072\u0020p\u0061\u0072\u0061\u006d\u0073\u003a\u0020\u0025\u002b\u0076",_dde );_aag .CubicTo (_dde [0],_dde [1],_dde [2],_dde [3],_dde [4],_dde [5]);case "\u0076","\u0079":if len (_afb .Params )!=4{return _ggc ;
-};_cec ,_gdd :=_ac .GetNumbersAsFloat (_afb .Params );if _gdd !=nil {return _gdd ;};_fd .Log .Debug ("\u0043u\u0062\u0069\u0063\u0020\u0062\u0065\u007a\u0069\u0065\u0072\u0020p\u0061\u0072\u0061\u006d\u0073\u003a\u0020\u0025\u002b\u0076",_cec );_aag .QuadraticTo (_cec [0],_cec [1],_cec [2],_cec [3]);
-case "\u0068":_aag .ClosePath ();_aag .NewSubPath ();case "\u0072\u0065":if len (_afb .Params )!=4{return _ggc ;};_cee ,_edg :=_ac .GetNumbersAsFloat (_afb .Params );if _edg !=nil {return _edg ;};_aag .DrawRectangle (_cee [0],_cee [1],_cee [2],_cee [3]);
-_aag .NewSubPath ();case "\u0053":_dca ,_ebg :=_ff .ColorspaceStroking .ColorToRGB (_ff .ColorStroking );if _ebg !=nil {_fd .Log .Debug ("\u0045\u0072\u0072\u006f\u0072\u0020\u0063\u006f\u006e\u0076\u0065r\u0074\u0069\u006e\u0067\u0020\u0063\u006f\u006c\u006f\u0072:\u0020\u0025\u0076",_ebg );
-return _ebg ;};_ggd ,_bef :=_dca .(*_bb .PdfColorDeviceRGB );if !_bef {_fd .Log .Debug ("\u0045\u0072\u0072\u006fr \u0063\u006f\u006e\u0076\u0065\u0072\u0074\u0069\u006e\u0067\u0020\u0063\u006f\u006co\u0072");return _ebg ;};_aag .SetRGBA (_ggd .R (),_ggd .G (),_ggd .B (),1);
-_aag .Stroke ();case "\u0073":_dff ,_ggb :=_ff .ColorspaceStroking .ColorToRGB (_ff .ColorStroking );if _ggb !=nil {_fd .Log .Debug ("\u0045\u0072\u0072\u006f\u0072\u0020\u0063\u006f\u006e\u0076\u0065r\u0074\u0069\u006e\u0067\u0020\u0063\u006f\u006c\u006f\u0072:\u0020\u0025\u0076",_ggb );
-return _ggb ;};_cac ,_gca :=_dff .(*_bb .PdfColorDeviceRGB );if !_gca {_fd .Log .Debug ("\u0045\u0072\u0072\u006fr \u0063\u006f\u006e\u0076\u0065\u0072\u0074\u0069\u006e\u0067\u0020\u0063\u006f\u006co\u0072");return _ggb ;};_aag .ClosePath ();_aag .NewSubPath ();
-_aag .SetRGBA (_cac .R (),_cac .G (),_cac .B (),1);_aag .Stroke ();case "\u0066","\u0046":_eee ,_cb :=_ff .ColorspaceNonStroking .ColorToRGB (_ff .ColorNonStroking );if _cb !=nil {_fd .Log .Debug ("\u0045\u0072\u0072\u006f\u0072\u0020\u0063\u006f\u006e\u0076\u0065r\u0074\u0069\u006e\u0067\u0020\u0063\u006f\u006c\u006f\u0072:\u0020\u0025\u0076",_cb );
-return _cb ;};switch _ag :=_eee .(type ){case *_bb .PdfColorDeviceRGB :_aag .SetRGBA (_ag .R (),_ag .G (),_ag .B (),1);_aag .SetFillRule (_ef .FillRuleWinding );_aag .Fill ();case *_bb .PdfColorPattern :_aag .Fill ();};_fd .Log .Debug ("\u0045\u0072\u0072\u006fr \u0063\u006f\u006e\u0076\u0065\u0072\u0074\u0069\u006e\u0067\u0020\u0063\u006f\u006co\u0072");
-case "\u0066\u002a":_cg ,_eebc :=_ff .ColorspaceNonStroking .ColorToRGB (_ff .ColorNonStroking );if _eebc !=nil {_fd .Log .Debug ("\u0045\u0072\u0072\u006f\u0072\u0020\u0063\u006f\u006e\u0076\u0065r\u0074\u0069\u006e\u0067\u0020\u0063\u006f\u006c\u006f\u0072:\u0020\u0025\u0076",_eebc );
-return _eebc ;};_cde ,_dgc :=_cg .(*_bb .PdfColorDeviceRGB );if !_dgc {_fd .Log .Debug ("\u0045\u0072\u0072\u006fr \u0063\u006f\u006e\u0076\u0065\u0072\u0074\u0069\u006e\u0067\u0020\u0063\u006f\u006co\u0072");return _eebc ;};_aag .SetRGBA (_cde .R (),_cde .G (),_cde .B (),1);
-_aag .SetFillRule (_ef .FillRuleEvenOdd );_aag .Fill ();case "\u0042":_fee ,_eccb :=_ff .ColorspaceNonStroking .ColorToRGB (_ff .ColorNonStroking );if _eccb !=nil {_fd .Log .Debug ("\u0045\u0072\u0072\u006f\u0072\u0020\u0063\u006f\u006e\u0076\u0065r\u0074\u0069\u006e\u0067\u0020\u0063\u006f\u006c\u006f\u0072:\u0020\u0025\u0076",_eccb );
-return _eccb ;};switch _bd :=_fee .(type ){case *_bb .PdfColorDeviceRGB :_aag .SetRGBA (_bd .R (),_bd .G (),_bd .B (),1);_aag .SetFillRule (_ef .FillRuleWinding );_aag .FillPreserve ();_fee ,_eccb =_ff .ColorspaceStroking .ColorToRGB (_ff .ColorStroking );
-if _eccb !=nil {_fd .Log .Debug ("\u0045\u0072\u0072\u006f\u0072\u0020\u0063\u006f\u006e\u0076\u0065r\u0074\u0069\u006e\u0067\u0020\u0063\u006f\u006c\u006f\u0072:\u0020\u0025\u0076",_eccb );return _eccb ;};if _ace ,_cbg :=_fee .(*_bb .PdfColorDeviceRGB );
-_cbg {_aag .SetRGBA (_ace .R (),_ace .G (),_ace .B (),1);_aag .Stroke ();};case *_bb .PdfColorPattern :_aag .SetFillRule (_ef .FillRuleWinding );_aag .Fill ();_aag .StrokePattern ();};case "\u0042\u002a":_eea ,_ceee :=_ff .ColorspaceNonStroking .ColorToRGB (_ff .ColorNonStroking );
-if _ceee !=nil {_fd .Log .Debug ("\u0045\u0072\u0072\u006f\u0072\u0020\u0063\u006f\u006e\u0076\u0065r\u0074\u0069\u006e\u0067\u0020\u0063\u006f\u006c\u006f\u0072:\u0020\u0025\u0076",_ceee );return _ceee ;};switch _gcd :=_eea .(type ){case *_bb .PdfColorDeviceRGB :_aag .SetRGBA (_gcd .R (),_gcd .G (),_gcd .B (),1);
-_aag .SetFillRule (_ef .FillRuleEvenOdd );_aag .FillPreserve ();_eea ,_ceee =_ff .ColorspaceStroking .ColorToRGB (_ff .ColorStroking );if _ceee !=nil {_fd .Log .Debug ("\u0045\u0072\u0072\u006f\u0072\u0020\u0063\u006f\u006e\u0076\u0065r\u0074\u0069\u006e\u0067\u0020\u0063\u006f\u006c\u006f\u0072:\u0020\u0025\u0076",_ceee );
-return _ceee ;};if _cge ,_gaa :=_eea .(*_bb .PdfColorDeviceRGB );_gaa {_aag .SetRGBA (_cge .R (),_cge .G (),_cge .B (),1);_aag .Stroke ();};case *_bb .PdfColorPattern :_aag .SetFillRule (_ef .FillRuleEvenOdd );_aag .Fill ();_aag .StrokePattern ();};case "\u0062":_aag .ClosePath ();
-_ddc ,_gbb :=_ff .ColorspaceNonStroking .ColorToRGB (_ff .ColorNonStroking );if _gbb !=nil {_fd .Log .Debug ("\u0045\u0072\u0072\u006f\u0072\u0020\u0063\u006f\u006e\u0076\u0065r\u0074\u0069\u006e\u0067\u0020\u0063\u006f\u006c\u006f\u0072:\u0020\u0025\u0076",_gbb );
-return _gbb ;};switch _effb :=_ddc .(type ){case *_bb .PdfColorDeviceRGB :_aag .SetRGBA (_effb .R (),_effb .G (),_effb .B (),1);_aag .NewSubPath ();_aag .SetFillRule (_ef .FillRuleWinding );_aag .FillPreserve ();_ddc ,_gbb =_ff .ColorspaceStroking .ColorToRGB (_ff .ColorStroking );
-if _gbb !=nil {_fd .Log .Debug ("\u0045\u0072\u0072\u006f\u0072\u0020\u0063\u006f\u006e\u0076\u0065r\u0074\u0069\u006e\u0067\u0020\u0063\u006f\u006c\u006f\u0072:\u0020\u0025\u0076",_gbb );return _gbb ;};if _cgg ,_gacg :=_ddc .(*_bb .PdfColorDeviceRGB );
-_gacg {_aag .SetRGBA (_cgg .R (),_cgg .G (),_cgg .B (),1);_aag .Stroke ();};case *_bb .PdfColorPattern :_aag .NewSubPath ();_aag .SetFillRule (_ef .FillRuleWinding );_aag .Fill ();_aag .StrokePattern ();};case "\u0062\u002a":_aag .ClosePath ();_ddg ,_fff :=_ff .ColorspaceNonStroking .ColorToRGB (_ff .ColorNonStroking );
-if _fff !=nil {_fd .Log .Debug ("\u0045\u0072\u0072\u006f\u0072\u0020\u0063\u006f\u006e\u0076\u0065r\u0074\u0069\u006e\u0067\u0020\u0063\u006f\u006c\u006f\u0072:\u0020\u0025\u0076",_fff );return _fff ;};switch _bcb :=_ddg .(type ){case *_bb .PdfColorDeviceRGB :_aag .SetRGBA (_bcb .R (),_bcb .G (),_bcb .B (),1);
-_aag .NewSubPath ();_aag .SetFillRule (_ef .FillRuleEvenOdd );_aag .FillPreserve ();_ddg ,_fff =_ff .ColorspaceStroking .ColorToRGB (_ff .ColorStroking );if _fff !=nil {_fd .Log .Debug ("\u0045\u0072\u0072\u006f\u0072\u0020\u0063\u006f\u006e\u0076\u0065r\u0074\u0069\u006e\u0067\u0020\u0063\u006f\u006c\u006f\u0072:\u0020\u0025\u0076",_fff );
-return _fff ;};if _bege ,_dacd :=_ddg .(*_bb .PdfColorDeviceRGB );_dacd {_aag .SetRGBA (_bege .R (),_bege .G (),_bege .B (),1);_aag .Stroke ();};case *_bb .PdfColorPattern :_aag .NewSubPath ();_aag .SetFillRule (_ef .FillRuleEvenOdd );_aag .Fill ();_aag .StrokePattern ();
-};case "\u006e":if _afeb {_aag .SetFillRule (_bg );_aag .ClipPreserve ();_afeb =false ;};_aag .ClearPath ();case "\u0057":_afeb =true ;_bg =_ef .FillRuleWinding ;case "\u0057\u002a":_afeb =true ;_bg =_ef .FillRuleEvenOdd ;case "\u0072\u0067":_gabe ,_edf :=_ff .ColorNonStroking .(*_bb .PdfColorDeviceRGB );
-if !_edf {_fd .Log .Debug ("\u0045\u0072\u0072\u006f\u0072\u0020\u0063\u006f\u006e\u0076\u0065r\u0074\u0069\u006e\u0067\u0020\u0063\u006f\u006c\u006f\u0072:\u0020\u0025\u0076",_ff .ColorNonStroking );return nil ;};_aag .SetFillRGBA (_gabe .R (),_gabe .G (),_gabe .B (),1);
-case "\u0052\u0047":_fdab ,_ba :=_ff .ColorStroking .(*_bb .PdfColorDeviceRGB );if !_ba {_fd .Log .Debug ("\u0045\u0072\u0072\u006f\u0072\u0020\u0063\u006f\u006e\u0076\u0065r\u0074\u0069\u006e\u0067\u0020\u0063\u006f\u006c\u006f\u0072:\u0020\u0025\u0076",_ff .ColorStroking );
-return nil ;};_aag .SetStrokeRGBA (_fdab .R (),_fdab .G (),_fdab .B (),1);case "\u006b":_abe ,_eeag :=_ff .ColorNonStroking .(*_bb .PdfColorDeviceCMYK );if !_eeag {_fd .Log .Debug ("\u0045\u0072\u0072\u006f\u0072\u0020\u0063\u006f\u006e\u0076\u0065r\u0074\u0069\u006e\u0067\u0020\u0063\u006f\u006c\u006f\u0072:\u0020\u0025\u0076",_ff .ColorNonStroking );
-return nil ;};_adag ,_cfa :=_ff .ColorspaceNonStroking .ColorToRGB (_abe );if _cfa !=nil {_fd .Log .Debug ("\u0045\u0072\u0072\u006f\u0072\u0020\u0063\u006f\u006e\u0076\u0065r\u0074\u0069\u006e\u0067\u0020\u0063\u006f\u006c\u006f\u0072:\u0020\u0025\u0076",_ff .ColorNonStroking );
-return nil ;};_bfec ,_eeag :=_adag .(*_bb .PdfColorDeviceRGB );if !_eeag {_fd .Log .Debug ("\u0045\u0072\u0072\u006f\u0072\u0020\u0063\u006f\u006e\u0076\u0065r\u0074\u0069\u006e\u0067\u0020\u0063\u006f\u006c\u006f\u0072:\u0020\u0025\u0076",_adag );return nil ;
-};_aag .SetFillRGBA (_bfec .R (),_bfec .G (),_bfec .B (),1);case "\u004b":_adad ,_dgcf :=_ff .ColorStroking .(*_bb .PdfColorDeviceCMYK );if !_dgcf {_fd .Log .Debug ("\u0045\u0072\u0072\u006f\u0072\u0020\u0063\u006f\u006e\u0076\u0065r\u0074\u0069\u006e\u0067\u0020\u0063\u006f\u006c\u006f\u0072:\u0020\u0025\u0076",_ff .ColorStroking );
-return nil ;};_fabg ,_degc :=_ff .ColorspaceStroking .ColorToRGB (_adad );if _degc !=nil {_fd .Log .Debug ("\u0045\u0072\u0072\u006f\u0072\u0020\u0063\u006f\u006e\u0076\u0065r\u0074\u0069\u006e\u0067\u0020\u0063\u006f\u006c\u006f\u0072:\u0020\u0025\u0076",_ff .ColorStroking );
-return nil ;};_aeb ,_dgcf :=_fabg .(*_bb .PdfColorDeviceRGB );if !_dgcf {_fd .Log .Debug ("\u0045\u0072\u0072\u006f\u0072\u0020\u0063\u006f\u006e\u0076\u0065r\u0074\u0069\u006e\u0067\u0020\u0063\u006f\u006c\u006f\u0072:\u0020\u0025\u0076",_fabg );return nil ;
-};_aag .SetStrokeRGBA (_aeb .R (),_aeb .G (),_aeb .B (),1);case "\u0067":_fdd ,_dbea :=_ff .ColorNonStroking .(*_bb .PdfColorDeviceGray );if !_dbea {_fd .Log .Debug ("\u0045\u0072\u0072\u006f\u0072\u0020\u0063\u006f\u006e\u0076\u0065r\u0074\u0069\u006e\u0067\u0020\u0063\u006f\u006c\u006f\u0072:\u0020\u0025\u0076",_ff .ColorNonStroking );
-return nil ;};_ebcd ,_gdc :=_ff .ColorspaceNonStroking .ColorToRGB (_fdd );if _gdc !=nil {_fd .Log .Debug ("\u0045\u0072\u0072\u006f\u0072\u0020\u0063\u006f\u006e\u0076\u0065r\u0074\u0069\u006e\u0067\u0020\u0063\u006f\u006c\u006f\u0072:\u0020\u0025\u0076",_ff .ColorNonStroking );
-return nil ;};_bbf ,_dbea :=_ebcd .(*_bb .PdfColorDeviceRGB );if !_dbea {_fd .Log .Debug ("\u0045\u0072\u0072\u006f\u0072\u0020\u0063\u006f\u006e\u0076\u0065r\u0074\u0069\u006e\u0067\u0020\u0063\u006f\u006c\u006f\u0072:\u0020\u0025\u0076",_ebcd );return nil ;
-};_aag .SetFillRGBA (_bbf .R (),_bbf .G (),_bbf .B (),1);case "\u0047":_dfd ,_bee :=_ff .ColorStroking .(*_bb .PdfColorDeviceGray );if !_bee {_fd .Log .Debug ("\u0045\u0072\u0072\u006f\u0072\u0020\u0063\u006f\u006e\u0076\u0065r\u0074\u0069\u006e\u0067\u0020\u0063\u006f\u006c\u006f\u0072:\u0020\u0025\u0076",_ff .ColorStroking );
-return nil ;};_dcbd ,_geb :=_ff .ColorspaceStroking .ColorToRGB (_dfd );if _geb !=nil {_fd .Log .Debug ("\u0045\u0072\u0072\u006f\u0072\u0020\u0063\u006f\u006e\u0076\u0065r\u0074\u0069\u006e\u0067\u0020\u0063\u006f\u006c\u006f\u0072:\u0020\u0025\u0076",_ff .ColorStroking );
-return nil ;};_cacb ,_bee :=_dcbd .(*_bb .PdfColorDeviceRGB );if !_bee {_fd .Log .Debug ("\u0045\u0072\u0072\u006f\u0072\u0020\u0063\u006f\u006e\u0076\u0065r\u0074\u0069\u006e\u0067\u0020\u0063\u006f\u006c\u006f\u0072:\u0020\u0025\u0076",_dcbd );return nil ;
-};_aag .SetStrokeRGBA (_cacb .R (),_cacb .G (),_cacb .B (),1);case "\u0063\u0073":if len (_afb .Params )> 0{if _fce ,_ffb :=_ac .GetName (_afb .Params [0]);_ffb &&_fce .String ()=="\u0050a\u0074\u0074\u0065\u0072\u006e"{break ;};};_eca ,_ecf :=_ff .ColorspaceNonStroking .ColorToRGB (_ff .ColorNonStroking );
-if _ecf !=nil {_fd .Log .Debug ("\u0045\u0072\u0072\u006f\u0072\u0020\u0063\u006f\u006e\u0076\u0065r\u0074\u0069\u006e\u0067\u0020\u0063\u006f\u006c\u006f\u0072:\u0020\u0025\u0076",_ff .ColorNonStroking );return nil ;};_fec ,_bdf :=_eca .(*_bb .PdfColorDeviceRGB );
-if !_bdf {_fd .Log .Debug ("\u0045\u0072\u0072\u006f\u0072\u0020\u0063\u006f\u006e\u0076\u0065r\u0074\u0069\u006e\u0067\u0020\u0063\u006f\u006c\u006f\u0072:\u0020\u0025\u0076",_eca );return nil ;};_aag .SetFillRGBA (_fec .R (),_fec .G (),_fec .B (),1);
-case "\u0073\u0063":_aced ,_egc :=_ff .ColorspaceNonStroking .ColorToRGB (_ff .ColorNonStroking );if _egc !=nil {_fd .Log .Debug ("\u0045\u0072\u0072\u006f\u0072\u0020\u0063\u006f\u006e\u0076\u0065r\u0074\u0069\u006e\u0067\u0020\u0063\u006f\u006c\u006f\u0072:\u0020\u0025\u0076",_ff .ColorNonStroking );
-return nil ;};_efeg ,_dga :=_aced .(*_bb .PdfColorDeviceRGB );if !_dga {_fd .Log .Debug ("\u0045\u0072\u0072\u006f\u0072\u0020\u0063\u006f\u006e\u0076\u0065r\u0074\u0069\u006e\u0067\u0020\u0063\u006f\u006c\u006f\u0072:\u0020\u0025\u0076",_aced );return nil ;
-};_aag .SetFillRGBA (_efeg .R (),_efeg .G (),_efeg .B (),1);case "\u0073\u0063\u006e":if len (_afb .Params )> 0&&len (_abc .Params )> 0{if _efee ,_abcd :=_ac .GetName (_abc .Params [0]);_abcd &&_efee .String ()=="\u0050a\u0074\u0074\u0065\u0072\u006e"{if _gbd ,_eaf :=_ac .GetName (_afb .Params [0]);
-_eaf {_cc ,_adde :=_gda .processGradient (_aag ,_afb ,_bcc ,_gbd );if _adde !=nil {_fd .Log .Debug ("\u0045\u0072\u0072\u006f\u0072\u0020\u0077\u0068\u0065\u006e\u0020\u0070\u0072o\u0063\u0065\u0073\u0073\u0069\u006eg\u0020\u0067\u0072\u0061\u0064\u0069\u0065\u006e\u0074\u0020\u0064\u0061\u0074a\u003a\u0020\u0025\u0076",_adde );
-break ;};if _cc ==nil {_fd .Log .Debug ("\u0055\u006ek\u006e\u006f\u0077n\u0020\u0067\u0072\u0061\u0064\u0069\u0065\u006e\u0074");break ;};_aag .SetFillStyle (_cc );_aag .SetStrokeStyle (_cc );break ;};};};_fcg ,_gfe :=_ff .ColorspaceNonStroking .ColorToRGB (_ff .ColorNonStroking );
-if _gfe !=nil {_fd .Log .Debug ("\u0045\u0072\u0072\u006f\u0072\u0020\u0063\u006f\u006e\u0076\u0065r\u0074\u0069\u006e\u0067\u0020\u0063\u006f\u006c\u006f\u0072:\u0020\u0025\u0076",_ff .ColorNonStroking );return nil ;};_cdg ,_bbe :=_fcg .(*_bb .PdfColorDeviceRGB );
-if !_bbe {_fd .Log .Debug ("\u0045\u0072\u0072\u006f\u0072\u0020\u0063\u006f\u006e\u0076\u0065r\u0074\u0069\u006e\u0067\u0020\u0063\u006f\u006c\u006f\u0072:\u0020\u0025\u0076",_fcg );return nil ;};_aag .SetFillRGBA (_cdg .R (),_cdg .G (),_cdg .B (),1);
-case "\u0043\u0053":if len (_afb .Params )> 0{if _bge ,_ffcf :=_ac .GetName (_afb .Params [0]);_ffcf &&_bge .String ()=="\u0050a\u0074\u0074\u0065\u0072\u006e"{break ;};};_gad ,_gbe :=_ff .ColorspaceStroking .ColorToRGB (_ff .ColorStroking );if _gbe !=nil {_fd .Log .Debug ("\u0045\u0072\u0072\u006f\u0072\u0020\u0063\u006f\u006e\u0076\u0065r\u0074\u0069\u006e\u0067\u0020\u0063\u006f\u006c\u006f\u0072:\u0020\u0025\u0076",_ff .ColorStroking );
-return nil ;};_adb ,_bfd :=_gad .(*_bb .PdfColorDeviceRGB );if !_bfd {_fd .Log .Debug ("\u0045\u0072\u0072\u006f\u0072\u0020\u0063\u006f\u006e\u0076\u0065r\u0074\u0069\u006e\u0067\u0020\u0063\u006f\u006c\u006f\u0072:\u0020\u0025\u0076",_gad );return nil ;
-};_aag .SetStrokeRGBA (_adb .R (),_adb .G (),_adb .B (),1);case "\u0053\u0043":_dba ,_ece :=_ff .ColorspaceStroking .ColorToRGB (_ff .ColorStroking );if _ece !=nil {_fd .Log .Debug ("\u0045\u0072\u0072\u006f\u0072\u0020\u0063\u006f\u006e\u0076\u0065r\u0074\u0069\u006e\u0067\u0020\u0063\u006f\u006c\u006f\u0072:\u0020\u0025\u0076",_ff .ColorStroking );
-return nil ;};_ffcc ,_daf :=_dba .(*_bb .PdfColorDeviceRGB );if !_daf {_fd .Log .Debug ("\u0045\u0072\u0072\u006f\u0072\u0020\u0063\u006f\u006e\u0076\u0065r\u0074\u0069\u006e\u0067\u0020\u0063\u006f\u006c\u006f\u0072:\u0020\u0025\u0076",_dba );return nil ;
-};_aag .SetStrokeRGBA (_ffcc .R (),_ffcc .G (),_ffcc .B (),1);case "\u0053\u0043\u004e":if len (_afb .Params )> 0&&len (_abc .Params )> 0{if _adg ,_addf :=_ac .GetName (_abc .Params [0]);_addf &&_adg .String ()=="\u0050a\u0074\u0074\u0065\u0072\u006e"{if _egf ,_abaf :=_ac .GetName (_afb .Params [0]);
-_abaf {_fbf ,_dbf :=_gda .processGradient (_aag ,_afb ,_bcc ,_egf );if _dbf !=nil {_fd .Log .Debug ("\u0045\u0072\u0072\u006f\u0072\u0020\u0077\u0068\u0065\u006e\u0020\u0070\u0072o\u0063\u0065\u0073\u0073\u0069\u006eg\u0020\u0067\u0072\u0061\u0064\u0069\u0065\u006e\u0074\u0020\u0064\u0061\u0074a\u003a\u0020\u0025\u0076",_dbf );
-break ;};if _fbf ==nil {_fd .Log .Debug ("\u0055\u006ek\u006e\u006f\u0077n\u0020\u0067\u0072\u0061\u0064\u0069\u0065\u006e\u0074");break ;};_aag .SetFillStyle (_fbf );_aag .SetStrokeStyle (_fbf );break ;};};};_eeac ,_ceb :=_ff .ColorspaceStroking .ColorToRGB (_ff .ColorStroking );
-if _ceb !=nil {_fd .Log .Debug ("\u0045\u0072\u0072\u006f\u0072\u0020\u0063\u006f\u006e\u0076\u0065r\u0074\u0069\u006e\u0067\u0020\u0063\u006f\u006c\u006f\u0072:\u0020\u0025\u0076",_ff .ColorStroking );return nil ;};_gfeg ,_bce :=_eeac .(*_bb .PdfColorDeviceRGB );
-if !_bce {_fd .Log .Debug ("\u0045\u0072\u0072\u006f\u0072\u0020\u0063\u006f\u006e\u0076\u0065r\u0074\u0069\u006e\u0067\u0020\u0063\u006f\u006c\u006f\u0072:\u0020\u0025\u0076",_eeac );return nil ;};_aag .SetStrokeRGBA (_gfeg .R (),_gfeg .G (),_gfeg .B (),1);
-case "\u0073\u0068":if len (_afb .Params )!=1{_fd .Log .Debug ("\u0049n\u0076\u0061\u006c\u0069\u0064\u0020\u0073\u0068\u0020\u0070\u0061r\u0061\u006d\u0073\u0020\u0066\u006f\u0072\u006d\u0061\u0074");break ;};_cff ,_ddb :=_ac .GetName (_afb .Params [0]);
-if !_ddb {_fd .Log .Debug ("F\u0061\u0069\u006c\u0065\u0064\u0020g\u0065\u0074\u0074\u0069\u006e\u0067\u0020\u0073\u0068a\u0064\u0069\u006eg\u0020n\u0061\u006d\u0065");break ;};_ccg ,_ddb :=_bcc .GetShadingByName (*_cff );if !_ddb {_fd .Log .Debug ("F\u0061\u0069\u006c\u0065\u0064\u0020g\u0065\u0074\u0074\u0069\u006e\u0067\u0020\u0073\u0068a\u0064\u0069\u006eg\u0020d\u0061\u0074\u0061");
-break ;};_feb ,_abab ,_fcd :=_gda .processShading (_aag ,_ccg );if _fcd !=nil {_fd .Log .Debug ("\u0045\u0072\u0072\u006f\u0072\u0020\u0077\u0068\u0065\u006e\u0020\u0070\u0072\u006f\u0063\u0065\u0073\u0073\u0069\u006e\u0067\u0020\u0073\u0068a\u0064\u0069\u006e\u0067\u0020d\u0061\u0074a\u003a\u0020\u0025\u0076",_fcd );
-break ;};if _feb ==nil {_fd .Log .Debug ("\u0055\u006ek\u006e\u006f\u0077n\u0020\u0067\u0072\u0061\u0064\u0069\u0065\u006e\u0074");break ;};_aab ,_fcd :=_abab .ToFloat64Array ();if _fcd !=nil {_fd .Log .Debug ("\u0045\u0072r\u006f\u0072\u0020\u0070\u0061\u0072\u0073\u0069\u006e\u0067\u0020\u0063\u006f\u006f\u0072\u0064\u0069\u006e\u0061\u0074\u0065\u0073: \u0025\u0076",_fcd );
-break ;};_aag .DrawRectangle (_aab [0],_aab [1],_aab [2],_aab [3]);_aag .NewSubPath ();_aag .SetFillStyle (_feb );_aag .SetStrokeStyle (_feb );_aag .Fill ();case "\u0044\u006f":if len (_afb .Params )!=1{return _ggc ;};_eeeb ,_dcc :=_ac .GetName (_afb .Params [0]);
-if !_dcc {return _beg ;};_ ,_dcaa :=_bcc .GetXObjectByName (*_eeeb );switch _dcaa {case _bb .XObjectTypeImage :_fd .Log .Debug ("\u0058\u004f\u0062\u006a\u0065\u0063\u0074\u0020\u0069\u006d\u0061\u0067e\u003a\u0020\u0025\u0073",_eeeb .String ());_aff ,_acg :=_bcc .GetXObjectImageByName (*_eeeb );
-if _acg !=nil {return _acg ;};_abf ,_acg :=_aff .ToImage ();if _acg !=nil {_fd .Log .Debug ("\u0052\u0065\u006e\u0064\u0065\u0072\u0069\u006e\u0067\u0020\u0072\u0065\u0073\u0075\u006c\u0074\u0020\u006day\u0020b\u0065\u0020\u0069\u006e\u0063\u006f\u006d\u0070\u006c\u0065\u0074\u0065.\u0020\u0049\u006d\u0061\u0067\u0065\u0020\u0063\u006f\u006e\u0076\u0065\u0072\u0073\u0069\u006f\u006e \u0065\u0072\u0072\u006f\u0072\u003a\u0020\u0025\u0076",_acg );
-return nil ;};if _edd :=_aff .ColorSpace ;_edd !=nil {var _cce bool ;switch _edd .(type ){case *_bb .PdfColorspaceSpecialIndexed :_cce =true ;};if _cce {if _aga ,_cga :=_edd .ImageToRGB (*_abf );_cga !=nil {_fd .Log .Debug ("\u0057\u0041\u0052\u004e\u003a\u0020\u0063\u006f\u0075\u006c\u0064\u0020\u006e\u006f\u0074\u0020\u0063\u006fnv\u0065r\u0074\u0020\u0069\u006d\u0061\u0067\u0065\u0020\u0074\u006f\u0020\u0052G\u0042\u002e\u0020\u004f\u0075\u0074\u0070\u0075\u0074\u0020\u006d\u0061\u0079\u0020\u0062\u0065\u0020i\u006e\u0063\u006f\u0072\u0072\u0065\u0063\u0074\u002e");
-}else {_abf =&_aga ;};};};_fdf :=_aag .FillPattern ().ColorAt (0,0);var _begc _da .Image ;if _aff .Mask !=nil {if _begc ,_acg =_ced (_aff .Mask ,_fdf );_acg !=nil {_fd .Log .Debug ("\u0057\u0041\u0052\u004e\u003a \u0063\u006f\u0075\u006c\u0064 \u006eo\u0074\u0020\u0067\u0065\u0074\u0020\u0065\u0078\u0070\u006c\u0069\u0063\u0069\u0074\u0020\u0069\u006d\u0061\u0067e\u0020\u006d\u0061\u0073\u006b\u002e\u0020\u004f\u0075\u0074\u0070\u0075\u0074\u0020\u006d\u0061\u0079\u0020\u0062\u0065\u0020\u0069\u006e\u0063o\u0072\u0072\u0065\u0063\u0074\u002e");
-_begc =nil ;};}else if _aff .SMask !=nil {if _begc ,_acg =_gdf (_aff .SMask );_acg !=nil {_fd .Log .Debug ("W\u0041\u0052\u004e\u003a\u0020\u0063\u006f\u0075\u006c\u0064\u0020\u006e\u006f\u0074\u0020\u0067\u0065\u0074\u0020\u0073\u006f\u0066\u0074\u0020\u0069\u006da\u0067e\u0020\u006d\u0061\u0073k\u002e\u0020O\u0075\u0074\u0070\u0075\u0074\u0020\u006d\u0061\u0079\u0020\u0062\u0065\u0020\u0069\u006e\u0063\u006f\u0072\u0072\u0065\u0063\u0074\u002e");
-_begc =nil ;};};var _baf _da .Image ;if _cgd ,_ :=_ac .GetBoolVal (_aff .ImageMask );_cgd {_baf =_adcg (_abf ,_fdf );}else {_baf ,_acg =_abf .ToGoImage ();if _acg !=nil {_fd .Log .Debug ("\u0052\u0065\u006e\u0064\u0065\u0072\u0069\u006e\u0067\u0020\u0072\u0065\u0073\u0075\u006c\u0074\u0020\u006day\u0020b\u0065\u0020\u0069\u006e\u0063\u006f\u006d\u0070\u006c\u0065\u0074\u0065.\u0020\u0049\u006d\u0061\u0067\u0065\u0020\u0063\u006f\u006e\u0076\u0065\u0072\u0073\u0069\u006f\u006e \u0065\u0072\u0072\u006f\u0072\u003a\u0020\u0025\u0076",_acg );
-return nil ;};};if _begc !=nil {_baf =_fabf (_baf ,_begc );};_beb :=_baf .Bounds ();_aag .Push ();_aag .Scale (1.0/float64 (_beb .Dx ()),-1.0/float64 (_beb .Dy ()));_aag .DrawImageAnchored (_baf ,0,0,0,1);_aag .Pop ();case _bb .XObjectTypeForm :_fd .Log .Debug ("\u0058\u004fb\u006a\u0065\u0063t\u0020\u0066\u006f\u0072\u006d\u003a\u0020\u0025\u0073",_eeeb .String ());
-_aac ,_dgd :=_bcc .GetXObjectFormByName (*_eeeb );if _dgd !=nil {return _dgd ;};_ffe ,_dgd :=_aac .GetContentStream ();if _dgd !=nil {return _dgd ;};_agd :=_aac .Resources ;if _agd ==nil {_agd =_bcc ;};_aag .Push ();if _aac .Matrix !=nil {_feg ,_cgeg :=_ac .GetArray (_aac .Matrix );
-if !_cgeg {return _beg ;};_cda ,_aad :=_ac .GetNumbersAsFloat (_feg .Elements ());if _aad !=nil {return _aad ;};if len (_cda )!=6{return _ggc ;};_ged :=_efg .NewMatrix (_cda [0],_cda [1],_cda [2],_cda [3],_cda [4],_cda [5]);_aag .SetMatrix (_aag .Matrix ().Mult (_ged ));
-};if _aac .BBox !=nil {_ecab ,_bac :=_ac .GetArray (_aac .BBox );if !_bac {return _beg ;};_fba ,_gabd :=_ac .GetNumbersAsFloat (_ecab .Elements ());if _gabd !=nil {return _gabd ;};if len (_fba )!=4{_fd .Log .Debug ("\u004c\u0065\u006e\u0020\u003d\u0020\u0025\u0064",len (_fba ));
-return _ggc ;};_aag .DrawRectangle (_fba [0],_fba [1],_fba [2]-_fba [0],_fba [3]-_fba [1]);_aag .SetRGBA (1,0,0,1);_aag .Clip ();}else {_fd .Log .Debug ("\u0045R\u0052\u004fR\u003a\u0020\u0052\u0065q\u0075\u0069\u0072e\u0064\u0020\u0042\u0042\u006f\u0078\u0020\u006d\u0069ss\u0069\u006e\u0067 \u006f\u006e \u0058\u004f\u0062\u006a\u0065\u0063t\u0020\u0046o\u0072\u006d");
-};_dgd =_gda .renderContentStream (_aag ,string (_ffe ),_agd );if _dgd !=nil {return _dgd ;};_aag .Pop ();};case "\u0042\u0049":if len (_afb .Params )!=1{return _ggc ;};_eae ,_cggc :=_afb .Params [0].(*_df .ContentStreamInlineImage );if !_cggc {return nil ;
-};_cfb ,_ccc :=_eae .ToImage (_bcc );if _ccc !=nil {_fd .Log .Debug ("\u0052\u0065\u006e\u0064\u0065\u0072\u0069\u006e\u0067\u0020\u0072\u0065\u0073\u0075\u006c\u0074\u0020\u006day\u0020b\u0065\u0020\u0069\u006e\u0063\u006f\u006d\u0070\u006c\u0065\u0074\u0065.\u0020\u0049\u006d\u0061\u0067\u0065\u0020\u0063\u006f\u006e\u0076\u0065\u0072\u0073\u0069\u006f\u006e \u0065\u0072\u0072\u006f\u0072\u003a\u0020\u0025\u0076",_ccc );
-return nil ;};_fega ,_ccc :=_cfb .ToGoImage ();if _ccc !=nil {_fd .Log .Debug ("\u0052\u0065\u006e\u0064\u0065\u0072\u0069\u006e\u0067\u0020\u0072\u0065\u0073\u0075\u006c\u0074\u0020\u006day\u0020b\u0065\u0020\u0069\u006e\u0063\u006f\u006d\u0070\u006c\u0065\u0074\u0065.\u0020\u0049\u006d\u0061\u0067\u0065\u0020\u0063\u006f\u006e\u0076\u0065\u0072\u0073\u0069\u006f\u006e \u0065\u0072\u0072\u006f\u0072\u003a\u0020\u0025\u0076",_ccc );
-return nil ;};_bgf :=_fega .Bounds ();_aag .Push ();_aag .Scale (1.0/float64 (_bgf .Dx ()),-1.0/float64 (_bgf .Dy ()));_aag .DrawImageAnchored (_fega ,0,0,0,1);_aag .Pop ();case "\u0042\u0054":_ecc .Reset ();case "\u0045\u0054":_ecc .Reset ();case "\u0054\u0072":if len (_afb .Params )!=1{return _ggc ;
-};_fbd ,_aabb :=_ac .GetNumberAsFloat (_afb .Params [0]);if _aabb !=nil {return _aabb ;};_ecc .Tr =_ef .TextRenderingMode (_fbd );case "\u0054\u004c":if len (_afb .Params )!=1{return _ggc ;};_aceb ,_dbc :=_ac .GetNumberAsFloat (_afb .Params [0]);if _dbc !=nil {return _dbc ;
-};_ecc .Tl =_aceb ;case "\u0054\u0063":if len (_afb .Params )!=1{return _ggc ;};_efa ,_fcea :=_ac .GetNumberAsFloat (_afb .Params [0]);if _fcea !=nil {return _fcea ;};_fd .Log .Debug ("\u0054\u0063\u003a\u0020\u0025\u0076",_efa );_ecc .Tc =_efa ;case "\u0054\u0077":if len (_afb .Params )!=1{return _ggc ;
-};_bgfb ,_abbf :=_ac .GetNumberAsFloat (_afb .Params [0]);if _abbf !=nil {return _abbf ;};_fd .Log .Debug ("\u0054\u0077\u003a\u0020\u0025\u0076",_bgfb );_ecc .Tw =_bgfb ;case "\u0054\u007a":if len (_afb .Params )!=1{return _ggc ;};_ddgg ,_bacg :=_ac .GetNumberAsFloat (_afb .Params [0]);
-if _bacg !=nil {return _bacg ;};_ecc .Th =_ddgg ;case "\u0054\u0073":if len (_afb .Params )!=1{return _ggc ;};_efb ,_feed :=_ac .GetNumberAsFloat (_afb .Params [0]);if _feed !=nil {return _feed ;};_ecc .Ts =_efb ;case "\u0054\u0064":if len (_afb .Params )!=2{return _ggc ;
-};_caf ,_bcag :=_ac .GetNumbersAsFloat (_afb .Params );if _bcag !=nil {return _bcag ;};_fd .Log .Debug ("\u0054\u0064\u003a\u0020\u0025\u0076",_caf );_ecc .ProcTd (_caf [0],_caf [1]);case "\u0054\u0044":if len (_afb .Params )!=2{return _ggc ;};_dfdf ,_ega :=_ac .GetNumbersAsFloat (_afb .Params );
-if _ega !=nil {return _ega ;};_fd .Log .Debug ("\u0054\u0044\u003a\u0020\u0025\u0076",_dfdf );_ecc .ProcTD (_dfdf [0],_dfdf [1]);case "\u0054\u002a":_ecc .ProcTStar ();case "\u0054\u006d":if len (_afb .Params )!=6{return _ggc ;};_afab ,_eaec :=_ac .GetNumbersAsFloat (_afb .Params );
-if _eaec !=nil {return _eaec ;};_fd .Log .Debug ("\u0054\u0065x\u0074\u0020\u006da\u0074\u0072\u0069\u0078\u003a\u0020\u0025\u002b\u0076",_afab );_ecc .ProcTm (_afab [0],_afab [1],_afab [2],_afab [3],_afab [4],_afab [5]);case "\u0027":if len (_afb .Params )!=1{return _ggc ;
-};_bgd ,_fdde :=_ac .GetStringBytes (_afb .Params [0]);if !_fdde {return _beg ;};_fd .Log .Debug ("\u0027\u0020\u0073t\u0072\u0069\u006e\u0067\u003a\u0020\u0025\u0073",string (_bgd ));_ecc .ProcQ (_bgd ,_aag );case "\u0022":if len (_afb .Params )!=3{return _ggc ;
-};_fcdb ,_abcb :=_ac .GetNumberAsFloat (_afb .Params [0]);if _abcb !=nil {return _abcb ;};_cad ,_abcb :=_ac .GetNumberAsFloat (_afb .Params [1]);if _abcb !=nil {return _abcb ;};_bfb ,_dgb :=_ac .GetStringBytes (_afb .Params [2]);if !_dgb {return _beg ;
-};_ecc .ProcDQ (_bfb ,_fcdb ,_cad ,_aag );case "\u0054\u006a":if len (_afb .Params )!=1{return _ggc ;};_caa ,_febg :=_ac .GetStringBytes (_afb .Params [0]);if !_febg {return _beg ;};_fd .Log .Debug ("\u0054j\u0020s\u0074\u0072\u0069\u006e\u0067\u003a\u0020\u0060\u0025\u0073\u0060",string (_caa ));
-_ecc .ProcTj (_caa ,_aag );case "\u0054\u004a":if len (_afb .Params )!=1{return _ggc ;};_afbd ,_dfb :=_ac .GetArray (_afb .Params [0]);if !_dfb {_fd .Log .Debug ("\u0054\u0079\u0070\u0065\u003a\u0020\u0025\u0054",_afbd );return _beg ;};_fd .Log .Debug ("\u0054\u004a\u0020\u0061\u0072\u0072\u0061\u0079\u003a\u0020\u0025\u002b\u0076",_afbd );
-for _ ,_ddea :=range _afbd .Elements (){switch _acgb :=_ddea .(type ){case *_ac .PdfObjectString :if _acgb !=nil {_ecc .ProcTj (_acgb .Bytes (),_aag );};case *_ac .PdfObjectFloat ,*_ac .PdfObjectInteger :_bccg ,_agag :=_ac .GetNumberAsFloat (_acgb );if _agag ==nil {_ecc .Translate (-_bccg *0.001*_ecc .Tf .Size *_ecc .Th /100.0,0);
-};};};case "\u0054\u0066":if len (_afb .Params )!=2{return _ggc ;};_fd .Log .Debug ("\u0025\u0023\u0076",_afb .Params );_gce ,_ecae :=_ac .GetName (_afb .Params [0]);if !_ecae ||_gce ==nil {_fd .Log .Debug ("\u0069\u006e\u0076\u0061l\u0069\u0064\u0020\u0066\u006f\u006e\u0074\u0020\u006e\u0061m\u0065 \u006f\u0062\u006a\u0065\u0063\u0074\u003a \u0025\u0076",_afb .Params [0]);
-return _beg ;};_fd .Log .Debug ("\u0046\u006f\u006e\u0074\u0020\u006e\u0061\u006d\u0065\u003a\u0020\u0025\u0073",_gce .String ());_bgb ,_cdb :=_ac .GetNumberAsFloat (_afb .Params [1]);if _cdb !=nil {_fd .Log .Debug ("\u0069\u006e\u0076\u0061l\u0069\u0064\u0020\u0066\u006f\u006e\u0074\u0020\u0073\u0069z\u0065 \u006f\u0062\u006a\u0065\u0063\u0074\u003a \u0025\u0076",_afb .Params [1]);
-return _beg ;};_fd .Log .Debug ("\u0046\u006f\u006e\u0074\u0020\u0073\u0069\u007a\u0065\u003a\u0020\u0025\u0076",_bgb );_bed ,_cfed :=_bcc .GetFontByName (*_gce );if !_cfed {_fd .Log .Debug ("\u0045R\u0052\u004f\u0052\u003a\u0020\u0046\u006f\u006e\u0074\u0020\u0025s\u0020\u006e\u006f\u0074\u0020\u0066\u006f\u0075\u006e\u0064",_gce .String ());
-return _e .New ("\u0066\u006f\u006e\u0074\u0020\u006e\u006f\u0074\u0020f\u006f\u0075\u006e\u0064");};_fd .Log .Debug ("\u0046\u006f\u006e\u0074\u003a\u0020\u0025\u0054",_bed );_bgc ,_ecae :=_ac .GetDict (_bed );if !_ecae {_fd .Log .Debug ("\u0045\u0052\u0052\u004f\u0052\u003a\u0020\u0063\u006f\u0075l\u0064\u0020\u006e\u006f\u0074\u0020\u0067e\u0074\u0020\u0066\u006f\u006e\u0074\u0020\u0064\u0069\u0063\u0074");
-return _beg ;};_cfff ,_cdb :=_bb .NewPdfFontFromPdfObject (_bgc );if _cdb !=nil {_fd .Log .Debug ("\u0045\u0052\u0052\u004f\u0052\u003a\u0020\u0063\u006f\u0075\u006c\u0064\u0020\u006e\u006f\u0074\u0020\u006c\u006f\u0061\u0064\u0020\u0066\u006fn\u0074\u0020\u0066\u0072\u006fm\u0020\u006fb\u006a\u0065\u0063\u0074");
-return _cdb ;};_gbf :=_cfff .BaseFont ();if _gbf ==""{_gbf =_gce .String ();};_bag ,_ecae :=_aef [_gbf ];if !_ecae {_bag ,_cdb =_ef .NewTextFont (_cfff ,_bgb );if _cdb !=nil {_fd .Log .Debug ("\u0045R\u0052\u004f\u0052\u003a\u0020\u0025v",_cdb );};};if _bag ==nil {if len (_gbf )> 7&&_gbf [6]=='+'{_gbf =_gbf [7:];
-};_cfea :=[]string {_gbf ,"\u0054i\u006de\u0073\u0020\u004e\u0065\u0077\u0020\u0052\u006f\u006d\u0061\u006e","\u0041\u0072\u0069a\u006c","D\u0065\u006a\u0061\u0056\u0075\u0020\u0053\u0061\u006e\u0073"};for _ ,_beaf :=range _cfea {_fd .Log .Debug ("\u0044\u0045\u0042\u0055\u0047\u003a \u0073\u0065\u0061\u0072\u0063\u0068\u0069\u006e\u0067\u0020\u0073\u0079\u0073t\u0065\u006d\u0020\u0066\u006f\u006e\u0074 \u0060\u0025\u0073\u0060",_beaf );
-if _bag ,_ecae =_aef [_beaf ];_ecae {break ;};_fddc :=_fg .Match (_beaf );if _fddc ==nil {_fd .Log .Debug ("c\u006f\u0075\u006c\u0064\u0020\u006eo\u0074\u0020\u0066\u0069\u006e\u0064\u0020\u0066\u006fn\u0074\u0020\u0066i\u006ce\u0020\u0025\u0073",_beaf );
-continue ;};_bag ,_cdb =_ef .NewTextFontFromPath (_fddc .Filename ,_bgb );if _cdb !=nil {_fd .Log .Debug ("c\u006f\u0075\u006c\u0064\u0020\u006eo\u0074\u0020\u006c\u006f\u0061\u0064\u0020\u0066\u006fn\u0074\u0020\u0066i\u006ce\u0020\u0025\u0073",_fddc .Filename );
-continue ;};_fd .Log .Debug ("\u0053\u0075\u0062\u0073\u0074\u0069t\u0075\u0074\u0069\u006e\u0067\u0020\u0066\u006f\u006e\u0074\u0020\u0025\u0073 \u0077\u0069\u0074\u0068\u0020\u0025\u0073 \u0028\u0025\u0073\u0029",_gbf ,_fddc .Name ,_fddc .Filename );
-_aef [_beaf ]=_bag ;break ;};};if _bag ==nil {_fd .Log .Debug ("\u0045\u0052\u0052\u004f\u0052\u003a\u0020\u0063\u006f\u0075\u006c\u0064\u0020n\u006f\u0074\u0020\u0066\u0069\u006ed\u0020\u0061\u006e\u0079\u0020\u0073\u0075\u0069\u0074\u0061\u0062\u006c\u0065 \u0066\u006f\u006e\u0074");
-return _e .New ("\u0063\u006f\u0075\u006c\u0064\u0020\u006e\u006f\u0074\u0020\u0066\u0069\u006e\u0064\u0020a\u006ey\u0020\u0073\u0075\u0069\u0074\u0061\u0062\u006c\u0065\u0020\u0066\u006f\u006e\u0074");};_ecc .ProcTf (_bag .WithSize (_bgb ,_cfff ));case "\u0042\u004d\u0043","\u0042\u0044\u0043":if len (_afb .Params )==2&&_afb .Params [0].String ()=="\u0041\u0072\u0074\u0069\u0066\u0061\u0063\u0074"{_bba ,_fcgb :=_ac .GetDict (_afb .Params [1]);
-if _fcgb {if _bba .Get ("\u0053u\u0062\u0074\u0079\u0070\u0065")!=nil &&_bba .Get ("\u0053u\u0062\u0074\u0079\u0070\u0065").String ()=="\u0057a\u0074\u0065\u0072\u006d\u0061\u0072k"{_ecc .Tr =_ef .TextRenderingModeInvisible ;};};};case "\u0045\u004d\u0043":default:_fd .Log .Debug ("\u0045\u0052\u0052\u004f\u0052\u003a\u0020\u0075\u006e\u0073u\u0070\u0070\u006f\u0072\u0074\u0065\u0064 \u006f\u0070\u0065\u0072\u0061\u006e\u0064\u003a\u0020\u0025\u0073",_afb .Operand );
-};_abc =_afb ;return nil ;});_eff =_add .Process (_fdaf );if _eff !=nil {return _eff ;};return nil ;};var (_beg =_e .New ("\u0074\u0079p\u0065\u0020\u0063h\u0065\u0063\u006b\u0020\u0065\u0072\u0072\u006f\u0072");_ggc =_e .New ("\u0072\u0061\u006e\u0067\u0065\u0020\u0063\u0068\u0065\u0063\u006b\u0020e\u0072\u0072\u006f\u0072");
-);func _bfa (_fcba string ,_aedg _da .Image )error {_gaab ,_egb :=_fe .Create (_fcba );if _egb !=nil {return _egb ;};defer _gaab .Close ();return _c .Encode (_gaab ,_aedg );};func _fcda (_adbd _ef .Gradient ,_afda *_bb .PdfFunctionType2 ,_bae _bb .PdfColorspace ,_fag float64 ,_ccgb bool )(_ef .Gradient ,error ){switch _bae .(type ){case *_bb .PdfColorspaceDeviceRGB :if len (_afda .C0 )!=3||len (_afda .C1 )!=3{return nil ,_e .New ("\u0069\u006e\u0063\u006f\u0072\u0072\u0065\u0063\u0074\u0020\u0052\u0047\u0042\u0020\u0063o\u006co\u0072\u0020\u0061\u0072\u0072\u0061\u0079\u0020\u006c\u0065\u006e\u0067\u0074\u0068");
-};_cbf :=_afda .C0 ;_geg :=_afda .C1 ;if _ccgb {_adbd .AddColorStop (0.0,_aa .RGBA {R :uint8 (_cbf [0]*255),G :uint8 (_cbf [1]*255),B :uint8 (_cbf [2]*255),A :255});};_adbd .AddColorStop (_fag ,_aa .RGBA {R :uint8 (_geg [0]*255),G :uint8 (_geg [1]*255),B :uint8 (_geg [2]*255),A :255});
-case *_bb .PdfColorspaceDeviceCMYK :if len (_afda .C0 )!=4||len (_afda .C1 )!=4{return nil ,_e .New ("\u0069\u006e\u0063\u006f\u0072\u0072e\u0063\u0074\u0020\u0043\u004d\u0059\u004b\u0020\u0063\u006f\u006c\u006f\u0072 \u0061\u0072\u0072\u0061\u0079\u0020\u006ce\u006e\u0067\u0074\u0068");
-};_caaf :=_afda .C0 ;_fdg :=_afda .C1 ;if _ccgb {_adbd .AddColorStop (0.0,_aa .CMYK {C :uint8 (_caaf [0]*255),M :uint8 (_caaf [1]*255),Y :uint8 (_caaf [2]*255),K :uint8 (_caaf [3]*255)});};_adbd .AddColorStop (_fag ,_aa .CMYK {C :uint8 (_fdg [0]*255),M :uint8 (_fdg [1]*255),Y :uint8 (_fdg [2]*255),K :uint8 (_fdg [3]*255)});
-default:return nil ,_b .Errorf ("u\u006e\u0073\u0075\u0070\u0070\u006fr\u0074\u0065\u0064\u0020\u0063\u006f\u006c\u006f\u0072 \u0073\u0070\u0061c\u0065:\u0020\u0025\u0073",_bae .String ());};return _adbd ,nil ;};func _dag (_aeff string ,_ecce _da .Image ,_bfdg int )error {_gged ,_bec :=_fe .Create (_aeff );
-if _bec !=nil {return _bec ;};defer _gged .Close ();return _g .Encode (_gged ,_ecce ,&_g .Options {Quality :_bfdg });};func _ced (_gde _ac .PdfObject ,_ebd _aa .Color )(_da .Image ,error ){_baab ,_faeb :=_ac .GetStream (_gde );if !_faeb {return nil ,nil ;
-};_bffe ,_gag :=_bb .NewXObjectImageFromStream (_baab );if _gag !=nil {return nil ,_gag ;};_daedd ,_gag :=_bffe .ToImage ();if _gag !=nil {return nil ,_gag ;};return _adcg (_daedd ,_ebd ),nil ;};
+type PdfShadingType int64
+
+func _gdf(_cca _ac.PdfObject) (_da.Image, error) {
+	_gebf, _cffe := _ac.GetStream(_cca)
+	if !_cffe {
+		return nil, nil
+	}
+	_cgac, _adage := _bb.NewXObjectImageFromStream(_gebf)
+	if _adage != nil {
+		return nil, _adage
+	}
+	_cacf, _adage := _cgac.ToImage()
+	if _adage != nil {
+		return nil, _adage
+	}
+	if _cacf.Width == 0 || _cacf.Height == 0 {
+		_fd.Log.Debug("\u0073o\u0066t\u0020\u006d\u0061\u0073\u006b\u0020\u0069\u006d\u0061\u0067\u0065 \u0068\u0061\u0073\u0020i\u006e\u0076\u0061\u006c\u0069d\u0020\u0064\u0069\u006d\u0065\u006e\u0073\u0069\u006f\u006e\u0073\u0020\u0028\u0025\u0064\u002c\u0020\u0025\u0064\u0029\u002e\u0020\u004f\u0075\u0074\u0070\u0075\u0074\u0020\u006d\u0061y\u0020\u0062\u0065\u0020\u0069\u006e\u0063\u006fr\u0072\u0065\u0063\u0074\u002e", _cacf.Width, _cacf.Height)
+		return nil, nil
+	}
+	return _daeb(_cacf), nil
+}
+
+func (_gda renderer) renderContentStream(_aag _ef.Context, _dcd string, _fdaf *_bb.PdfPageResources) error {
+	_db, _eff := _df.NewContentStreamParser(_dcd).Parse()
+	if _eff != nil {
+		return _eff
+	}
+	_ecc := _aag.TextState()
+	_ecc.GlobalScale = _gda._aca
+	_aef := map[string]*_ef.TextFont{}
+	_fg := _gf.NewFinder(&_gf.FinderOpts{Extensions: []string{"\u002e\u0074\u0074\u0066", "\u002e\u0074\u0074\u0063"}})
+	var _abc *_df.ContentStreamOperation
+	var _afeb bool
+	var _bg _ef.FillRule
+	_add := _df.NewContentStreamProcessor(*_db)
+	_add.AddHandler(_df.HandlerConditionEnumAllOperands, "", func(_afb *_df.ContentStreamOperation, _ff _df.GraphicsState, _bcc *_bb.PdfPageResources) error {
+		_fd.Log.Debug("\u0050\u0072\u006f\u0063\u0065\u0073\u0073\u0069\u006e\u0067\u0020\u0025\u0073", _afb.Operand)
+		switch _afb.Operand {
+		case "\u0071":
+			_aag.Push()
+		case "\u0051":
+			_aag.Pop()
+			_ecc = _aag.TextState()
+		case "\u0063\u006d":
+			if len(_afb.Params) != 6 {
+				return _ggc
+			}
+			_adc, _ffc := _ac.GetNumbersAsFloat(_afb.Params)
+			if _ffc != nil {
+				return _ffc
+			}
+			_gb := _efg.NewMatrix(_adc[0], _adc[1], _adc[2], _adc[3], _adc[4], _adc[5])
+			_fd.Log.Debug("\u0047\u0072\u0061\u0070\u0068\u0069\u0063\u0073\u0020\u0073\u0074a\u0074\u0065\u0020\u006d\u0061\u0074\u0072\u0069\u0078\u003a \u0025\u002b\u0076", _gb)
+			_aag.SetMatrix(_aag.Matrix().Mult(_gb))
+		case "\u0077":
+			if len(_afb.Params) != 1 {
+				return _ggc
+			}
+			_gfa, _fdb := _ac.GetNumbersAsFloat(_afb.Params)
+			if _fdb != nil {
+				return _fdb
+			}
+			_aag.SetLineWidth(_gfa[0])
+		case "\u004a":
+			if len(_afb.Params) != 1 {
+				return _ggc
+			}
+			_fac, _adf := _ac.GetIntVal(_afb.Params[0])
+			if !_adf {
+				return _beg
+			}
+			switch _fac {
+			case 0:
+				_aag.SetLineCap(_ef.LineCapButt)
+			case 1:
+				_aag.SetLineCap(_ef.LineCapRound)
+			case 2:
+				_aag.SetLineCap(_ef.LineCapSquare)
+			default:
+				_fd.Log.Debug("\u0049\u006e\u0076\u0061\u006c\u0069\u0064\u0020\u006c\u0069\u006ee\u0020\u0063\u0061\u0070\u0020\u0073\u0074\u0079\u006c\u0065:\u0020\u0025\u0064", _fac)
+				return _ggc
+			}
+		case "\u006a":
+			if len(_afb.Params) != 1 {
+				return _ggc
+			}
+			_cdd, _aed := _ac.GetIntVal(_afb.Params[0])
+			if !_aed {
+				return _beg
+			}
+			switch _cdd {
+			case 0:
+				_aag.SetLineJoin(_ef.LineJoinBevel)
+			case 1:
+				_aag.SetLineJoin(_ef.LineJoinRound)
+			case 2:
+				_aag.SetLineJoin(_ef.LineJoinBevel)
+			default:
+				_fd.Log.Debug("I\u006e\u0076\u0061\u006c\u0069\u0064 \u006c\u0069\u006e\u0065\u0020\u006a\u006f\u0069\u006e \u0073\u0074\u0079l\u0065:\u0020\u0025\u0064", _cdd)
+				return _ggc
+			}
+		case "\u004d":
+			if len(_afb.Params) != 1 {
+				return _ggc
+			}
+			_aea, _ecd := _ac.GetNumbersAsFloat(_afb.Params)
+			if _ecd != nil {
+				return _ecd
+			}
+			_ = _aea
+			_fd.Log.Debug("\u004di\u0074\u0065\u0072\u0020l\u0069\u006d\u0069\u0074\u0020n\u006ft\u0020s\u0075\u0070\u0070\u006f\u0072\u0074\u0065d")
+		case "\u0064":
+			if len(_afb.Params) != 2 {
+				return _ggc
+			}
+			_ead, _gdb := _ac.GetArray(_afb.Params[0])
+			if !_gdb {
+				return _beg
+			}
+			_dbe, _gdb := _ac.GetIntVal(_afb.Params[1])
+			if !_gdb {
+				_, _fed := _ac.GetFloatVal(_afb.Params[1])
+				if !_fed {
+					return _beg
+				}
+			}
+			_aecg, _cfg := _ac.GetNumbersAsFloat(_ead.Elements())
+			if _cfg != nil {
+				return _cfg
+			}
+			_aag.SetDash(_aecg...)
+			_ = _dbe
+			_fd.Log.Debug("\u004c\u0069n\u0065\u0020\u0064\u0061\u0073\u0068\u0020\u0070\u0068\u0061\u0073\u0065\u0020\u006e\u006f\u0074\u0020\u0073\u0075\u0070\u0070\u006frt\u0065\u0064")
+		case "\u0072\u0069":
+			_fd.Log.Debug("\u0052\u0065\u006e\u0064\u0065\u0072\u0069\u006e\u0067\u0020i\u006e\u0074\u0065\u006e\u0074\u0020\u006eo\u0074\u0020\u0073\u0075\u0070\u0070\u006f\u0072\u0074\u0065\u0064")
+		case "\u0069":
+			_fd.Log.Debug("\u0046\u006c\u0061\u0074\u006e\u0065\u0073\u0073\u0020\u0074\u006f\u006c\u0065\u0072\u0061n\u0063e\u0020\u006e\u006f\u0074\u0020\u0073\u0075\u0070\u0070\u006f\u0072\u0074\u0065\u0064")
+		case "\u0067\u0073":
+			if len(_afb.Params) != 1 {
+				return _ggc
+			}
+			_bfe, _ce := _ac.GetName(_afb.Params[0])
+			if !_ce {
+				return _beg
+			}
+			if _bfe == nil {
+				return _ggc
+			}
+			_fdbf, _ce := _bcc.GetExtGState(*_bfe)
+			if !_ce {
+				_fd.Log.Debug("\u0045\u0052\u0052OR\u003a\u0020\u0063\u006f\u0075\u006c\u0064\u0020\u006eo\u0074 \u0066i\u006ed\u0020\u0072\u0065\u0073\u006f\u0075\u0072\u0063\u0065\u003a\u0020\u0025\u0073", *_bfe)
+				return _e.New("\u0072e\u0073o\u0075\u0072\u0063\u0065\u0020n\u006f\u0074 \u0066\u006f\u0075\u006e\u0064")
+			}
+			_afc, _ce := _ac.GetDict(_fdbf)
+			if !_ce {
+				_fd.Log.Debug("\u0045\u0052RO\u0052\u003a\u0020c\u006f\u0075\u006c\u0064 ge\u0074 g\u0072\u0061\u0070\u0068\u0069\u0063\u0073 s\u0074\u0061\u0074\u0065\u0020\u0064\u0069c\u0074")
+				return _beg
+			}
+			_fd.Log.Debug("G\u0053\u0020\u0064\u0069\u0063\u0074\u003a\u0020\u0025\u0073", _afc.String())
+			_bea := _afc.Get("\u0063\u0061")
+			if _bea != nil {
+				_fab, _dge := _ac.GetNumberAsFloat(_bea)
+				if _dge == nil {
+					_efe, _deg := _ff.ColorspaceNonStroking.ColorToRGB(_ff.ColorNonStroking)
+					if _deg != nil {
+						_fd.Log.Debug("\u0045\u0072\u0072\u006f\u0072\u0020\u0063\u006f\u006e\u0076\u0065r\u0074\u0069\u006e\u0067\u0020\u0063\u006f\u006c\u006f\u0072:\u0020\u0025\u0076", _deg)
+						return _deg
+					}
+					_gfaa, _dac := _efe.(*_bb.PdfColorDeviceRGB)
+					if !_dac {
+						_fd.Log.Debug("\u0045\u0072\u0072\u006fr \u0063\u006f\u006e\u0076\u0065\u0072\u0074\u0069\u006e\u0067\u0020\u0063\u006f\u006co\u0072")
+						return _deg
+					}
+					_aag.SetFillRGBA(_gfaa.R(), _gfaa.G(), _gfaa.B(), _fab)
+				}
+			}
+		case "\u006d":
+			if len(_afb.Params) != 2 {
+				_fd.Log.Debug("\u0057\u0041\u0052\u004e\u003a\u0020\u0065\u0072\u0072o\u0072\u0020\u0077\u0068\u0069\u006c\u0065\u0020\u0070\u0072\u006f\u0063\u0065\u0073\u0073\u0069\u006e\u0067\u0020\u0060\u006d\u0060\u0020o\u0070\u0065r\u0061\u0074o\u0072\u003a\u0020\u0025\u0073\u002e\u0020\u004f\u0075\u0074\u0070\u0075\u0074 m\u0061\u0079\u0020\u0062\u0065\u0020\u0069\u006e\u0063o\u0072\u0072\u0065\u0063\u0074\u002e", _ggc)
+				return nil
+			}
+			_dbd, _afea := _ac.GetNumbersAsFloat(_afb.Params)
+			if _afea != nil {
+				return _afea
+			}
+			_fd.Log.Debug("M\u006f\u0076\u0065\u0020\u0074\u006f\u003a\u0020\u0025\u0076", _dbd)
+			_aag.NewSubPath()
+			_aag.MoveTo(_dbd[0], _dbd[1])
+		case "\u006c":
+			if len(_afb.Params) != 2 {
+				_fd.Log.Debug("\u0057\u0041\u0052\u004e\u003a\u0020\u0065\u0072\u0072o\u0072\u0020\u0077\u0068\u0069\u006c\u0065\u0020\u0070\u0072\u006f\u0063\u0065\u0073\u0073\u0069\u006e\u0067\u0020\u0060\u006c\u0060\u0020o\u0070\u0065r\u0061\u0074o\u0072\u003a\u0020\u0025\u0073\u002e\u0020\u004f\u0075\u0074\u0070\u0075\u0074 m\u0061\u0079\u0020\u0062\u0065\u0020\u0069\u006e\u0063o\u0072\u0072\u0065\u0063\u0074\u002e", _ggc)
+				return nil
+			}
+			_ge, _afa := _ac.GetNumbersAsFloat(_afb.Params)
+			if _afa != nil {
+				return _afa
+			}
+			_aag.LineTo(_ge[0], _ge[1])
+		case "\u0063":
+			if len(_afb.Params) != 6 {
+				return _ggc
+			}
+			_dde, _cfe := _ac.GetNumbersAsFloat(_afb.Params)
+			if _cfe != nil {
+				return _cfe
+			}
+			_fd.Log.Debug("\u0043u\u0062\u0069\u0063\u0020\u0062\u0065\u007a\u0069\u0065\u0072\u0020p\u0061\u0072\u0061\u006d\u0073\u003a\u0020\u0025\u002b\u0076", _dde)
+			_aag.CubicTo(_dde[0], _dde[1], _dde[2], _dde[3], _dde[4], _dde[5])
+		case "\u0076", "\u0079":
+			if len(_afb.Params) != 4 {
+				return _ggc
+			}
+			_cec, _gdd := _ac.GetNumbersAsFloat(_afb.Params)
+			if _gdd != nil {
+				return _gdd
+			}
+			_fd.Log.Debug("\u0043u\u0062\u0069\u0063\u0020\u0062\u0065\u007a\u0069\u0065\u0072\u0020p\u0061\u0072\u0061\u006d\u0073\u003a\u0020\u0025\u002b\u0076", _cec)
+			_aag.QuadraticTo(_cec[0], _cec[1], _cec[2], _cec[3])
+		case "\u0068":
+			_aag.ClosePath()
+			_aag.NewSubPath()
+		case "\u0072\u0065":
+			if len(_afb.Params) != 4 {
+				return _ggc
+			}
+			_cee, _edg := _ac.GetNumbersAsFloat(_afb.Params)
+			if _edg != nil {
+				return _edg
+			}
+			_aag.DrawRectangle(_cee[0], _cee[1], _cee[2], _cee[3])
+			_aag.NewSubPath()
+		case "\u0053":
+			_dca, _ebg := _ff.ColorspaceStroking.ColorToRGB(_ff.ColorStroking)
+			if _ebg != nil {
+				_fd.Log.Debug("\u0045\u0072\u0072\u006f\u0072\u0020\u0063\u006f\u006e\u0076\u0065r\u0074\u0069\u006e\u0067\u0020\u0063\u006f\u006c\u006f\u0072:\u0020\u0025\u0076", _ebg)
+				return _ebg
+			}
+			_ggd, _bef := _dca.(*_bb.PdfColorDeviceRGB)
+			if !_bef {
+				_fd.Log.Debug("\u0045\u0072\u0072\u006fr \u0063\u006f\u006e\u0076\u0065\u0072\u0074\u0069\u006e\u0067\u0020\u0063\u006f\u006co\u0072")
+				return _ebg
+			}
+			_aag.SetRGBA(_ggd.R(), _ggd.G(), _ggd.B(), 1)
+			_aag.Stroke()
+		case "\u0073":
+			_dff, _ggb := _ff.ColorspaceStroking.ColorToRGB(_ff.ColorStroking)
+			if _ggb != nil {
+				_fd.Log.Debug("\u0045\u0072\u0072\u006f\u0072\u0020\u0063\u006f\u006e\u0076\u0065r\u0074\u0069\u006e\u0067\u0020\u0063\u006f\u006c\u006f\u0072:\u0020\u0025\u0076", _ggb)
+				return _ggb
+			}
+			_cac, _gca := _dff.(*_bb.PdfColorDeviceRGB)
+			if !_gca {
+				_fd.Log.Debug("\u0045\u0072\u0072\u006fr \u0063\u006f\u006e\u0076\u0065\u0072\u0074\u0069\u006e\u0067\u0020\u0063\u006f\u006co\u0072")
+				return _ggb
+			}
+			_aag.ClosePath()
+			_aag.NewSubPath()
+			_aag.SetRGBA(_cac.R(), _cac.G(), _cac.B(), 1)
+			_aag.Stroke()
+		case "\u0066", "\u0046":
+			_eee, _cb := _ff.ColorspaceNonStroking.ColorToRGB(_ff.ColorNonStroking)
+			if _cb != nil {
+				_fd.Log.Debug("\u0045\u0072\u0072\u006f\u0072\u0020\u0063\u006f\u006e\u0076\u0065r\u0074\u0069\u006e\u0067\u0020\u0063\u006f\u006c\u006f\u0072:\u0020\u0025\u0076", _cb)
+				return _cb
+			}
+			switch _ag := _eee.(type) {
+			case *_bb.PdfColorDeviceRGB:
+				_aag.SetRGBA(_ag.R(), _ag.G(), _ag.B(), 1)
+				_aag.SetFillRule(_ef.FillRuleWinding)
+				_aag.Fill()
+			case *_bb.PdfColorPattern:
+				_aag.Fill()
+			}
+			_fd.Log.Debug("\u0045\u0072\u0072\u006fr \u0063\u006f\u006e\u0076\u0065\u0072\u0074\u0069\u006e\u0067\u0020\u0063\u006f\u006co\u0072")
+		case "\u0066\u002a":
+			_cg, _eebc := _ff.ColorspaceNonStroking.ColorToRGB(_ff.ColorNonStroking)
+			if _eebc != nil {
+				_fd.Log.Debug("\u0045\u0072\u0072\u006f\u0072\u0020\u0063\u006f\u006e\u0076\u0065r\u0074\u0069\u006e\u0067\u0020\u0063\u006f\u006c\u006f\u0072:\u0020\u0025\u0076", _eebc)
+				return _eebc
+			}
+			_cde, _dgc := _cg.(*_bb.PdfColorDeviceRGB)
+			if !_dgc {
+				_fd.Log.Debug("\u0045\u0072\u0072\u006fr \u0063\u006f\u006e\u0076\u0065\u0072\u0074\u0069\u006e\u0067\u0020\u0063\u006f\u006co\u0072")
+				return _eebc
+			}
+			_aag.SetRGBA(_cde.R(), _cde.G(), _cde.B(), 1)
+			_aag.SetFillRule(_ef.FillRuleEvenOdd)
+			_aag.Fill()
+		case "\u0042":
+			_fee, _eccb := _ff.ColorspaceNonStroking.ColorToRGB(_ff.ColorNonStroking)
+			if _eccb != nil {
+				_fd.Log.Debug("\u0045\u0072\u0072\u006f\u0072\u0020\u0063\u006f\u006e\u0076\u0065r\u0074\u0069\u006e\u0067\u0020\u0063\u006f\u006c\u006f\u0072:\u0020\u0025\u0076", _eccb)
+				return _eccb
+			}
+			switch _bd := _fee.(type) {
+			case *_bb.PdfColorDeviceRGB:
+				_aag.SetRGBA(_bd.R(), _bd.G(), _bd.B(), 1)
+				_aag.SetFillRule(_ef.FillRuleWinding)
+				_aag.FillPreserve()
+				_fee, _eccb = _ff.ColorspaceStroking.ColorToRGB(_ff.ColorStroking)
+				if _eccb != nil {
+					_fd.Log.Debug("\u0045\u0072\u0072\u006f\u0072\u0020\u0063\u006f\u006e\u0076\u0065r\u0074\u0069\u006e\u0067\u0020\u0063\u006f\u006c\u006f\u0072:\u0020\u0025\u0076", _eccb)
+					return _eccb
+				}
+				if _ace, _cbg := _fee.(*_bb.PdfColorDeviceRGB); _cbg {
+					_aag.SetRGBA(_ace.R(), _ace.G(), _ace.B(), 1)
+					_aag.Stroke()
+				}
+			case *_bb.PdfColorPattern:
+				_aag.SetFillRule(_ef.FillRuleWinding)
+				_aag.Fill()
+				_aag.StrokePattern()
+			}
+		case "\u0042\u002a":
+			_eea, _ceee := _ff.ColorspaceNonStroking.ColorToRGB(_ff.ColorNonStroking)
+			if _ceee != nil {
+				_fd.Log.Debug("\u0045\u0072\u0072\u006f\u0072\u0020\u0063\u006f\u006e\u0076\u0065r\u0074\u0069\u006e\u0067\u0020\u0063\u006f\u006c\u006f\u0072:\u0020\u0025\u0076", _ceee)
+				return _ceee
+			}
+			switch _gcd := _eea.(type) {
+			case *_bb.PdfColorDeviceRGB:
+				_aag.SetRGBA(_gcd.R(), _gcd.G(), _gcd.B(), 1)
+				_aag.SetFillRule(_ef.FillRuleEvenOdd)
+				_aag.FillPreserve()
+				_eea, _ceee = _ff.ColorspaceStroking.ColorToRGB(_ff.ColorStroking)
+				if _ceee != nil {
+					_fd.Log.Debug("\u0045\u0072\u0072\u006f\u0072\u0020\u0063\u006f\u006e\u0076\u0065r\u0074\u0069\u006e\u0067\u0020\u0063\u006f\u006c\u006f\u0072:\u0020\u0025\u0076", _ceee)
+					return _ceee
+				}
+				if _cge, _gaa := _eea.(*_bb.PdfColorDeviceRGB); _gaa {
+					_aag.SetRGBA(_cge.R(), _cge.G(), _cge.B(), 1)
+					_aag.Stroke()
+				}
+			case *_bb.PdfColorPattern:
+				_aag.SetFillRule(_ef.FillRuleEvenOdd)
+				_aag.Fill()
+				_aag.StrokePattern()
+			}
+		case "\u0062":
+			_aag.ClosePath()
+			_ddc, _gbb := _ff.ColorspaceNonStroking.ColorToRGB(_ff.ColorNonStroking)
+			if _gbb != nil {
+				_fd.Log.Debug("\u0045\u0072\u0072\u006f\u0072\u0020\u0063\u006f\u006e\u0076\u0065r\u0074\u0069\u006e\u0067\u0020\u0063\u006f\u006c\u006f\u0072:\u0020\u0025\u0076", _gbb)
+				return _gbb
+			}
+			switch _effb := _ddc.(type) {
+			case *_bb.PdfColorDeviceRGB:
+				_aag.SetRGBA(_effb.R(), _effb.G(), _effb.B(), 1)
+				_aag.NewSubPath()
+				_aag.SetFillRule(_ef.FillRuleWinding)
+				_aag.FillPreserve()
+				_ddc, _gbb = _ff.ColorspaceStroking.ColorToRGB(_ff.ColorStroking)
+				if _gbb != nil {
+					_fd.Log.Debug("\u0045\u0072\u0072\u006f\u0072\u0020\u0063\u006f\u006e\u0076\u0065r\u0074\u0069\u006e\u0067\u0020\u0063\u006f\u006c\u006f\u0072:\u0020\u0025\u0076", _gbb)
+					return _gbb
+				}
+				if _cgg, _gacg := _ddc.(*_bb.PdfColorDeviceRGB); _gacg {
+					_aag.SetRGBA(_cgg.R(), _cgg.G(), _cgg.B(), 1)
+					_aag.Stroke()
+				}
+			case *_bb.PdfColorPattern:
+				_aag.NewSubPath()
+				_aag.SetFillRule(_ef.FillRuleWinding)
+				_aag.Fill()
+				_aag.StrokePattern()
+			}
+		case "\u0062\u002a":
+			_aag.ClosePath()
+			_ddg, _fff := _ff.ColorspaceNonStroking.ColorToRGB(_ff.ColorNonStroking)
+			if _fff != nil {
+				_fd.Log.Debug("\u0045\u0072\u0072\u006f\u0072\u0020\u0063\u006f\u006e\u0076\u0065r\u0074\u0069\u006e\u0067\u0020\u0063\u006f\u006c\u006f\u0072:\u0020\u0025\u0076", _fff)
+				return _fff
+			}
+			switch _bcb := _ddg.(type) {
+			case *_bb.PdfColorDeviceRGB:
+				_aag.SetRGBA(_bcb.R(), _bcb.G(), _bcb.B(), 1)
+				_aag.NewSubPath()
+				_aag.SetFillRule(_ef.FillRuleEvenOdd)
+				_aag.FillPreserve()
+				_ddg, _fff = _ff.ColorspaceStroking.ColorToRGB(_ff.ColorStroking)
+				if _fff != nil {
+					_fd.Log.Debug("\u0045\u0072\u0072\u006f\u0072\u0020\u0063\u006f\u006e\u0076\u0065r\u0074\u0069\u006e\u0067\u0020\u0063\u006f\u006c\u006f\u0072:\u0020\u0025\u0076", _fff)
+					return _fff
+				}
+				if _bege, _dacd := _ddg.(*_bb.PdfColorDeviceRGB); _dacd {
+					_aag.SetRGBA(_bege.R(), _bege.G(), _bege.B(), 1)
+					_aag.Stroke()
+				}
+			case *_bb.PdfColorPattern:
+				_aag.NewSubPath()
+				_aag.SetFillRule(_ef.FillRuleEvenOdd)
+				_aag.Fill()
+				_aag.StrokePattern()
+			}
+		case "\u006e":
+			if _afeb {
+				_aag.SetFillRule(_bg)
+				_aag.ClipPreserve()
+				_afeb = false
+			}
+			_aag.ClearPath()
+		case "\u0057":
+			_afeb = true
+			_bg = _ef.FillRuleWinding
+		case "\u0057\u002a":
+			_afeb = true
+			_bg = _ef.FillRuleEvenOdd
+		case "\u0072\u0067":
+			_gabe, _edf := _ff.ColorNonStroking.(*_bb.PdfColorDeviceRGB)
+			if !_edf {
+				_fd.Log.Debug("\u0045\u0072\u0072\u006f\u0072\u0020\u0063\u006f\u006e\u0076\u0065r\u0074\u0069\u006e\u0067\u0020\u0063\u006f\u006c\u006f\u0072:\u0020\u0025\u0076", _ff.ColorNonStroking)
+				return nil
+			}
+			_aag.SetFillRGBA(_gabe.R(), _gabe.G(), _gabe.B(), 1)
+		case "\u0052\u0047":
+			_fdab, _ba := _ff.ColorStroking.(*_bb.PdfColorDeviceRGB)
+			if !_ba {
+				_fd.Log.Debug("\u0045\u0072\u0072\u006f\u0072\u0020\u0063\u006f\u006e\u0076\u0065r\u0074\u0069\u006e\u0067\u0020\u0063\u006f\u006c\u006f\u0072:\u0020\u0025\u0076", _ff.ColorStroking)
+				return nil
+			}
+			_aag.SetStrokeRGBA(_fdab.R(), _fdab.G(), _fdab.B(), 1)
+		case "\u006b":
+			_abe, _eeag := _ff.ColorNonStroking.(*_bb.PdfColorDeviceCMYK)
+			if !_eeag {
+				_fd.Log.Debug("\u0045\u0072\u0072\u006f\u0072\u0020\u0063\u006f\u006e\u0076\u0065r\u0074\u0069\u006e\u0067\u0020\u0063\u006f\u006c\u006f\u0072:\u0020\u0025\u0076", _ff.ColorNonStroking)
+				return nil
+			}
+			_adag, _cfa := _ff.ColorspaceNonStroking.ColorToRGB(_abe)
+			if _cfa != nil {
+				_fd.Log.Debug("\u0045\u0072\u0072\u006f\u0072\u0020\u0063\u006f\u006e\u0076\u0065r\u0074\u0069\u006e\u0067\u0020\u0063\u006f\u006c\u006f\u0072:\u0020\u0025\u0076", _ff.ColorNonStroking)
+				return nil
+			}
+			_bfec, _eeag := _adag.(*_bb.PdfColorDeviceRGB)
+			if !_eeag {
+				_fd.Log.Debug("\u0045\u0072\u0072\u006f\u0072\u0020\u0063\u006f\u006e\u0076\u0065r\u0074\u0069\u006e\u0067\u0020\u0063\u006f\u006c\u006f\u0072:\u0020\u0025\u0076", _adag)
+				return nil
+			}
+			_aag.SetFillRGBA(_bfec.R(), _bfec.G(), _bfec.B(), 1)
+		case "\u004b":
+			_adad, _dgcf := _ff.ColorStroking.(*_bb.PdfColorDeviceCMYK)
+			if !_dgcf {
+				_fd.Log.Debug("\u0045\u0072\u0072\u006f\u0072\u0020\u0063\u006f\u006e\u0076\u0065r\u0074\u0069\u006e\u0067\u0020\u0063\u006f\u006c\u006f\u0072:\u0020\u0025\u0076", _ff.ColorStroking)
+				return nil
+			}
+			_fabg, _degc := _ff.ColorspaceStroking.ColorToRGB(_adad)
+			if _degc != nil {
+				_fd.Log.Debug("\u0045\u0072\u0072\u006f\u0072\u0020\u0063\u006f\u006e\u0076\u0065r\u0074\u0069\u006e\u0067\u0020\u0063\u006f\u006c\u006f\u0072:\u0020\u0025\u0076", _ff.ColorStroking)
+				return nil
+			}
+			_aeb, _dgcf := _fabg.(*_bb.PdfColorDeviceRGB)
+			if !_dgcf {
+				_fd.Log.Debug("\u0045\u0072\u0072\u006f\u0072\u0020\u0063\u006f\u006e\u0076\u0065r\u0074\u0069\u006e\u0067\u0020\u0063\u006f\u006c\u006f\u0072:\u0020\u0025\u0076", _fabg)
+				return nil
+			}
+			_aag.SetStrokeRGBA(_aeb.R(), _aeb.G(), _aeb.B(), 1)
+		case "\u0067":
+			_fdd, _dbea := _ff.ColorNonStroking.(*_bb.PdfColorDeviceGray)
+			if !_dbea {
+				_fd.Log.Debug("\u0045\u0072\u0072\u006f\u0072\u0020\u0063\u006f\u006e\u0076\u0065r\u0074\u0069\u006e\u0067\u0020\u0063\u006f\u006c\u006f\u0072:\u0020\u0025\u0076", _ff.ColorNonStroking)
+				return nil
+			}
+			_ebcd, _gdc := _ff.ColorspaceNonStroking.ColorToRGB(_fdd)
+			if _gdc != nil {
+				_fd.Log.Debug("\u0045\u0072\u0072\u006f\u0072\u0020\u0063\u006f\u006e\u0076\u0065r\u0074\u0069\u006e\u0067\u0020\u0063\u006f\u006c\u006f\u0072:\u0020\u0025\u0076", _ff.ColorNonStroking)
+				return nil
+			}
+			_bbf, _dbea := _ebcd.(*_bb.PdfColorDeviceRGB)
+			if !_dbea {
+				_fd.Log.Debug("\u0045\u0072\u0072\u006f\u0072\u0020\u0063\u006f\u006e\u0076\u0065r\u0074\u0069\u006e\u0067\u0020\u0063\u006f\u006c\u006f\u0072:\u0020\u0025\u0076", _ebcd)
+				return nil
+			}
+			_aag.SetFillRGBA(_bbf.R(), _bbf.G(), _bbf.B(), 1)
+		case "\u0047":
+			_dfd, _bee := _ff.ColorStroking.(*_bb.PdfColorDeviceGray)
+			if !_bee {
+				_fd.Log.Debug("\u0045\u0072\u0072\u006f\u0072\u0020\u0063\u006f\u006e\u0076\u0065r\u0074\u0069\u006e\u0067\u0020\u0063\u006f\u006c\u006f\u0072:\u0020\u0025\u0076", _ff.ColorStroking)
+				return nil
+			}
+			_dcbd, _geb := _ff.ColorspaceStroking.ColorToRGB(_dfd)
+			if _geb != nil {
+				_fd.Log.Debug("\u0045\u0072\u0072\u006f\u0072\u0020\u0063\u006f\u006e\u0076\u0065r\u0074\u0069\u006e\u0067\u0020\u0063\u006f\u006c\u006f\u0072:\u0020\u0025\u0076", _ff.ColorStroking)
+				return nil
+			}
+			_cacb, _bee := _dcbd.(*_bb.PdfColorDeviceRGB)
+			if !_bee {
+				_fd.Log.Debug("\u0045\u0072\u0072\u006f\u0072\u0020\u0063\u006f\u006e\u0076\u0065r\u0074\u0069\u006e\u0067\u0020\u0063\u006f\u006c\u006f\u0072:\u0020\u0025\u0076", _dcbd)
+				return nil
+			}
+			_aag.SetStrokeRGBA(_cacb.R(), _cacb.G(), _cacb.B(), 1)
+		case "\u0063\u0073":
+			if len(_afb.Params) > 0 {
+				if _fce, _ffb := _ac.GetName(_afb.Params[0]); _ffb && _fce.String() == "\u0050a\u0074\u0074\u0065\u0072\u006e" {
+					break
+				}
+			}
+			_eca, _ecf := _ff.ColorspaceNonStroking.ColorToRGB(_ff.ColorNonStroking)
+			if _ecf != nil {
+				_fd.Log.Debug("\u0045\u0072\u0072\u006f\u0072\u0020\u0063\u006f\u006e\u0076\u0065r\u0074\u0069\u006e\u0067\u0020\u0063\u006f\u006c\u006f\u0072:\u0020\u0025\u0076", _ff.ColorNonStroking)
+				return nil
+			}
+			_fec, _bdf := _eca.(*_bb.PdfColorDeviceRGB)
+			if !_bdf {
+				_fd.Log.Debug("\u0045\u0072\u0072\u006f\u0072\u0020\u0063\u006f\u006e\u0076\u0065r\u0074\u0069\u006e\u0067\u0020\u0063\u006f\u006c\u006f\u0072:\u0020\u0025\u0076", _eca)
+				return nil
+			}
+			_aag.SetFillRGBA(_fec.R(), _fec.G(), _fec.B(), 1)
+		case "\u0073\u0063":
+			_aced, _egc := _ff.ColorspaceNonStroking.ColorToRGB(_ff.ColorNonStroking)
+			if _egc != nil {
+				_fd.Log.Debug("\u0045\u0072\u0072\u006f\u0072\u0020\u0063\u006f\u006e\u0076\u0065r\u0074\u0069\u006e\u0067\u0020\u0063\u006f\u006c\u006f\u0072:\u0020\u0025\u0076", _ff.ColorNonStroking)
+				return nil
+			}
+			_efeg, _dga := _aced.(*_bb.PdfColorDeviceRGB)
+			if !_dga {
+				_fd.Log.Debug("\u0045\u0072\u0072\u006f\u0072\u0020\u0063\u006f\u006e\u0076\u0065r\u0074\u0069\u006e\u0067\u0020\u0063\u006f\u006c\u006f\u0072:\u0020\u0025\u0076", _aced)
+				return nil
+			}
+			_aag.SetFillRGBA(_efeg.R(), _efeg.G(), _efeg.B(), 1)
+		case "\u0073\u0063\u006e":
+			if len(_afb.Params) > 0 && len(_abc.Params) > 0 {
+				if _efee, _abcd := _ac.GetName(_abc.Params[0]); _abcd && _efee.String() == "\u0050a\u0074\u0074\u0065\u0072\u006e" {
+					if _gbd, _eaf := _ac.GetName(_afb.Params[0]); _eaf {
+						_cc, _adde := _gda.processGradient(_aag, _afb, _bcc, _gbd)
+						if _adde != nil {
+							_fd.Log.Debug("\u0045\u0072\u0072\u006f\u0072\u0020\u0077\u0068\u0065\u006e\u0020\u0070\u0072o\u0063\u0065\u0073\u0073\u0069\u006eg\u0020\u0067\u0072\u0061\u0064\u0069\u0065\u006e\u0074\u0020\u0064\u0061\u0074a\u003a\u0020\u0025\u0076", _adde)
+							break
+						}
+						if _cc == nil {
+							_fd.Log.Debug("\u0055\u006ek\u006e\u006f\u0077n\u0020\u0067\u0072\u0061\u0064\u0069\u0065\u006e\u0074")
+							break
+						}
+						_aag.SetFillStyle(_cc)
+						_aag.SetStrokeStyle(_cc)
+						break
+					}
+				}
+			}
+			_fcg, _gfe := _ff.ColorspaceNonStroking.ColorToRGB(_ff.ColorNonStroking)
+			if _gfe != nil {
+				_fd.Log.Debug("\u0045\u0072\u0072\u006f\u0072\u0020\u0063\u006f\u006e\u0076\u0065r\u0074\u0069\u006e\u0067\u0020\u0063\u006f\u006c\u006f\u0072:\u0020\u0025\u0076", _ff.ColorNonStroking)
+				return nil
+			}
+			_cdg, _bbe := _fcg.(*_bb.PdfColorDeviceRGB)
+			if !_bbe {
+				_fd.Log.Debug("\u0045\u0072\u0072\u006f\u0072\u0020\u0063\u006f\u006e\u0076\u0065r\u0074\u0069\u006e\u0067\u0020\u0063\u006f\u006c\u006f\u0072:\u0020\u0025\u0076", _fcg)
+				return nil
+			}
+			_aag.SetFillRGBA(_cdg.R(), _cdg.G(), _cdg.B(), 1)
+		case "\u0043\u0053":
+			if len(_afb.Params) > 0 {
+				if _bge, _ffcf := _ac.GetName(_afb.Params[0]); _ffcf && _bge.String() == "\u0050a\u0074\u0074\u0065\u0072\u006e" {
+					break
+				}
+			}
+			_gad, _gbe := _ff.ColorspaceStroking.ColorToRGB(_ff.ColorStroking)
+			if _gbe != nil {
+				_fd.Log.Debug("\u0045\u0072\u0072\u006f\u0072\u0020\u0063\u006f\u006e\u0076\u0065r\u0074\u0069\u006e\u0067\u0020\u0063\u006f\u006c\u006f\u0072:\u0020\u0025\u0076", _ff.ColorStroking)
+				return nil
+			}
+			_adb, _bfd := _gad.(*_bb.PdfColorDeviceRGB)
+			if !_bfd {
+				_fd.Log.Debug("\u0045\u0072\u0072\u006f\u0072\u0020\u0063\u006f\u006e\u0076\u0065r\u0074\u0069\u006e\u0067\u0020\u0063\u006f\u006c\u006f\u0072:\u0020\u0025\u0076", _gad)
+				return nil
+			}
+			_aag.SetStrokeRGBA(_adb.R(), _adb.G(), _adb.B(), 1)
+		case "\u0053\u0043":
+			_dba, _ece := _ff.ColorspaceStroking.ColorToRGB(_ff.ColorStroking)
+			if _ece != nil {
+				_fd.Log.Debug("\u0045\u0072\u0072\u006f\u0072\u0020\u0063\u006f\u006e\u0076\u0065r\u0074\u0069\u006e\u0067\u0020\u0063\u006f\u006c\u006f\u0072:\u0020\u0025\u0076", _ff.ColorStroking)
+				return nil
+			}
+			_ffcc, _daf := _dba.(*_bb.PdfColorDeviceRGB)
+			if !_daf {
+				_fd.Log.Debug("\u0045\u0072\u0072\u006f\u0072\u0020\u0063\u006f\u006e\u0076\u0065r\u0074\u0069\u006e\u0067\u0020\u0063\u006f\u006c\u006f\u0072:\u0020\u0025\u0076", _dba)
+				return nil
+			}
+			_aag.SetStrokeRGBA(_ffcc.R(), _ffcc.G(), _ffcc.B(), 1)
+		case "\u0053\u0043\u004e":
+			if len(_afb.Params) > 0 && len(_abc.Params) > 0 {
+				if _adg, _addf := _ac.GetName(_abc.Params[0]); _addf && _adg.String() == "\u0050a\u0074\u0074\u0065\u0072\u006e" {
+					if _egf, _abaf := _ac.GetName(_afb.Params[0]); _abaf {
+						_fbf, _dbf := _gda.processGradient(_aag, _afb, _bcc, _egf)
+						if _dbf != nil {
+							_fd.Log.Debug("\u0045\u0072\u0072\u006f\u0072\u0020\u0077\u0068\u0065\u006e\u0020\u0070\u0072o\u0063\u0065\u0073\u0073\u0069\u006eg\u0020\u0067\u0072\u0061\u0064\u0069\u0065\u006e\u0074\u0020\u0064\u0061\u0074a\u003a\u0020\u0025\u0076", _dbf)
+							break
+						}
+						if _fbf == nil {
+							_fd.Log.Debug("\u0055\u006ek\u006e\u006f\u0077n\u0020\u0067\u0072\u0061\u0064\u0069\u0065\u006e\u0074")
+							break
+						}
+						_aag.SetFillStyle(_fbf)
+						_aag.SetStrokeStyle(_fbf)
+						break
+					}
+				}
+			}
+			_eeac, _ceb := _ff.ColorspaceStroking.ColorToRGB(_ff.ColorStroking)
+			if _ceb != nil {
+				_fd.Log.Debug("\u0045\u0072\u0072\u006f\u0072\u0020\u0063\u006f\u006e\u0076\u0065r\u0074\u0069\u006e\u0067\u0020\u0063\u006f\u006c\u006f\u0072:\u0020\u0025\u0076", _ff.ColorStroking)
+				return nil
+			}
+			_gfeg, _bce := _eeac.(*_bb.PdfColorDeviceRGB)
+			if !_bce {
+				_fd.Log.Debug("\u0045\u0072\u0072\u006f\u0072\u0020\u0063\u006f\u006e\u0076\u0065r\u0074\u0069\u006e\u0067\u0020\u0063\u006f\u006c\u006f\u0072:\u0020\u0025\u0076", _eeac)
+				return nil
+			}
+			_aag.SetStrokeRGBA(_gfeg.R(), _gfeg.G(), _gfeg.B(), 1)
+		case "\u0073\u0068":
+			if len(_afb.Params) != 1 {
+				_fd.Log.Debug("\u0049n\u0076\u0061\u006c\u0069\u0064\u0020\u0073\u0068\u0020\u0070\u0061r\u0061\u006d\u0073\u0020\u0066\u006f\u0072\u006d\u0061\u0074")
+				break
+			}
+			_cff, _ddb := _ac.GetName(_afb.Params[0])
+			if !_ddb {
+				_fd.Log.Debug("F\u0061\u0069\u006c\u0065\u0064\u0020g\u0065\u0074\u0074\u0069\u006e\u0067\u0020\u0073\u0068a\u0064\u0069\u006eg\u0020n\u0061\u006d\u0065")
+				break
+			}
+			_ccg, _ddb := _bcc.GetShadingByName(*_cff)
+			if !_ddb {
+				_fd.Log.Debug("F\u0061\u0069\u006c\u0065\u0064\u0020g\u0065\u0074\u0074\u0069\u006e\u0067\u0020\u0073\u0068a\u0064\u0069\u006eg\u0020d\u0061\u0074\u0061")
+				break
+			}
+			_feb, _abab, _fcd := _gda.processShading(_aag, _ccg)
+			if _fcd != nil {
+				_fd.Log.Debug("\u0045\u0072\u0072\u006f\u0072\u0020\u0077\u0068\u0065\u006e\u0020\u0070\u0072\u006f\u0063\u0065\u0073\u0073\u0069\u006e\u0067\u0020\u0073\u0068a\u0064\u0069\u006e\u0067\u0020d\u0061\u0074a\u003a\u0020\u0025\u0076", _fcd)
+				break
+			}
+			if _feb == nil {
+				_fd.Log.Debug("\u0055\u006ek\u006e\u006f\u0077n\u0020\u0067\u0072\u0061\u0064\u0069\u0065\u006e\u0074")
+				break
+			}
+			_aab, _fcd := _abab.ToFloat64Array()
+			if _fcd != nil {
+				_fd.Log.Debug("\u0045\u0072r\u006f\u0072\u0020\u0070\u0061\u0072\u0073\u0069\u006e\u0067\u0020\u0063\u006f\u006f\u0072\u0064\u0069\u006e\u0061\u0074\u0065\u0073: \u0025\u0076", _fcd)
+				break
+			}
+			_aag.DrawRectangle(_aab[0], _aab[1], _aab[2], _aab[3])
+			_aag.NewSubPath()
+			_aag.SetFillStyle(_feb)
+			_aag.SetStrokeStyle(_feb)
+			_aag.Fill()
+		case "\u0044\u006f":
+			if len(_afb.Params) != 1 {
+				return _ggc
+			}
+			_eeeb, _dcc := _ac.GetName(_afb.Params[0])
+			if !_dcc {
+				return _beg
+			}
+			_, _dcaa := _bcc.GetXObjectByName(*_eeeb)
+			switch _dcaa {
+			case _bb.XObjectTypeImage:
+				_fd.Log.Debug("\u0058\u004f\u0062\u006a\u0065\u0063\u0074\u0020\u0069\u006d\u0061\u0067e\u003a\u0020\u0025\u0073", _eeeb.String())
+				_aff, _acg := _bcc.GetXObjectImageByName(*_eeeb)
+				if _acg != nil {
+					return _acg
+				}
+				_abf, _acg := _aff.ToImage()
+				if _acg != nil {
+					_fd.Log.Debug("\u0052\u0065\u006e\u0064\u0065\u0072\u0069\u006e\u0067\u0020\u0072\u0065\u0073\u0075\u006c\u0074\u0020\u006day\u0020b\u0065\u0020\u0069\u006e\u0063\u006f\u006d\u0070\u006c\u0065\u0074\u0065.\u0020\u0049\u006d\u0061\u0067\u0065\u0020\u0063\u006f\u006e\u0076\u0065\u0072\u0073\u0069\u006f\u006e \u0065\u0072\u0072\u006f\u0072\u003a\u0020\u0025\u0076", _acg)
+					return nil
+				}
+				if _edd := _aff.ColorSpace; _edd != nil {
+					var _cce bool
+					switch _edd.(type) {
+					case *_bb.PdfColorspaceSpecialIndexed:
+						_cce = true
+					}
+					if _cce {
+						if _aga, _cga := _edd.ImageToRGB(*_abf); _cga != nil {
+							_fd.Log.Debug("\u0057\u0041\u0052\u004e\u003a\u0020\u0063\u006f\u0075\u006c\u0064\u0020\u006e\u006f\u0074\u0020\u0063\u006fnv\u0065r\u0074\u0020\u0069\u006d\u0061\u0067\u0065\u0020\u0074\u006f\u0020\u0052G\u0042\u002e\u0020\u004f\u0075\u0074\u0070\u0075\u0074\u0020\u006d\u0061\u0079\u0020\u0062\u0065\u0020i\u006e\u0063\u006f\u0072\u0072\u0065\u0063\u0074\u002e")
+						} else {
+							_abf = &_aga
+						}
+					}
+				}
+				_fdf := _aag.FillPattern().ColorAt(0, 0)
+				var _begc _da.Image
+				if _aff.Mask != nil {
+					if _begc, _acg = _ced(_aff.Mask, _fdf); _acg != nil {
+						_fd.Log.Debug("\u0057\u0041\u0052\u004e\u003a \u0063\u006f\u0075\u006c\u0064 \u006eo\u0074\u0020\u0067\u0065\u0074\u0020\u0065\u0078\u0070\u006c\u0069\u0063\u0069\u0074\u0020\u0069\u006d\u0061\u0067e\u0020\u006d\u0061\u0073\u006b\u002e\u0020\u004f\u0075\u0074\u0070\u0075\u0074\u0020\u006d\u0061\u0079\u0020\u0062\u0065\u0020\u0069\u006e\u0063o\u0072\u0072\u0065\u0063\u0074\u002e")
+						_begc = nil
+					}
+				} else if _aff.SMask != nil {
+					if _begc, _acg = _gdf(_aff.SMask); _acg != nil {
+						_fd.Log.Debug("W\u0041\u0052\u004e\u003a\u0020\u0063\u006f\u0075\u006c\u0064\u0020\u006e\u006f\u0074\u0020\u0067\u0065\u0074\u0020\u0073\u006f\u0066\u0074\u0020\u0069\u006da\u0067e\u0020\u006d\u0061\u0073k\u002e\u0020O\u0075\u0074\u0070\u0075\u0074\u0020\u006d\u0061\u0079\u0020\u0062\u0065\u0020\u0069\u006e\u0063\u006f\u0072\u0072\u0065\u0063\u0074\u002e")
+						_begc = nil
+					}
+				}
+				var _baf _da.Image
+				if _cgd, _ := _ac.GetBoolVal(_aff.ImageMask); _cgd {
+					_baf = _adcg(_abf, _fdf)
+				} else {
+					_baf, _acg = _abf.ToGoImage()
+					if _acg != nil {
+						_fd.Log.Debug("\u0052\u0065\u006e\u0064\u0065\u0072\u0069\u006e\u0067\u0020\u0072\u0065\u0073\u0075\u006c\u0074\u0020\u006day\u0020b\u0065\u0020\u0069\u006e\u0063\u006f\u006d\u0070\u006c\u0065\u0074\u0065.\u0020\u0049\u006d\u0061\u0067\u0065\u0020\u0063\u006f\u006e\u0076\u0065\u0072\u0073\u0069\u006f\u006e \u0065\u0072\u0072\u006f\u0072\u003a\u0020\u0025\u0076", _acg)
+						return nil
+					}
+				}
+				if _begc != nil {
+					_baf = _fabf(_baf, _begc)
+				}
+				_beb := _baf.Bounds()
+				_aag.Push()
+				_aag.Scale(1.0/float64(_beb.Dx()), -1.0/float64(_beb.Dy()))
+				_aag.DrawImageAnchored(_baf, 0, 0, 0, 1)
+				_aag.Pop()
+			case _bb.XObjectTypeForm:
+				_fd.Log.Debug("\u0058\u004fb\u006a\u0065\u0063t\u0020\u0066\u006f\u0072\u006d\u003a\u0020\u0025\u0073", _eeeb.String())
+				_aac, _dgd := _bcc.GetXObjectFormByName(*_eeeb)
+				if _dgd != nil {
+					return _dgd
+				}
+				_ffe, _dgd := _aac.GetContentStream()
+				if _dgd != nil {
+					return _dgd
+				}
+				_agd := _aac.Resources
+				if _agd == nil {
+					_agd = _bcc
+				}
+				_aag.Push()
+				if _aac.Matrix != nil {
+					_feg, _cgeg := _ac.GetArray(_aac.Matrix)
+					if !_cgeg {
+						return _beg
+					}
+					_cda, _aad := _ac.GetNumbersAsFloat(_feg.Elements())
+					if _aad != nil {
+						return _aad
+					}
+					if len(_cda) != 6 {
+						return _ggc
+					}
+					_ged := _efg.NewMatrix(_cda[0], _cda[1], _cda[2], _cda[3], _cda[4], _cda[5])
+					_aag.SetMatrix(_aag.Matrix().Mult(_ged))
+				}
+				if _aac.BBox != nil {
+					_ecab, _bac := _ac.GetArray(_aac.BBox)
+					if !_bac {
+						return _beg
+					}
+					_fba, _gabd := _ac.GetNumbersAsFloat(_ecab.Elements())
+					if _gabd != nil {
+						return _gabd
+					}
+					if len(_fba) != 4 {
+						_fd.Log.Debug("\u004c\u0065\u006e\u0020\u003d\u0020\u0025\u0064", len(_fba))
+						return _ggc
+					}
+					_aag.DrawRectangle(_fba[0], _fba[1], _fba[2]-_fba[0], _fba[3]-_fba[1])
+					_aag.SetRGBA(1, 0, 0, 1)
+					_aag.Clip()
+				} else {
+					_fd.Log.Debug("\u0045R\u0052\u004fR\u003a\u0020\u0052\u0065q\u0075\u0069\u0072e\u0064\u0020\u0042\u0042\u006f\u0078\u0020\u006d\u0069ss\u0069\u006e\u0067 \u006f\u006e \u0058\u004f\u0062\u006a\u0065\u0063t\u0020\u0046o\u0072\u006d")
+				}
+				_dgd = _gda.renderContentStream(_aag, string(_ffe), _agd)
+				if _dgd != nil {
+					return _dgd
+				}
+				_aag.Pop()
+			}
+		case "\u0042\u0049":
+			if len(_afb.Params) != 1 {
+				return _ggc
+			}
+			_eae, _cggc := _afb.Params[0].(*_df.ContentStreamInlineImage)
+			if !_cggc {
+				return nil
+			}
+			_cfb, _ccc := _eae.ToImage(_bcc)
+			if _ccc != nil {
+				_fd.Log.Debug("\u0052\u0065\u006e\u0064\u0065\u0072\u0069\u006e\u0067\u0020\u0072\u0065\u0073\u0075\u006c\u0074\u0020\u006day\u0020b\u0065\u0020\u0069\u006e\u0063\u006f\u006d\u0070\u006c\u0065\u0074\u0065.\u0020\u0049\u006d\u0061\u0067\u0065\u0020\u0063\u006f\u006e\u0076\u0065\u0072\u0073\u0069\u006f\u006e \u0065\u0072\u0072\u006f\u0072\u003a\u0020\u0025\u0076", _ccc)
+				return nil
+			}
+			_fega, _ccc := _cfb.ToGoImage()
+			if _ccc != nil {
+				_fd.Log.Debug("\u0052\u0065\u006e\u0064\u0065\u0072\u0069\u006e\u0067\u0020\u0072\u0065\u0073\u0075\u006c\u0074\u0020\u006day\u0020b\u0065\u0020\u0069\u006e\u0063\u006f\u006d\u0070\u006c\u0065\u0074\u0065.\u0020\u0049\u006d\u0061\u0067\u0065\u0020\u0063\u006f\u006e\u0076\u0065\u0072\u0073\u0069\u006f\u006e \u0065\u0072\u0072\u006f\u0072\u003a\u0020\u0025\u0076", _ccc)
+				return nil
+			}
+			_bgf := _fega.Bounds()
+			_aag.Push()
+			_aag.Scale(1.0/float64(_bgf.Dx()), -1.0/float64(_bgf.Dy()))
+			_aag.DrawImageAnchored(_fega, 0, 0, 0, 1)
+			_aag.Pop()
+		case "\u0042\u0054":
+			_ecc.Reset()
+		case "\u0045\u0054":
+			_ecc.Reset()
+		case "\u0054\u0072":
+			if len(_afb.Params) != 1 {
+				return _ggc
+			}
+			_fbd, _aabb := _ac.GetNumberAsFloat(_afb.Params[0])
+			if _aabb != nil {
+				return _aabb
+			}
+			_ecc.Tr = _ef.TextRenderingMode(_fbd)
+		case "\u0054\u004c":
+			if len(_afb.Params) != 1 {
+				return _ggc
+			}
+			_aceb, _dbc := _ac.GetNumberAsFloat(_afb.Params[0])
+			if _dbc != nil {
+				return _dbc
+			}
+			_ecc.Tl = _aceb
+		case "\u0054\u0063":
+			if len(_afb.Params) != 1 {
+				return _ggc
+			}
+			_efa, _fcea := _ac.GetNumberAsFloat(_afb.Params[0])
+			if _fcea != nil {
+				return _fcea
+			}
+			_fd.Log.Debug("\u0054\u0063\u003a\u0020\u0025\u0076", _efa)
+			_ecc.Tc = _efa
+		case "\u0054\u0077":
+			if len(_afb.Params) != 1 {
+				return _ggc
+			}
+			_bgfb, _abbf := _ac.GetNumberAsFloat(_afb.Params[0])
+			if _abbf != nil {
+				return _abbf
+			}
+			_fd.Log.Debug("\u0054\u0077\u003a\u0020\u0025\u0076", _bgfb)
+			_ecc.Tw = _bgfb
+		case "\u0054\u007a":
+			if len(_afb.Params) != 1 {
+				return _ggc
+			}
+			_ddgg, _bacg := _ac.GetNumberAsFloat(_afb.Params[0])
+			if _bacg != nil {
+				return _bacg
+			}
+			_ecc.Th = _ddgg
+		case "\u0054\u0073":
+			if len(_afb.Params) != 1 {
+				return _ggc
+			}
+			_efb, _feed := _ac.GetNumberAsFloat(_afb.Params[0])
+			if _feed != nil {
+				return _feed
+			}
+			_ecc.Ts = _efb
+		case "\u0054\u0064":
+			if len(_afb.Params) != 2 {
+				return _ggc
+			}
+			_caf, _bcag := _ac.GetNumbersAsFloat(_afb.Params)
+			if _bcag != nil {
+				return _bcag
+			}
+			_fd.Log.Debug("\u0054\u0064\u003a\u0020\u0025\u0076", _caf)
+			_ecc.ProcTd(_caf[0], _caf[1])
+		case "\u0054\u0044":
+			if len(_afb.Params) != 2 {
+				return _ggc
+			}
+			_dfdf, _ega := _ac.GetNumbersAsFloat(_afb.Params)
+			if _ega != nil {
+				return _ega
+			}
+			_fd.Log.Debug("\u0054\u0044\u003a\u0020\u0025\u0076", _dfdf)
+			_ecc.ProcTD(_dfdf[0], _dfdf[1])
+		case "\u0054\u002a":
+			_ecc.ProcTStar()
+		case "\u0054\u006d":
+			if len(_afb.Params) != 6 {
+				return _ggc
+			}
+			_afab, _eaec := _ac.GetNumbersAsFloat(_afb.Params)
+			if _eaec != nil {
+				return _eaec
+			}
+			_fd.Log.Debug("\u0054\u0065x\u0074\u0020\u006da\u0074\u0072\u0069\u0078\u003a\u0020\u0025\u002b\u0076", _afab)
+			_ecc.ProcTm(_afab[0], _afab[1], _afab[2], _afab[3], _afab[4], _afab[5])
+		case "\u0027":
+			if len(_afb.Params) != 1 {
+				return _ggc
+			}
+			_bgd, _fdde := _ac.GetStringBytes(_afb.Params[0])
+			if !_fdde {
+				return _beg
+			}
+			_fd.Log.Debug("\u0027\u0020\u0073t\u0072\u0069\u006e\u0067\u003a\u0020\u0025\u0073", string(_bgd))
+			_ecc.ProcQ(_bgd, _aag)
+		case "\u0022":
+			if len(_afb.Params) != 3 {
+				return _ggc
+			}
+			_fcdb, _abcb := _ac.GetNumberAsFloat(_afb.Params[0])
+			if _abcb != nil {
+				return _abcb
+			}
+			_cad, _abcb := _ac.GetNumberAsFloat(_afb.Params[1])
+			if _abcb != nil {
+				return _abcb
+			}
+			_bfb, _dgb := _ac.GetStringBytes(_afb.Params[2])
+			if !_dgb {
+				return _beg
+			}
+			_ecc.ProcDQ(_bfb, _fcdb, _cad, _aag)
+		case "\u0054\u006a":
+			if len(_afb.Params) != 1 {
+				return _ggc
+			}
+			_caa, _febg := _ac.GetStringBytes(_afb.Params[0])
+			if !_febg {
+				return _beg
+			}
+			_fd.Log.Debug("\u0054j\u0020s\u0074\u0072\u0069\u006e\u0067\u003a\u0020\u0060\u0025\u0073\u0060", string(_caa))
+			_ecc.ProcTj(_caa, _aag)
+		case "\u0054\u004a":
+			if len(_afb.Params) != 1 {
+				return _ggc
+			}
+			_afbd, _dfb := _ac.GetArray(_afb.Params[0])
+			if !_dfb {
+				_fd.Log.Debug("\u0054\u0079\u0070\u0065\u003a\u0020\u0025\u0054", _afbd)
+				return _beg
+			}
+			_fd.Log.Debug("\u0054\u004a\u0020\u0061\u0072\u0072\u0061\u0079\u003a\u0020\u0025\u002b\u0076", _afbd)
+			for _, _ddea := range _afbd.Elements() {
+				switch _acgb := _ddea.(type) {
+				case *_ac.PdfObjectString:
+					if _acgb != nil {
+						_ecc.ProcTj(_acgb.Bytes(), _aag)
+					}
+				case *_ac.PdfObjectFloat, *_ac.PdfObjectInteger:
+					_bccg, _agag := _ac.GetNumberAsFloat(_acgb)
+					if _agag == nil {
+						_ecc.Translate(-_bccg*0.001*_ecc.Tf.Size*_ecc.Th/100.0, 0)
+					}
+				}
+			}
+		case "\u0054\u0066":
+			if len(_afb.Params) != 2 {
+				return _ggc
+			}
+			_fd.Log.Debug("\u0025\u0023\u0076", _afb.Params)
+			_gce, _ecae := _ac.GetName(_afb.Params[0])
+			if !_ecae || _gce == nil {
+				_fd.Log.Debug("\u0069\u006e\u0076\u0061l\u0069\u0064\u0020\u0066\u006f\u006e\u0074\u0020\u006e\u0061m\u0065 \u006f\u0062\u006a\u0065\u0063\u0074\u003a \u0025\u0076", _afb.Params[0])
+				return _beg
+			}
+			_fd.Log.Debug("\u0046\u006f\u006e\u0074\u0020\u006e\u0061\u006d\u0065\u003a\u0020\u0025\u0073", _gce.String())
+			_bgb, _cdb := _ac.GetNumberAsFloat(_afb.Params[1])
+			if _cdb != nil {
+				_fd.Log.Debug("\u0069\u006e\u0076\u0061l\u0069\u0064\u0020\u0066\u006f\u006e\u0074\u0020\u0073\u0069z\u0065 \u006f\u0062\u006a\u0065\u0063\u0074\u003a \u0025\u0076", _afb.Params[1])
+				return _beg
+			}
+			_fd.Log.Debug("\u0046\u006f\u006e\u0074\u0020\u0073\u0069\u007a\u0065\u003a\u0020\u0025\u0076", _bgb)
+			_bed, _cfed := _bcc.GetFontByName(*_gce)
+			if !_cfed {
+				_fd.Log.Debug("\u0045R\u0052\u004f\u0052\u003a\u0020\u0046\u006f\u006e\u0074\u0020\u0025s\u0020\u006e\u006f\u0074\u0020\u0066\u006f\u0075\u006e\u0064", _gce.String())
+				return _e.New("\u0066\u006f\u006e\u0074\u0020\u006e\u006f\u0074\u0020f\u006f\u0075\u006e\u0064")
+			}
+			_fd.Log.Debug("\u0046\u006f\u006e\u0074\u003a\u0020\u0025\u0054", _bed)
+			_bgc, _ecae := _ac.GetDict(_bed)
+			if !_ecae {
+				_fd.Log.Debug("\u0045\u0052\u0052\u004f\u0052\u003a\u0020\u0063\u006f\u0075l\u0064\u0020\u006e\u006f\u0074\u0020\u0067e\u0074\u0020\u0066\u006f\u006e\u0074\u0020\u0064\u0069\u0063\u0074")
+				return _beg
+			}
+			_cfff, _cdb := _bb.NewPdfFontFromPdfObject(_bgc)
+			if _cdb != nil {
+				_fd.Log.Debug("\u0045\u0052\u0052\u004f\u0052\u003a\u0020\u0063\u006f\u0075\u006c\u0064\u0020\u006e\u006f\u0074\u0020\u006c\u006f\u0061\u0064\u0020\u0066\u006fn\u0074\u0020\u0066\u0072\u006fm\u0020\u006fb\u006a\u0065\u0063\u0074")
+				return _cdb
+			}
+			_gbf := _cfff.BaseFont()
+			if _gbf == "" {
+				_gbf = _gce.String()
+			}
+			_bag, _ecae := _aef[_gbf]
+			if !_ecae {
+				_bag, _cdb = _ef.NewTextFont(_cfff, _bgb)
+				if _cdb != nil {
+					_fd.Log.Debug("\u0045R\u0052\u004f\u0052\u003a\u0020\u0025v", _cdb)
+				}
+			}
+			if _bag == nil {
+				if len(_gbf) > 7 && _gbf[6] == '+' {
+					_gbf = _gbf[7:]
+				}
+				_cfea := []string{_gbf, "\u0054i\u006de\u0073\u0020\u004e\u0065\u0077\u0020\u0052\u006f\u006d\u0061\u006e", "\u0041\u0072\u0069a\u006c", "D\u0065\u006a\u0061\u0056\u0075\u0020\u0053\u0061\u006e\u0073"}
+				for _, _beaf := range _cfea {
+					_fd.Log.Debug("\u0044\u0045\u0042\u0055\u0047\u003a \u0073\u0065\u0061\u0072\u0063\u0068\u0069\u006e\u0067\u0020\u0073\u0079\u0073t\u0065\u006d\u0020\u0066\u006f\u006e\u0074 \u0060\u0025\u0073\u0060", _beaf)
+					if _bag, _ecae = _aef[_beaf]; _ecae {
+						break
+					}
+					_fddc := _fg.Match(_beaf)
+					if _fddc == nil {
+						_fd.Log.Debug("c\u006f\u0075\u006c\u0064\u0020\u006eo\u0074\u0020\u0066\u0069\u006e\u0064\u0020\u0066\u006fn\u0074\u0020\u0066i\u006ce\u0020\u0025\u0073", _beaf)
+						continue
+					}
+					_bag, _cdb = _ef.NewTextFontFromPath(_fddc.Filename, _bgb)
+					if _cdb != nil {
+						_fd.Log.Debug("c\u006f\u0075\u006c\u0064\u0020\u006eo\u0074\u0020\u006c\u006f\u0061\u0064\u0020\u0066\u006fn\u0074\u0020\u0066i\u006ce\u0020\u0025\u0073", _fddc.Filename)
+						continue
+					}
+					_fd.Log.Debug("\u0053\u0075\u0062\u0073\u0074\u0069t\u0075\u0074\u0069\u006e\u0067\u0020\u0066\u006f\u006e\u0074\u0020\u0025\u0073 \u0077\u0069\u0074\u0068\u0020\u0025\u0073 \u0028\u0025\u0073\u0029", _gbf, _fddc.Name, _fddc.Filename)
+					_aef[_beaf] = _bag
+					break
+				}
+			}
+			if _bag == nil {
+				_fd.Log.Debug("\u0045\u0052\u0052\u004f\u0052\u003a\u0020\u0063\u006f\u0075\u006c\u0064\u0020n\u006f\u0074\u0020\u0066\u0069\u006ed\u0020\u0061\u006e\u0079\u0020\u0073\u0075\u0069\u0074\u0061\u0062\u006c\u0065 \u0066\u006f\u006e\u0074")
+				return _e.New("\u0063\u006f\u0075\u006c\u0064\u0020\u006e\u006f\u0074\u0020\u0066\u0069\u006e\u0064\u0020a\u006ey\u0020\u0073\u0075\u0069\u0074\u0061\u0062\u006c\u0065\u0020\u0066\u006f\u006e\u0074")
+			}
+			_ecc.ProcTf(_bag.WithSize(_bgb, _cfff))
+		case "\u0042\u004d\u0043", "\u0042\u0044\u0043":
+			if len(_afb.Params) == 2 && _afb.Params[0].String() == "\u0041\u0072\u0074\u0069\u0066\u0061\u0063\u0074" {
+				_bba, _fcgb := _ac.GetDict(_afb.Params[1])
+				if _fcgb {
+					if _bba.Get("\u0053u\u0062\u0074\u0079\u0070\u0065") != nil && _bba.Get("\u0053u\u0062\u0074\u0079\u0070\u0065").String() == "\u0057a\u0074\u0065\u0072\u006d\u0061\u0072k" {
+						_ecc.Tr = _ef.TextRenderingModeInvisible
+					}
+				}
+			}
+		case "\u0045\u004d\u0043":
+		default:
+			_fd.Log.Debug("\u0045\u0052\u0052\u004f\u0052\u003a\u0020\u0075\u006e\u0073u\u0070\u0070\u006f\u0072\u0074\u0065\u0064 \u006f\u0070\u0065\u0072\u0061\u006e\u0064\u003a\u0020\u0025\u0073", _afb.Operand)
+		}
+		_abc = _afb
+		return nil
+	})
+	_eff = _add.Process(_fdaf)
+	if _eff != nil {
+		return _eff
+	}
+	return nil
+}
+
+var (
+	_beg = _e.New("\u0074\u0079p\u0065\u0020\u0063h\u0065\u0063\u006b\u0020\u0065\u0072\u0072\u006f\u0072")
+	_ggc = _e.New("\u0072\u0061\u006e\u0067\u0065\u0020\u0063\u0068\u0065\u0063\u006b\u0020e\u0072\u0072\u006f\u0072")
+)
+
+func _bfa(_fcba string, _aedg _da.Image) error {
+	_gaab, _egb := _fe.Create(_fcba)
+	if _egb != nil {
+		return _egb
+	}
+	defer _gaab.Close()
+	return _c.Encode(_gaab, _aedg)
+}
+
+func _fcda(_adbd _ef.Gradient, _afda *_bb.PdfFunctionType2, _bae _bb.PdfColorspace, _fag float64, _ccgb bool) (_ef.Gradient, error) {
+	switch _bae.(type) {
+	case *_bb.PdfColorspaceDeviceRGB:
+		if len(_afda.C0) != 3 || len(_afda.C1) != 3 {
+			return nil, _e.New("\u0069\u006e\u0063\u006f\u0072\u0072\u0065\u0063\u0074\u0020\u0052\u0047\u0042\u0020\u0063o\u006co\u0072\u0020\u0061\u0072\u0072\u0061\u0079\u0020\u006c\u0065\u006e\u0067\u0074\u0068")
+		}
+		_cbf := _afda.C0
+		_geg := _afda.C1
+		if _ccgb {
+			_adbd.AddColorStop(0.0, _aa.RGBA{R: uint8(_cbf[0] * 255), G: uint8(_cbf[1] * 255), B: uint8(_cbf[2] * 255), A: 255})
+		}
+		_adbd.AddColorStop(_fag, _aa.RGBA{R: uint8(_geg[0] * 255), G: uint8(_geg[1] * 255), B: uint8(_geg[2] * 255), A: 255})
+	case *_bb.PdfColorspaceDeviceCMYK:
+		if len(_afda.C0) != 4 || len(_afda.C1) != 4 {
+			return nil, _e.New("\u0069\u006e\u0063\u006f\u0072\u0072e\u0063\u0074\u0020\u0043\u004d\u0059\u004b\u0020\u0063\u006f\u006c\u006f\u0072 \u0061\u0072\u0072\u0061\u0079\u0020\u006ce\u006e\u0067\u0074\u0068")
+		}
+		_caaf := _afda.C0
+		_fdg := _afda.C1
+		if _ccgb {
+			_adbd.AddColorStop(0.0, _aa.CMYK{C: uint8(_caaf[0] * 255), M: uint8(_caaf[1] * 255), Y: uint8(_caaf[2] * 255), K: uint8(_caaf[3] * 255)})
+		}
+		_adbd.AddColorStop(_fag, _aa.CMYK{C: uint8(_fdg[0] * 255), M: uint8(_fdg[1] * 255), Y: uint8(_fdg[2] * 255), K: uint8(_fdg[3] * 255)})
+	default:
+		return nil, _b.Errorf("u\u006e\u0073\u0075\u0070\u0070\u006fr\u0074\u0065\u0064\u0020\u0063\u006f\u006c\u006f\u0072 \u0073\u0070\u0061c\u0065:\u0020\u0025\u0073", _bae.String())
+	}
+	return _adbd, nil
+}
+
+func _dag(_aeff string, _ecce _da.Image, _bfdg int) error {
+	_gged, _bec := _fe.Create(_aeff)
+	if _bec != nil {
+		return _bec
+	}
+	defer _gged.Close()
+	return _g.Encode(_gged, _ecce, &_g.Options{Quality: _bfdg})
+}
+
+func _ced(_gde _ac.PdfObject, _ebd _aa.Color) (_da.Image, error) {
+	_baab, _faeb := _ac.GetStream(_gde)
+	if !_faeb {
+		return nil, nil
+	}
+	_bffe, _gag := _bb.NewXObjectImageFromStream(_baab)
+	if _gag != nil {
+		return nil, _gag
+	}
+	_daedd, _gag := _bffe.ToImage()
+	if _gag != nil {
+		return nil, _gag
+	}
+	return _adcg(_daedd, _ebd), nil
+}
 
 // RenderToPath converts the specified PDF page into an image and saves the
 // result at the specified location.
-func (_ebc *ImageDevice )RenderToPath (page *_bb .PdfPage ,outputPath string )error {_cae ,_ecb :=_ebc .Render (page );if _ecb !=nil {return _ecb ;};_gd :=_ee .ToLower (_ec .Ext (outputPath ));if _gd ==""{return _e .New ("\u0063\u006ful\u0064\u0020\u006eo\u0074\u0020\u0072\u0065cog\u006eiz\u0065\u0020\u006f\u0075\u0074\u0070\u0075t \u0066\u0069\u006c\u0065\u0020\u0074\u0079p\u0065");
-};switch _gd {case "\u002e\u0070\u006e\u0067":return _bfa (outputPath ,_cae );case "\u002e\u006a\u0070\u0067","\u002e\u006a\u0070e\u0067":return _dag (outputPath ,_cae ,100);};return _b .Errorf ("\u0075\u006e\u0072\u0065\u0063\u006fg\u006e\u0069\u007a\u0065\u0064\u0020\u006f\u0075\u0074\u0070\u0075\u0074\u0020f\u0069\u006c\u0065\u0020\u0074\u0079\u0070e\u003a\u0020\u0025\u0073",_gd );
-};
+func (_ebc *ImageDevice) RenderToPath(page *_bb.PdfPage, outputPath string) error {
+	_cae, _ecb := _ebc.Render(page)
+	if _ecb != nil {
+		return _ecb
+	}
+	_gd := _ee.ToLower(_ec.Ext(outputPath))
+	if _gd == "" {
+		return _e.New("\u0063\u006ful\u0064\u0020\u006eo\u0074\u0020\u0072\u0065cog\u006eiz\u0065\u0020\u006f\u0075\u0074\u0070\u0075t \u0066\u0069\u006c\u0065\u0020\u0074\u0079p\u0065")
+	}
+	switch _gd {
+	case "\u002e\u0070\u006e\u0067":
+		return _bfa(outputPath, _cae)
+	case "\u002e\u006a\u0070\u0067", "\u002e\u006a\u0070e\u0067":
+		return _dag(outputPath, _cae, 100)
+	}
+	return _b.Errorf("\u0075\u006e\u0072\u0065\u0063\u006fg\u006e\u0069\u007a\u0065\u0064\u0020\u006f\u0075\u0074\u0070\u0075\u0074\u0020f\u0069\u006c\u0065\u0020\u0074\u0079\u0070e\u003a\u0020\u0025\u0073", _gd)
+}
 
 // RenderWithOpts converts the specified PDF page into an image, optionally flattens annotations and returns the result.
-func (_dc *ImageDevice )RenderWithOpts (page *_bb .PdfPage ,skipFlattening bool )(_da .Image ,error ){_dcb ,_gac :=page .GetMediaBox ();if _gac !=nil {return nil ,_gac ;};_dcb .Normalize ();_aae :=page .CropBox ;var _dd ,_gg float64 ;if _aae !=nil {_aae .Normalize ();
-_dd ,_gg =_aae .Width (),_aae .Height ();};_af :=page .Rotate ;_cd ,_gge ,_ea ,_bc :=_dcb .Llx ,_dcb .Lly ,_dcb .Width (),_dcb .Height ();_ab :=_efg .IdentityMatrix ();if _af !=nil &&*_af %360!=0&&*_af %90==0{_afe :=-float64 (*_af );_be :=_fgf (_ea ,_bc ,_afe );
-_ab =_ab .Translate ((_be .Width -_ea )/2+_ea /2,(_be .Height -_bc )/2+_bc /2).Rotate (_afe *_d .Pi /180).Translate (-_ea /2,-_bc /2);_ea ,_bc =_be .Width ,_be .Height ;if _aae !=nil {_abb :=_fgf (_dd ,_gg ,_afe );_dd ,_gg =_abb .Width ,_abb .Height ;};
-};if _cd !=0||_gge !=0{_ab =_ab .Translate (-_cd ,-_gge );};_dc ._aca =1.0;if _dc .OutputWidth !=0{_fa :=_ea ;if _aae !=nil {_fa =_dd ;};_dc ._aca =float64 (_dc .OutputWidth )/_fa ;_ea ,_bc ,_dd ,_gg =_ea *_dc ._aca ,_bc *_dc ._aca ,_dd *_dc ._aca ,_gg *_dc ._aca ;
-_ab =_efg .ScaleMatrix (_dc ._aca ,_dc ._aca ).Mult (_ab );};_fc :=_ga .NewContext (int (_ea ),int (_bc ));if _gc :=_dc .renderPage (_fc ,page ,_ab ,skipFlattening );_gc !=nil {return nil ,_gc ;};_aba :=_fc .Image ();if _aae !=nil {_bbc ,_de :=(_aae .Llx -_cd )*_dc ._aca ,(_aae .Lly -_gge )*_dc ._aca ;
-_ae :=_da .Rect (0,0,int (_dd ),int (_gg ));_fae :=_da .Pt (int (_bbc ),int (_bc -_de -_gg ));_cf :=_da .NewRGBA (_ae );_a .Draw (_cf ,_ae ,_aba ,_fae ,_a .Src );_aba =_cf ;};return _aba ,nil ;};func _fgf (_ege ,_dfbb ,_ddbd float64 )_ad .BoundingBox {return _ad .Path {Points :[]_ad .Point {_ad .NewPoint (0,0).Rotate (_ddbd ),_ad .NewPoint (_ege ,0).Rotate (_ddbd ),_ad .NewPoint (0,_dfbb ).Rotate (_ddbd ),_ad .NewPoint (_ege ,_dfbb ).Rotate (_ddbd )}}.GetBoundingBox ();
-};func (_adgb renderer )processShading (_afcb _ef .Context ,_fgc *_bb .PdfShading )(_ef .Gradient ,*_ac .PdfObjectArray ,error ){_acga :=int64 (*_fgc .ShadingType );if _acga ==int64 (ShadingTypeAxial ){return _adgb .processLinearShading (_afcb ,_fgc );
-}else if _acga ==int64 (ShadingTypeRadial ){return _adgb .processRadialShading (_afcb ,_fgc );}else {_fd .Log .Debug (_b .Sprintf ("\u0050r\u006f\u0063e\u0073\u0073\u0069n\u0067\u0020\u0067\u0072\u0061\u0064\u0069e\u006e\u0074\u0020\u0074\u0079\u0070e\u0020\u0025\u0064\u0020\u006e\u006f\u0074\u0020\u0079\u0065\u0074 \u0073\u0075\u0070\u0070\u006f\u0072\u0074\u0065\u0064",_acga ));
-};return nil ,nil ,nil ;};func _daeb (_adfc *_bb .Image )_da .Image {_efad ,_dfac :=int (_adfc .Width ),int (_adfc .Height );if _efad <=0||_dfac <=0{_fd .Log .Debug ("\u0069\u006e\u0076\u0061\u006c\u0069d\u0020\u0069\u006d\u0061\u0067\u0065\u0020\u0064\u0069\u006d\u0065\u006e\u0073i\u006f\u006e\u0073\u0020\u0028\u0025\u0064,\u0020\u0025\u0064\u0029",_efad ,_dfac );
-return nil ;};_gfg :=_da .NewRGBA (_da .Rect (0,0,_efad ,_dfac ));for _ecg :=0;_ecg < _dfac ;_ecg ++{for _baff :=0;_baff < _efad ;_baff ++{_fcgf ,_dcac :=_adfc .ColorAt (_baff ,_ecg );if _dcac !=nil {_fd .Log .Debug ("\u0063o\u0075l\u0064\u0020\u006e\u006f\u0074\u0020\u0072\u0065\u0074\u0072\u0069e\u0076\u0065\u0020\u0069m\u0061\u0067\u0065\u0020\u006da\u0073\u006b\u0020\u0076\u0061\u006c\u0075\u0065\u0020\u0061\u0074\u0020\u0028\u0025\u0064\u002c\u0020\u0025\u0064\u0029\u002e\u0020\u004f\u0075\u0074\u0070\u0075\u0074\u0020\u006d\u0061y\u0020\u0062\u0065\u0020\u0069\u006e\u0063\u006fr\u0072\u0065\u0063\u0074\u002e",_baff ,_ecg );
-continue ;};_cabc ,_bfeg ,_bfc ,_ :=_fcgf .RGBA ();var _bccc _aa .Color ;if _cabc +_bfeg +_bfc ==0{_bccc =_aa .Transparent ;}else {_egac :=uint8 (_ac .RGBToGrayscale (int (_cabc >>8),int (_bfeg >>8),int (_bfc >>8)));_bccc =_aa .RGBA {R :255,G :255,B :255,A :_egac };
-};_gfg .Set (_baff ,_ecg ,_bccc );};};return _gfg ;};
+func (_dc *ImageDevice) RenderWithOpts(page *_bb.PdfPage, skipFlattening bool) (_da.Image, error) {
+	_dcb, _gac := page.GetMediaBox()
+	if _gac != nil {
+		return nil, _gac
+	}
+	_dcb.Normalize()
+	_aae := page.CropBox
+	var _dd, _gg float64
+	if _aae != nil {
+		_aae.Normalize()
+		_dd, _gg = _aae.Width(), _aae.Height()
+	}
+	_af := page.Rotate
+	_cd, _gge, _ea, _bc := _dcb.Llx, _dcb.Lly, _dcb.Width(), _dcb.Height()
+	_ab := _efg.IdentityMatrix()
+	if _af != nil && *_af%360 != 0 && *_af%90 == 0 {
+		_afe := -float64(*_af)
+		_be := _fgf(_ea, _bc, _afe)
+		_ab = _ab.Translate((_be.Width-_ea)/2+_ea/2, (_be.Height-_bc)/2+_bc/2).Rotate(_afe*_d.Pi/180).Translate(-_ea/2, -_bc/2)
+		_ea, _bc = _be.Width, _be.Height
+		if _aae != nil {
+			_abb := _fgf(_dd, _gg, _afe)
+			_dd, _gg = _abb.Width, _abb.Height
+		}
+	}
+	if _cd != 0 || _gge != 0 {
+		_ab = _ab.Translate(-_cd, -_gge)
+	}
+	_dc._aca = 1.0
+	if _dc.OutputWidth != 0 {
+		_fa := _ea
+		if _aae != nil {
+			_fa = _dd
+		}
+		_dc._aca = float64(_dc.OutputWidth) / _fa
+		_ea, _bc, _dd, _gg = _ea*_dc._aca, _bc*_dc._aca, _dd*_dc._aca, _gg*_dc._aca
+		_ab = _efg.ScaleMatrix(_dc._aca, _dc._aca).Mult(_ab)
+	}
+	_fc := _ga.NewContext(int(_ea), int(_bc))
+	if _gc := _dc.renderPage(_fc, page, _ab, skipFlattening); _gc != nil {
+		return nil, _gc
+	}
+	_aba := _fc.Image()
+	if _aae != nil {
+		_bbc, _de := (_aae.Llx-_cd)*_dc._aca, (_aae.Lly-_gge)*_dc._aca
+		_ae := _da.Rect(0, 0, int(_dd), int(_gg))
+		_fae := _da.Pt(int(_bbc), int(_bc-_de-_gg))
+		_cf := _da.NewRGBA(_ae)
+		_a.Draw(_cf, _ae, _aba, _fae, _a.Src)
+		_aba = _cf
+	}
+	return _aba, nil
+}
+
+func _fgf(_ege, _dfbb, _ddbd float64) _ad.BoundingBox {
+	return _ad.Path{Points: []_ad.Point{_ad.NewPoint(0, 0).Rotate(_ddbd), _ad.NewPoint(_ege, 0).Rotate(_ddbd), _ad.NewPoint(0, _dfbb).Rotate(_ddbd), _ad.NewPoint(_ege, _dfbb).Rotate(_ddbd)}}.GetBoundingBox()
+}
+
+func (_adgb renderer) processShading(_afcb _ef.Context, _fgc *_bb.PdfShading) (_ef.Gradient, *_ac.PdfObjectArray, error) {
+	_acga := int64(*_fgc.ShadingType)
+	if _acga == int64(ShadingTypeAxial) {
+		return _adgb.processLinearShading(_afcb, _fgc)
+	} else if _acga == int64(ShadingTypeRadial) {
+		return _adgb.processRadialShading(_afcb, _fgc)
+	} else {
+		_fd.Log.Debug(_b.Sprintf("\u0050r\u006f\u0063e\u0073\u0073\u0069n\u0067\u0020\u0067\u0072\u0061\u0064\u0069e\u006e\u0074\u0020\u0074\u0079\u0070e\u0020\u0025\u0064\u0020\u006e\u006f\u0074\u0020\u0079\u0065\u0074 \u0073\u0075\u0070\u0070\u006f\u0072\u0074\u0065\u0064", _acga))
+	}
+	return nil, nil, nil
+}
+
+func _daeb(_adfc *_bb.Image) _da.Image {
+	_efad, _dfac := int(_adfc.Width), int(_adfc.Height)
+	if _efad <= 0 || _dfac <= 0 {
+		_fd.Log.Debug("\u0069\u006e\u0076\u0061\u006c\u0069d\u0020\u0069\u006d\u0061\u0067\u0065\u0020\u0064\u0069\u006d\u0065\u006e\u0073i\u006f\u006e\u0073\u0020\u0028\u0025\u0064,\u0020\u0025\u0064\u0029", _efad, _dfac)
+		return nil
+	}
+	_gfg := _da.NewRGBA(_da.Rect(0, 0, _efad, _dfac))
+	for _ecg := 0; _ecg < _dfac; _ecg++ {
+		for _baff := 0; _baff < _efad; _baff++ {
+			_fcgf, _dcac := _adfc.ColorAt(_baff, _ecg)
+			if _dcac != nil {
+				_fd.Log.Debug("\u0063o\u0075l\u0064\u0020\u006e\u006f\u0074\u0020\u0072\u0065\u0074\u0072\u0069e\u0076\u0065\u0020\u0069m\u0061\u0067\u0065\u0020\u006da\u0073\u006b\u0020\u0076\u0061\u006c\u0075\u0065\u0020\u0061\u0074\u0020\u0028\u0025\u0064\u002c\u0020\u0025\u0064\u0029\u002e\u0020\u004f\u0075\u0074\u0070\u0075\u0074\u0020\u006d\u0061y\u0020\u0062\u0065\u0020\u0069\u006e\u0063\u006fr\u0072\u0065\u0063\u0074\u002e", _baff, _ecg)
+				continue
+			}
+			_cabc, _bfeg, _bfc, _ := _fcgf.RGBA()
+			var _bccc _aa.Color
+			if _cabc+_bfeg+_bfc == 0 {
+				_bccc = _aa.Transparent
+			} else {
+				_egac := uint8(_ac.RGBToGrayscale(int(_cabc>>8), int(_bfeg>>8), int(_bfc>>8)))
+				_bccc = _aa.RGBA{R: 255, G: 255, B: 255, A: _egac}
+			}
+			_gfg.Set(_baff, _ecg, _bccc)
+		}
+	}
+	return _gfg
+}

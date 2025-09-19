@@ -9,13 +9,101 @@
 // Use of this source code is governed by the UniDoc End User License Agreement
 // terms that can be accessed at https://unidoc.io/eula/
 
-package decoder ;import (_g "github.com/unidoc/unipdf/v4/internal/bitwise";_gc "github.com/unidoc/unipdf/v4/internal/jbig2/bitmap";_ga "github.com/unidoc/unipdf/v4/internal/jbig2/document";_c "github.com/unidoc/unipdf/v4/internal/jbig2/errors";_d "image";
-);func (_gb *Decoder )DecodePage (pageNumber int )([]byte ,error ){return _gb .decodePage (pageNumber )};func (_ag *Decoder )DecodePageImage (pageNumber int )(_d .Image ,error ){const _gce ="\u0064\u0065\u0063od\u0065\u0072\u002e\u0044\u0065\u0063\u006f\u0064\u0065\u0050\u0061\u0067\u0065\u0049\u006d\u0061\u0067\u0065";
-_ae ,_gbf :=_ag .decodePageImage (pageNumber );if _gbf !=nil {return nil ,_c .Wrap (_gbf ,_gce ,"");};return _ae ,nil ;};type Decoder struct{_dc *_g .Reader ;_e *_ga .Document ;_b int ;_db Parameters ;};func (_gcg *Decoder )decodePageImage (_gae int )(_d .Image ,error ){const _deg ="\u0064e\u0063o\u0064\u0065\u0050\u0061\u0067\u0065\u0049\u006d\u0061\u0067\u0065";
-if _gae < 0{return nil ,_c .Errorf (_deg ,"\u0069n\u0076\u0061\u006c\u0069d\u0020\u0070\u0061\u0067\u0065 \u006eu\u006db\u0065\u0072\u003a\u0020\u0027\u0025\u0064'",_gae );};if _gae > int (_gcg ._e .NumberOfPages ){return nil ,_c .Errorf (_deg ,"p\u0061\u0067\u0065\u003a\u0020\u0027%\u0064\u0027\u0020\u006e\u006f\u0074 \u0066\u006f\u0075\u006e\u0064\u0020\u0069n\u0020\u0074\u0068\u0065\u0020\u0064\u0065\u0063\u006f\u0064e\u0072",_gae );
-};_ef ,_ad :=_gcg ._e .GetPage (_gae );if _ad !=nil {return nil ,_c .Wrap (_ad ,_deg ,"");};_dd ,_ad :=_ef .GetBitmap ();if _ad !=nil {return nil ,_c .Wrap (_ad ,_deg ,"");};_dd .InverseData ();return _dd .ToImage (),nil ;};func (_de *Decoder )decodePage (_gd int )([]byte ,error ){const _cg ="\u0064\u0065\u0063\u006f\u0064\u0065\u0050\u0061\u0067\u0065";
-if _gd < 0{return nil ,_c .Errorf (_cg ,"\u0069n\u0076\u0061\u006c\u0069d\u0020\u0070\u0061\u0067\u0065 \u006eu\u006db\u0065\u0072\u003a\u0020\u0027\u0025\u0064'",_gd );};if _gd > int (_de ._e .NumberOfPages ){return nil ,_c .Errorf (_cg ,"p\u0061\u0067\u0065\u003a\u0020\u0027%\u0064\u0027\u0020\u006e\u006f\u0074 \u0066\u006f\u0075\u006e\u0064\u0020\u0069n\u0020\u0074\u0068\u0065\u0020\u0064\u0065\u0063\u006f\u0064e\u0072",_gd );
-};_cbg ,_ed :=_de ._e .GetPage (_gd );if _ed !=nil {return nil ,_c .Wrap (_ed ,_cg ,"");};_ba ,_ed :=_cbg .GetBitmap ();if _ed !=nil {return nil ,_c .Wrap (_ed ,_cg ,"");};_ba .InverseData ();if !_de ._db .UnpaddedData {return _ba .Data ,nil ;};return _ba .GetUnpaddedData ();
-};func (_cd *Decoder )DecodeNextPage ()([]byte ,error ){_cd ._b ++;_cb :=_cd ._b ;return _cd .decodePage (_cb );};func Decode (input []byte ,parameters Parameters ,globals *_ga .Globals )(*Decoder ,error ){_eg :=_g .NewReader (input );_dg ,_ddf :=_ga .DecodeDocument (_eg ,globals );
-if _ddf !=nil {return nil ,_ddf ;};return &Decoder {_dc :_eg ,_e :_dg ,_db :parameters },nil ;};type Parameters struct{UnpaddedData bool ;Color _gc .Color ;};func (_f *Decoder )PageNumber ()(int ,error ){const _bf ="\u0044e\u0063o\u0064\u0065\u0072\u002e\u0050a\u0067\u0065N\u0075\u006d\u0062\u0065\u0072";
-if _f ._e ==nil {return 0,_c .Error (_bf ,"d\u0065\u0063\u006f\u0064\u0065\u0072 \u006e\u006f\u0074\u0020\u0069\u006e\u0069\u0074\u0069a\u006c\u0069\u007ae\u0064 \u0079\u0065\u0074");};return int (_f ._e .NumberOfPages ),nil ;};
+package decoder
+
+import (
+	_g "github.com/szwede/unipdf/v4/internal/bitwise"
+	_gc "github.com/szwede/unipdf/v4/internal/jbig2/bitmap"
+	_ga "github.com/szwede/unipdf/v4/internal/jbig2/document"
+	_c "github.com/szwede/unipdf/v4/internal/jbig2/errors"
+	_d "image"
+)
+
+func (_gb *Decoder) DecodePage(pageNumber int) ([]byte, error) { return _gb.decodePage(pageNumber) }
+
+func (_ag *Decoder) DecodePageImage(pageNumber int) (_d.Image, error) {
+	const _gce = "\u0064\u0065\u0063od\u0065\u0072\u002e\u0044\u0065\u0063\u006f\u0064\u0065\u0050\u0061\u0067\u0065\u0049\u006d\u0061\u0067\u0065"
+	_ae, _gbf := _ag.decodePageImage(pageNumber)
+	if _gbf != nil {
+		return nil, _c.Wrap(_gbf, _gce, "")
+	}
+	return _ae, nil
+}
+
+type Decoder struct {
+	_dc *_g.Reader
+	_e  *_ga.Document
+	_b  int
+	_db Parameters
+}
+
+func (_gcg *Decoder) decodePageImage(_gae int) (_d.Image, error) {
+	const _deg = "\u0064e\u0063o\u0064\u0065\u0050\u0061\u0067\u0065\u0049\u006d\u0061\u0067\u0065"
+	if _gae < 0 {
+		return nil, _c.Errorf(_deg, "\u0069n\u0076\u0061\u006c\u0069d\u0020\u0070\u0061\u0067\u0065 \u006eu\u006db\u0065\u0072\u003a\u0020\u0027\u0025\u0064'", _gae)
+	}
+	if _gae > int(_gcg._e.NumberOfPages) {
+		return nil, _c.Errorf(_deg, "p\u0061\u0067\u0065\u003a\u0020\u0027%\u0064\u0027\u0020\u006e\u006f\u0074 \u0066\u006f\u0075\u006e\u0064\u0020\u0069n\u0020\u0074\u0068\u0065\u0020\u0064\u0065\u0063\u006f\u0064e\u0072", _gae)
+	}
+	_ef, _ad := _gcg._e.GetPage(_gae)
+	if _ad != nil {
+		return nil, _c.Wrap(_ad, _deg, "")
+	}
+	_dd, _ad := _ef.GetBitmap()
+	if _ad != nil {
+		return nil, _c.Wrap(_ad, _deg, "")
+	}
+	_dd.InverseData()
+	return _dd.ToImage(), nil
+}
+
+func (_de *Decoder) decodePage(_gd int) ([]byte, error) {
+	const _cg = "\u0064\u0065\u0063\u006f\u0064\u0065\u0050\u0061\u0067\u0065"
+	if _gd < 0 {
+		return nil, _c.Errorf(_cg, "\u0069n\u0076\u0061\u006c\u0069d\u0020\u0070\u0061\u0067\u0065 \u006eu\u006db\u0065\u0072\u003a\u0020\u0027\u0025\u0064'", _gd)
+	}
+	if _gd > int(_de._e.NumberOfPages) {
+		return nil, _c.Errorf(_cg, "p\u0061\u0067\u0065\u003a\u0020\u0027%\u0064\u0027\u0020\u006e\u006f\u0074 \u0066\u006f\u0075\u006e\u0064\u0020\u0069n\u0020\u0074\u0068\u0065\u0020\u0064\u0065\u0063\u006f\u0064e\u0072", _gd)
+	}
+	_cbg, _ed := _de._e.GetPage(_gd)
+	if _ed != nil {
+		return nil, _c.Wrap(_ed, _cg, "")
+	}
+	_ba, _ed := _cbg.GetBitmap()
+	if _ed != nil {
+		return nil, _c.Wrap(_ed, _cg, "")
+	}
+	_ba.InverseData()
+	if !_de._db.UnpaddedData {
+		return _ba.Data, nil
+	}
+	return _ba.GetUnpaddedData()
+}
+
+func (_cd *Decoder) DecodeNextPage() ([]byte, error) {
+	_cd._b++
+	_cb := _cd._b
+	return _cd.decodePage(_cb)
+}
+
+func Decode(input []byte, parameters Parameters, globals *_ga.Globals) (*Decoder, error) {
+	_eg := _g.NewReader(input)
+	_dg, _ddf := _ga.DecodeDocument(_eg, globals)
+	if _ddf != nil {
+		return nil, _ddf
+	}
+	return &Decoder{_dc: _eg, _e: _dg, _db: parameters}, nil
+}
+
+type Parameters struct {
+	UnpaddedData bool
+	Color        _gc.Color
+}
+
+func (_f *Decoder) PageNumber() (int, error) {
+	const _bf = "\u0044e\u0063o\u0064\u0065\u0072\u002e\u0050a\u0067\u0065N\u0075\u006d\u0062\u0065\u0072"
+	if _f._e == nil {
+		return 0, _c.Error(_bf, "d\u0065\u0063\u006f\u0064\u0065\u0072 \u006e\u006f\u0074\u0020\u0069\u006e\u0069\u0074\u0069a\u006c\u0069\u007ae\u0064 \u0079\u0065\u0074")
+	}
+	return int(_f._e.NumberOfPages), nil
+}

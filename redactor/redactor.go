@@ -9,104 +9,930 @@
 // Use of this source code is governed by the UniDoc End User License Agreement
 // terms that can be accessed at https://unidoc.io/eula/
 
-package redactor ;import (_d "errors";_b "fmt";_ba "github.com/unidoc/unipdf/v4/common";_bc "github.com/unidoc/unipdf/v4/contentstream";_fd "github.com/unidoc/unipdf/v4/core";_dg "github.com/unidoc/unipdf/v4/creator";_bf "github.com/unidoc/unipdf/v4/extractor";
-_c "github.com/unidoc/unipdf/v4/model";_de "io";_f "regexp";_e "sort";_fa "strings";);
+package redactor
+
+import (
+	_d "errors"
+	_b "fmt"
+	_ba "github.com/szwede/unipdf/v4/common"
+	_bc "github.com/szwede/unipdf/v4/contentstream"
+	_fd "github.com/szwede/unipdf/v4/core"
+	_dg "github.com/szwede/unipdf/v4/creator"
+	_bf "github.com/szwede/unipdf/v4/extractor"
+	_c "github.com/szwede/unipdf/v4/model"
+	_de "io"
+	_f "regexp"
+	_e "sort"
+	_fa "strings"
+)
 
 // Write writes the content of `re.creator` to writer of type io.Writer interface.
-func (_cfc *Redactor )Write (writer _de .Writer )error {return _cfc ._cbe .Write (writer )};func _gfc (_dag *_bc .ContentStreamOperations ,PdfObj _fd .PdfObject )(*_bc .ContentStreamOperation ,int ,bool ){for _aaa ,_ggeb :=range *_dag {_dea :=_ggeb .Operand ;
-if _dea =="\u0054\u006a"{_ade :=_fd .TraceToDirectObject (_ggeb .Params [0]);if _ade ==PdfObj {return _ggeb ,_aaa ,true ;};}else if _dea =="\u0054\u004a"{_dgf ,_cgag :=_fd .GetArray (_ggeb .Params [0]);if !_cgag {return nil ,_aaa ,_cgag ;};for _ ,_efg :=range _dgf .Elements (){if _efg ==PdfObj {return _ggeb ,_aaa ,true ;
-};};}else if _dea =="\u0022"{_fecd :=_fd .TraceToDirectObject (_ggeb .Params [2]);if _fecd ==PdfObj {return _ggeb ,_aaa ,true ;};}else if _dea =="\u0027"{_fecb :=_fd .TraceToDirectObject (_ggeb .Params [0]);if _fecb ==PdfObj {return _ggeb ,_aaa ,true ;
-};};};return nil ,-1,false ;};func _ffe (_agb *_bf .TextMarkArray )(_fd .PdfObject ,int ){var _adf _fd .PdfObject ;_cf :=-1;for _cdg ,_ffd :=range _agb .Elements (){_adf =_ffd .DirectObject ;_cf =_cdg ;if _adf !=nil {break ;};};return _adf ,_cf ;};func _ccge (_dbcg []*matchedIndex ,_eeed [][]int )[]*matchedIndex {_abgbd :=[]*matchedIndex {};
-for _ ,_bccg :=range _dbcg {_daafd ,_gda :=_bedc (_bccg ,_eeed );if _daafd {_bbg :=_gdbg (_bccg ,_gda );_abgbd =append (_abgbd ,_bbg ...);}else {_abgbd =append (_abgbd ,_bccg );};};return _abgbd ;};
+func (_cfc *Redactor) Write(writer _de.Writer) error { return _cfc._cbe.Write(writer) }
+
+func _gfc(_dag *_bc.ContentStreamOperations, PdfObj _fd.PdfObject) (*_bc.ContentStreamOperation, int, bool) {
+	for _aaa, _ggeb := range *_dag {
+		_dea := _ggeb.Operand
+		if _dea == "\u0054\u006a" {
+			_ade := _fd.TraceToDirectObject(_ggeb.Params[0])
+			if _ade == PdfObj {
+				return _ggeb, _aaa, true
+			}
+		} else if _dea == "\u0054\u004a" {
+			_dgf, _cgag := _fd.GetArray(_ggeb.Params[0])
+			if !_cgag {
+				return nil, _aaa, _cgag
+			}
+			for _, _efg := range _dgf.Elements() {
+				if _efg == PdfObj {
+					return _ggeb, _aaa, true
+				}
+			}
+		} else if _dea == "\u0022" {
+			_fecd := _fd.TraceToDirectObject(_ggeb.Params[2])
+			if _fecd == PdfObj {
+				return _ggeb, _aaa, true
+			}
+		} else if _dea == "\u0027" {
+			_fecb := _fd.TraceToDirectObject(_ggeb.Params[0])
+			if _fecb == PdfObj {
+				return _ggeb, _aaa, true
+			}
+		}
+	}
+	return nil, -1, false
+}
+
+func _ffe(_agb *_bf.TextMarkArray) (_fd.PdfObject, int) {
+	var _adf _fd.PdfObject
+	_cf := -1
+	for _cdg, _ffd := range _agb.Elements() {
+		_adf = _ffd.DirectObject
+		_cf = _cdg
+		if _adf != nil {
+			break
+		}
+	}
+	return _adf, _cf
+}
+
+func _ccge(_dbcg []*matchedIndex, _eeed [][]int) []*matchedIndex {
+	_abgbd := []*matchedIndex{}
+	for _, _bccg := range _dbcg {
+		_daafd, _gda := _bedc(_bccg, _eeed)
+		if _daafd {
+			_bbg := _gdbg(_bccg, _gda)
+			_abgbd = append(_abgbd, _bbg...)
+		} else {
+			_abgbd = append(_abgbd, _bccg)
+		}
+	}
+	return _abgbd
+}
 
 // RedactionOptions is a collection of RedactionTerm objects.
-type RedactionOptions struct{Terms []RedactionTerm ;};type localSpanMarks struct{_aag *_bf .TextMarkArray ;_cgadc int ;_egba string ;};func _fed (_ffgc ,_dbb string )[]int {if len (_dbb )==0{return nil ;};var _aaab []int ;for _dgfe :=0;_dgfe < len (_ffgc );
-{_gfe :=_fa .Index (_ffgc [_dgfe :],_dbb );if _gfe < 0{return _aaab ;};_aaab =append (_aaab ,_dgfe +_gfe );_dgfe +=_gfe +len (_dbb );};return _aaab ;};func _ggea (_gee *_bf .TextMarkArray )string {_fba :="";for _ ,_eeac :=range _gee .Elements (){_fba +=_eeac .Text ;
-};return _fba ;};
+type RedactionOptions struct{ Terms []RedactionTerm }
+
+type localSpanMarks struct {
+	_aag   *_bf.TextMarkArray
+	_cgadc int
+	_egba  string
+}
+
+func _fed(_ffgc, _dbb string) []int {
+	if len(_dbb) == 0 {
+		return nil
+	}
+	var _aaab []int
+	for _dgfe := 0; _dgfe < len(_ffgc); {
+		_gfe := _fa.Index(_ffgc[_dgfe:], _dbb)
+		if _gfe < 0 {
+			return _aaab
+		}
+		_aaab = append(_aaab, _dgfe+_gfe)
+		_dgfe += _gfe + len(_dbb)
+	}
+	return _aaab
+}
+
+func _ggea(_gee *_bf.TextMarkArray) string {
+	_fba := ""
+	for _, _eeac := range _gee.Elements() {
+		_fba += _eeac.Text
+	}
+	return _fba
+}
 
 // RedactRectanglePropsNew return a new pointer to a default RectangleProps object.
-func RedactRectanglePropsNew ()*RectangleProps {return &RectangleProps {FillColor :_dg .ColorBlack ,BorderWidth :0.0,FillOpacity :1.0};};func _fbc (_aeba _fd .PdfObject ,_fcf *_c .PdfFont )(string ,error ){_fae ,_acb :=_fd .GetStringBytes (_aeba );if !_acb {return "",_fd .ErrTypeError ;
-};_gdde :=_fcf .BytesToCharcodes (_fae );_aaad ,_bcce ,_cfda :=_fcf .CharcodesToStrings (_gdde ,"");if _cfda > 0{_ba .Log .Debug ("\u0072\u0065nd\u0065\u0072\u0054e\u0078\u0074\u003a\u0020num\u0043ha\u0072\u0073\u003d\u0025\u0064\u0020\u006eum\u004d\u0069\u0073\u0073\u0065\u0073\u003d%\u0064",_bcce ,_cfda );
-};_ffa :=_fa .Join (_aaad ,"");return _ffa ,nil ;};func _fabe (_adea RedactionTerm )(*regexMatcher ,error ){return &regexMatcher {_dbg :_adea },nil };func (_ffec *Redactor )redactPage (_cgff *_bc .ContentStreamOperations ,_def *_c .PdfPageResources )([]matchedBBox ,*_bc .ContentStreamOperations ,error ){_cea ,_deg :=_bf .NewFromContents (_cgff .String (),_def );
-if _deg !=nil {return nil ,nil ,_deg ;};_cddab ,_ ,_ ,_deg :=_cea .ExtractPageText ();if _deg !=nil {return nil ,nil ,_deg ;};_cgff =_cddab .GetContentStreamOps ();_bcde :=_cddab .Marks ();_fcfa :=_cddab .Text ();_fcfa ,_gag :=_gdba (_fcfa );_ccg :=[]matchedBBox {};
-_gdg :=make (map[_fd .PdfObject ][]localSpanMarks );_dddc :=[]*targetMap {};for _ ,_bee :=range _ffec ._bcg .Terms {_gfa ,_cee :=_fabe (_bee );if _cee !=nil {return nil ,nil ,_cee ;};_eaa ,_cee :=_gfa .match (_fcfa );if _cee !=nil {return nil ,nil ,_cee ;
-};_eaa =_ccge (_eaa ,_gag );_cgfg :=_aae (_eaa );_dddc =append (_dddc ,_cgfg ...);};_cgbe (_dddc );for _ ,_eabf :=range _dddc {_dgfea :=_eabf ._daafg ;_ggb :=_eabf ._eab ;_gdb :=[]matchedBBox {};for _ ,_eda :=range _ggb {_dffg ,_dadf ,_gcc :=_abgb (_eda ,_bcde ,_dgfea );
-if _gcc !=nil {return nil ,nil ,_gcc ;};_bccef :=_ceg (_dffg );for _ead ,_cgfa :=range _bccef {_gccg :=localSpanMarks {_aag :_cgfa ,_cgadc :_ead ,_egba :_dgfea };_agf ,_ :=_ffe (_cgfa );if _ceab ,_fdg :=_gdg [_agf ];_fdg {_gdg [_agf ]=append (_ceab ,_gccg );
-}else {_gdg [_agf ]=[]localSpanMarks {_gccg };};};_gdb =append (_gdb ,_dadf );};_ccg =append (_ccg ,_gdb ...);};_deg =_fe (_cgff ,_gdg );if _deg !=nil {return nil ,nil ,_deg ;};return _ccg ,_cgff ,nil ;};func _fec (_aa *_bc .ContentStreamOperation ,_ce _fd .PdfObject ,_abg []localSpanMarks )error {_fca ,_dc :=_fd .GetArray (_aa .Params [0]);
-_ded :=[]_fd .PdfObject {};if !_dc {_ba .Log .Debug ("\u0045\u0052\u0052OR\u003a\u0020\u0054\u004a\u0020\u006f\u0070\u003d\u0025s\u0020G\u0065t\u0041r\u0072\u0061\u0079\u0056\u0061\u006c\u0020\u0066\u0061\u0069\u006c\u0065\u0064",_aa );return _b .Errorf ("\u0073\u0070\u0061\u006e\u004d\u0061\u0072\u006bs\u002e\u0042\u0042ox\u0020\u0068\u0061\u0073\u0020\u006eo\u0020\u0062\u006f\u0075\u006e\u0064\u0069\u006e\u0067\u0020\u0062\u006f\u0078\u002e\u0020s\u0070\u0061\u006e\u004d\u0061\u0072\u006b\u0073=\u0025\u0073",_aa );
-};_af ,_gc :=_ef (_abg );if len (_gc )==1{_cfg :=_gc [0];_cgc :=_af [_cfg ];if len (_cgc )==1{_bg :=_cgc [0];_gf :=_bg ._aag ;_fcc :=_edg (_gf );_age ,_beb :=_fbc (_ce ,_fcc );if _beb !=nil {return _beb ;};_ed ,_beb :=_aff (_bg ,_gf ,_fcc ,_age ,_cfg );
-if _beb !=nil {return _beb ;};for _ ,_ga :=range _fca .Elements (){if _ga ==_ce {_ded =append (_ded ,_ed ...);}else {_ded =append (_ded ,_ga );};};}else {_dedg :=_cgc [0]._aag ;_bb :=_edg (_dedg );_gaa ,_dfb :=_fbc (_ce ,_bb );if _dfb !=nil {return _dfb ;
-};_fgc ,_dfb :=_bgg (_gaa ,_cgc );if _dfb !=nil {return _dfb ;};_fee :=_abf (_fgc );_eb :=_eac (_gaa ,_fee ,_bb );for _ ,_cdd :=range _fca .Elements (){if _cdd ==_ce {_ded =append (_ded ,_eb ...);}else {_ded =append (_ded ,_cdd );};};};_aa .Params [0]=_fd .MakeArray (_ded ...);
-}else if len (_gc )> 1{_bed :=_abg [0];_cga :=_bed ._aag ;_ ,_ac :=_ffe (_cga );_bgb :=_cga .Elements ()[_ac ];_ecd :=_bgb .Font ;_bfbc ,_bfa :=_fbc (_ce ,_ecd );if _bfa !=nil {return _bfa ;};_ea ,_bfa :=_bgg (_bfbc ,_abg );if _bfa !=nil {return _bfa ;
-};_dd :=_abf (_ea );_ecc :=_eac (_bfbc ,_dd ,_ecd );for _ ,_aed :=range _fca .Elements (){if _aed ==_ce {_ded =append (_ded ,_ecc ...);}else {_ded =append (_ded ,_aed );};};_aa .Params [0]=_fd .MakeArray (_ded ...);};return nil ;};type placeHolders struct{_cc []int ;
-_ae string ;_ab float64 ;};func _bada (_beba ,_cddf ,_bfc float64 )float64 {_bfc =_bfc /100;_bcb :=(-1000*_beba )/(_cddf *_bfc );return _bcb ;};type matchedIndex struct{_dbf int ;_cgca int ;_gcf string ;};
+func RedactRectanglePropsNew() *RectangleProps {
+	return &RectangleProps{FillColor: _dg.ColorBlack, BorderWidth: 0.0, FillOpacity: 1.0}
+}
+
+func _fbc(_aeba _fd.PdfObject, _fcf *_c.PdfFont) (string, error) {
+	_fae, _acb := _fd.GetStringBytes(_aeba)
+	if !_acb {
+		return "", _fd.ErrTypeError
+	}
+	_gdde := _fcf.BytesToCharcodes(_fae)
+	_aaad, _bcce, _cfda := _fcf.CharcodesToStrings(_gdde, "")
+	if _cfda > 0 {
+		_ba.Log.Debug("\u0072\u0065nd\u0065\u0072\u0054e\u0078\u0074\u003a\u0020num\u0043ha\u0072\u0073\u003d\u0025\u0064\u0020\u006eum\u004d\u0069\u0073\u0073\u0065\u0073\u003d%\u0064", _bcce, _cfda)
+	}
+	_ffa := _fa.Join(_aaad, "")
+	return _ffa, nil
+}
+
+func _fabe(_adea RedactionTerm) (*regexMatcher, error) { return &regexMatcher{_dbg: _adea}, nil }
+
+func (_ffec *Redactor) redactPage(_cgff *_bc.ContentStreamOperations, _def *_c.PdfPageResources) ([]matchedBBox, *_bc.ContentStreamOperations, error) {
+	_cea, _deg := _bf.NewFromContents(_cgff.String(), _def)
+	if _deg != nil {
+		return nil, nil, _deg
+	}
+	_cddab, _, _, _deg := _cea.ExtractPageText()
+	if _deg != nil {
+		return nil, nil, _deg
+	}
+	_cgff = _cddab.GetContentStreamOps()
+	_bcde := _cddab.Marks()
+	_fcfa := _cddab.Text()
+	_fcfa, _gag := _gdba(_fcfa)
+	_ccg := []matchedBBox{}
+	_gdg := make(map[_fd.PdfObject][]localSpanMarks)
+	_dddc := []*targetMap{}
+	for _, _bee := range _ffec._bcg.Terms {
+		_gfa, _cee := _fabe(_bee)
+		if _cee != nil {
+			return nil, nil, _cee
+		}
+		_eaa, _cee := _gfa.match(_fcfa)
+		if _cee != nil {
+			return nil, nil, _cee
+		}
+		_eaa = _ccge(_eaa, _gag)
+		_cgfg := _aae(_eaa)
+		_dddc = append(_dddc, _cgfg...)
+	}
+	_cgbe(_dddc)
+	for _, _eabf := range _dddc {
+		_dgfea := _eabf._daafg
+		_ggb := _eabf._eab
+		_gdb := []matchedBBox{}
+		for _, _eda := range _ggb {
+			_dffg, _dadf, _gcc := _abgb(_eda, _bcde, _dgfea)
+			if _gcc != nil {
+				return nil, nil, _gcc
+			}
+			_bccef := _ceg(_dffg)
+			for _ead, _cgfa := range _bccef {
+				_gccg := localSpanMarks{_aag: _cgfa, _cgadc: _ead, _egba: _dgfea}
+				_agf, _ := _ffe(_cgfa)
+				if _ceab, _fdg := _gdg[_agf]; _fdg {
+					_gdg[_agf] = append(_ceab, _gccg)
+				} else {
+					_gdg[_agf] = []localSpanMarks{_gccg}
+				}
+			}
+			_gdb = append(_gdb, _dadf)
+		}
+		_ccg = append(_ccg, _gdb...)
+	}
+	_deg = _fe(_cgff, _gdg)
+	if _deg != nil {
+		return nil, nil, _deg
+	}
+	return _ccg, _cgff, nil
+}
+
+func _fec(_aa *_bc.ContentStreamOperation, _ce _fd.PdfObject, _abg []localSpanMarks) error {
+	_fca, _dc := _fd.GetArray(_aa.Params[0])
+	_ded := []_fd.PdfObject{}
+	if !_dc {
+		_ba.Log.Debug("\u0045\u0052\u0052OR\u003a\u0020\u0054\u004a\u0020\u006f\u0070\u003d\u0025s\u0020G\u0065t\u0041r\u0072\u0061\u0079\u0056\u0061\u006c\u0020\u0066\u0061\u0069\u006c\u0065\u0064", _aa)
+		return _b.Errorf("\u0073\u0070\u0061\u006e\u004d\u0061\u0072\u006bs\u002e\u0042\u0042ox\u0020\u0068\u0061\u0073\u0020\u006eo\u0020\u0062\u006f\u0075\u006e\u0064\u0069\u006e\u0067\u0020\u0062\u006f\u0078\u002e\u0020s\u0070\u0061\u006e\u004d\u0061\u0072\u006b\u0073=\u0025\u0073", _aa)
+	}
+	_af, _gc := _ef(_abg)
+	if len(_gc) == 1 {
+		_cfg := _gc[0]
+		_cgc := _af[_cfg]
+		if len(_cgc) == 1 {
+			_bg := _cgc[0]
+			_gf := _bg._aag
+			_fcc := _edg(_gf)
+			_age, _beb := _fbc(_ce, _fcc)
+			if _beb != nil {
+				return _beb
+			}
+			_ed, _beb := _aff(_bg, _gf, _fcc, _age, _cfg)
+			if _beb != nil {
+				return _beb
+			}
+			for _, _ga := range _fca.Elements() {
+				if _ga == _ce {
+					_ded = append(_ded, _ed...)
+				} else {
+					_ded = append(_ded, _ga)
+				}
+			}
+		} else {
+			_dedg := _cgc[0]._aag
+			_bb := _edg(_dedg)
+			_gaa, _dfb := _fbc(_ce, _bb)
+			if _dfb != nil {
+				return _dfb
+			}
+			_fgc, _dfb := _bgg(_gaa, _cgc)
+			if _dfb != nil {
+				return _dfb
+			}
+			_fee := _abf(_fgc)
+			_eb := _eac(_gaa, _fee, _bb)
+			for _, _cdd := range _fca.Elements() {
+				if _cdd == _ce {
+					_ded = append(_ded, _eb...)
+				} else {
+					_ded = append(_ded, _cdd)
+				}
+			}
+		}
+		_aa.Params[0] = _fd.MakeArray(_ded...)
+	} else if len(_gc) > 1 {
+		_bed := _abg[0]
+		_cga := _bed._aag
+		_, _ac := _ffe(_cga)
+		_bgb := _cga.Elements()[_ac]
+		_ecd := _bgb.Font
+		_bfbc, _bfa := _fbc(_ce, _ecd)
+		if _bfa != nil {
+			return _bfa
+		}
+		_ea, _bfa := _bgg(_bfbc, _abg)
+		if _bfa != nil {
+			return _bfa
+		}
+		_dd := _abf(_ea)
+		_ecc := _eac(_bfbc, _dd, _ecd)
+		for _, _aed := range _fca.Elements() {
+			if _aed == _ce {
+				_ded = append(_ded, _ecc...)
+			} else {
+				_ded = append(_ded, _aed)
+			}
+		}
+		_aa.Params[0] = _fd.MakeArray(_ded...)
+	}
+	return nil
+}
+
+type placeHolders struct {
+	_cc []int
+	_ae string
+	_ab float64
+}
+
+func _bada(_beba, _cddf, _bfc float64) float64 {
+	_bfc = _bfc / 100
+	_bcb := (-1000 * _beba) / (_cddf * _bfc)
+	return _bcb
+}
+
+type matchedIndex struct {
+	_dbf  int
+	_cgca int
+	_gcf  string
+}
 
 // Redactor represents a Redactor object.
-type Redactor struct{_fff *_c .PdfReader ;_bcg *RedactionOptions ;_cbe *_dg .Creator ;_fgab *RectangleProps ;};func _eac (_fcb string ,_ffeg []replacement ,_cdf *_c .PdfFont )[]_fd .PdfObject {_dcae :=[]_fd .PdfObject {};_gde :=0;_bdf :=_fcb ;for _eba ,_aac :=range _ffeg {_ebg :=_aac ._aee ;
-_gad :=_aac ._da ;_bfab :=_aac ._g ;_ddbg :=_fd .MakeFloat (_gad );if _gde > _ebg ||_ebg ==-1{continue ;};_gec :=_fcb [_gde :_ebg ];_afe :=_fecc (_gec ,_cdf );_aedg :=_fd .MakeStringFromBytes (_afe );_dcae =append (_dcae ,_aedg );_dcae =append (_dcae ,_ddbg );
-_bda :=_ebg +len (_bfab );_bdf =_fcb [_bda :];_gde =_bda ;if _eba ==len (_ffeg )-1{_afe =_fecc (_bdf ,_cdf );_aedg =_fd .MakeStringFromBytes (_afe );_dcae =append (_dcae ,_aedg );};};return _dcae ;};func _ceg (_aga *_bf .TextMarkArray )[]*_bf .TextMarkArray {_fedd :=_aga .Elements ();
-_abfb :=len (_fedd );var _beef _fd .PdfObject ;_efad :=[]*_bf .TextMarkArray {};_dfd :=&_bf .TextMarkArray {};_eed :=-1;for _bdcb ,_aafcd :=range _fedd {_gcg :=_aafcd .DirectObject ;_eed =_aafcd .Index ;if _gcg ==nil {_ebb :=_dedc (_aga ,_bdcb ,_eed );
-if _beef !=nil {if _ebb ==-1||_ebb > _bdcb {_efad =append (_efad ,_dfd );_dfd =&_bf .TextMarkArray {};};};}else if _gcg !=nil &&_beef ==nil {if _eed ==0&&_bdcb > 0{_efad =append (_efad ,_dfd );_dfd =&_bf .TextMarkArray {};};}else if _gcg !=nil &&_beef !=nil {if _gcg !=_beef {_efad =append (_efad ,_dfd );
-_dfd =&_bf .TextMarkArray {};};};_beef =_gcg ;_dfd .Append (_aafcd );if _bdcb ==(_abfb -1){_efad =append (_efad ,_dfd );};};return _efad ;};type regexMatcher struct{_dbg RedactionTerm };
+type Redactor struct {
+	_fff  *_c.PdfReader
+	_bcg  *RedactionOptions
+	_cbe  *_dg.Creator
+	_fgab *RectangleProps
+}
+
+func _eac(_fcb string, _ffeg []replacement, _cdf *_c.PdfFont) []_fd.PdfObject {
+	_dcae := []_fd.PdfObject{}
+	_gde := 0
+	_bdf := _fcb
+	for _eba, _aac := range _ffeg {
+		_ebg := _aac._aee
+		_gad := _aac._da
+		_bfab := _aac._g
+		_ddbg := _fd.MakeFloat(_gad)
+		if _gde > _ebg || _ebg == -1 {
+			continue
+		}
+		_gec := _fcb[_gde:_ebg]
+		_afe := _fecc(_gec, _cdf)
+		_aedg := _fd.MakeStringFromBytes(_afe)
+		_dcae = append(_dcae, _aedg)
+		_dcae = append(_dcae, _ddbg)
+		_bda := _ebg + len(_bfab)
+		_bdf = _fcb[_bda:]
+		_gde = _bda
+		if _eba == len(_ffeg)-1 {
+			_afe = _fecc(_bdf, _cdf)
+			_aedg = _fd.MakeStringFromBytes(_afe)
+			_dcae = append(_dcae, _aedg)
+		}
+	}
+	return _dcae
+}
+
+func _ceg(_aga *_bf.TextMarkArray) []*_bf.TextMarkArray {
+	_fedd := _aga.Elements()
+	_abfb := len(_fedd)
+	var _beef _fd.PdfObject
+	_efad := []*_bf.TextMarkArray{}
+	_dfd := &_bf.TextMarkArray{}
+	_eed := -1
+	for _bdcb, _aafcd := range _fedd {
+		_gcg := _aafcd.DirectObject
+		_eed = _aafcd.Index
+		if _gcg == nil {
+			_ebb := _dedc(_aga, _bdcb, _eed)
+			if _beef != nil {
+				if _ebb == -1 || _ebb > _bdcb {
+					_efad = append(_efad, _dfd)
+					_dfd = &_bf.TextMarkArray{}
+				}
+			}
+		} else if _gcg != nil && _beef == nil {
+			if _eed == 0 && _bdcb > 0 {
+				_efad = append(_efad, _dfd)
+				_dfd = &_bf.TextMarkArray{}
+			}
+		} else if _gcg != nil && _beef != nil {
+			if _gcg != _beef {
+				_efad = append(_efad, _dfd)
+				_dfd = &_bf.TextMarkArray{}
+			}
+		}
+		_beef = _gcg
+		_dfd.Append(_aafcd)
+		if _bdcb == (_abfb - 1) {
+			_efad = append(_efad, _dfd)
+		}
+	}
+	return _efad
+}
+
+type regexMatcher struct{ _dbg RedactionTerm }
 
 // WriteToFile writes the redacted document to file specified by `outputPath`.
-func (_dggg *Redactor )WriteToFile (outputPath string )error {if _gbbd :=_dggg ._cbe .WriteToFile (outputPath );_gbbd !=nil {return _b .Errorf ("\u0066\u0061\u0069l\u0065\u0064\u0020\u0074o\u0020\u0077\u0072\u0069\u0074\u0065\u0020t\u0068\u0065\u0020\u006f\u0075\u0074\u0070\u0075\u0074\u0020\u0066\u0069\u006c\u0065");
-};return nil ;};func _afg (_feb *_c .PdfFont ,_bad _bf .TextMark )float64 {_ggc :=0.001;_daa :=_bad .Th /100;if _feb .Subtype ()=="\u0054\u0079\u0070e\u0033"{_ggc =1;};_dcg ,_dca :=_feb .GetRuneMetrics (' ');if !_dca {_dcg ,_dca =_feb .GetCharMetrics (32);
-};if !_dca {_dcg ,_ =_c .DefaultFont ().GetRuneMetrics (' ');};_fcd :=_ggc *((_dcg .Wx *_bad .FontSize +_bad .Tc +_bad .Tw )/_daa );return _fcd ;};func _ef (_aeed []localSpanMarks )(map[string ][]localSpanMarks ,[]string ){_fb :=make (map[string ][]localSpanMarks );
-_cgg :=[]string {};for _ ,_edb :=range _aeed {_ge :=_edb ._egba ;if _abgc ,_acg :=_fb [_ge ];_acg {_fb [_ge ]=append (_abgc ,_edb );}else {_fb [_ge ]=[]localSpanMarks {_edb };_cgg =append (_cgg ,_ge );};};return _fb ,_cgg ;};func _fecc (_bfg string ,_cca *_c .PdfFont )[]byte {_afb ,_gaag :=_cca .StringToCharcodeBytes (_bfg );
-if _gaag !=0{_ba .Log .Debug ("\u0057\u0041\u0052\u004e\u003a\u0020\u0073\u006fm\u0065\u0020\u0072un\u0065\u0073\u0020\u0063\u006f\u0075l\u0064\u0020\u006e\u006f\u0074\u0020\u0062\u0065\u0020\u0065\u006e\u0063\u006f\u0064\u0065d\u002e\u000a\u0009\u0025\u0073\u0020\u002d\u003e \u0025\u0076",_bfg ,_afb );
-};return _afb ;};type targetMap struct{_daafg string ;_eab [][]int ;};
+func (_dggg *Redactor) WriteToFile(outputPath string) error {
+	if _gbbd := _dggg._cbe.WriteToFile(outputPath); _gbbd != nil {
+		return _b.Errorf("\u0066\u0061\u0069l\u0065\u0064\u0020\u0074o\u0020\u0077\u0072\u0069\u0074\u0065\u0020t\u0068\u0065\u0020\u006f\u0075\u0074\u0070\u0075\u0074\u0020\u0066\u0069\u006c\u0065")
+	}
+	return nil
+}
+
+func _afg(_feb *_c.PdfFont, _bad _bf.TextMark) float64 {
+	_ggc := 0.001
+	_daa := _bad.Th / 100
+	if _feb.Subtype() == "\u0054\u0079\u0070e\u0033" {
+		_ggc = 1
+	}
+	_dcg, _dca := _feb.GetRuneMetrics(' ')
+	if !_dca {
+		_dcg, _dca = _feb.GetCharMetrics(32)
+	}
+	if !_dca {
+		_dcg, _ = _c.DefaultFont().GetRuneMetrics(' ')
+	}
+	_fcd := _ggc * ((_dcg.Wx*_bad.FontSize + _bad.Tc + _bad.Tw) / _daa)
+	return _fcd
+}
+
+func _ef(_aeed []localSpanMarks) (map[string][]localSpanMarks, []string) {
+	_fb := make(map[string][]localSpanMarks)
+	_cgg := []string{}
+	for _, _edb := range _aeed {
+		_ge := _edb._egba
+		if _abgc, _acg := _fb[_ge]; _acg {
+			_fb[_ge] = append(_abgc, _edb)
+		} else {
+			_fb[_ge] = []localSpanMarks{_edb}
+			_cgg = append(_cgg, _ge)
+		}
+	}
+	return _fb, _cgg
+}
+
+func _fecc(_bfg string, _cca *_c.PdfFont) []byte {
+	_afb, _gaag := _cca.StringToCharcodeBytes(_bfg)
+	if _gaag != 0 {
+		_ba.Log.Debug("\u0057\u0041\u0052\u004e\u003a\u0020\u0073\u006fm\u0065\u0020\u0072un\u0065\u0073\u0020\u0063\u006f\u0075l\u0064\u0020\u006e\u006f\u0074\u0020\u0062\u0065\u0020\u0065\u006e\u0063\u006f\u0064\u0065d\u002e\u000a\u0009\u0025\u0073\u0020\u002d\u003e \u0025\u0076", _bfg, _afb)
+	}
+	return _afb
+}
+
+type targetMap struct {
+	_daafg string
+	_eab   [][]int
+}
 
 // New instantiates a Redactor object with given PdfReader and `regex` pattern.
-func New (reader *_c .PdfReader ,opts *RedactionOptions ,rectProps *RectangleProps )*Redactor {if rectProps ==nil {rectProps =RedactRectanglePropsNew ();};return &Redactor {_fff :reader ,_bcg :opts ,_cbe :_dg .New (),_fgab :rectProps };};type matchedBBox struct{_bfaa _c .PdfRectangle ;
-_cgb string ;};type replacement struct{_g string ;_da float64 ;_aee int ;};func _aae (_fcfd []*matchedIndex )[]*targetMap {_beeg :=make (map[string ][][]int );_aagb :=[]*targetMap {};for _ ,_aad :=range _fcfd {_gca :=_aad ._gcf ;_bbaf :=[]int {_aad ._dbf ,_aad ._cgca };
-if _beea ,_affe :=_beeg [_gca ];_affe {_beeg [_gca ]=append (_beea ,_bbaf );}else {_beeg [_gca ]=[][]int {_bbaf };};};for _cbge ,_eca :=range _beeg {_dfge :=&targetMap {_daafg :_cbge ,_eab :_eca };_aagb =append (_aagb ,_dfge );};return _aagb ;};func _bedc (_bbgc *matchedIndex ,_daee [][]int )(bool ,[][]int ){_eeag :=[][]int {};
-for _ ,_dcge :=range _daee {if _bbgc ._dbf < _dcge [0]&&_bbgc ._cgca > _dcge [1]{_eeag =append (_eeag ,_dcge );};};return len (_eeag )> 0,_eeag ;};
+func New(reader *_c.PdfReader, opts *RedactionOptions, rectProps *RectangleProps) *Redactor {
+	if rectProps == nil {
+		rectProps = RedactRectanglePropsNew()
+	}
+	return &Redactor{_fff: reader, _bcg: opts, _cbe: _dg.New(), _fgab: rectProps}
+}
+
+type matchedBBox struct {
+	_bfaa _c.PdfRectangle
+	_cgb  string
+}
+
+type replacement struct {
+	_g   string
+	_da  float64
+	_aee int
+}
+
+func _aae(_fcfd []*matchedIndex) []*targetMap {
+	_beeg := make(map[string][][]int)
+	_aagb := []*targetMap{}
+	for _, _aad := range _fcfd {
+		_gca := _aad._gcf
+		_bbaf := []int{_aad._dbf, _aad._cgca}
+		if _beea, _affe := _beeg[_gca]; _affe {
+			_beeg[_gca] = append(_beea, _bbaf)
+		} else {
+			_beeg[_gca] = [][]int{_bbaf}
+		}
+	}
+	for _cbge, _eca := range _beeg {
+		_dfge := &targetMap{_daafg: _cbge, _eab: _eca}
+		_aagb = append(_aagb, _dfge)
+	}
+	return _aagb
+}
+
+func _bedc(_bbgc *matchedIndex, _daee [][]int) (bool, [][]int) {
+	_eeag := [][]int{}
+	for _, _dcge := range _daee {
+		if _bbgc._dbf < _dcge[0] && _bbgc._cgca > _dcge[1] {
+			_eeag = append(_eeag, _dcge)
+		}
+	}
+	return len(_eeag) > 0, _eeag
+}
 
 // Redact executes the redact operation on a pdf file and updates the content streams of all pages of the file.
-func (_gddb *Redactor )Redact ()error {_bdc ,_cafc :=_gddb ._fff .GetNumPages ();if _cafc !=nil {return _b .Errorf ("\u0066\u0061\u0069\u006c\u0065\u0064 \u0074\u006f\u0020\u0067\u0065\u0074\u0020\u0074\u0068\u0065\u0020\u006e\u0075m\u0062\u0065\u0072\u0020\u006f\u0066\u0020P\u0061\u0067\u0065\u0073");
-};_eefde :=_gddb ._fgab .FillColor ;_bbf :=_gddb ._fgab .BorderWidth ;_fgb :=_gddb ._fgab .FillOpacity ;for _gaaf :=1;_gaaf <=_bdc ;_gaaf ++{_eee ,_ebc :=_gddb ._fff .GetPage (_gaaf );if _ebc !=nil {return _ebc ;};_cdef ,_ebc :=_bf .New (_eee );if _ebc !=nil {return _ebc ;
-};_fdcc ,_ ,_ ,_ebc :=_cdef .ExtractPageText ();if _ebc !=nil {return _ebc ;};_cdda :=_fdcc .GetContentStreamOps ();_bbaa ,_eefc ,_ebc :=_gddb .redactPage (_cdda ,_eee .Resources );if _eefc ==nil {_ba .Log .Info ("N\u006f\u0020\u006d\u0061\u0074\u0063\u0068\u0020\u0066\u006f\u0075\u006e\u0064\u0020\u0066\u006f\u0072\u0020t\u0068\u0065\u0020\u0070\u0072\u006f\u0076\u0069\u0064\u0065d \u0070\u0061\u0074t\u0061r\u006e\u002e");
-_eefc =_cdda ;};_cfga :=_bc .ContentStreamOperation {Operand :"\u006e"};*_eefc =append (*_eefc ,&_cfga );_eee .SetContentStreams ([]string {_eefc .String ()},_fd .NewFlateEncoder ());if _ebc !=nil {return _ebc ;};_fecdc ,_ebc :=_eee .GetMediaBox ();if _ebc !=nil {return _ebc ;
-};if _eee .MediaBox ==nil {_eee .MediaBox =_fecdc ;};if _dbbc :=_gddb ._cbe .AddPage (_eee );_dbbc !=nil {return _dbbc ;};_e .Slice (_bbaa ,func (_bcd ,_dbd int )bool {return _bbaa [_bcd ]._cgb < _bbaa [_dbd ]._cgb });_cdgcb :=_fecdc .Ury ;for _ ,_dcc :=range _bbaa {_agec :=_dcc ._bfaa ;
-_eebf :=_gddb ._cbe .NewRectangle (_agec .Llx ,_cdgcb -_agec .Lly ,_agec .Urx -_agec .Llx ,-(_agec .Ury -_agec .Lly ));_eebf .SetFillColor (_eefde );_eebf .SetBorderWidth (_bbf );_eebf .SetFillOpacity (_fgb );if _geg :=_gddb ._cbe .Draw (_eebf );_geg !=nil {return nil ;
-};};};_gddb ._cbe .SetOutlineTree (_gddb ._fff .GetOutlineTree ());return nil ;};func _fe (_ag *_bc .ContentStreamOperations ,_aeb map[_fd .PdfObject ][]localSpanMarks )error {for _cd ,_ff :=range _aeb {if _cd ==nil {continue ;};_fc ,_db ,_cde :=_gfc (_ag ,_cd );
-if !_cde {_ba .Log .Debug ("Pd\u0066\u004fb\u006a\u0065\u0063\u0074\u0020\u0025\u0073\u006e\u006ft\u0020\u0066\u006f\u0075\u006e\u0064\u0020\u0069\u006e\u0020\u0073\u0069\u0064\u0065\u0020\u0074\u0068\u0065\u0020\u0063\u006f\u006e\u0074\u0065\u006e\u0074\u0073\u0074r\u0065a\u006d\u0020\u006f\u0070\u0065\u0072\u0061\u0074i\u006fn\u0020\u0025s",_cd ,_ag );
-return nil ;};if _fc .Operand =="\u0054\u006a"{_bab :=_gab (_fc ,_cd ,_ff );if _bab !=nil {return _bab ;};}else if _fc .Operand =="\u0054\u004a"{_df :=_fec (_fc ,_cd ,_ff );if _df !=nil {return _df ;};}else if _fc .Operand =="\u0027"||_fc .Operand =="\u0022"{_gg :=_bce (_ag ,_fc .Operand ,_db );
-if _gg !=nil {return _gg ;};_gg =_gab (_fc ,_cd ,_ff );if _gg !=nil {return _gg ;};};};return nil ;};func _gab (_bgbg *_bc .ContentStreamOperation ,_cec _fd .PdfObject ,_ffef []localSpanMarks )error {var _bcc *_fd .PdfObjectArray ;_badf ,_gb :=_ef (_ffef );
-if len (_gb )==1{_ddd :=_gb [0];_gge :=_badf [_ddd ];if len (_gge )==1{_faa :=_gge [0];_fgdf :=_faa ._aag ;_ceb :=_edg (_fgdf );_egg ,_eefd :=_fbc (_cec ,_ceb );if _eefd !=nil {return _eefd ;};_cb ,_eefd :=_aff (_faa ,_fgdf ,_ceb ,_egg ,_ddd );if _eefd !=nil {return _eefd ;
-};_bcc =_fd .MakeArray (_cb ...);}else {_abd :=_gge [0]._aag ;_abb :=_edg (_abd );_baf ,_cgf :=_fbc (_cec ,_abb );if _cgf !=nil {return _cgf ;};_ccb ,_cgf :=_bgg (_baf ,_gge );if _cgf !=nil {return _cgf ;};_dfa :=_abf (_ccb );_eeba :=_eac (_baf ,_dfa ,_abb );
-_bcc =_fd .MakeArray (_eeba ...);};}else if len (_gb )> 1{_ddc :=_ffef [0];_fdc :=_ddc ._aag ;_ ,_cfb :=_ffe (_fdc );_ged :=_fdc .Elements ()[_cfb ];_efd :=_ged .Font ;_cded ,_gce :=_fbc (_cec ,_efd );if _gce !=nil {return _gce ;};_aaf ,_gce :=_bgg (_cded ,_ffef );
-if _gce !=nil {return _gce ;};_dac :=_abf (_aaf );_fac :=_eac (_cded ,_dac ,_efd );_bcc =_fd .MakeArray (_fac ...);};_bgbg .Params [0]=_bcc ;_bgbg .Operand ="\u0054\u004a";return nil ;};func _gdba (_agg string )(string ,[][]int ){_bdd :=_f .MustCompile ("\u005c\u006e");
-_bfgb :=_bdd .FindAllStringIndex (_agg ,-1);_dacd :=_bdd .ReplaceAllString (_agg ,"\u0020");return _dacd ,_bfgb ;};func _bgg (_fga string ,_cgad []localSpanMarks )([]placeHolders ,error ){_bef :="";_cggc :=[]placeHolders {};for _dec ,_bea :=range _cgad {_ffg :=_bea ._aag ;
-_beg :=_bea ._egba ;_gae :=_ggea (_ffg );_ffc ,_cgae :=_bebf (_ffg );if _cgae !=nil {return nil ,_cgae ;};if _gae !=_bef {var _bba []int ;if _dec ==0&&_beg !=_gae {_afc :=_fa .Index (_fga ,_gae );_bba =[]int {_afc };}else if _dec ==len (_cgad )-1{_fcad :=_fa .LastIndex (_fga ,_gae );
-_bba =[]int {_fcad };}else {_bba =_fed (_fga ,_gae );};_cfd :=placeHolders {_cc :_bba ,_ae :_gae ,_ab :_ffc };_cggc =append (_cggc ,_cfd );};_bef =_gae ;};return _cggc ,nil ;};func _dedc (_bga *_bf .TextMarkArray ,_eeeg int ,_babe int )int {_ggbc :=_bga .Elements ();
-_cce :=_eeeg -1;_gcd :=_eeeg +1;_edad :=-1;if _cce >=0{_gbb :=_ggbc [_cce ];_bdfa :=_gbb .ObjString ;_acd :=len (_bdfa );_gdcg :=_gbb .Index ;if _gdcg +1< _acd {_edad =_cce ;return _edad ;};};if _gcd < len (_ggbc ){_fefb :=_ggbc [_gcd ];_bbba :=_fefb .ObjString ;
-if _bbba [0]!=_fefb .Text {_edad =_gcd ;return _edad ;};};return _edad ;};func _abgb (_cfgf []int ,_dcaf *_bf .TextMarkArray ,_gaeb string )(*_bf .TextMarkArray ,matchedBBox ,error ){_adc :=matchedBBox {};_gbe :=_cfgf [0];_dagg :=_cfgf [1];_bdad :=len (_gaeb )-len (_fa .TrimLeft (_gaeb ,"\u0020"));
-_adb :=len (_gaeb )-len (_fa .TrimRight (_gaeb ,"\u0020\u000a"));_gbe =_gbe +_bdad ;_dagg =_dagg -_adb ;_gaeb =_fa .Trim (_gaeb ,"\u0020\u000a");_gaae ,_bge :=_dcaf .RangeOffset (_gbe ,_dagg );if _bge !=nil {return nil ,_adc ,_bge ;};_gdcd ,_bcbf :=_gaae .BBox ();
-if !_bcbf {return nil ,_adc ,_b .Errorf ("\u0073\u0070\u0061\u006e\u004d\u0061\u0072\u006bs\u002e\u0042\u0042ox\u0020\u0068\u0061\u0073\u0020\u006eo\u0020\u0062\u006f\u0075\u006e\u0064\u0069\u006e\u0067\u0020\u0062\u006f\u0078\u002e\u0020s\u0070\u0061\u006e\u004d\u0061\u0072\u006b\u0073=\u0025\u0073",_gaae );
-};_adc =matchedBBox {_cgb :_gaeb ,_bfaa :_gdcd };return _gaae ,_adc ,nil ;};func _gdbg (_aec *matchedIndex ,_gadc [][]int )[]*matchedIndex {_cafg :=[]*matchedIndex {};_bcf :=_aec ._dbf ;_cdgb :=_bcf ;_ddg :=_aec ._gcf ;_bgbc :=0;for _ ,_ggf :=range _gadc {_aegc :=_ggf [0]-_bcf ;
-if _bgbc >=_aegc {continue ;};_gdcb :=_ddg [_bgbc :_aegc ];_bfd :=&matchedIndex {_gcf :_gdcb ,_dbf :_cdgb ,_cgca :_ggf [0]};if len (_fa .TrimSpace (_gdcb ))!=0{_cafg =append (_cafg ,_bfd );};_bgbc =_ggf [1]-_bcf ;_cdgb =_bcf +_bgbc ;};_fcag :=_ddg [_bgbc :];
-_ccbf :=&matchedIndex {_gcf :_fcag ,_dbf :_cdgb ,_cgca :_aec ._cgca };if len (_fa .TrimSpace (_fcag ))!=0{_cafg =append (_cafg ,_ccbf );};return _cafg ;};func _ebaf (_gac *targetMap ,_efb []int ){var _cbeg [][]int ;for _cdff ,_bcbe :=range _gac ._eab {if _gdc (_cdff ,_efb ){continue ;
-};_cbeg =append (_cbeg ,_bcbe );};_gac ._eab =_cbeg ;};
+func (_gddb *Redactor) Redact() error {
+	_bdc, _cafc := _gddb._fff.GetNumPages()
+	if _cafc != nil {
+		return _b.Errorf("\u0066\u0061\u0069\u006c\u0065\u0064 \u0074\u006f\u0020\u0067\u0065\u0074\u0020\u0074\u0068\u0065\u0020\u006e\u0075m\u0062\u0065\u0072\u0020\u006f\u0066\u0020P\u0061\u0067\u0065\u0073")
+	}
+	_eefde := _gddb._fgab.FillColor
+	_bbf := _gddb._fgab.BorderWidth
+	_fgb := _gddb._fgab.FillOpacity
+	for _gaaf := 1; _gaaf <= _bdc; _gaaf++ {
+		_eee, _ebc := _gddb._fff.GetPage(_gaaf)
+		if _ebc != nil {
+			return _ebc
+		}
+		_cdef, _ebc := _bf.New(_eee)
+		if _ebc != nil {
+			return _ebc
+		}
+		_fdcc, _, _, _ebc := _cdef.ExtractPageText()
+		if _ebc != nil {
+			return _ebc
+		}
+		_cdda := _fdcc.GetContentStreamOps()
+		_bbaa, _eefc, _ebc := _gddb.redactPage(_cdda, _eee.Resources)
+		if _eefc == nil {
+			_ba.Log.Info("N\u006f\u0020\u006d\u0061\u0074\u0063\u0068\u0020\u0066\u006f\u0075\u006e\u0064\u0020\u0066\u006f\u0072\u0020t\u0068\u0065\u0020\u0070\u0072\u006f\u0076\u0069\u0064\u0065d \u0070\u0061\u0074t\u0061r\u006e\u002e")
+			_eefc = _cdda
+		}
+		_cfga := _bc.ContentStreamOperation{Operand: "\u006e"}
+		*_eefc = append(*_eefc, &_cfga)
+		_eee.SetContentStreams([]string{_eefc.String()}, _fd.NewFlateEncoder())
+		if _ebc != nil {
+			return _ebc
+		}
+		_fecdc, _ebc := _eee.GetMediaBox()
+		if _ebc != nil {
+			return _ebc
+		}
+		if _eee.MediaBox == nil {
+			_eee.MediaBox = _fecdc
+		}
+		if _dbbc := _gddb._cbe.AddPage(_eee); _dbbc != nil {
+			return _dbbc
+		}
+		_e.Slice(_bbaa, func(_bcd, _dbd int) bool { return _bbaa[_bcd]._cgb < _bbaa[_dbd]._cgb })
+		_cdgcb := _fecdc.Ury
+		for _, _dcc := range _bbaa {
+			_agec := _dcc._bfaa
+			_eebf := _gddb._cbe.NewRectangle(_agec.Llx, _cdgcb-_agec.Lly, _agec.Urx-_agec.Llx, -(_agec.Ury - _agec.Lly))
+			_eebf.SetFillColor(_eefde)
+			_eebf.SetBorderWidth(_bbf)
+			_eebf.SetFillOpacity(_fgb)
+			if _geg := _gddb._cbe.Draw(_eebf); _geg != nil {
+				return nil
+			}
+		}
+	}
+	_gddb._cbe.SetOutlineTree(_gddb._fff.GetOutlineTree())
+	return nil
+}
+
+func _fe(_ag *_bc.ContentStreamOperations, _aeb map[_fd.PdfObject][]localSpanMarks) error {
+	for _cd, _ff := range _aeb {
+		if _cd == nil {
+			continue
+		}
+		_fc, _db, _cde := _gfc(_ag, _cd)
+		if !_cde {
+			_ba.Log.Debug("Pd\u0066\u004fb\u006a\u0065\u0063\u0074\u0020\u0025\u0073\u006e\u006ft\u0020\u0066\u006f\u0075\u006e\u0064\u0020\u0069\u006e\u0020\u0073\u0069\u0064\u0065\u0020\u0074\u0068\u0065\u0020\u0063\u006f\u006e\u0074\u0065\u006e\u0074\u0073\u0074r\u0065a\u006d\u0020\u006f\u0070\u0065\u0072\u0061\u0074i\u006fn\u0020\u0025s", _cd, _ag)
+			return nil
+		}
+		if _fc.Operand == "\u0054\u006a" {
+			_bab := _gab(_fc, _cd, _ff)
+			if _bab != nil {
+				return _bab
+			}
+		} else if _fc.Operand == "\u0054\u004a" {
+			_df := _fec(_fc, _cd, _ff)
+			if _df != nil {
+				return _df
+			}
+		} else if _fc.Operand == "\u0027" || _fc.Operand == "\u0022" {
+			_gg := _bce(_ag, _fc.Operand, _db)
+			if _gg != nil {
+				return _gg
+			}
+			_gg = _gab(_fc, _cd, _ff)
+			if _gg != nil {
+				return _gg
+			}
+		}
+	}
+	return nil
+}
+
+func _gab(_bgbg *_bc.ContentStreamOperation, _cec _fd.PdfObject, _ffef []localSpanMarks) error {
+	var _bcc *_fd.PdfObjectArray
+	_badf, _gb := _ef(_ffef)
+	if len(_gb) == 1 {
+		_ddd := _gb[0]
+		_gge := _badf[_ddd]
+		if len(_gge) == 1 {
+			_faa := _gge[0]
+			_fgdf := _faa._aag
+			_ceb := _edg(_fgdf)
+			_egg, _eefd := _fbc(_cec, _ceb)
+			if _eefd != nil {
+				return _eefd
+			}
+			_cb, _eefd := _aff(_faa, _fgdf, _ceb, _egg, _ddd)
+			if _eefd != nil {
+				return _eefd
+			}
+			_bcc = _fd.MakeArray(_cb...)
+		} else {
+			_abd := _gge[0]._aag
+			_abb := _edg(_abd)
+			_baf, _cgf := _fbc(_cec, _abb)
+			if _cgf != nil {
+				return _cgf
+			}
+			_ccb, _cgf := _bgg(_baf, _gge)
+			if _cgf != nil {
+				return _cgf
+			}
+			_dfa := _abf(_ccb)
+			_eeba := _eac(_baf, _dfa, _abb)
+			_bcc = _fd.MakeArray(_eeba...)
+		}
+	} else if len(_gb) > 1 {
+		_ddc := _ffef[0]
+		_fdc := _ddc._aag
+		_, _cfb := _ffe(_fdc)
+		_ged := _fdc.Elements()[_cfb]
+		_efd := _ged.Font
+		_cded, _gce := _fbc(_cec, _efd)
+		if _gce != nil {
+			return _gce
+		}
+		_aaf, _gce := _bgg(_cded, _ffef)
+		if _gce != nil {
+			return _gce
+		}
+		_dac := _abf(_aaf)
+		_fac := _eac(_cded, _dac, _efd)
+		_bcc = _fd.MakeArray(_fac...)
+	}
+	_bgbg.Params[0] = _bcc
+	_bgbg.Operand = "\u0054\u004a"
+	return nil
+}
+
+func _gdba(_agg string) (string, [][]int) {
+	_bdd := _f.MustCompile("\u005c\u006e")
+	_bfgb := _bdd.FindAllStringIndex(_agg, -1)
+	_dacd := _bdd.ReplaceAllString(_agg, "\u0020")
+	return _dacd, _bfgb
+}
+
+func _bgg(_fga string, _cgad []localSpanMarks) ([]placeHolders, error) {
+	_bef := ""
+	_cggc := []placeHolders{}
+	for _dec, _bea := range _cgad {
+		_ffg := _bea._aag
+		_beg := _bea._egba
+		_gae := _ggea(_ffg)
+		_ffc, _cgae := _bebf(_ffg)
+		if _cgae != nil {
+			return nil, _cgae
+		}
+		if _gae != _bef {
+			var _bba []int
+			if _dec == 0 && _beg != _gae {
+				_afc := _fa.Index(_fga, _gae)
+				_bba = []int{_afc}
+			} else if _dec == len(_cgad)-1 {
+				_fcad := _fa.LastIndex(_fga, _gae)
+				_bba = []int{_fcad}
+			} else {
+				_bba = _fed(_fga, _gae)
+			}
+			_cfd := placeHolders{_cc: _bba, _ae: _gae, _ab: _ffc}
+			_cggc = append(_cggc, _cfd)
+		}
+		_bef = _gae
+	}
+	return _cggc, nil
+}
+
+func _dedc(_bga *_bf.TextMarkArray, _eeeg int, _babe int) int {
+	_ggbc := _bga.Elements()
+	_cce := _eeeg - 1
+	_gcd := _eeeg + 1
+	_edad := -1
+	if _cce >= 0 {
+		_gbb := _ggbc[_cce]
+		_bdfa := _gbb.ObjString
+		_acd := len(_bdfa)
+		_gdcg := _gbb.Index
+		if _gdcg+1 < _acd {
+			_edad = _cce
+			return _edad
+		}
+	}
+	if _gcd < len(_ggbc) {
+		_fefb := _ggbc[_gcd]
+		_bbba := _fefb.ObjString
+		if _bbba[0] != _fefb.Text {
+			_edad = _gcd
+			return _edad
+		}
+	}
+	return _edad
+}
+
+func _abgb(_cfgf []int, _dcaf *_bf.TextMarkArray, _gaeb string) (*_bf.TextMarkArray, matchedBBox, error) {
+	_adc := matchedBBox{}
+	_gbe := _cfgf[0]
+	_dagg := _cfgf[1]
+	_bdad := len(_gaeb) - len(_fa.TrimLeft(_gaeb, "\u0020"))
+	_adb := len(_gaeb) - len(_fa.TrimRight(_gaeb, "\u0020\u000a"))
+	_gbe = _gbe + _bdad
+	_dagg = _dagg - _adb
+	_gaeb = _fa.Trim(_gaeb, "\u0020\u000a")
+	_gaae, _bge := _dcaf.RangeOffset(_gbe, _dagg)
+	if _bge != nil {
+		return nil, _adc, _bge
+	}
+	_gdcd, _bcbf := _gaae.BBox()
+	if !_bcbf {
+		return nil, _adc, _b.Errorf("\u0073\u0070\u0061\u006e\u004d\u0061\u0072\u006bs\u002e\u0042\u0042ox\u0020\u0068\u0061\u0073\u0020\u006eo\u0020\u0062\u006f\u0075\u006e\u0064\u0069\u006e\u0067\u0020\u0062\u006f\u0078\u002e\u0020s\u0070\u0061\u006e\u004d\u0061\u0072\u006b\u0073=\u0025\u0073", _gaae)
+	}
+	_adc = matchedBBox{_cgb: _gaeb, _bfaa: _gdcd}
+	return _gaae, _adc, nil
+}
+
+func _gdbg(_aec *matchedIndex, _gadc [][]int) []*matchedIndex {
+	_cafg := []*matchedIndex{}
+	_bcf := _aec._dbf
+	_cdgb := _bcf
+	_ddg := _aec._gcf
+	_bgbc := 0
+	for _, _ggf := range _gadc {
+		_aegc := _ggf[0] - _bcf
+		if _bgbc >= _aegc {
+			continue
+		}
+		_gdcb := _ddg[_bgbc:_aegc]
+		_bfd := &matchedIndex{_gcf: _gdcb, _dbf: _cdgb, _cgca: _ggf[0]}
+		if len(_fa.TrimSpace(_gdcb)) != 0 {
+			_cafg = append(_cafg, _bfd)
+		}
+		_bgbc = _ggf[1] - _bcf
+		_cdgb = _bcf + _bgbc
+	}
+	_fcag := _ddg[_bgbc:]
+	_ccbf := &matchedIndex{_gcf: _fcag, _dbf: _cdgb, _cgca: _aec._cgca}
+	if len(_fa.TrimSpace(_fcag)) != 0 {
+		_cafg = append(_cafg, _ccbf)
+	}
+	return _cafg
+}
+
+func _ebaf(_gac *targetMap, _efb []int) {
+	var _cbeg [][]int
+	for _cdff, _bcbe := range _gac._eab {
+		if _gdc(_cdff, _efb) {
+			continue
+		}
+		_cbeg = append(_cbeg, _bcbe)
+	}
+	_gac._eab = _cbeg
+}
 
 // RedactionTerm holds the regexp pattern and the replacement string for the redaction process.
-type RedactionTerm struct{Pattern *_f .Regexp ;};func _edg (_ca *_bf .TextMarkArray )*_c .PdfFont {_ ,_ccc :=_ffe (_ca );_eg :=_ca .Elements ()[_ccc ];_ecdc :=_eg .Font ;return _ecdc ;};func _abf (_dff []placeHolders )[]replacement {_ccad :=[]replacement {};
-for _ ,_gaeg :=range _dff {_dcd :=_gaeg ._cc ;_daaf :=_gaeg ._ae ;_bdb :=_gaeg ._ab ;for _ ,_daag :=range _dcd {_cdgf :=replacement {_g :_daaf ,_da :_bdb ,_aee :_daag };_ccad =append (_ccad ,_cdgf );};};_e .Slice (_ccad ,func (_ace ,_dge int )bool {return _ccad [_ace ]._aee < _ccad [_dge ]._aee });
-return _ccad ;};func _fag (_fbd ,_gbge targetMap )(bool ,[]int ){_bbbf :=_fa .Contains (_fbd ._daafg ,_gbge ._daafg );var _cafca []int ;for _ ,_aeg :=range _fbd ._eab {for _gfb ,_fge :=range _gbge ._eab {if _fge [0]>=_aeg [0]&&_fge [1]<=_aeg [1]{_cafca =append (_cafca ,_gfb );
-};};};return _bbbf ,_cafca ;};func _cgbe (_fgac []*targetMap ){for _bgba ,_ggcf :=range _fgac {for _bffd ,_aeeg :=range _fgac {if _bgba !=_bffd {_ccgb ,_gecc :=_fag (*_ggcf ,*_aeeg );if _ccgb {_ebaf (_aeeg ,_gecc );};};};};};func _bebf (_egc *_bf .TextMarkArray )(float64 ,error ){_dacb ,_ccaf :=_egc .BBox ();
-if !_ccaf {return 0.0,_b .Errorf ("\u0073\u0070\u0061\u006e\u004d\u0061\u0072\u006bs\u002e\u0042\u0042ox\u0020\u0068\u0061\u0073\u0020\u006eo\u0020\u0062\u006f\u0075\u006e\u0064\u0069\u006e\u0067\u0020\u0062\u006f\u0078\u002e\u0020s\u0070\u0061\u006e\u004d\u0061\u0072\u006b\u0073=\u0025\u0073",_egc );
-};_bbb :=_abe (_egc );_fbf :=0.0;_ ,_dcb :=_ffe (_egc );_feea :=_egc .Elements ()[_dcb ];_fef :=_feea .Font ;if _bbb > 0{_fbf =_afg (_fef ,_feea );};_fab :=(_dacb .Urx -_dacb .Llx );_fab =_fab +_fbf *float64 (_bbb );Tj :=_bada (_fab ,_feea .FontSize ,_feea .Th );
-return Tj ,nil ;};func _gdc (_dbc int ,_fbb []int )bool {for _ ,_gbgf :=range _fbb {if _gbgf ==_dbc {return true ;};};return false ;};func _aff (_cfbe localSpanMarks ,_gbg *_bf .TextMarkArray ,_bec *_c .PdfFont ,_ccdf ,_dfg string )([]_fd .PdfObject ,error ){_afd :=_ggea (_gbg );
-Tj ,_gabf :=_bebf (_gbg );if _gabf !=nil {return nil ,_gabf ;};_cfbf :=len (_ccdf );_cbg :=len (_afd );_dae :=-1;_abec :=_fd .MakeFloat (Tj );if _afd !=_dfg {_deda :=_cfbe ._cgadc ;if _deda ==0{_dae =_fa .LastIndex (_ccdf ,_afd );}else {_dae =_fa .Index (_ccdf ,_afd );
-};}else {_dae =_fa .Index (_ccdf ,_afd );};_eea :=_dae +_cbg ;_badfg :=[]_fd .PdfObject {};if _dae ==0&&_eea ==_cfbf {_badfg =append (_badfg ,_abec );}else if _dae ==0&&_eea < _cfbf {_cecc :=_fecc (_ccdf [_eea :],_bec );_ddb :=_fd .MakeStringFromBytes (_cecc );
-_badfg =append (_badfg ,_abec ,_ddb );}else if _dae > 0&&_eea >=_cfbf {_cdgc :=_fecc (_ccdf [:_dae ],_bec );_caf :=_fd .MakeStringFromBytes (_cdgc );_badfg =append (_badfg ,_caf ,_abec );}else if _dae > 0&&_eea < _cfbf {_edd :=_fecc (_ccdf [:_dae ],_bec );
-_ddbd :=_fecc (_ccdf [_eea :],_bec );_aafc :=_fd .MakeStringFromBytes (_edd );_babc :=_fd .MakeString (string (_ddbd ));_badfg =append (_badfg ,_aafc ,_abec ,_babc );};return _badfg ,nil ;};func (_gbc *regexMatcher )match (_dfc string )([]*matchedIndex ,error ){_abfc :=_gbc ._dbg .Pattern ;
-if _abfc ==nil {return nil ,_d .New ("\u006e\u006f\u0020\u0070at\u0074\u0065\u0072\u006e\u0020\u0063\u006f\u006d\u0070\u0069\u006c\u0065\u0064");};var (_agbd =_abfc .FindAllStringIndex (_dfc ,-1);_gdbc []*matchedIndex ;);for _ ,_acc :=range _agbd {_gdbc =append (_gdbc ,&matchedIndex {_dbf :_acc [0],_cgca :_acc [1],_gcf :_dfc [_acc [0]:_acc [1]]});
-};return _gdbc ,nil ;};func _abe (_be *_bf .TextMarkArray )int {_bd :=0;_gdd :=_be .Elements ();if _gdd [0].Text =="\u0020"{_bd ++;};if _gdd [_be .Len ()-1].Text =="\u0020"{_bd ++;};return _bd ;};
+type RedactionTerm struct{ Pattern *_f.Regexp }
+
+func _edg(_ca *_bf.TextMarkArray) *_c.PdfFont {
+	_, _ccc := _ffe(_ca)
+	_eg := _ca.Elements()[_ccc]
+	_ecdc := _eg.Font
+	return _ecdc
+}
+
+func _abf(_dff []placeHolders) []replacement {
+	_ccad := []replacement{}
+	for _, _gaeg := range _dff {
+		_dcd := _gaeg._cc
+		_daaf := _gaeg._ae
+		_bdb := _gaeg._ab
+		for _, _daag := range _dcd {
+			_cdgf := replacement{_g: _daaf, _da: _bdb, _aee: _daag}
+			_ccad = append(_ccad, _cdgf)
+		}
+	}
+	_e.Slice(_ccad, func(_ace, _dge int) bool { return _ccad[_ace]._aee < _ccad[_dge]._aee })
+	return _ccad
+}
+
+func _fag(_fbd, _gbge targetMap) (bool, []int) {
+	_bbbf := _fa.Contains(_fbd._daafg, _gbge._daafg)
+	var _cafca []int
+	for _, _aeg := range _fbd._eab {
+		for _gfb, _fge := range _gbge._eab {
+			if _fge[0] >= _aeg[0] && _fge[1] <= _aeg[1] {
+				_cafca = append(_cafca, _gfb)
+			}
+		}
+	}
+	return _bbbf, _cafca
+}
+
+func _cgbe(_fgac []*targetMap) {
+	for _bgba, _ggcf := range _fgac {
+		for _bffd, _aeeg := range _fgac {
+			if _bgba != _bffd {
+				_ccgb, _gecc := _fag(*_ggcf, *_aeeg)
+				if _ccgb {
+					_ebaf(_aeeg, _gecc)
+				}
+			}
+		}
+	}
+}
+
+func _bebf(_egc *_bf.TextMarkArray) (float64, error) {
+	_dacb, _ccaf := _egc.BBox()
+	if !_ccaf {
+		return 0.0, _b.Errorf("\u0073\u0070\u0061\u006e\u004d\u0061\u0072\u006bs\u002e\u0042\u0042ox\u0020\u0068\u0061\u0073\u0020\u006eo\u0020\u0062\u006f\u0075\u006e\u0064\u0069\u006e\u0067\u0020\u0062\u006f\u0078\u002e\u0020s\u0070\u0061\u006e\u004d\u0061\u0072\u006b\u0073=\u0025\u0073", _egc)
+	}
+	_bbb := _abe(_egc)
+	_fbf := 0.0
+	_, _dcb := _ffe(_egc)
+	_feea := _egc.Elements()[_dcb]
+	_fef := _feea.Font
+	if _bbb > 0 {
+		_fbf = _afg(_fef, _feea)
+	}
+	_fab := (_dacb.Urx - _dacb.Llx)
+	_fab = _fab + _fbf*float64(_bbb)
+	Tj := _bada(_fab, _feea.FontSize, _feea.Th)
+	return Tj, nil
+}
+
+func _gdc(_dbc int, _fbb []int) bool {
+	for _, _gbgf := range _fbb {
+		if _gbgf == _dbc {
+			return true
+		}
+	}
+	return false
+}
+
+func _aff(_cfbe localSpanMarks, _gbg *_bf.TextMarkArray, _bec *_c.PdfFont, _ccdf, _dfg string) ([]_fd.PdfObject, error) {
+	_afd := _ggea(_gbg)
+	Tj, _gabf := _bebf(_gbg)
+	if _gabf != nil {
+		return nil, _gabf
+	}
+	_cfbf := len(_ccdf)
+	_cbg := len(_afd)
+	_dae := -1
+	_abec := _fd.MakeFloat(Tj)
+	if _afd != _dfg {
+		_deda := _cfbe._cgadc
+		if _deda == 0 {
+			_dae = _fa.LastIndex(_ccdf, _afd)
+		} else {
+			_dae = _fa.Index(_ccdf, _afd)
+		}
+	} else {
+		_dae = _fa.Index(_ccdf, _afd)
+	}
+	_eea := _dae + _cbg
+	_badfg := []_fd.PdfObject{}
+	if _dae == 0 && _eea == _cfbf {
+		_badfg = append(_badfg, _abec)
+	} else if _dae == 0 && _eea < _cfbf {
+		_cecc := _fecc(_ccdf[_eea:], _bec)
+		_ddb := _fd.MakeStringFromBytes(_cecc)
+		_badfg = append(_badfg, _abec, _ddb)
+	} else if _dae > 0 && _eea >= _cfbf {
+		_cdgc := _fecc(_ccdf[:_dae], _bec)
+		_caf := _fd.MakeStringFromBytes(_cdgc)
+		_badfg = append(_badfg, _caf, _abec)
+	} else if _dae > 0 && _eea < _cfbf {
+		_edd := _fecc(_ccdf[:_dae], _bec)
+		_ddbd := _fecc(_ccdf[_eea:], _bec)
+		_aafc := _fd.MakeStringFromBytes(_edd)
+		_babc := _fd.MakeString(string(_ddbd))
+		_badfg = append(_badfg, _aafc, _abec, _babc)
+	}
+	return _badfg, nil
+}
+
+func (_gbc *regexMatcher) match(_dfc string) ([]*matchedIndex, error) {
+	_abfc := _gbc._dbg.Pattern
+	if _abfc == nil {
+		return nil, _d.New("\u006e\u006f\u0020\u0070at\u0074\u0065\u0072\u006e\u0020\u0063\u006f\u006d\u0070\u0069\u006c\u0065\u0064")
+	}
+	var (
+		_agbd = _abfc.FindAllStringIndex(_dfc, -1)
+		_gdbc []*matchedIndex
+	)
+	for _, _acc := range _agbd {
+		_gdbc = append(_gdbc, &matchedIndex{_dbf: _acc[0], _cgca: _acc[1], _gcf: _dfc[_acc[0]:_acc[1]]})
+	}
+	return _gdbc, nil
+}
+
+func _abe(_be *_bf.TextMarkArray) int {
+	_bd := 0
+	_gdd := _be.Elements()
+	if _gdd[0].Text == "\u0020" {
+		_bd++
+	}
+	if _gdd[_be.Len()-1].Text == "\u0020" {
+		_bd++
+	}
+	return _bd
+}
 
 // RectangleProps defines properties of the redaction rectangle to be drawn.
-type RectangleProps struct{FillColor _dg .Color ;BorderWidth float64 ;FillOpacity float64 ;};func _bce (_gd *_bc .ContentStreamOperations ,_dab string ,_cdb int )error {_ad :=_bc .ContentStreamOperations {};var _ccd _bc .ContentStreamOperation ;for _gga ,_fdd :=range *_gd {if _gga ==_cdb {if _dab =="\u0027"{_cg :=_bc .ContentStreamOperation {Operand :"\u0054\u002a"};
-_ad =append (_ad ,&_cg );_ccd .Params =_fdd .Params ;_ccd .Operand ="\u0054\u006a";_ad =append (_ad ,&_ccd );}else if _dab =="\u0022"{_ee :=_fdd .Params [:2];Tc ,Tw :=_ee [0],_ee [1];_fg :=_bc .ContentStreamOperation {Params :[]_fd .PdfObject {Tc },Operand :"\u0054\u0063"};
-_ad =append (_ad ,&_fg );_fg =_bc .ContentStreamOperation {Params :[]_fd .PdfObject {Tw },Operand :"\u0054\u0077"};_ad =append (_ad ,&_fg );_ccd .Params =[]_fd .PdfObject {_fdd .Params [2]};_ccd .Operand ="\u0054\u006a";_ad =append (_ad ,&_ccd );};};_ad =append (_ad ,_fdd );
-};*_gd =_ad ;return nil ;};
+type RectangleProps struct {
+	FillColor   _dg.Color
+	BorderWidth float64
+	FillOpacity float64
+}
+
+func _bce(_gd *_bc.ContentStreamOperations, _dab string, _cdb int) error {
+	_ad := _bc.ContentStreamOperations{}
+	var _ccd _bc.ContentStreamOperation
+	for _gga, _fdd := range *_gd {
+		if _gga == _cdb {
+			if _dab == "\u0027" {
+				_cg := _bc.ContentStreamOperation{Operand: "\u0054\u002a"}
+				_ad = append(_ad, &_cg)
+				_ccd.Params = _fdd.Params
+				_ccd.Operand = "\u0054\u006a"
+				_ad = append(_ad, &_ccd)
+			} else if _dab == "\u0022" {
+				_ee := _fdd.Params[:2]
+				Tc, Tw := _ee[0], _ee[1]
+				_fg := _bc.ContentStreamOperation{Params: []_fd.PdfObject{Tc}, Operand: "\u0054\u0063"}
+				_ad = append(_ad, &_fg)
+				_fg = _bc.ContentStreamOperation{Params: []_fd.PdfObject{Tw}, Operand: "\u0054\u0077"}
+				_ad = append(_ad, &_fg)
+				_ccd.Params = []_fd.PdfObject{_fdd.Params[2]}
+				_ccd.Operand = "\u0054\u006a"
+				_ad = append(_ad, &_ccd)
+			}
+		}
+		_ad = append(_ad, _fdd)
+	}
+	*_gd = _ad
+	return nil
+}

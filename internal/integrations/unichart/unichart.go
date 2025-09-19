@@ -9,31 +9,286 @@
 // Use of this source code is governed by the UniDoc End User License Agreement
 // terms that can be accessed at https://unidoc.io/eula/
 
-package unichart ;import (_c "bytes";_d "fmt";_e "github.com/unidoc/unichart/render";_fb "github.com/unidoc/unipdf/v4/common";_dc "github.com/unidoc/unipdf/v4/contentstream";_gf "github.com/unidoc/unipdf/v4/contentstream/draw";_gc "github.com/unidoc/unipdf/v4/core";
-_b "github.com/unidoc/unipdf/v4/model";_f "image/color";_ce "io";_gd "math";);func (_aa *Renderer )SetStrokeColor (color _f .Color ){_aa ._fffg =color ;_fdf ,_eeb ,_eebd ,_ :=_ecf (color );_aa ._fff .Add_RG (_fdf ,_eeb ,_eebd );};func (_fe *Renderer )Fill (){_fe ._fff .Add_f ()};
-func (_bd *Renderer )Close (){_bd ._fff .Add_h ()};func _cee (_dcc float64 )float64 {return _dcc *_gd .Pi /180.0};func (_gb *Renderer )QuadCurveTo (cx ,cy ,x ,y int ){_gb ._fff .Add_v (float64 (x ),float64 (y ),float64 (cx ),float64 (cy ));};func (_ged *Renderer )ClearTextRotation (){_ged ._cdd =0};
-func (_be *Renderer )SetFillColor (color _f .Color ){_be ._a =color ;_gda ,_aeg ,_ceg ,_ :=_ecf (color );_be ._fff .Add_rg (_gda ,_aeg ,_ceg );};func (_ec *Renderer )GetDPI ()float64 {return _ec ._cd };func (_eb *Renderer )Stroke (){_eb ._fff .Add_S ()};
-func (_eag *Renderer )wrapText (_cfe string )[]string {var (_eafe []string ;_cdad []rune ;);for _ ,_fbg :=range _cfe {if _fbg =='\n'{_eafe =append (_eafe ,string (_cdad ));_cdad =[]rune {};continue ;};_cdad =append (_cdad ,_fbg );};if len (_cdad )> 0{_eafe =append (_eafe ,string (_cdad ));
-};return _eafe ;};func (_ege *Renderer )SetTextRotation (radians float64 ){_ege ._cdd =_dgff (-radians )};func (_ddg *Renderer )SetFontSize (size float64 ){_ddg ._cb =size };func (_da *Renderer )FillStroke (){_da ._fff .Add_B ()};func (_cbf *Renderer )Text (text string ,x ,y int ){_cbf ._fff .Add_q ();
-_cbf .SetFont (_cbf ._ac );_bgd ,_aab ,_dgg ,_ :=_ecf (_cbf ._ae );_cbf ._fff .Add_rg (_bgd ,_aab ,_dgg );_cbf ._fff .Translate (float64 (x ),float64 (y )).Scale (1,-1);if _ecd :=_cbf ._cdd ;_ecd !=0{_cbf ._fff .RotateDeg (_ecd );};_cbf ._fff .Add_BT ().Add_TL (_cbf ._cb );
-var (_ccc =_cbf ._ac .Encoder ();_gfc =_cbf .wrapText (text );_fg =len (_gfc ););for _bb ,_gbe :=range _gfc {_cbf ._fff .Add_TJ (_gc .MakeStringFromBytes (_ccc .Encode (_gbe )));if _bb !=_fg -1{_cbf ._fff .Add_Tstar ();};};_cbf ._fff .Add_ET ();_cbf ._fff .Add_Q ();
-};func (_ad *Renderer )SetClassName (name string ){};func (_fee *Renderer )MeasureText (text string )_e .Box {_dgc :=_fee ._cb ;_aca ,_bea :=_fee ._ac .GetFontDescriptor ();if _bea !=nil {_fb .Log .Debug ("W\u0041\u0052\u004e\u003a\u0020\u0055n\u0061\u0062\u006c\u0065\u0020\u0074o\u0020\u0067\u0065\u0074\u0020\u0066\u006fn\u0074\u0020\u0064\u0065\u0073\u0063\u0072\u0069\u0070\u0074o\u0072");
-}else {_adb ,_bgf :=_aca .GetCapHeight ();if _bgf !=nil {_fb .Log .Debug ("\u0057\u0041\u0052\u004e\u003a\u0020\u0055\u006e\u0061\u0062\u006c\u0065\u0020t\u006f\u0020\u0067\u0065\u0074\u0020f\u006f\u006e\u0074\u0020\u0063\u0061\u0070\u0020\u0068\u0065\u0069\u0067\u0068t\u003a\u0020\u0025\u0076",_bgf );
-}else {_dgc =_adb /1000.0*_fee ._cb ;};};var (_bf =0.0;_efc =_fee .wrapText (text ););for _ ,_afg :=range _efc {if _eaf :=_fee .getTextWidth (_afg );_eaf > _bf {_bf =_eaf ;};};_dggc :=_e .NewBox (0,0,int (_bf ),int (_dgc ));if _cegb :=_fee ._cdd ;_cegb !=0{_dggc =_dggc .Corners ().Rotate (_cegb ).Box ();
-};return _dggc ;};func (_fa *Renderer )SetFontColor (color _f .Color ){_fa ._ae =color };func _dgff (_add float64 )float64 {return _add *180/_gd .Pi };type Renderer struct{_gg int ;_ff int ;_cd float64 ;_fff *_dc .ContentCreator ;_fd *_b .PdfPageResources ;
-_a _f .Color ;_fffg _f .Color ;_ba float64 ;_ac *_b .PdfFont ;_cb float64 ;_ae _f .Color ;_cdd float64 ;_eg map[*_b .PdfFont ]_gc .PdfObjectName ;};func (_fbb *Renderer )ResetStyle (){_fbb .SetFillColor (_f .Black );_fbb .SetStrokeColor (_f .Transparent );
-_fbb .SetStrokeWidth (0);_fbb .SetFont (_b .DefaultFont ());_fbb .SetFontColor (_f .Black );_fbb .SetFontSize (12);_fbb .SetTextRotation (0);};func (_af *Renderer )MoveTo (x ,y int ){_af ._fff .Add_m (float64 (x ),float64 (y ))};func (_ab *Renderer )ArcTo (cx ,cy int ,rx ,ry ,startAngle ,deltaAngle float64 ){startAngle =_dgff (2.0*_gd .Pi -startAngle );
-deltaAngle =_dgff (-deltaAngle );_cbe ,_bec :=deltaAngle ,1;if _gd .Abs (deltaAngle )> 90.0{_bec =int (_gd .Ceil (_gd .Abs (deltaAngle )/90.0));_cbe =deltaAngle /float64 (_bec );};var (_dd =_cee (_cbe /2);_db =_gd .Abs (4.0/3.0*(1.0-_gd .Cos (_dd ))/_gd .Sin (_dd ));
-_dba =float64 (cx );_bg =float64 (cy ););for _cf :=0;_cf < _bec ;_cf ++{_cdg :=_cee (startAngle +float64 (_cf )*_cbe );_ge :=_cee (startAngle +float64 (_cf +1)*_cbe );_dff :=_gd .Cos (_cdg );_dbb :=_gd .Cos (_ge );_bcc :=_gd .Sin (_cdg );_ffd :=_gd .Sin (_ge );
-var _fba []float64 ;if _cbe > 0{_fba =[]float64 {_dba +rx *_dff ,_bg -ry *_bcc ,_dba +rx *(_dff -_db *_bcc ),_bg -ry *(_bcc +_db *_dff ),_dba +rx *(_dbb +_db *_ffd ),_bg -ry *(_ffd -_db *_dbb ),_dba +rx *_dbb ,_bg -ry *_ffd };}else {_fba =[]float64 {_dba +rx *_dff ,_bg -ry *_bcc ,_dba +rx *(_dff +_db *_bcc ),_bg -ry *(_bcc -_db *_dff ),_dba +rx *(_dbb -_db *_ffd ),_bg -ry *(_ffd +_db *_dbb ),_dba +rx *_dbb ,_bg -ry *_ffd };
-};if _cf ==0{_ab ._fff .Add_l (_fba [0],_fba [1]);};_ab ._fff .Add_c (_fba [2],_fba [3],_fba [4],_fba [5],_fba [6],_fba [7]);};};func (_dg *Renderer )SetStrokeWidth (width float64 ){_dg ._ba =width ;_dg ._fff .Add_w (width )};func _fbaf (_aag _f .Color )(uint8 ,uint8 ,uint8 ,uint8 ){_cff ,_dfg ,_eaa ,_aec :=_aag .RGBA ();
-return uint8 (_cff >>8),uint8 (_dfg >>8),uint8 (_eaa >>8),uint8 (_aec >>8);};func _ecf (_bbd _f .Color )(float64 ,float64 ,float64 ,float64 ){_dgf ,_fea ,_ed ,_ca :=_fbaf (_bbd );return float64 (_dgf )/255,float64 (_fea )/255,float64 (_ed )/255,float64 (_ca )/255;
-};func (_ee *Renderer )SetDPI (dpi float64 ){_ee ._cd =dpi };func (_cbc *Renderer )getTextWidth (_dde string )float64 {var _bfe float64 ;for _ ,_dcg :=range _dde {_aac ,_fc :=_cbc ._ac .GetRuneMetrics (_dcg );if !_fc {_fb .Log .Debug ("\u0045\u0052\u0052OR\u003a\u0020\u0075\u006e\u0073\u0075\u0070\u0070\u006fr\u0074e\u0064 \u0072u\u006e\u0065\u0020\u0025\u0076\u0020\u0069\u006e\u0020\u0066\u006f\u006e\u0074",_dcg );
-};_bfe +=_aac .Wx ;};return _cbc ._cb *_bfe /1000.0;};func (_gbf *Renderer )SetFont (font _e .Font ){_cgb ,_efb :=font .(*_b .PdfFont );if !_efb {_fb .Log .Debug ("\u0045R\u0052\u004f\u0052\u003a\u0020\u0069\u006e\u0076\u0061\u006c\u0069d\u0020\u0066\u006f\u006e\u0074\u0020\u0074\u0079\u0070\u0065");
-return ;};_fbd ,_efb :=_gbf ._eg [_cgb ];if !_efb {_fbd =_bfa ("\u0046\u006f\u006e\u0074",1,_gbf ._fd .HasFontByName );if _bee :=_gbf ._fd .SetFontByName (_fbd ,_cgb .ToPdfObject ());_bee !=nil {_fb .Log .Debug ("\u0045\u0052\u0052\u004f\u0052:\u0020\u0063\u006f\u0075\u006c\u0064\u0020\u006e\u006f\u0074\u0020\u0061\u0064d\u0020\u0066\u006f\u006e\u0074\u0020\u0025\u0076\u0020\u0074\u006f\u0020\u0072\u0065\u0073\u006f\u0075\u0072\u0063\u0065\u0073",_cgb );
-};_gbf ._eg [_cgb ]=_fbd ;};_gbf ._fff .Add_Tf (_fbd ,_gbf ._cb );_gbf ._ac =_cgb ;};func (_aegc *Renderer )LineTo (x ,y int ){_aegc ._fff .Add_l (float64 (x ),float64 (y ))};func (_ag *Renderer )SetStrokeDashArray (dashArray []float64 ){_gaa :=make ([]int64 ,len (dashArray ));
-for _gae ,_ef :=range dashArray {_gaa [_gae ]=int64 (_ef );};_ag ._fff .Add_d (_gaa ,0);};func NewRenderer (cc *_dc .ContentCreator ,res *_b .PdfPageResources )func (int ,int )(_e .Renderer ,error ){return func (_ga ,_df int )(_e .Renderer ,error ){_gdg :=&Renderer {_gg :_ga ,_ff :_df ,_cd :72,_fff :cc ,_fd :res ,_eg :map[*_b .PdfFont ]_gc .PdfObjectName {}};
-_gdg .ResetStyle ();return _gdg ,nil ;};};func _bfa (_fde string ,_egd int ,_cgg func (_gc .PdfObjectName )bool )_gc .PdfObjectName {_eebe :=_gc .PdfObjectName (_d .Sprintf ("\u0025\u0073\u0025\u0064",_fde ,_egd ));for _gfe :=_egd ;_cgg (_eebe );{_gfe ++;
-_eebe =_gc .PdfObjectName (_d .Sprintf ("\u0025\u0073\u0025\u0064",_fde ,_gfe ));};return _eebe ;};func (_cc *Renderer )Circle (radius float64 ,x ,y int ){_gfa :=radius ;if _ea :=_cc ._ba ;_ea !=0{_gfa -=_ea /2;};_agc :=_gfa *0.551784;_cfg :=_gf .CubicBezierPath {Curves :[]_gf .CubicBezierCurve {_gf .NewCubicBezierCurve (-_gfa ,0,-_gfa ,_agc ,-_agc ,_gfa ,0,_gfa ),_gf .NewCubicBezierCurve (0,_gfa ,_agc ,_gfa ,_gfa ,_agc ,_gfa ,0),_gf .NewCubicBezierCurve (_gfa ,0,_gfa ,-_agc ,_agc ,-_gfa ,0,-_gfa ),_gf .NewCubicBezierCurve (0,-_gfa ,-_agc ,-_gfa ,-_gfa ,-_agc ,-_gfa ,0)}};
-if _fbe :=_cc ._ba ;_fbe !=0{_cfg =_cfg .Offset (_fbe /2,_fbe /2);};_cfg =_cfg .Offset (float64 (x ),float64 (y ));_gf .DrawBezierPathWithCreator (_cfg ,_cc ._fff );};func (_cbb *Renderer )Save (w _ce .Writer )error {if w ==nil {return nil ;};_ ,_ffa :=_ce .Copy (w ,_c .NewBuffer (_cbb ._fff .Bytes ()));
-return _ffa ;};
+package unichart
+
+import (
+	_c "bytes"
+	_d "fmt"
+	_fb "github.com/szwede/unipdf/v4/common"
+	_dc "github.com/szwede/unipdf/v4/contentstream"
+	_gf "github.com/szwede/unipdf/v4/contentstream/draw"
+	_gc "github.com/szwede/unipdf/v4/core"
+	_b "github.com/szwede/unipdf/v4/model"
+	_e "github.com/unidoc/unichart/render"
+	_f "image/color"
+	_ce "io"
+	_gd "math"
+)
+
+func (_aa *Renderer) SetStrokeColor(color _f.Color) {
+	_aa._fffg = color
+	_fdf, _eeb, _eebd, _ := _ecf(color)
+	_aa._fff.Add_RG(_fdf, _eeb, _eebd)
+}
+
+func (_fe *Renderer) Fill() { _fe._fff.Add_f() }
+
+func (_bd *Renderer) Close() { _bd._fff.Add_h() }
+
+func _cee(_dcc float64) float64 { return _dcc * _gd.Pi / 180.0 }
+
+func (_gb *Renderer) QuadCurveTo(cx, cy, x, y int) {
+	_gb._fff.Add_v(float64(x), float64(y), float64(cx), float64(cy))
+}
+
+func (_ged *Renderer) ClearTextRotation() { _ged._cdd = 0 }
+
+func (_be *Renderer) SetFillColor(color _f.Color) {
+	_be._a = color
+	_gda, _aeg, _ceg, _ := _ecf(color)
+	_be._fff.Add_rg(_gda, _aeg, _ceg)
+}
+
+func (_ec *Renderer) GetDPI() float64 { return _ec._cd }
+
+func (_eb *Renderer) Stroke() { _eb._fff.Add_S() }
+
+func (_eag *Renderer) wrapText(_cfe string) []string {
+	var (
+		_eafe []string
+		_cdad []rune
+	)
+	for _, _fbg := range _cfe {
+		if _fbg == '\n' {
+			_eafe = append(_eafe, string(_cdad))
+			_cdad = []rune{}
+			continue
+		}
+		_cdad = append(_cdad, _fbg)
+	}
+	if len(_cdad) > 0 {
+		_eafe = append(_eafe, string(_cdad))
+	}
+	return _eafe
+}
+
+func (_ege *Renderer) SetTextRotation(radians float64) { _ege._cdd = _dgff(-radians) }
+
+func (_ddg *Renderer) SetFontSize(size float64) { _ddg._cb = size }
+
+func (_da *Renderer) FillStroke() { _da._fff.Add_B() }
+
+func (_cbf *Renderer) Text(text string, x, y int) {
+	_cbf._fff.Add_q()
+	_cbf.SetFont(_cbf._ac)
+	_bgd, _aab, _dgg, _ := _ecf(_cbf._ae)
+	_cbf._fff.Add_rg(_bgd, _aab, _dgg)
+	_cbf._fff.Translate(float64(x), float64(y)).Scale(1, -1)
+	if _ecd := _cbf._cdd; _ecd != 0 {
+		_cbf._fff.RotateDeg(_ecd)
+	}
+	_cbf._fff.Add_BT().Add_TL(_cbf._cb)
+	var (
+		_ccc = _cbf._ac.Encoder()
+		_gfc = _cbf.wrapText(text)
+		_fg  = len(_gfc)
+	)
+	for _bb, _gbe := range _gfc {
+		_cbf._fff.Add_TJ(_gc.MakeStringFromBytes(_ccc.Encode(_gbe)))
+		if _bb != _fg-1 {
+			_cbf._fff.Add_Tstar()
+		}
+	}
+	_cbf._fff.Add_ET()
+	_cbf._fff.Add_Q()
+}
+
+func (_ad *Renderer) SetClassName(name string) {}
+
+func (_fee *Renderer) MeasureText(text string) _e.Box {
+	_dgc := _fee._cb
+	_aca, _bea := _fee._ac.GetFontDescriptor()
+	if _bea != nil {
+		_fb.Log.Debug("W\u0041\u0052\u004e\u003a\u0020\u0055n\u0061\u0062\u006c\u0065\u0020\u0074o\u0020\u0067\u0065\u0074\u0020\u0066\u006fn\u0074\u0020\u0064\u0065\u0073\u0063\u0072\u0069\u0070\u0074o\u0072")
+	} else {
+		_adb, _bgf := _aca.GetCapHeight()
+		if _bgf != nil {
+			_fb.Log.Debug("\u0057\u0041\u0052\u004e\u003a\u0020\u0055\u006e\u0061\u0062\u006c\u0065\u0020t\u006f\u0020\u0067\u0065\u0074\u0020f\u006f\u006e\u0074\u0020\u0063\u0061\u0070\u0020\u0068\u0065\u0069\u0067\u0068t\u003a\u0020\u0025\u0076", _bgf)
+		} else {
+			_dgc = _adb / 1000.0 * _fee._cb
+		}
+	}
+	var (
+		_bf  = 0.0
+		_efc = _fee.wrapText(text)
+	)
+	for _, _afg := range _efc {
+		if _eaf := _fee.getTextWidth(_afg); _eaf > _bf {
+			_bf = _eaf
+		}
+	}
+	_dggc := _e.NewBox(0, 0, int(_bf), int(_dgc))
+	if _cegb := _fee._cdd; _cegb != 0 {
+		_dggc = _dggc.Corners().Rotate(_cegb).Box()
+	}
+	return _dggc
+}
+
+func (_fa *Renderer) SetFontColor(color _f.Color) { _fa._ae = color }
+
+func _dgff(_add float64) float64 { return _add * 180 / _gd.Pi }
+
+type Renderer struct {
+	_gg   int
+	_ff   int
+	_cd   float64
+	_fff  *_dc.ContentCreator
+	_fd   *_b.PdfPageResources
+	_a    _f.Color
+	_fffg _f.Color
+	_ba   float64
+	_ac   *_b.PdfFont
+	_cb   float64
+	_ae   _f.Color
+	_cdd  float64
+	_eg   map[*_b.PdfFont]_gc.PdfObjectName
+}
+
+func (_fbb *Renderer) ResetStyle() {
+	_fbb.SetFillColor(_f.Black)
+	_fbb.SetStrokeColor(_f.Transparent)
+	_fbb.SetStrokeWidth(0)
+	_fbb.SetFont(_b.DefaultFont())
+	_fbb.SetFontColor(_f.Black)
+	_fbb.SetFontSize(12)
+	_fbb.SetTextRotation(0)
+}
+
+func (_af *Renderer) MoveTo(x, y int) { _af._fff.Add_m(float64(x), float64(y)) }
+
+func (_ab *Renderer) ArcTo(cx, cy int, rx, ry, startAngle, deltaAngle float64) {
+	startAngle = _dgff(2.0*_gd.Pi - startAngle)
+	deltaAngle = _dgff(-deltaAngle)
+	_cbe, _bec := deltaAngle, 1
+	if _gd.Abs(deltaAngle) > 90.0 {
+		_bec = int(_gd.Ceil(_gd.Abs(deltaAngle) / 90.0))
+		_cbe = deltaAngle / float64(_bec)
+	}
+	var (
+		_dd  = _cee(_cbe / 2)
+		_db  = _gd.Abs(4.0 / 3.0 * (1.0 - _gd.Cos(_dd)) / _gd.Sin(_dd))
+		_dba = float64(cx)
+		_bg  = float64(cy)
+	)
+	for _cf := 0; _cf < _bec; _cf++ {
+		_cdg := _cee(startAngle + float64(_cf)*_cbe)
+		_ge := _cee(startAngle + float64(_cf+1)*_cbe)
+		_dff := _gd.Cos(_cdg)
+		_dbb := _gd.Cos(_ge)
+		_bcc := _gd.Sin(_cdg)
+		_ffd := _gd.Sin(_ge)
+		var _fba []float64
+		if _cbe > 0 {
+			_fba = []float64{_dba + rx*_dff, _bg - ry*_bcc, _dba + rx*(_dff-_db*_bcc), _bg - ry*(_bcc+_db*_dff), _dba + rx*(_dbb+_db*_ffd), _bg - ry*(_ffd-_db*_dbb), _dba + rx*_dbb, _bg - ry*_ffd}
+		} else {
+			_fba = []float64{_dba + rx*_dff, _bg - ry*_bcc, _dba + rx*(_dff+_db*_bcc), _bg - ry*(_bcc-_db*_dff), _dba + rx*(_dbb-_db*_ffd), _bg - ry*(_ffd+_db*_dbb), _dba + rx*_dbb, _bg - ry*_ffd}
+		}
+		if _cf == 0 {
+			_ab._fff.Add_l(_fba[0], _fba[1])
+		}
+		_ab._fff.Add_c(_fba[2], _fba[3], _fba[4], _fba[5], _fba[6], _fba[7])
+	}
+}
+
+func (_dg *Renderer) SetStrokeWidth(width float64) { _dg._ba = width; _dg._fff.Add_w(width) }
+
+func _fbaf(_aag _f.Color) (uint8, uint8, uint8, uint8) {
+	_cff, _dfg, _eaa, _aec := _aag.RGBA()
+	return uint8(_cff >> 8), uint8(_dfg >> 8), uint8(_eaa >> 8), uint8(_aec >> 8)
+}
+
+func _ecf(_bbd _f.Color) (float64, float64, float64, float64) {
+	_dgf, _fea, _ed, _ca := _fbaf(_bbd)
+	return float64(_dgf) / 255, float64(_fea) / 255, float64(_ed) / 255, float64(_ca) / 255
+}
+
+func (_ee *Renderer) SetDPI(dpi float64) { _ee._cd = dpi }
+
+func (_cbc *Renderer) getTextWidth(_dde string) float64 {
+	var _bfe float64
+	for _, _dcg := range _dde {
+		_aac, _fc := _cbc._ac.GetRuneMetrics(_dcg)
+		if !_fc {
+			_fb.Log.Debug("\u0045\u0052\u0052OR\u003a\u0020\u0075\u006e\u0073\u0075\u0070\u0070\u006fr\u0074e\u0064 \u0072u\u006e\u0065\u0020\u0025\u0076\u0020\u0069\u006e\u0020\u0066\u006f\u006e\u0074", _dcg)
+		}
+		_bfe += _aac.Wx
+	}
+	return _cbc._cb * _bfe / 1000.0
+}
+
+func (_gbf *Renderer) SetFont(font _e.Font) {
+	_cgb, _efb := font.(*_b.PdfFont)
+	if !_efb {
+		_fb.Log.Debug("\u0045R\u0052\u004f\u0052\u003a\u0020\u0069\u006e\u0076\u0061\u006c\u0069d\u0020\u0066\u006f\u006e\u0074\u0020\u0074\u0079\u0070\u0065")
+		return
+	}
+	_fbd, _efb := _gbf._eg[_cgb]
+	if !_efb {
+		_fbd = _bfa("\u0046\u006f\u006e\u0074", 1, _gbf._fd.HasFontByName)
+		if _bee := _gbf._fd.SetFontByName(_fbd, _cgb.ToPdfObject()); _bee != nil {
+			_fb.Log.Debug("\u0045\u0052\u0052\u004f\u0052:\u0020\u0063\u006f\u0075\u006c\u0064\u0020\u006e\u006f\u0074\u0020\u0061\u0064d\u0020\u0066\u006f\u006e\u0074\u0020\u0025\u0076\u0020\u0074\u006f\u0020\u0072\u0065\u0073\u006f\u0075\u0072\u0063\u0065\u0073", _cgb)
+		}
+		_gbf._eg[_cgb] = _fbd
+	}
+	_gbf._fff.Add_Tf(_fbd, _gbf._cb)
+	_gbf._ac = _cgb
+}
+
+func (_aegc *Renderer) LineTo(x, y int) { _aegc._fff.Add_l(float64(x), float64(y)) }
+
+func (_ag *Renderer) SetStrokeDashArray(dashArray []float64) {
+	_gaa := make([]int64, len(dashArray))
+	for _gae, _ef := range dashArray {
+		_gaa[_gae] = int64(_ef)
+	}
+	_ag._fff.Add_d(_gaa, 0)
+}
+
+func NewRenderer(cc *_dc.ContentCreator, res *_b.PdfPageResources) func(int, int) (_e.Renderer, error) {
+	return func(_ga, _df int) (_e.Renderer, error) {
+		_gdg := &Renderer{_gg: _ga, _ff: _df, _cd: 72, _fff: cc, _fd: res, _eg: map[*_b.PdfFont]_gc.PdfObjectName{}}
+		_gdg.ResetStyle()
+		return _gdg, nil
+	}
+}
+
+func _bfa(_fde string, _egd int, _cgg func(_gc.PdfObjectName) bool) _gc.PdfObjectName {
+	_eebe := _gc.PdfObjectName(_d.Sprintf("\u0025\u0073\u0025\u0064", _fde, _egd))
+	for _gfe := _egd; _cgg(_eebe); {
+		_gfe++
+		_eebe = _gc.PdfObjectName(_d.Sprintf("\u0025\u0073\u0025\u0064", _fde, _gfe))
+	}
+	return _eebe
+}
+
+func (_cc *Renderer) Circle(radius float64, x, y int) {
+	_gfa := radius
+	if _ea := _cc._ba; _ea != 0 {
+		_gfa -= _ea / 2
+	}
+	_agc := _gfa * 0.551784
+	_cfg := _gf.CubicBezierPath{Curves: []_gf.CubicBezierCurve{_gf.NewCubicBezierCurve(-_gfa, 0, -_gfa, _agc, -_agc, _gfa, 0, _gfa), _gf.NewCubicBezierCurve(0, _gfa, _agc, _gfa, _gfa, _agc, _gfa, 0), _gf.NewCubicBezierCurve(_gfa, 0, _gfa, -_agc, _agc, -_gfa, 0, -_gfa), _gf.NewCubicBezierCurve(0, -_gfa, -_agc, -_gfa, -_gfa, -_agc, -_gfa, 0)}}
+	if _fbe := _cc._ba; _fbe != 0 {
+		_cfg = _cfg.Offset(_fbe/2, _fbe/2)
+	}
+	_cfg = _cfg.Offset(float64(x), float64(y))
+	_gf.DrawBezierPathWithCreator(_cfg, _cc._fff)
+}
+
+func (_cbb *Renderer) Save(w _ce.Writer) error {
+	if w == nil {
+		return nil
+	}
+	_, _ffa := _ce.Copy(w, _c.NewBuffer(_cbb._fff.Bytes()))
+	return _ffa
+}

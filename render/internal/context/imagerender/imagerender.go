@@ -9,100 +9,1067 @@
 // Use of this source code is governed by the UniDoc End User License Agreement
 // terms that can be accessed at https://unidoc.io/eula/
 
-package imagerender ;import (_a "errors";_eed "fmt";_fef "github.com/unidoc/freetype/raster";_c "github.com/unidoc/unipdf/v4/common";_b "github.com/unidoc/unipdf/v4/internal/precision";_d "github.com/unidoc/unipdf/v4/internal/transform";_eac "github.com/unidoc/unipdf/v4/render/internal/context";
-_bf "golang.org/x/image/draw";_cg "golang.org/x/image/font";_be "golang.org/x/image/math/f64";_eeg "golang.org/x/image/math/fixed";_eb "image";_fe "image/color";_eea "image/draw";_ea "math";_f "sort";_ee "strings";);func (_bae *Context )Image ()_eb .Image {return _bae ._af };
-func (_fee *Context )SetLineJoin (lineJoin _eac .LineJoin ){_fee ._gg =lineJoin };type radialGradient struct{_egde ,_gbgg ,_dbad circle ;_bda ,_dfeb float64 ;_cda float64 ;_gbda stops ;};func (_gadef *patternPainter )Paint (ss []_fef .Span ,done bool ){_cagf :=_gadef ._dgc .Bounds ();
-for _ ,_eff :=range ss {if _eff .Y < _cagf .Min .Y {continue ;};if _eff .Y >=_cagf .Max .Y {return ;};if _eff .X0 < _cagf .Min .X {_eff .X0 =_cagf .Min .X ;};if _eff .X1 > _cagf .Max .X {_eff .X1 =_cagf .Max .X ;};if _eff .X0 >=_eff .X1 {continue ;};const _bbcf =1<<16-1;
-_cee :=_eff .Y -_gadef ._dgc .Rect .Min .Y ;_bba :=_eff .X0 -_gadef ._dgc .Rect .Min .X ;_acbf :=(_eff .Y -_gadef ._dgc .Rect .Min .Y )*_gadef ._dgc .Stride +(_eff .X0 -_gadef ._dgc .Rect .Min .X )*4;_gbba :=_acbf +(_eff .X1 -_eff .X0 )*4;for _cbg ,_beg :=_acbf ,_bba ;
-_cbg < _gbba ;_cbg ,_beg =_cbg +4,_beg +1{_edgd :=_eff .Alpha ;if _gadef ._gefe !=nil {_edgd =_edgd *uint32 (_gadef ._gefe .AlphaAt (_beg ,_cee ).A )/255;if _edgd ==0{continue ;};};_ddbe :=_gadef ._gccd .ColorAt (_beg ,_cee );_feb ,_bdea ,_egca ,_ggef :=_ddbe .RGBA ();
-_gafe :=uint32 (_gadef ._dgc .Pix [_cbg +0]);_dadb :=uint32 (_gadef ._dgc .Pix [_cbg +1]);_afff :=uint32 (_gadef ._dgc .Pix [_cbg +2]);_egbda :=uint32 (_gadef ._dgc .Pix [_cbg +3]);_age :=(_bbcf -(_ggef *_edgd /_bbcf ))*0x101;_gadef ._dgc .Pix [_cbg +0]=uint8 ((_gafe *_age +_feb *_edgd )/_bbcf >>8);
-_gadef ._dgc .Pix [_cbg +1]=uint8 ((_dadb *_age +_bdea *_edgd )/_bbcf >>8);_gadef ._dgc .Pix [_cbg +2]=uint8 ((_afff *_age +_egca *_edgd )/_bbcf >>8);_gadef ._dgc .Pix [_cbg +3]=uint8 ((_egbda *_age +_ggef *_edgd )/_bbcf >>8);};};};func (_dbcc *linearGradient )AddColorStop (offset float64 ,color _fe .Color ){_dbcc ._egcf =append (_dbcc ._egcf ,stop {_dfbd :offset ,_becb :color });
-_f .Sort (_dbcc ._egcf );};func _gddc (_dcbd _fe .Color )_eac .Pattern {return &solidPattern {_aag :_dcbd }};func _bgg (_cbec float64 ,_gacf stops )_fe .Color {if _cbec <=0.0||len (_gacf )==1{return _gacf [0]._becb ;};_bfee :=_gacf [len (_gacf )-1];if _cbec >=_bfee ._dfbd {return _bfee ._becb ;
-};for _aac ,_adaf :=range _gacf [1:]{if _cbec < _adaf ._dfbd {_cbec =(_cbec -_gacf [_aac ]._dfbd )/(_adaf ._dfbd -_gacf [_aac ]._dfbd );return _ddeg (_gacf [_aac ]._becb ,_adaf ._becb ,_cbec );};};return _bfee ._becb ;};func (_bdd *Context )SetDash (dashes ...float64 ){_bdd ._eef =dashes };
-func (_aeba *Context )DrawStringAnchored (s string ,face _cg .Face ,x ,y ,ax ,ay float64 ){_gdda ,_eegg :=_aeba .MeasureString (s ,face );_aeba .drawString (s ,face ,x -ax *_gdda ,y +ay *_eegg );};var (_gdb =_gddc (_fe .White );_cd =_gddc (_fe .Black );
-);func (_efbd *Context )ScaleAbout (sx ,sy ,x ,y float64 ){_efbd .Translate (x ,y );_efbd .Scale (sx ,sy );_efbd .Translate (-x ,-y );};func (_ece *Context )NewSubPath (){if _ece ._efb {_ece ._fba .Add1 (_gfgc (_ece ._afg ));};_ece ._efb =false ;};func (_baa stops )Len ()int {return len (_baa )};
-func (_ccf *linearGradient )ColorAt (x ,y int )_fe .Color {if len (_ccf ._egcf )==0{return _fe .Transparent ;};_fead ,_fgbf :=float64 (x ),float64 (y );_egbd ,_gdbd ,_ebd ,_dde :=_ccf ._ddb ,_ccf ._eefab ,_ccf ._dada ,_ccf ._aee ;_def ,_fag :=_ebd -_egbd ,_dde -_gdbd ;
-if _fag ==0&&_def !=0{return _bgg ((_fead -_egbd )/_def ,_ccf ._egcf );};if _def ==0&&_fag !=0{return _bgg ((_fgbf -_gdbd )/_fag ,_ccf ._egcf );};_efa :=_def *(_fead -_egbd )+_fag *(_fgbf -_gdbd );if _efa < 0{return _ccf ._egcf [0]._becb ;};_cagb :=_ea .Hypot (_def ,_fag );
-_bag :=((_fead -_egbd )*-_fag +(_fgbf -_gdbd )*_def )/(_cagb *_cagb );_cgbf ,_gbf :=_egbd +_bag *-_fag ,_gdbd +_bag *_def ;_gaf :=_ea .Hypot (_fead -_cgbf ,_fgbf -_gbf )/_cagb ;return _bgg (_gaf ,_ccf ._egcf );};func (_cbb *Context )stroke (_fge _fef .Painter ){_ffc :=_cbb ._bb ;
-if len (_cbb ._eef )> 0{_ffc =_gec (_ffc ,_cbb ._eef ,_cbb ._ebb );}else {_ffc =_gbfb (_gfb (_ffc ));};_aca :=_cbb ._ebg ;_aca .UseNonZeroWinding =true ;_aca .Clear ();_cfe :=(_cbb ._dcg .ScalingFactorX ()+_cbb ._dcg .ScalingFactorY ())/2;_aca .AddStroke (_ffc ,_gdbe (_cbb ._aea *_cfe ),_cbb .capper (),_cbb .joiner ());
-_aca .Rasterize (_fge );};func (_fgd *Context )SetMask (mask *_eb .Alpha )error {if mask .Bounds ().Size ()!=_fgd ._af .Bounds ().Size (){return _a .New ("\u006d\u0061\u0073\u006b\u0020\u0073i\u007a\u0065\u0020\u006d\u0075\u0073\u0074\u0020\u006d\u0061\u0074\u0063\u0068 \u0063\u006f\u006e\u0074\u0065\u0078\u0074 \u0073\u0069\u007a\u0065");
-};_fgd ._cab =mask ;return nil ;};func _gbfb (_aaca [][]_d .Point )_fef .Path {var _fbd _fef .Path ;for _ ,_abac :=range _aaca {var _ceg _eeg .Point26_6 ;for _gdde ,_agbdd :=range _abac {_bdfd :=_gfgc (_agbdd );if _gdde ==0{_fbd .Start (_bdfd );}else {_fbfg :=_bdfd .X -_ceg .X ;
-_abe :=_bdfd .Y -_ceg .Y ;if _fbfg < 0{_fbfg =-_fbfg ;};if _abe < 0{_abe =-_abe ;};if _fbfg +_abe > 8{_fbd .Add1 (_bdfd );};};_ceg =_bdfd ;};};return _fbd ;};func _gbe (_efea ,_efbf uint32 ,_cfef float64 )uint8 {return uint8 (int32 (float64 (_efea )*(1.0-_cfef )+float64 (_efbf )*_cfef )>>8);
-};func NewContextForRGBA (im *_eb .RGBA )*Context {_bd :=im .Bounds ().Size ().X ;_fec :=im .Bounds ().Size ().Y ;return &Context {_bafg :_bd ,_fea :_fec ,_ebg :_fef .NewRasterizer (_bd ,_fec ),_af :im ,_bed :_fe .Transparent ,_dgeb :_gdb ,_adb :_cd ,_aea :1,_aga :_eac .FillRuleWinding ,_dcg :_d .IdentityMatrix (),_aa :_eac .NewTextState ()};
-};func _agb (_dc ,_bfe ,_dfb ,_dfa ,_deg ,_dd ,_cag ,_gag float64 )[]_d .Point {_fd :=(_ea .Hypot (_dfb -_dc ,_dfa -_bfe )+_ea .Hypot (_deg -_dfb ,_dd -_dfa )+_ea .Hypot (_cag -_deg ,_gag -_dd ));_deb :=int (_fd +0.5);if _deb < 4{_deb =4;};_db :=float64 (_deb )-1;
-_baf :=make ([]_d .Point ,_deb );for _fb :=0;_fb < _deb ;_fb ++{_fefg :=float64 (_fb )/_db ;_bff ,_dag :=_ab (_dc ,_bfe ,_dfb ,_dfa ,_deg ,_dd ,_cag ,_gag ,_fefg );_baf [_fb ]=_d .NewPoint (_bff ,_dag );};return _baf ;};func (_gcc *Context )Push (){_caf :=*_gcc ;
-_gcc ._fbc =append (_gcc ._fbc ,&_caf )};func (_ecf *Context )DrawLine (x1 ,y1 ,x2 ,y2 float64 ){_ecf .MoveTo (x1 ,y1 );_ecf .LineTo (x2 ,y2 )};func (_aeb *Context )SetFillRGBA (r ,g ,b ,a float64 ){_ ,_ ,_ ,_bbe :=_aeb ._bed .RGBA ();if _bbe > 0&&_bbe !=65535&&a ==1{a =float64 (_bbe )/65535;
-};_aba :=_fe .NRGBA {uint8 (r *255),uint8 (g *255),uint8 (b *255),uint8 (a *255)};_aeb ._bed =_aba ;_aeb ._dgeb =_gddc (_aba );};type circle struct{_ccg ,_fbaf ,_fdcd float64 };func (_edg *Context )Scale (x ,y float64 ){_edg ._dcg =_edg ._dcg .Scale (x ,y )};
-func (_gad *Context )Identity (){_gad ._dcg =_d .IdentityMatrix ()};func (_dbc *Context )QuadraticTo (x1 ,y1 ,x2 ,y2 float64 ){if !_dbc ._efb {_dbc .MoveTo (x1 ,y1 );};x1 ,y1 =_dbc .Transform (x1 ,y1 );x2 ,y2 =_dbc .Transform (x2 ,y2 );_acd :=_d .NewPoint (x1 ,y1 );
-_ec :=_d .NewPoint (x2 ,y2 );_fcc :=_gfgc (_acd );_efd :=_gfgc (_ec );_dbc ._bb .Add2 (_fcc ,_efd );_dbc ._fba .Add2 (_fcc ,_efd );_dbc ._dba =_ec ;};func (_bcf *Context )SetLineCap (lineCap _eac .LineCap ){_bcf ._fca =lineCap };func (_bdg *Context )fill (_ffca _fef .Painter ){_fac :=_bdg ._fba ;
-if _bdg ._efb {_fac =make (_fef .Path ,len (_bdg ._fba ));copy (_fac ,_bdg ._fba );_fac .Add1 (_gfgc (_bdg ._afg ));};_agdf :=_bdg ._ebg ;_agdf .UseNonZeroWinding =_bdg ._aga ==_eac .FillRuleWinding ;_agdf .Clear ();_agdf .AddPath (_fac );_agdf .Rasterize (_ffca );
-};func (_ccb *Context )InvertMask (){if _ccb ._cab ==nil {_ccb ._cab =_eb .NewAlpha (_ccb ._af .Bounds ());}else {for _adba ,_fde :=range _ccb ._cab .Pix {_ccb ._cab .Pix [_adba ]=255-_fde ;};};};func (_ebbb *Context )DrawRectangle (x ,y ,w ,h float64 ){_ebbb .NewSubPath ();
-_ebbb .MoveTo (x ,y );_ebbb .LineTo (x +w ,y );_ebbb .LineTo (x +w ,y +h );_ebbb .LineTo (x ,y +h );_ebbb .ClosePath ();};func _gfb (_cagc _fef .Path )[][]_d .Point {var _fefe [][]_d .Point ;var _cgac []_d .Point ;var _ffb ,_gdcf float64 ;for _ecaf :=0;
-_ecaf < len (_cagc );{switch _cagc [_ecaf ]{case 0:if len (_cgac )> 0{_fefe =append (_fefe ,_cgac );_cgac =nil ;};_acgd :=_adgc (_cagc [_ecaf +1]);_cdgg :=_adgc (_cagc [_ecaf +2]);_cgac =append (_cgac ,_d .NewPoint (_acgd ,_cdgg ));_ffb ,_gdcf =_acgd ,_cdgg ;
-_ecaf +=4;case 1:_gce :=_adgc (_cagc [_ecaf +1]);_dee :=_adgc (_cagc [_ecaf +2]);_cgac =append (_cgac ,_d .NewPoint (_gce ,_dee ));_ffb ,_gdcf =_gce ,_dee ;_ecaf +=4;case 2:_dcfd :=_adgc (_cagc [_ecaf +1]);_agdd :=_adgc (_cagc [_ecaf +2]);_bde :=_adgc (_cagc [_ecaf +3]);
-_gcee :=_adgc (_cagc [_ecaf +4]);_ded :=_gd (_ffb ,_gdcf ,_dcfd ,_agdd ,_bde ,_gcee );_cgac =append (_cgac ,_ded ...);_ffb ,_gdcf =_bde ,_gcee ;_ecaf +=6;case 3:_cdab :=_adgc (_cagc [_ecaf +1]);_daa :=_adgc (_cagc [_ecaf +2]);_cefe :=_adgc (_cagc [_ecaf +3]);
-_agfa :=_adgc (_cagc [_ecaf +4]);_gbb :=_adgc (_cagc [_ecaf +5]);_egdc :=_adgc (_cagc [_ecaf +6]);_gdga :=_agb (_ffb ,_gdcf ,_cdab ,_daa ,_cefe ,_agfa ,_gbb ,_egdc );_cgac =append (_cgac ,_gdga ...);_ffb ,_gdcf =_gbb ,_egdc ;_ecaf +=8;default:_c .Log .Debug ("\u0057\u0041\u0052\u004e: \u0069\u006e\u0076\u0061\u006c\u0069\u0064\u0020\u0070\u0061\u0074\u0068\u003a\u0020%\u0076",_cagc );
-return _fefe ;};};if len (_cgac )> 0{_fefe =append (_fefe ,_cgac );};return _fefe ;};func (_ggc *Context )SetDashOffset (offset float64 ){_ggc ._ebb =offset };func (_egb *Context )drawRegularPolygon (_ddfg int ,_abaa ,_egc ,_eda ,_fbb float64 ){_fccd :=2*_ea .Pi /float64 (_ddfg );
-_fbb -=_ea .Pi /2;if _ddfg %2==0{_fbb +=_fccd /2;};_egb .NewSubPath ();for _gff :=0;_gff < _ddfg ;_gff ++{_faca :=_fbb +_fccd *float64 (_gff );_egb .LineTo (_abaa +_eda *_ea .Cos (_faca ),_egc +_eda *_ea .Sin (_faca ));};_egb .ClosePath ();};func (_gee *Context )FillPreserve (){var _bfa _fef .Painter ;
-if _gee ._cab ==nil {if _gefg ,_faa :=_gee ._dgeb .(*solidPattern );_faa {_aef :=_fef .NewRGBAPainter (_gee ._af );_aef .SetColor (_gefg ._aag );_bfa =_aef ;};};if _bfa ==nil {_bfa =_beea (_gee ._af ,_gee ._cab ,_gee ._dgeb );};_gee .fill (_bfa );};func (_gbd *Context )StrokePattern ()_eac .Pattern {return _gbd ._adb };
-type patternPainter struct{_dgc *_eb .RGBA ;_gefe *_eb .Alpha ;_gccd _eac .Pattern ;};func (_cff *Context )SetMatrix (m _d .Matrix ){_cff ._dcg =m };func (_feed *Context )TextState ()*_eac .TextState {return &_feed ._aa };func _bab (_agg ,_caef ,_dgd ,_fegb ,_eace ,_ffa float64 )float64 {return _agg *_fegb +_caef *_eace +_dgd *_ffa ;
-};func (_ccdb *Context )DrawEllipse (x ,y ,rx ,ry float64 ){_ccdb .NewSubPath ();_ccdb .DrawEllipticalArc (x ,y ,rx ,ry ,0,2*_ea .Pi );_ccdb .ClosePath ();};func (_cgd *Context )DrawPoint (x ,y ,r float64 ){_cgd .Push ();_ebf ,_afc :=_cgd .Transform (x ,y );
-_cgd .Identity ();_cgd .DrawCircle (_ebf ,_afc ,r );_cgd .Pop ();};func (_acb *Context )DrawRoundedRectangle (x ,y ,w ,h ,r float64 ){_ddd ,_fbab ,_aaff ,_gdg :=x ,x +r ,x +w -r ,x +w ;_gea ,_fgb ,_ddf ,_cdfa :=y ,y +r ,y +h -r ,y +h ;_acb .NewSubPath ();
-_acb .MoveTo (_fbab ,_gea );_acb .LineTo (_aaff ,_gea );_acb .DrawArc (_aaff ,_fgb ,r ,_ffaa (270),_ffaa (360));_acb .LineTo (_gdg ,_ddf );_acb .DrawArc (_aaff ,_ddf ,r ,_ffaa (0),_ffaa (90));_acb .LineTo (_fbab ,_cdfa );_acb .DrawArc (_fbab ,_ddf ,r ,_ffaa (90),_ffaa (180));
-_acb .LineTo (_ddd ,_fgb );_acb .DrawArc (_fbab ,_fgb ,r ,_ffaa (180),_ffaa (270));_acb .ClosePath ();};func (_eeff *Context )joiner ()_fef .Joiner {switch _eeff ._gg {case _eac .LineJoinBevel :return _fef .BevelJoiner ;case _eac .LineJoinRound :return _fef .RoundJoiner ;
-};return nil ;};func (_ggcg *Context )DrawCircle (x ,y ,r float64 ){_ggcg .NewSubPath ();_ggcg .DrawEllipticalArc (x ,y ,r ,r ,0,2*_ea .Pi );_ggcg .ClosePath ();};func (_cae *Context )Rotate (angle float64 ){_cae ._dcg =_cae ._dcg .Rotate (angle )};func (_dbg *Context )SetFillStyle (pattern _eac .Pattern ){if _ggd ,_dec :=pattern .(*solidPattern );
-_dec {_dbg ._bed =_ggd ._aag ;};_dbg ._dgeb =pattern ;};func (_faf *Context )SetColor (c _fe .Color ){_faf .setFillAndStrokeColor (c )};func (_aff *Context )Clip (){_aff .ClipPreserve ();_aff .ClearPath ()};type linearGradient struct{_ddb ,_eefab ,_dada ,_aee float64 ;
-_egcf stops ;};func (_cad *Context )ResetClip (){_cad ._cab =nil };func (_fdag *Context )ShearAbout (sx ,sy ,x ,y float64 ){_fdag .Translate (x ,y );_fdag .Shear (sx ,sy );_fdag .Translate (-x ,-y );};func (_cgg *solidPattern )ColorAt (x ,y int )_fe .Color {return _cgg ._aag };
-func (_bgfb *Context )Translate (x ,y float64 ){_bgfb ._dcg =_bgfb ._dcg .Translate (x ,y )};func _gec (_gbde _fef .Path ,_dade []float64 ,_gbc float64 )_fef .Path {return _gbfb (_faaf (_gfb (_gbde ),_dade ,_gbc ));};func (_gge *radialGradient )AddColorStop (offset float64 ,color _fe .Color ){_gge ._gbda =append (_gge ._gbda ,stop {_dfbd :offset ,_becb :color });
-_f .Sort (_gge ._gbda );};func (_cgae *Context )Width ()int {return _cgae ._bafg };func NewLinearGradient (x0 ,y0 ,x1 ,y1 float64 )_eac .Gradient {_dfed :=&linearGradient {_ddb :x0 ,_eefab :y0 ,_dada :x1 ,_aee :y1 };return _dfed ;};func (_dcf *radialGradient )ColorAt (x ,y int )_fe .Color {if len (_dcf ._gbda )==0{return _fe .Transparent ;
-};_cade ,_agae :=float64 (x )+0.5-_dcf ._egde ._ccg ,float64 (y )+0.5-_dcf ._egde ._fbaf ;_aeggg :=_bab (_cade ,_agae ,_dcf ._egde ._fdcd ,_dcf ._dbad ._ccg ,_dcf ._dbad ._fbaf ,_dcf ._dbad ._fdcd );_ddbb :=_bab (_cade ,_agae ,-_dcf ._egde ._fdcd ,_cade ,_agae ,_dcf ._egde ._fdcd );
-if _dcf ._bda ==0{if _aeggg ==0{return _fe .Transparent ;};_baef :=0.5*_ddbb /_aeggg ;if _baef *_dcf ._dbad ._fdcd >=_dcf ._cda {return _bgg (_baef ,_dcf ._gbda );};return _fe .Transparent ;};_dfc :=_bab (_aeggg ,_dcf ._bda ,0,_aeggg ,-_ddbb ,0);if _dfc >=0{_gfga :=_ea .Sqrt (_dfc );
-_cbef :=(_aeggg +_gfga )*_dcf ._dfeb ;_efe :=(_aeggg -_gfga )*_dcf ._dfeb ;if _cbef *_dcf ._dbad ._fdcd >=_dcf ._cda {return _bgg (_cbef ,_dcf ._gbda );}else if _efe *_dcf ._dbad ._fdcd >=_dcf ._cda {return _bgg (_efe ,_dcf ._gbda );};};return _fe .Transparent ;
-};func (_aaf *Context )SetStrokeRGBA (r ,g ,b ,a float64 ){_bbg :=_fe .NRGBA {uint8 (r *255),uint8 (g *255),uint8 (b *255),uint8 (a *255)};_aaf ._adb =_gddc (_bbg );};func NewContext (width ,height int )*Context {return NewContextForRGBA (_eb .NewRGBA (_eb .Rect (0,0,width ,height )));
-};func (_eedba *Context )SetStrokeStyle (pattern _eac .Pattern ){_eedba ._adb =pattern };func (_cdg *Context )StrokePreserve (){var _cfg _fef .Painter ;if _cdg ._cab ==nil {if _afe ,_bgf :=_cdg ._adb .(*solidPattern );_bgf {_dfe :=_fef .NewRGBAPainter (_cdg ._af );
-_dfe .SetColor (_afe ._aag );_cfg =_dfe ;};};if _cfg ==nil {_cfg =_beea (_cdg ._af ,_cdg ._cab ,_cdg ._adb );};_cdg .stroke (_cfg );};func (_bfaf *Context )Pop (){_cac :=*_bfaf ;_cef :=_bfaf ._fbc ;_gade :=_cef [len (_cef )-1];*_bfaf =*_gade ;_bfaf ._bb =_cac ._bb ;
-_bfaf ._fba =_cac ._fba ;_bfaf ._afg =_cac ._afg ;_bfaf ._dba =_cac ._dba ;_bfaf ._efb =_cac ._efb ;};func (_aegg *Context )DrawEllipticalArc (x ,y ,rx ,ry ,angle1 ,angle2 float64 ){const _dcgeb =16;for _fbf :=0;_fbf < _dcgeb ;_fbf ++{_ffe :=float64 (_fbf +0)/_dcgeb ;
-_fda :=float64 (_fbf +1)/_dcgeb ;_dfd :=angle1 +(angle2 -angle1 )*_ffe ;_fdd :=angle1 +(angle2 -angle1 )*_fda ;_dfda :=x +rx *_ea .Cos (_dfd );_ceb :=y +ry *_ea .Sin (_dfd );_cdc :=x +rx *_ea .Cos ((_dfd +_fdd )/2);_cabe :=y +ry *_ea .Sin ((_dfd +_fdd )/2);
-_bffd :=x +rx *_ea .Cos (_fdd );_add :=y +ry *_ea .Sin (_fdd );_dac :=2*_cdc -_dfda /2-_bffd /2;_adde :=2*_cabe -_ceb /2-_add /2;if _fbf ==0{if _aegg ._efb {_aegg .LineTo (_dfda ,_ceb );}else {_aegg .MoveTo (_dfda ,_ceb );};};_aegg .QuadraticTo (_dac ,_adde ,_bffd ,_add );
-};};func _gd (_cb ,_fefa ,_eaf ,_ga ,_ac ,_bc float64 )[]_d .Point {_bec :=(_ea .Hypot (_eaf -_cb ,_ga -_fefa )+_ea .Hypot (_ac -_eaf ,_bc -_ga ));_adg :=int (_bec +0.5);if _adg < 4{_adg =4;};_cbf :=float64 (_adg )-1;_bca :=make ([]_d .Point ,_adg );for _eedb :=0;
-_eedb < _adg ;_eedb ++{_bg :=float64 (_eedb )/_cbf ;_dgf ,_ada :=_da (_cb ,_fefa ,_eaf ,_ga ,_ac ,_bc ,_bg );_bca [_eedb ]=_d .NewPoint (_dgf ,_ada );};return _bca ;};func (_fg *Context )FillPattern ()_eac .Pattern {return _fg ._dgeb };func (_fecc *Context )SetRGBA (r ,g ,b ,a float64 ){_ ,_ ,_ ,_dad :=_fecc ._bed .RGBA ();
-if _dad > 0&&_dad !=65535&&a ==1{a =float64 (_dad )/65535;};_fecc ._bed =_fe .NRGBA {uint8 (r *255),uint8 (g *255),uint8 (b *255),uint8 (a *255)};_fecc .setFillAndStrokeColor (_fecc ._bed );};func (_cbe *Context )DrawImage (im _eb .Image ,x ,y int ){_cbe .DrawImageAnchored (im ,x ,y ,0,0)};
-func _da (_g ,_ca ,_ad ,_gf ,_cc ,_ae ,_dg float64 )(_fc ,_cf float64 ){_df :=1-_dg ;_de :=_df *_df ;_ef :=2*_df *_dg ;_ccd :=_dg *_dg ;_fc =_de *_g +_ef *_ad +_ccd *_cc ;_cf =_de *_ca +_ef *_gf +_ccd *_ae ;return ;};func _cdb (_ffd _eb .Image ,_bcfe repeatOp )_eac .Pattern {return &surfacePattern {_fff :_ffd ,_dccb :_bcfe };
-};type repeatOp int ;func (_feg *Context )setFillAndStrokeColor (_fa _fe .Color ){_feg ._bed =_fa ;_feg ._dgeb =_gddc (_fa );_feg ._adb =_gddc (_fa );};func (_ff *Context )SetRGB255 (r ,g ,b int ){_ff .SetRGBA255 (r ,g ,b ,255)};type surfacePattern struct{_fff _eb .Image ;
-_dccb repeatOp ;};func (_fdc *Context )SetFillRule (fillRule _eac .FillRule ){_fdc ._aga =fillRule };func (_egg *Context )AsMask ()*_eb .Alpha {_fcg :=_eb .NewAlpha (_egg ._af .Bounds ());_bf .Draw (_fcg ,_egg ._af .Bounds (),_egg ._af ,_eb .Point {},_bf .Src );
-return _fcg ;};func (_dcge *Context )SetLineWidth (lineWidth float64 ){_dcge ._aea =lineWidth };func (_dcc stops )Swap (i ,j int ){_dcc [i ],_dcc [j ]=_dcc [j ],_dcc [i ]};func _ffaa (_babc float64 )float64 {return _babc *_ea .Pi /180};func _adgc (_bage _eeg .Int26_6 )float64 {const _fcce ,_eaff =6,1<<6-1;
-if _bage >=0{return float64 (_bage >>_fcce )+float64 (_bage &_eaff )/64;};_bage =-_bage ;if _bage >=0{return -(float64 (_bage >>_fcce )+float64 (_bage &_eaff )/64);};return 0;};func (_bfb *Context )LineWidth ()float64 {return _bfb ._aea };func (_bad *Context )CubicTo (x1 ,y1 ,x2 ,y2 ,x3 ,y3 float64 ){if !_bad ._efb {_bad .MoveTo (x1 ,y1 );
-};_egd ,_ecb :=_bad ._dba .X ,_bad ._dba .Y ;x1 ,y1 =_bad .Transform (x1 ,y1 );x2 ,y2 =_bad .Transform (x2 ,y2 );x3 ,y3 =_bad .Transform (x3 ,y3 );_gfd :=_agb (_egd ,_ecb ,x1 ,y1 ,x2 ,y2 ,x3 ,y3 );_efc :=_gfgc (_bad ._dba );for _ ,_aed :=range _gfd [1:]{_gcf :=_gfgc (_aed );
-if _gcf ==_efc {continue ;};_efc =_gcf ;_bad ._bb .Add1 (_gcf );_bad ._fba .Add1 (_gcf );_bad ._dba =_aed ;};};func (_facb *Context )MeasureString (s string ,face _cg .Face )(_eacg ,_gfe float64 ){_gfdb :=&_cg .Drawer {Face :face };_dda :=_gfdb .MeasureString (s );
-return float64 (_dda >>6),_facb ._aa .Tf .Size ;};func (_fdg *Context )SetHexColor (x string ){_dbga ,_eag ,_ge ,_abb :=_adbb (x );_fdg .SetRGBA255 (_dbga ,_eag ,_ge ,_abb );};func (_dce *Context )DrawArc (x ,y ,r ,angle1 ,angle2 float64 ){_dce .DrawEllipticalArc (x ,y ,r ,r ,angle1 ,angle2 );
-};func (_fcb *Context )SetPixel (x ,y int ){_fcb ._af .Set (x ,y ,_fcb ._bed )};func (_eabf *Context )Transform (x ,y float64 )(_gba ,_edc float64 ){return _eabf ._dcg .Transform (x ,y )};func _ddeg (_eae ,_gdcc _fe .Color ,_agbd float64 )_fe .Color {_dbfg ,_gfef ,_aab ,_eeac :=_eae .RGBA ();
-_ggbf ,_ddfc ,_fae ,_abda :=_gdcc .RGBA ();return _fe .RGBA {_gbe (_dbfg ,_ggbf ,_agbd ),_gbe (_gfef ,_ddfc ,_agbd ),_gbe (_aab ,_fae ,_agbd ),_gbe (_eeac ,_abda ,_agbd )};};func _adbb (_cdcd string )(_dcbf ,_bddd ,_aacd ,_faac int ){_cdcd =_ee .TrimPrefix (_cdcd ,"\u0023");
-_faac =255;if len (_cdcd )==3{_dffd :="\u00251\u0078\u0025\u0031\u0078\u0025\u0031x";_eed .Sscanf (_cdcd ,_dffd ,&_dcbf ,&_bddd ,&_aacd );_dcbf |=_dcbf <<4;_bddd |=_bddd <<4;_aacd |=_aacd <<4;};if len (_cdcd )==6{_gfc :="\u0025\u0030\u0032x\u0025\u0030\u0032\u0078\u0025\u0030\u0032\u0078";
-_eed .Sscanf (_cdcd ,_gfc ,&_dcbf ,&_bddd ,&_aacd );};if len (_cdcd )==8{_fdcdd :="\u0025\u00302\u0078\u0025\u00302\u0078\u0025\u0030\u0032\u0078\u0025\u0030\u0032\u0078";_eed .Sscanf (_cdcd ,_fdcdd ,&_dcbf ,&_bddd ,&_aacd ,&_faac );};return ;};func (_cec *Context )Shear (x ,y float64 ){_cec ._dcg .Shear (x ,y )};
-func (_bdgf *Context )Fill (){_bdgf .FillPreserve ();_bdgf .ClearPath ()};func (_ggbc *Context )Matrix ()_d .Matrix {return _ggbc ._dcg };func (_afa *Context )ClosePath (){if _afa ._efb {_agbg :=_gfgc (_afa ._afg );_afa ._bb .Add1 (_agbg );_afa ._fba .Add1 (_agbg );
-_afa ._dba =_afa ._afg ;};};type solidPattern struct{_aag _fe .Color };func _faaf (_dccc [][]_d .Point ,_addf []float64 ,_eefe float64 )[][]_d .Point {var _aec [][]_d .Point ;if len (_addf )==0{return _dccc ;};if len (_addf )==1{_addf =append (_addf ,_addf [0]);
-};for _ ,_dcbc :=range _dccc {if len (_dcbc )< 2{continue ;};_cfd :=_dcbc [0];_adbe :=1;_gdcff :=0;_ddc :=0.0;if _eefe !=0{var _ddfd float64 ;for _ ,_dccd :=range _addf {_ddfd +=_dccd ;};_eefe =_ea .Mod (_eefe ,_ddfd );if _eefe < 0{_eefe +=_ddfd ;};for _dab ,_dca :=range _addf {_eefe -=_dca ;
-if _eefe < 0{_gdcff =_dab ;_ddc =_dca +_eefe ;break ;};};};var _dcd []_d .Point ;_dcd =append (_dcd ,_cfd );for _adbe < len (_dcbc ){_aeea :=_addf [_gdcff ];_bef :=_dcbc [_adbe ];_ebff :=_cfd .Distance (_bef );_egae :=_aeea -_ddc ;if _ebff > _egae {_daf :=_egae /_ebff ;
-_bfec :=_cfd .Interpolate (_bef ,_daf );_dcd =append (_dcd ,_bfec );if _gdcff %2==0&&len (_dcd )> 1{_aec =append (_aec ,_dcd );};_dcd =nil ;_dcd =append (_dcd ,_bfec );_ddc =0;_cfd =_bfec ;_gdcff =(_gdcff +1)%len (_addf );}else {_dcd =append (_dcd ,_bef );
-_cfd =_bef ;_ddc +=_ebff ;_adbe ++;};};if _gdcff %2==0&&len (_dcd )> 1{_aec =append (_aec ,_dcd );};};return _aec ;};func (_gdc *Context )ClearPath (){_gdc ._bb .Clear ();_gdc ._fba .Clear ();_gdc ._efb =false };func (_cdf *Context )MoveTo (x ,y float64 ){if _cdf ._efb {_cdf ._fba .Add1 (_gfgc (_cdf ._afg ));
-};x ,y =_cdf .Transform (x ,y );_debe :=_d .NewPoint (x ,y );_dcb :=_gfgc (_debe );_cdf ._bb .Start (_dcb );_cdf ._fba .Start (_dcb );_cdf ._afg =_debe ;_cdf ._dba =_debe ;_cdf ._efb =true ;};type Context struct{_bafg int ;_fea int ;_ebg *_fef .Rasterizer ;
-_af *_eb .RGBA ;_cab *_eb .Alpha ;_bed _fe .Color ;_dgeb _eac .Pattern ;_adb _eac .Pattern ;_bb _fef .Path ;_fba _fef .Path ;_afg _d .Point ;_dba _d .Point ;_efb bool ;_eef []float64 ;_ebb float64 ;_aea float64 ;_fca _eac .LineCap ;_gg _eac .LineJoin ;
-_aga _eac .FillRule ;_dcg _d .Matrix ;_aa _eac .TextState ;_fbc []*Context ;};func (_gfg *Context )DrawImageAnchored (im _eb .Image ,x ,y int ,ax ,ay float64 ){_ega :=im .Bounds ().Size ();x -=int (ax *float64 (_ega .X ));y -=int (ay *float64 (_ega .Y ));
-_bddb :=_bf .BiLinear ;_fcf :=_gfg ._dcg .Clone ().Translate (float64 (x ),float64 (y ));_fcfb :=_be .Aff3 {_fcf [0],_fcf [3],_fcf [6],_fcf [1],_fcf [4],_fcf [7]};if _gfg ._cab ==nil {_bddb .Transform (_gfg ._af ,_fcfb ,im ,im .Bounds (),_bf .Over ,nil );
-}else {_bddb .Transform (_gfg ._af ,_fcfb ,im ,im .Bounds (),_bf .Over ,&_bf .Options {DstMask :_gfg ._cab ,DstMaskP :_eb .Point {}});};};func (_fegd *Context )drawString (_aae string ,_ged _cg .Face ,_bbc ,_eggc float64 ){_bac :=&_cg .Drawer {Src :_eb .NewUniform (_fegd ._bed ),Face :_ged ,Dot :_gfgc (_d .NewPoint (_bbc ,_eggc ))};
-_bdf :=rune (-1);for _ ,_cfb :=range _aae {if _bdf >=0{_bac .Dot .X +=_bac .Face .Kern (_bdf ,_cfb );};_dbf ,_abd ,_agf ,_eedf ,_aede :=_bac .Face .Glyph (_bac .Dot ,_cfb );if !_aede {continue ;};_gdd :=_dbf .Sub (_dbf .Min );_aeaa :=_eb .NewRGBA (_gdd );
-_bf .DrawMask (_aeaa ,_gdd ,_bac .Src ,_eb .Point {},_abd ,_agf ,_bf .Over );var _bfac *_bf .Options ;if _fegd ._cab !=nil {_bfac =&_bf .Options {DstMask :_fegd ._cab ,DstMaskP :_eb .Point {}};};_cebd :=_fegd ._dcg .Clone ().Translate (float64 (_dbf .Min .X ),float64 (_dbf .Min .Y ));
-_ccda :=_be .Aff3 {_cebd [0],_cebd [3],_cebd [6],_cebd [1],_cebd [4],_cebd [7]};_bf .BiLinear .Transform (_fegd ._af ,_ccda ,_aeaa ,_gdd ,_bf .Over ,_bfac );_bac .Dot .X +=_eedf ;_bdf =_cfb ;};};func _beea (_egf *_eb .RGBA ,_cdbg *_eb .Alpha ,_eafd _eac .Pattern )*patternPainter {return &patternPainter {_egf ,_cdbg ,_eafd };
-};func (_aebd *Context )Clear (){_bbea :=_eb .NewUniform (_aebd ._bed );_bf .Draw (_aebd ._af ,_aebd ._af .Bounds (),_bbea ,_eb .Point {},_bf .Src );};func _gdbe (_bfed float64 )_eeg .Int26_6 {_bfed =_b .RoundDefault (_bfed );return _eeg .Int26_6 (_bfed *64);
-};func _ab (_dff ,_ba ,_dge ,_acg ,_aeg ,_bee ,_gb ,_ed ,_eg float64 )(_dea ,_gae float64 ){_cga :=1-_eg ;_gbg :=_cga *_cga *_cga ;_ag :=3*_cga *_cga *_eg ;_agd :=3*_cga *_eg *_eg ;_gac :=_eg *_eg *_eg ;_dea =_gbg *_dff +_ag *_dge +_agd *_aeg +_gac *_gb ;
-_gae =_gbg *_ba +_ag *_acg +_agd *_bee +_gac *_ed ;return ;};func (_afgc stops )Less (i ,j int )bool {return _afgc [i ]._dfbd < _afgc [j ]._dfbd };func (_eefa *Context )LineTo (x ,y float64 ){if !_eefa ._efb {_eefa .MoveTo (x ,y );}else {x ,y =_eefa .Transform (x ,y );
-_gc :=_d .NewPoint (x ,y );_ce :=_gfgc (_gc );_eefa ._bb .Add1 (_ce );_eefa ._fba .Add1 (_ce );_eefa ._dba =_gc ;};};func _adgb (_afeg _eb .Image )*_eb .RGBA {_bfg :=_afeg .Bounds ();_bbad :=_eb .NewRGBA (_bfg );_eea .Draw (_bbad ,_bfg ,_afeg ,_bfg .Min ,_eea .Src );
-return _bbad ;};func (_cgf *Context )Height ()int {return _cgf ._fea };func NewContextForImage (im _eb .Image )*Context {return NewContextForRGBA (_adgb (im ))};func (_bbb *Context )DrawString (s string ,face _cg .Face ,x ,y float64 ){_bbb .DrawStringAnchored (s ,face ,x ,y ,0,0);
-};func (_cebdg *surfacePattern )ColorAt (x ,y int )_fe .Color {_afb :=_cebdg ._fff .Bounds ();switch _cebdg ._dccb {case _efde :if y >=_afb .Dy (){return _fe .Transparent ;};case _gaa :if x >=_afb .Dx (){return _fe .Transparent ;};case _ggg :if x >=_afb .Dx ()||y >=_afb .Dy (){return _fe .Transparent ;
-};};x =x %_afb .Dx ()+_afb .Min .X ;y =y %_afb .Dy ()+_afb .Min .Y ;return _cebdg ._fff .At (x ,y );};const (_fagg repeatOp =iota ;_efde ;_gaa ;_ggg ;);func (_fdb *Context )capper ()_fef .Capper {switch _fdb ._fca {case _eac .LineCapButt :return _fef .ButtCapper ;
-case _eac .LineCapRound :return _fef .RoundCapper ;case _eac .LineCapSquare :return _fef .SquareCapper ;};return nil ;};func _gfgc (_cbdd _d .Point )_eeg .Point26_6 {return _eeg .Point26_6 {X :_gdbe (_cbdd .X ),Y :_gdbe (_cbdd .Y )};};func (_ggb *Context )Stroke (){_ggb .StrokePreserve ();
-_ggb .ClearPath ()};func (_fga *Context )ClipPreserve (){_eca :=_eb .NewAlpha (_eb .Rect (0,0,_fga ._bafg ,_fga ._fea ));_cdd :=_fef .NewAlphaOverPainter (_eca );_fga .fill (_cdd );if _fga ._cab ==nil {_fga ._cab =_eca ;}else {_bbgg :=_eb .NewAlpha (_eb .Rect (0,0,_fga ._bafg ,_fga ._fea ));
-_bf .DrawMask (_bbgg ,_bbgg .Bounds (),_eca ,_eb .Point {},_fga ._cab ,_eb .Point {},_bf .Over );_fga ._cab =_bbgg ;};};type stops []stop ;type stop struct{_dfbd float64 ;_becb _fe .Color ;};func (_bcg *Context )SetRGBA255 (r ,g ,b ,a int ){_bcg ._bed =_fe .NRGBA {uint8 (r ),uint8 (g ),uint8 (b ),uint8 (a )};
-_bcg .setFillAndStrokeColor (_bcg ._bed );};func (_ead *Context )RotateAbout (angle ,x ,y float64 ){_ead .Translate (x ,y );_ead .Rotate (angle );_ead .Translate (-x ,-y );};func NewRadialGradient (x0 ,y0 ,r0 ,x1 ,y1 ,r1 float64 )_eac .Gradient {_dddb :=circle {x0 ,y0 ,r0 };
-_babe :=circle {x1 ,y1 ,r1 };_fcdd :=circle {x1 -x0 ,y1 -y0 ,r1 -r0 };_ecg :=_bab (_fcdd ._ccg ,_fcdd ._fbaf ,-_fcdd ._fdcd ,_fcdd ._ccg ,_fcdd ._fbaf ,_fcdd ._fdcd );var _gaff float64 ;if _ecg !=0{_gaff =1.0/_ecg ;};_fbg :=-_dddb ._fdcd ;_fdaf :=&radialGradient {_egde :_dddb ,_gbgg :_babe ,_dbad :_fcdd ,_bda :_ecg ,_dfeb :_gaff ,_cda :_fbg };
-return _fdaf ;};func (_cgb *Context )SetRGB (r ,g ,b float64 ){_cgb .SetRGBA (r ,g ,b ,1)};
+package imagerender
+
+import (
+	_a "errors"
+	_eed "fmt"
+	_c "github.com/szwede/unipdf/v4/common"
+	_b "github.com/szwede/unipdf/v4/internal/precision"
+	_d "github.com/szwede/unipdf/v4/internal/transform"
+	_eac "github.com/szwede/unipdf/v4/render/internal/context"
+	_fef "github.com/unidoc/freetype/raster"
+	_bf "golang.org/x/image/draw"
+	_cg "golang.org/x/image/font"
+	_be "golang.org/x/image/math/f64"
+	_eeg "golang.org/x/image/math/fixed"
+	_eb "image"
+	_fe "image/color"
+	_eea "image/draw"
+	_ea "math"
+	_f "sort"
+	_ee "strings"
+)
+
+func (_bae *Context) Image() _eb.Image { return _bae._af }
+
+func (_fee *Context) SetLineJoin(lineJoin _eac.LineJoin) { _fee._gg = lineJoin }
+
+type radialGradient struct {
+	_egde, _gbgg, _dbad circle
+	_bda, _dfeb         float64
+	_cda                float64
+	_gbda               stops
+}
+
+func (_gadef *patternPainter) Paint(ss []_fef.Span, done bool) {
+	_cagf := _gadef._dgc.Bounds()
+	for _, _eff := range ss {
+		if _eff.Y < _cagf.Min.Y {
+			continue
+		}
+		if _eff.Y >= _cagf.Max.Y {
+			return
+		}
+		if _eff.X0 < _cagf.Min.X {
+			_eff.X0 = _cagf.Min.X
+		}
+		if _eff.X1 > _cagf.Max.X {
+			_eff.X1 = _cagf.Max.X
+		}
+		if _eff.X0 >= _eff.X1 {
+			continue
+		}
+		const _bbcf = 1<<16 - 1
+		_cee := _eff.Y - _gadef._dgc.Rect.Min.Y
+		_bba := _eff.X0 - _gadef._dgc.Rect.Min.X
+		_acbf := (_eff.Y-_gadef._dgc.Rect.Min.Y)*_gadef._dgc.Stride + (_eff.X0-_gadef._dgc.Rect.Min.X)*4
+		_gbba := _acbf + (_eff.X1-_eff.X0)*4
+		for _cbg, _beg := _acbf, _bba; _cbg < _gbba; _cbg, _beg = _cbg+4, _beg+1 {
+			_edgd := _eff.Alpha
+			if _gadef._gefe != nil {
+				_edgd = _edgd * uint32(_gadef._gefe.AlphaAt(_beg, _cee).A) / 255
+				if _edgd == 0 {
+					continue
+				}
+			}
+			_ddbe := _gadef._gccd.ColorAt(_beg, _cee)
+			_feb, _bdea, _egca, _ggef := _ddbe.RGBA()
+			_gafe := uint32(_gadef._dgc.Pix[_cbg+0])
+			_dadb := uint32(_gadef._dgc.Pix[_cbg+1])
+			_afff := uint32(_gadef._dgc.Pix[_cbg+2])
+			_egbda := uint32(_gadef._dgc.Pix[_cbg+3])
+			_age := (_bbcf - (_ggef * _edgd / _bbcf)) * 0x101
+			_gadef._dgc.Pix[_cbg+0] = uint8((_gafe*_age + _feb*_edgd) / _bbcf >> 8)
+			_gadef._dgc.Pix[_cbg+1] = uint8((_dadb*_age + _bdea*_edgd) / _bbcf >> 8)
+			_gadef._dgc.Pix[_cbg+2] = uint8((_afff*_age + _egca*_edgd) / _bbcf >> 8)
+			_gadef._dgc.Pix[_cbg+3] = uint8((_egbda*_age + _ggef*_edgd) / _bbcf >> 8)
+		}
+	}
+}
+
+func (_dbcc *linearGradient) AddColorStop(offset float64, color _fe.Color) {
+	_dbcc._egcf = append(_dbcc._egcf, stop{_dfbd: offset, _becb: color})
+	_f.Sort(_dbcc._egcf)
+}
+
+func _gddc(_dcbd _fe.Color) _eac.Pattern { return &solidPattern{_aag: _dcbd} }
+
+func _bgg(_cbec float64, _gacf stops) _fe.Color {
+	if _cbec <= 0.0 || len(_gacf) == 1 {
+		return _gacf[0]._becb
+	}
+	_bfee := _gacf[len(_gacf)-1]
+	if _cbec >= _bfee._dfbd {
+		return _bfee._becb
+	}
+	for _aac, _adaf := range _gacf[1:] {
+		if _cbec < _adaf._dfbd {
+			_cbec = (_cbec - _gacf[_aac]._dfbd) / (_adaf._dfbd - _gacf[_aac]._dfbd)
+			return _ddeg(_gacf[_aac]._becb, _adaf._becb, _cbec)
+		}
+	}
+	return _bfee._becb
+}
+
+func (_bdd *Context) SetDash(dashes ...float64) { _bdd._eef = dashes }
+
+func (_aeba *Context) DrawStringAnchored(s string, face _cg.Face, x, y, ax, ay float64) {
+	_gdda, _eegg := _aeba.MeasureString(s, face)
+	_aeba.drawString(s, face, x-ax*_gdda, y+ay*_eegg)
+}
+
+var (
+	_gdb = _gddc(_fe.White)
+	_cd  = _gddc(_fe.Black)
+)
+
+func (_efbd *Context) ScaleAbout(sx, sy, x, y float64) {
+	_efbd.Translate(x, y)
+	_efbd.Scale(sx, sy)
+	_efbd.Translate(-x, -y)
+}
+
+func (_ece *Context) NewSubPath() {
+	if _ece._efb {
+		_ece._fba.Add1(_gfgc(_ece._afg))
+	}
+	_ece._efb = false
+}
+
+func (_baa stops) Len() int { return len(_baa) }
+
+func (_ccf *linearGradient) ColorAt(x, y int) _fe.Color {
+	if len(_ccf._egcf) == 0 {
+		return _fe.Transparent
+	}
+	_fead, _fgbf := float64(x), float64(y)
+	_egbd, _gdbd, _ebd, _dde := _ccf._ddb, _ccf._eefab, _ccf._dada, _ccf._aee
+	_def, _fag := _ebd-_egbd, _dde-_gdbd
+	if _fag == 0 && _def != 0 {
+		return _bgg((_fead-_egbd)/_def, _ccf._egcf)
+	}
+	if _def == 0 && _fag != 0 {
+		return _bgg((_fgbf-_gdbd)/_fag, _ccf._egcf)
+	}
+	_efa := _def*(_fead-_egbd) + _fag*(_fgbf-_gdbd)
+	if _efa < 0 {
+		return _ccf._egcf[0]._becb
+	}
+	_cagb := _ea.Hypot(_def, _fag)
+	_bag := ((_fead-_egbd)*-_fag + (_fgbf-_gdbd)*_def) / (_cagb * _cagb)
+	_cgbf, _gbf := _egbd+_bag*-_fag, _gdbd+_bag*_def
+	_gaf := _ea.Hypot(_fead-_cgbf, _fgbf-_gbf) / _cagb
+	return _bgg(_gaf, _ccf._egcf)
+}
+
+func (_cbb *Context) stroke(_fge _fef.Painter) {
+	_ffc := _cbb._bb
+	if len(_cbb._eef) > 0 {
+		_ffc = _gec(_ffc, _cbb._eef, _cbb._ebb)
+	} else {
+		_ffc = _gbfb(_gfb(_ffc))
+	}
+	_aca := _cbb._ebg
+	_aca.UseNonZeroWinding = true
+	_aca.Clear()
+	_cfe := (_cbb._dcg.ScalingFactorX() + _cbb._dcg.ScalingFactorY()) / 2
+	_aca.AddStroke(_ffc, _gdbe(_cbb._aea*_cfe), _cbb.capper(), _cbb.joiner())
+	_aca.Rasterize(_fge)
+}
+
+func (_fgd *Context) SetMask(mask *_eb.Alpha) error {
+	if mask.Bounds().Size() != _fgd._af.Bounds().Size() {
+		return _a.New("\u006d\u0061\u0073\u006b\u0020\u0073i\u007a\u0065\u0020\u006d\u0075\u0073\u0074\u0020\u006d\u0061\u0074\u0063\u0068 \u0063\u006f\u006e\u0074\u0065\u0078\u0074 \u0073\u0069\u007a\u0065")
+	}
+	_fgd._cab = mask
+	return nil
+}
+
+func _gbfb(_aaca [][]_d.Point) _fef.Path {
+	var _fbd _fef.Path
+	for _, _abac := range _aaca {
+		var _ceg _eeg.Point26_6
+		for _gdde, _agbdd := range _abac {
+			_bdfd := _gfgc(_agbdd)
+			if _gdde == 0 {
+				_fbd.Start(_bdfd)
+			} else {
+				_fbfg := _bdfd.X - _ceg.X
+				_abe := _bdfd.Y - _ceg.Y
+				if _fbfg < 0 {
+					_fbfg = -_fbfg
+				}
+				if _abe < 0 {
+					_abe = -_abe
+				}
+				if _fbfg+_abe > 8 {
+					_fbd.Add1(_bdfd)
+				}
+			}
+			_ceg = _bdfd
+		}
+	}
+	return _fbd
+}
+
+func _gbe(_efea, _efbf uint32, _cfef float64) uint8 {
+	return uint8(int32(float64(_efea)*(1.0-_cfef)+float64(_efbf)*_cfef) >> 8)
+}
+
+func NewContextForRGBA(im *_eb.RGBA) *Context {
+	_bd := im.Bounds().Size().X
+	_fec := im.Bounds().Size().Y
+	return &Context{_bafg: _bd, _fea: _fec, _ebg: _fef.NewRasterizer(_bd, _fec), _af: im, _bed: _fe.Transparent, _dgeb: _gdb, _adb: _cd, _aea: 1, _aga: _eac.FillRuleWinding, _dcg: _d.IdentityMatrix(), _aa: _eac.NewTextState()}
+}
+
+func _agb(_dc, _bfe, _dfb, _dfa, _deg, _dd, _cag, _gag float64) []_d.Point {
+	_fd := (_ea.Hypot(_dfb-_dc, _dfa-_bfe) + _ea.Hypot(_deg-_dfb, _dd-_dfa) + _ea.Hypot(_cag-_deg, _gag-_dd))
+	_deb := int(_fd + 0.5)
+	if _deb < 4 {
+		_deb = 4
+	}
+	_db := float64(_deb) - 1
+	_baf := make([]_d.Point, _deb)
+	for _fb := 0; _fb < _deb; _fb++ {
+		_fefg := float64(_fb) / _db
+		_bff, _dag := _ab(_dc, _bfe, _dfb, _dfa, _deg, _dd, _cag, _gag, _fefg)
+		_baf[_fb] = _d.NewPoint(_bff, _dag)
+	}
+	return _baf
+}
+
+func (_gcc *Context) Push() {
+	_caf := *_gcc
+	_gcc._fbc = append(_gcc._fbc, &_caf)
+}
+
+func (_ecf *Context) DrawLine(x1, y1, x2, y2 float64) {
+	_ecf.MoveTo(x1, y1)
+	_ecf.LineTo(x2, y2)
+}
+
+func (_aeb *Context) SetFillRGBA(r, g, b, a float64) {
+	_, _, _, _bbe := _aeb._bed.RGBA()
+	if _bbe > 0 && _bbe != 65535 && a == 1 {
+		a = float64(_bbe) / 65535
+	}
+	_aba := _fe.NRGBA{uint8(r * 255), uint8(g * 255), uint8(b * 255), uint8(a * 255)}
+	_aeb._bed = _aba
+	_aeb._dgeb = _gddc(_aba)
+}
+
+type circle struct{ _ccg, _fbaf, _fdcd float64 }
+
+func (_edg *Context) Scale(x, y float64) { _edg._dcg = _edg._dcg.Scale(x, y) }
+
+func (_gad *Context) Identity() { _gad._dcg = _d.IdentityMatrix() }
+
+func (_dbc *Context) QuadraticTo(x1, y1, x2, y2 float64) {
+	if !_dbc._efb {
+		_dbc.MoveTo(x1, y1)
+	}
+	x1, y1 = _dbc.Transform(x1, y1)
+	x2, y2 = _dbc.Transform(x2, y2)
+	_acd := _d.NewPoint(x1, y1)
+	_ec := _d.NewPoint(x2, y2)
+	_fcc := _gfgc(_acd)
+	_efd := _gfgc(_ec)
+	_dbc._bb.Add2(_fcc, _efd)
+	_dbc._fba.Add2(_fcc, _efd)
+	_dbc._dba = _ec
+}
+
+func (_bcf *Context) SetLineCap(lineCap _eac.LineCap) { _bcf._fca = lineCap }
+
+func (_bdg *Context) fill(_ffca _fef.Painter) {
+	_fac := _bdg._fba
+	if _bdg._efb {
+		_fac = make(_fef.Path, len(_bdg._fba))
+		copy(_fac, _bdg._fba)
+		_fac.Add1(_gfgc(_bdg._afg))
+	}
+	_agdf := _bdg._ebg
+	_agdf.UseNonZeroWinding = _bdg._aga == _eac.FillRuleWinding
+	_agdf.Clear()
+	_agdf.AddPath(_fac)
+	_agdf.Rasterize(_ffca)
+}
+
+func (_ccb *Context) InvertMask() {
+	if _ccb._cab == nil {
+		_ccb._cab = _eb.NewAlpha(_ccb._af.Bounds())
+	} else {
+		for _adba, _fde := range _ccb._cab.Pix {
+			_ccb._cab.Pix[_adba] = 255 - _fde
+		}
+	}
+}
+
+func (_ebbb *Context) DrawRectangle(x, y, w, h float64) {
+	_ebbb.NewSubPath()
+	_ebbb.MoveTo(x, y)
+	_ebbb.LineTo(x+w, y)
+	_ebbb.LineTo(x+w, y+h)
+	_ebbb.LineTo(x, y+h)
+	_ebbb.ClosePath()
+}
+
+func _gfb(_cagc _fef.Path) [][]_d.Point {
+	var _fefe [][]_d.Point
+	var _cgac []_d.Point
+	var _ffb, _gdcf float64
+	for _ecaf := 0; _ecaf < len(_cagc); {
+		switch _cagc[_ecaf] {
+		case 0:
+			if len(_cgac) > 0 {
+				_fefe = append(_fefe, _cgac)
+				_cgac = nil
+			}
+			_acgd := _adgc(_cagc[_ecaf+1])
+			_cdgg := _adgc(_cagc[_ecaf+2])
+			_cgac = append(_cgac, _d.NewPoint(_acgd, _cdgg))
+			_ffb, _gdcf = _acgd, _cdgg
+			_ecaf += 4
+		case 1:
+			_gce := _adgc(_cagc[_ecaf+1])
+			_dee := _adgc(_cagc[_ecaf+2])
+			_cgac = append(_cgac, _d.NewPoint(_gce, _dee))
+			_ffb, _gdcf = _gce, _dee
+			_ecaf += 4
+		case 2:
+			_dcfd := _adgc(_cagc[_ecaf+1])
+			_agdd := _adgc(_cagc[_ecaf+2])
+			_bde := _adgc(_cagc[_ecaf+3])
+			_gcee := _adgc(_cagc[_ecaf+4])
+			_ded := _gd(_ffb, _gdcf, _dcfd, _agdd, _bde, _gcee)
+			_cgac = append(_cgac, _ded...)
+			_ffb, _gdcf = _bde, _gcee
+			_ecaf += 6
+		case 3:
+			_cdab := _adgc(_cagc[_ecaf+1])
+			_daa := _adgc(_cagc[_ecaf+2])
+			_cefe := _adgc(_cagc[_ecaf+3])
+			_agfa := _adgc(_cagc[_ecaf+4])
+			_gbb := _adgc(_cagc[_ecaf+5])
+			_egdc := _adgc(_cagc[_ecaf+6])
+			_gdga := _agb(_ffb, _gdcf, _cdab, _daa, _cefe, _agfa, _gbb, _egdc)
+			_cgac = append(_cgac, _gdga...)
+			_ffb, _gdcf = _gbb, _egdc
+			_ecaf += 8
+		default:
+			_c.Log.Debug("\u0057\u0041\u0052\u004e: \u0069\u006e\u0076\u0061\u006c\u0069\u0064\u0020\u0070\u0061\u0074\u0068\u003a\u0020%\u0076", _cagc)
+			return _fefe
+		}
+	}
+	if len(_cgac) > 0 {
+		_fefe = append(_fefe, _cgac)
+	}
+	return _fefe
+}
+
+func (_ggc *Context) SetDashOffset(offset float64) { _ggc._ebb = offset }
+
+func (_egb *Context) drawRegularPolygon(_ddfg int, _abaa, _egc, _eda, _fbb float64) {
+	_fccd := 2 * _ea.Pi / float64(_ddfg)
+	_fbb -= _ea.Pi / 2
+	if _ddfg%2 == 0 {
+		_fbb += _fccd / 2
+	}
+	_egb.NewSubPath()
+	for _gff := 0; _gff < _ddfg; _gff++ {
+		_faca := _fbb + _fccd*float64(_gff)
+		_egb.LineTo(_abaa+_eda*_ea.Cos(_faca), _egc+_eda*_ea.Sin(_faca))
+	}
+	_egb.ClosePath()
+}
+
+func (_gee *Context) FillPreserve() {
+	var _bfa _fef.Painter
+	if _gee._cab == nil {
+		if _gefg, _faa := _gee._dgeb.(*solidPattern); _faa {
+			_aef := _fef.NewRGBAPainter(_gee._af)
+			_aef.SetColor(_gefg._aag)
+			_bfa = _aef
+		}
+	}
+	if _bfa == nil {
+		_bfa = _beea(_gee._af, _gee._cab, _gee._dgeb)
+	}
+	_gee.fill(_bfa)
+}
+
+func (_gbd *Context) StrokePattern() _eac.Pattern { return _gbd._adb }
+
+type patternPainter struct {
+	_dgc  *_eb.RGBA
+	_gefe *_eb.Alpha
+	_gccd _eac.Pattern
+}
+
+func (_cff *Context) SetMatrix(m _d.Matrix) { _cff._dcg = m }
+
+func (_feed *Context) TextState() *_eac.TextState { return &_feed._aa }
+
+func _bab(_agg, _caef, _dgd, _fegb, _eace, _ffa float64) float64 {
+	return _agg*_fegb + _caef*_eace + _dgd*_ffa
+}
+
+func (_ccdb *Context) DrawEllipse(x, y, rx, ry float64) {
+	_ccdb.NewSubPath()
+	_ccdb.DrawEllipticalArc(x, y, rx, ry, 0, 2*_ea.Pi)
+	_ccdb.ClosePath()
+}
+
+func (_cgd *Context) DrawPoint(x, y, r float64) {
+	_cgd.Push()
+	_ebf, _afc := _cgd.Transform(x, y)
+	_cgd.Identity()
+	_cgd.DrawCircle(_ebf, _afc, r)
+	_cgd.Pop()
+}
+
+func (_acb *Context) DrawRoundedRectangle(x, y, w, h, r float64) {
+	_ddd, _fbab, _aaff, _gdg := x, x+r, x+w-r, x+w
+	_gea, _fgb, _ddf, _cdfa := y, y+r, y+h-r, y+h
+	_acb.NewSubPath()
+	_acb.MoveTo(_fbab, _gea)
+	_acb.LineTo(_aaff, _gea)
+	_acb.DrawArc(_aaff, _fgb, r, _ffaa(270), _ffaa(360))
+	_acb.LineTo(_gdg, _ddf)
+	_acb.DrawArc(_aaff, _ddf, r, _ffaa(0), _ffaa(90))
+	_acb.LineTo(_fbab, _cdfa)
+	_acb.DrawArc(_fbab, _ddf, r, _ffaa(90), _ffaa(180))
+	_acb.LineTo(_ddd, _fgb)
+	_acb.DrawArc(_fbab, _fgb, r, _ffaa(180), _ffaa(270))
+	_acb.ClosePath()
+}
+
+func (_eeff *Context) joiner() _fef.Joiner {
+	switch _eeff._gg {
+	case _eac.LineJoinBevel:
+		return _fef.BevelJoiner
+	case _eac.LineJoinRound:
+		return _fef.RoundJoiner
+	}
+	return nil
+}
+
+func (_ggcg *Context) DrawCircle(x, y, r float64) {
+	_ggcg.NewSubPath()
+	_ggcg.DrawEllipticalArc(x, y, r, r, 0, 2*_ea.Pi)
+	_ggcg.ClosePath()
+}
+
+func (_cae *Context) Rotate(angle float64) { _cae._dcg = _cae._dcg.Rotate(angle) }
+
+func (_dbg *Context) SetFillStyle(pattern _eac.Pattern) {
+	if _ggd, _dec := pattern.(*solidPattern); _dec {
+		_dbg._bed = _ggd._aag
+	}
+	_dbg._dgeb = pattern
+}
+
+func (_faf *Context) SetColor(c _fe.Color) { _faf.setFillAndStrokeColor(c) }
+
+func (_aff *Context) Clip() { _aff.ClipPreserve(); _aff.ClearPath() }
+
+type linearGradient struct {
+	_ddb, _eefab, _dada, _aee float64
+	_egcf                     stops
+}
+
+func (_cad *Context) ResetClip() { _cad._cab = nil }
+
+func (_fdag *Context) ShearAbout(sx, sy, x, y float64) {
+	_fdag.Translate(x, y)
+	_fdag.Shear(sx, sy)
+	_fdag.Translate(-x, -y)
+}
+
+func (_cgg *solidPattern) ColorAt(x, y int) _fe.Color { return _cgg._aag }
+
+func (_bgfb *Context) Translate(x, y float64) { _bgfb._dcg = _bgfb._dcg.Translate(x, y) }
+
+func _gec(_gbde _fef.Path, _dade []float64, _gbc float64) _fef.Path {
+	return _gbfb(_faaf(_gfb(_gbde), _dade, _gbc))
+}
+
+func (_gge *radialGradient) AddColorStop(offset float64, color _fe.Color) {
+	_gge._gbda = append(_gge._gbda, stop{_dfbd: offset, _becb: color})
+	_f.Sort(_gge._gbda)
+}
+
+func (_cgae *Context) Width() int { return _cgae._bafg }
+
+func NewLinearGradient(x0, y0, x1, y1 float64) _eac.Gradient {
+	_dfed := &linearGradient{_ddb: x0, _eefab: y0, _dada: x1, _aee: y1}
+	return _dfed
+}
+
+func (_dcf *radialGradient) ColorAt(x, y int) _fe.Color {
+	if len(_dcf._gbda) == 0 {
+		return _fe.Transparent
+	}
+	_cade, _agae := float64(x)+0.5-_dcf._egde._ccg, float64(y)+0.5-_dcf._egde._fbaf
+	_aeggg := _bab(_cade, _agae, _dcf._egde._fdcd, _dcf._dbad._ccg, _dcf._dbad._fbaf, _dcf._dbad._fdcd)
+	_ddbb := _bab(_cade, _agae, -_dcf._egde._fdcd, _cade, _agae, _dcf._egde._fdcd)
+	if _dcf._bda == 0 {
+		if _aeggg == 0 {
+			return _fe.Transparent
+		}
+		_baef := 0.5 * _ddbb / _aeggg
+		if _baef*_dcf._dbad._fdcd >= _dcf._cda {
+			return _bgg(_baef, _dcf._gbda)
+		}
+		return _fe.Transparent
+	}
+	_dfc := _bab(_aeggg, _dcf._bda, 0, _aeggg, -_ddbb, 0)
+	if _dfc >= 0 {
+		_gfga := _ea.Sqrt(_dfc)
+		_cbef := (_aeggg + _gfga) * _dcf._dfeb
+		_efe := (_aeggg - _gfga) * _dcf._dfeb
+		if _cbef*_dcf._dbad._fdcd >= _dcf._cda {
+			return _bgg(_cbef, _dcf._gbda)
+		} else if _efe*_dcf._dbad._fdcd >= _dcf._cda {
+			return _bgg(_efe, _dcf._gbda)
+		}
+	}
+	return _fe.Transparent
+}
+
+func (_aaf *Context) SetStrokeRGBA(r, g, b, a float64) {
+	_bbg := _fe.NRGBA{uint8(r * 255), uint8(g * 255), uint8(b * 255), uint8(a * 255)}
+	_aaf._adb = _gddc(_bbg)
+}
+
+func NewContext(width, height int) *Context {
+	return NewContextForRGBA(_eb.NewRGBA(_eb.Rect(0, 0, width, height)))
+}
+
+func (_eedba *Context) SetStrokeStyle(pattern _eac.Pattern) { _eedba._adb = pattern }
+
+func (_cdg *Context) StrokePreserve() {
+	var _cfg _fef.Painter
+	if _cdg._cab == nil {
+		if _afe, _bgf := _cdg._adb.(*solidPattern); _bgf {
+			_dfe := _fef.NewRGBAPainter(_cdg._af)
+			_dfe.SetColor(_afe._aag)
+			_cfg = _dfe
+		}
+	}
+	if _cfg == nil {
+		_cfg = _beea(_cdg._af, _cdg._cab, _cdg._adb)
+	}
+	_cdg.stroke(_cfg)
+}
+
+func (_bfaf *Context) Pop() {
+	_cac := *_bfaf
+	_cef := _bfaf._fbc
+	_gade := _cef[len(_cef)-1]
+	*_bfaf = *_gade
+	_bfaf._bb = _cac._bb
+	_bfaf._fba = _cac._fba
+	_bfaf._afg = _cac._afg
+	_bfaf._dba = _cac._dba
+	_bfaf._efb = _cac._efb
+}
+
+func (_aegg *Context) DrawEllipticalArc(x, y, rx, ry, angle1, angle2 float64) {
+	const _dcgeb = 16
+	for _fbf := 0; _fbf < _dcgeb; _fbf++ {
+		_ffe := float64(_fbf+0) / _dcgeb
+		_fda := float64(_fbf+1) / _dcgeb
+		_dfd := angle1 + (angle2-angle1)*_ffe
+		_fdd := angle1 + (angle2-angle1)*_fda
+		_dfda := x + rx*_ea.Cos(_dfd)
+		_ceb := y + ry*_ea.Sin(_dfd)
+		_cdc := x + rx*_ea.Cos((_dfd+_fdd)/2)
+		_cabe := y + ry*_ea.Sin((_dfd+_fdd)/2)
+		_bffd := x + rx*_ea.Cos(_fdd)
+		_add := y + ry*_ea.Sin(_fdd)
+		_dac := 2*_cdc - _dfda/2 - _bffd/2
+		_adde := 2*_cabe - _ceb/2 - _add/2
+		if _fbf == 0 {
+			if _aegg._efb {
+				_aegg.LineTo(_dfda, _ceb)
+			} else {
+				_aegg.MoveTo(_dfda, _ceb)
+			}
+		}
+		_aegg.QuadraticTo(_dac, _adde, _bffd, _add)
+	}
+}
+
+func _gd(_cb, _fefa, _eaf, _ga, _ac, _bc float64) []_d.Point {
+	_bec := (_ea.Hypot(_eaf-_cb, _ga-_fefa) + _ea.Hypot(_ac-_eaf, _bc-_ga))
+	_adg := int(_bec + 0.5)
+	if _adg < 4 {
+		_adg = 4
+	}
+	_cbf := float64(_adg) - 1
+	_bca := make([]_d.Point, _adg)
+	for _eedb := 0; _eedb < _adg; _eedb++ {
+		_bg := float64(_eedb) / _cbf
+		_dgf, _ada := _da(_cb, _fefa, _eaf, _ga, _ac, _bc, _bg)
+		_bca[_eedb] = _d.NewPoint(_dgf, _ada)
+	}
+	return _bca
+}
+
+func (_fg *Context) FillPattern() _eac.Pattern { return _fg._dgeb }
+
+func (_fecc *Context) SetRGBA(r, g, b, a float64) {
+	_, _, _, _dad := _fecc._bed.RGBA()
+	if _dad > 0 && _dad != 65535 && a == 1 {
+		a = float64(_dad) / 65535
+	}
+	_fecc._bed = _fe.NRGBA{uint8(r * 255), uint8(g * 255), uint8(b * 255), uint8(a * 255)}
+	_fecc.setFillAndStrokeColor(_fecc._bed)
+}
+
+func (_cbe *Context) DrawImage(im _eb.Image, x, y int) { _cbe.DrawImageAnchored(im, x, y, 0, 0) }
+
+func _da(_g, _ca, _ad, _gf, _cc, _ae, _dg float64) (_fc, _cf float64) {
+	_df := 1 - _dg
+	_de := _df * _df
+	_ef := 2 * _df * _dg
+	_ccd := _dg * _dg
+	_fc = _de*_g + _ef*_ad + _ccd*_cc
+	_cf = _de*_ca + _ef*_gf + _ccd*_ae
+	return
+}
+
+func _cdb(_ffd _eb.Image, _bcfe repeatOp) _eac.Pattern {
+	return &surfacePattern{_fff: _ffd, _dccb: _bcfe}
+}
+
+type repeatOp int
+
+func (_feg *Context) setFillAndStrokeColor(_fa _fe.Color) {
+	_feg._bed = _fa
+	_feg._dgeb = _gddc(_fa)
+	_feg._adb = _gddc(_fa)
+}
+
+func (_ff *Context) SetRGB255(r, g, b int) { _ff.SetRGBA255(r, g, b, 255) }
+
+type surfacePattern struct {
+	_fff  _eb.Image
+	_dccb repeatOp
+}
+
+func (_fdc *Context) SetFillRule(fillRule _eac.FillRule) { _fdc._aga = fillRule }
+
+func (_egg *Context) AsMask() *_eb.Alpha {
+	_fcg := _eb.NewAlpha(_egg._af.Bounds())
+	_bf.Draw(_fcg, _egg._af.Bounds(), _egg._af, _eb.Point{}, _bf.Src)
+	return _fcg
+}
+
+func (_dcge *Context) SetLineWidth(lineWidth float64) { _dcge._aea = lineWidth }
+
+func (_dcc stops) Swap(i, j int) { _dcc[i], _dcc[j] = _dcc[j], _dcc[i] }
+
+func _ffaa(_babc float64) float64 { return _babc * _ea.Pi / 180 }
+
+func _adgc(_bage _eeg.Int26_6) float64 {
+	const _fcce, _eaff = 6, 1<<6 - 1
+	if _bage >= 0 {
+		return float64(_bage>>_fcce) + float64(_bage&_eaff)/64
+	}
+	_bage = -_bage
+	if _bage >= 0 {
+		return -(float64(_bage>>_fcce) + float64(_bage&_eaff)/64)
+	}
+	return 0
+}
+
+func (_bfb *Context) LineWidth() float64 { return _bfb._aea }
+
+func (_bad *Context) CubicTo(x1, y1, x2, y2, x3, y3 float64) {
+	if !_bad._efb {
+		_bad.MoveTo(x1, y1)
+	}
+	_egd, _ecb := _bad._dba.X, _bad._dba.Y
+	x1, y1 = _bad.Transform(x1, y1)
+	x2, y2 = _bad.Transform(x2, y2)
+	x3, y3 = _bad.Transform(x3, y3)
+	_gfd := _agb(_egd, _ecb, x1, y1, x2, y2, x3, y3)
+	_efc := _gfgc(_bad._dba)
+	for _, _aed := range _gfd[1:] {
+		_gcf := _gfgc(_aed)
+		if _gcf == _efc {
+			continue
+		}
+		_efc = _gcf
+		_bad._bb.Add1(_gcf)
+		_bad._fba.Add1(_gcf)
+		_bad._dba = _aed
+	}
+}
+
+func (_facb *Context) MeasureString(s string, face _cg.Face) (_eacg, _gfe float64) {
+	_gfdb := &_cg.Drawer{Face: face}
+	_dda := _gfdb.MeasureString(s)
+	return float64(_dda >> 6), _facb._aa.Tf.Size
+}
+
+func (_fdg *Context) SetHexColor(x string) {
+	_dbga, _eag, _ge, _abb := _adbb(x)
+	_fdg.SetRGBA255(_dbga, _eag, _ge, _abb)
+}
+
+func (_dce *Context) DrawArc(x, y, r, angle1, angle2 float64) {
+	_dce.DrawEllipticalArc(x, y, r, r, angle1, angle2)
+}
+
+func (_fcb *Context) SetPixel(x, y int) { _fcb._af.Set(x, y, _fcb._bed) }
+
+func (_eabf *Context) Transform(x, y float64) (_gba, _edc float64) {
+	return _eabf._dcg.Transform(x, y)
+}
+
+func _ddeg(_eae, _gdcc _fe.Color, _agbd float64) _fe.Color {
+	_dbfg, _gfef, _aab, _eeac := _eae.RGBA()
+	_ggbf, _ddfc, _fae, _abda := _gdcc.RGBA()
+	return _fe.RGBA{_gbe(_dbfg, _ggbf, _agbd), _gbe(_gfef, _ddfc, _agbd), _gbe(_aab, _fae, _agbd), _gbe(_eeac, _abda, _agbd)}
+}
+
+func _adbb(_cdcd string) (_dcbf, _bddd, _aacd, _faac int) {
+	_cdcd = _ee.TrimPrefix(_cdcd, "\u0023")
+	_faac = 255
+	if len(_cdcd) == 3 {
+		_dffd := "\u00251\u0078\u0025\u0031\u0078\u0025\u0031x"
+		_eed.Sscanf(_cdcd, _dffd, &_dcbf, &_bddd, &_aacd)
+		_dcbf |= _dcbf << 4
+		_bddd |= _bddd << 4
+		_aacd |= _aacd << 4
+	}
+	if len(_cdcd) == 6 {
+		_gfc := "\u0025\u0030\u0032x\u0025\u0030\u0032\u0078\u0025\u0030\u0032\u0078"
+		_eed.Sscanf(_cdcd, _gfc, &_dcbf, &_bddd, &_aacd)
+	}
+	if len(_cdcd) == 8 {
+		_fdcdd := "\u0025\u00302\u0078\u0025\u00302\u0078\u0025\u0030\u0032\u0078\u0025\u0030\u0032\u0078"
+		_eed.Sscanf(_cdcd, _fdcdd, &_dcbf, &_bddd, &_aacd, &_faac)
+	}
+	return
+}
+
+func (_cec *Context) Shear(x, y float64) { _cec._dcg.Shear(x, y) }
+
+func (_bdgf *Context) Fill() { _bdgf.FillPreserve(); _bdgf.ClearPath() }
+
+func (_ggbc *Context) Matrix() _d.Matrix { return _ggbc._dcg }
+
+func (_afa *Context) ClosePath() {
+	if _afa._efb {
+		_agbg := _gfgc(_afa._afg)
+		_afa._bb.Add1(_agbg)
+		_afa._fba.Add1(_agbg)
+		_afa._dba = _afa._afg
+	}
+}
+
+type solidPattern struct{ _aag _fe.Color }
+
+func _faaf(_dccc [][]_d.Point, _addf []float64, _eefe float64) [][]_d.Point {
+	var _aec [][]_d.Point
+	if len(_addf) == 0 {
+		return _dccc
+	}
+	if len(_addf) == 1 {
+		_addf = append(_addf, _addf[0])
+	}
+	for _, _dcbc := range _dccc {
+		if len(_dcbc) < 2 {
+			continue
+		}
+		_cfd := _dcbc[0]
+		_adbe := 1
+		_gdcff := 0
+		_ddc := 0.0
+		if _eefe != 0 {
+			var _ddfd float64
+			for _, _dccd := range _addf {
+				_ddfd += _dccd
+			}
+			_eefe = _ea.Mod(_eefe, _ddfd)
+			if _eefe < 0 {
+				_eefe += _ddfd
+			}
+			for _dab, _dca := range _addf {
+				_eefe -= _dca
+				if _eefe < 0 {
+					_gdcff = _dab
+					_ddc = _dca + _eefe
+					break
+				}
+			}
+		}
+		var _dcd []_d.Point
+		_dcd = append(_dcd, _cfd)
+		for _adbe < len(_dcbc) {
+			_aeea := _addf[_gdcff]
+			_bef := _dcbc[_adbe]
+			_ebff := _cfd.Distance(_bef)
+			_egae := _aeea - _ddc
+			if _ebff > _egae {
+				_daf := _egae / _ebff
+				_bfec := _cfd.Interpolate(_bef, _daf)
+				_dcd = append(_dcd, _bfec)
+				if _gdcff%2 == 0 && len(_dcd) > 1 {
+					_aec = append(_aec, _dcd)
+				}
+				_dcd = nil
+				_dcd = append(_dcd, _bfec)
+				_ddc = 0
+				_cfd = _bfec
+				_gdcff = (_gdcff + 1) % len(_addf)
+			} else {
+				_dcd = append(_dcd, _bef)
+				_cfd = _bef
+				_ddc += _ebff
+				_adbe++
+			}
+		}
+		if _gdcff%2 == 0 && len(_dcd) > 1 {
+			_aec = append(_aec, _dcd)
+		}
+	}
+	return _aec
+}
+
+func (_gdc *Context) ClearPath() { _gdc._bb.Clear(); _gdc._fba.Clear(); _gdc._efb = false }
+
+func (_cdf *Context) MoveTo(x, y float64) {
+	if _cdf._efb {
+		_cdf._fba.Add1(_gfgc(_cdf._afg))
+	}
+	x, y = _cdf.Transform(x, y)
+	_debe := _d.NewPoint(x, y)
+	_dcb := _gfgc(_debe)
+	_cdf._bb.Start(_dcb)
+	_cdf._fba.Start(_dcb)
+	_cdf._afg = _debe
+	_cdf._dba = _debe
+	_cdf._efb = true
+}
+
+type Context struct {
+	_bafg int
+	_fea  int
+	_ebg  *_fef.Rasterizer
+	_af   *_eb.RGBA
+	_cab  *_eb.Alpha
+	_bed  _fe.Color
+	_dgeb _eac.Pattern
+	_adb  _eac.Pattern
+	_bb   _fef.Path
+	_fba  _fef.Path
+	_afg  _d.Point
+	_dba  _d.Point
+	_efb  bool
+	_eef  []float64
+	_ebb  float64
+	_aea  float64
+	_fca  _eac.LineCap
+	_gg   _eac.LineJoin
+	_aga  _eac.FillRule
+	_dcg  _d.Matrix
+	_aa   _eac.TextState
+	_fbc  []*Context
+}
+
+func (_gfg *Context) DrawImageAnchored(im _eb.Image, x, y int, ax, ay float64) {
+	_ega := im.Bounds().Size()
+	x -= int(ax * float64(_ega.X))
+	y -= int(ay * float64(_ega.Y))
+	_bddb := _bf.BiLinear
+	_fcf := _gfg._dcg.Clone().Translate(float64(x), float64(y))
+	_fcfb := _be.Aff3{_fcf[0], _fcf[3], _fcf[6], _fcf[1], _fcf[4], _fcf[7]}
+	if _gfg._cab == nil {
+		_bddb.Transform(_gfg._af, _fcfb, im, im.Bounds(), _bf.Over, nil)
+	} else {
+		_bddb.Transform(_gfg._af, _fcfb, im, im.Bounds(), _bf.Over, &_bf.Options{DstMask: _gfg._cab, DstMaskP: _eb.Point{}})
+	}
+}
+
+func (_fegd *Context) drawString(_aae string, _ged _cg.Face, _bbc, _eggc float64) {
+	_bac := &_cg.Drawer{Src: _eb.NewUniform(_fegd._bed), Face: _ged, Dot: _gfgc(_d.NewPoint(_bbc, _eggc))}
+	_bdf := rune(-1)
+	for _, _cfb := range _aae {
+		if _bdf >= 0 {
+			_bac.Dot.X += _bac.Face.Kern(_bdf, _cfb)
+		}
+		_dbf, _abd, _agf, _eedf, _aede := _bac.Face.Glyph(_bac.Dot, _cfb)
+		if !_aede {
+			continue
+		}
+		_gdd := _dbf.Sub(_dbf.Min)
+		_aeaa := _eb.NewRGBA(_gdd)
+		_bf.DrawMask(_aeaa, _gdd, _bac.Src, _eb.Point{}, _abd, _agf, _bf.Over)
+		var _bfac *_bf.Options
+		if _fegd._cab != nil {
+			_bfac = &_bf.Options{DstMask: _fegd._cab, DstMaskP: _eb.Point{}}
+		}
+		_cebd := _fegd._dcg.Clone().Translate(float64(_dbf.Min.X), float64(_dbf.Min.Y))
+		_ccda := _be.Aff3{_cebd[0], _cebd[3], _cebd[6], _cebd[1], _cebd[4], _cebd[7]}
+		_bf.BiLinear.Transform(_fegd._af, _ccda, _aeaa, _gdd, _bf.Over, _bfac)
+		_bac.Dot.X += _eedf
+		_bdf = _cfb
+	}
+}
+
+func _beea(_egf *_eb.RGBA, _cdbg *_eb.Alpha, _eafd _eac.Pattern) *patternPainter {
+	return &patternPainter{_egf, _cdbg, _eafd}
+}
+
+func (_aebd *Context) Clear() {
+	_bbea := _eb.NewUniform(_aebd._bed)
+	_bf.Draw(_aebd._af, _aebd._af.Bounds(), _bbea, _eb.Point{}, _bf.Src)
+}
+
+func _gdbe(_bfed float64) _eeg.Int26_6 {
+	_bfed = _b.RoundDefault(_bfed)
+	return _eeg.Int26_6(_bfed * 64)
+}
+
+func _ab(_dff, _ba, _dge, _acg, _aeg, _bee, _gb, _ed, _eg float64) (_dea, _gae float64) {
+	_cga := 1 - _eg
+	_gbg := _cga * _cga * _cga
+	_ag := 3 * _cga * _cga * _eg
+	_agd := 3 * _cga * _eg * _eg
+	_gac := _eg * _eg * _eg
+	_dea = _gbg*_dff + _ag*_dge + _agd*_aeg + _gac*_gb
+	_gae = _gbg*_ba + _ag*_acg + _agd*_bee + _gac*_ed
+	return
+}
+
+func (_afgc stops) Less(i, j int) bool { return _afgc[i]._dfbd < _afgc[j]._dfbd }
+
+func (_eefa *Context) LineTo(x, y float64) {
+	if !_eefa._efb {
+		_eefa.MoveTo(x, y)
+	} else {
+		x, y = _eefa.Transform(x, y)
+		_gc := _d.NewPoint(x, y)
+		_ce := _gfgc(_gc)
+		_eefa._bb.Add1(_ce)
+		_eefa._fba.Add1(_ce)
+		_eefa._dba = _gc
+	}
+}
+
+func _adgb(_afeg _eb.Image) *_eb.RGBA {
+	_bfg := _afeg.Bounds()
+	_bbad := _eb.NewRGBA(_bfg)
+	_eea.Draw(_bbad, _bfg, _afeg, _bfg.Min, _eea.Src)
+	return _bbad
+}
+
+func (_cgf *Context) Height() int { return _cgf._fea }
+
+func NewContextForImage(im _eb.Image) *Context { return NewContextForRGBA(_adgb(im)) }
+
+func (_bbb *Context) DrawString(s string, face _cg.Face, x, y float64) {
+	_bbb.DrawStringAnchored(s, face, x, y, 0, 0)
+}
+
+func (_cebdg *surfacePattern) ColorAt(x, y int) _fe.Color {
+	_afb := _cebdg._fff.Bounds()
+	switch _cebdg._dccb {
+	case _efde:
+		if y >= _afb.Dy() {
+			return _fe.Transparent
+		}
+	case _gaa:
+		if x >= _afb.Dx() {
+			return _fe.Transparent
+		}
+	case _ggg:
+		if x >= _afb.Dx() || y >= _afb.Dy() {
+			return _fe.Transparent
+		}
+	}
+	x = x%_afb.Dx() + _afb.Min.X
+	y = y%_afb.Dy() + _afb.Min.Y
+	return _cebdg._fff.At(x, y)
+}
+
+const (
+	_fagg repeatOp = iota
+	_efde
+	_gaa
+	_ggg
+)
+
+func (_fdb *Context) capper() _fef.Capper {
+	switch _fdb._fca {
+	case _eac.LineCapButt:
+		return _fef.ButtCapper
+	case _eac.LineCapRound:
+		return _fef.RoundCapper
+	case _eac.LineCapSquare:
+		return _fef.SquareCapper
+	}
+	return nil
+}
+
+func _gfgc(_cbdd _d.Point) _eeg.Point26_6 {
+	return _eeg.Point26_6{X: _gdbe(_cbdd.X), Y: _gdbe(_cbdd.Y)}
+}
+
+func (_ggb *Context) Stroke() {
+	_ggb.StrokePreserve()
+	_ggb.ClearPath()
+}
+
+func (_fga *Context) ClipPreserve() {
+	_eca := _eb.NewAlpha(_eb.Rect(0, 0, _fga._bafg, _fga._fea))
+	_cdd := _fef.NewAlphaOverPainter(_eca)
+	_fga.fill(_cdd)
+	if _fga._cab == nil {
+		_fga._cab = _eca
+	} else {
+		_bbgg := _eb.NewAlpha(_eb.Rect(0, 0, _fga._bafg, _fga._fea))
+		_bf.DrawMask(_bbgg, _bbgg.Bounds(), _eca, _eb.Point{}, _fga._cab, _eb.Point{}, _bf.Over)
+		_fga._cab = _bbgg
+	}
+}
+
+type stops []stop
+
+type stop struct {
+	_dfbd float64
+	_becb _fe.Color
+}
+
+func (_bcg *Context) SetRGBA255(r, g, b, a int) {
+	_bcg._bed = _fe.NRGBA{uint8(r), uint8(g), uint8(b), uint8(a)}
+	_bcg.setFillAndStrokeColor(_bcg._bed)
+}
+
+func (_ead *Context) RotateAbout(angle, x, y float64) {
+	_ead.Translate(x, y)
+	_ead.Rotate(angle)
+	_ead.Translate(-x, -y)
+}
+
+func NewRadialGradient(x0, y0, r0, x1, y1, r1 float64) _eac.Gradient {
+	_dddb := circle{x0, y0, r0}
+	_babe := circle{x1, y1, r1}
+	_fcdd := circle{x1 - x0, y1 - y0, r1 - r0}
+	_ecg := _bab(_fcdd._ccg, _fcdd._fbaf, -_fcdd._fdcd, _fcdd._ccg, _fcdd._fbaf, _fcdd._fdcd)
+	var _gaff float64
+	if _ecg != 0 {
+		_gaff = 1.0 / _ecg
+	}
+	_fbg := -_dddb._fdcd
+	_fdaf := &radialGradient{_egde: _dddb, _gbgg: _babe, _dbad: _fcdd, _bda: _ecg, _dfeb: _gaff, _cda: _fbg}
+	return _fdaf
+}
+
+func (_cgb *Context) SetRGB(r, g, b float64) { _cgb.SetRGBA(r, g, b, 1) }

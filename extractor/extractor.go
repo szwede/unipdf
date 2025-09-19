@@ -11,383 +11,2700 @@
 
 // Package extractor is used for quickly extracting PDF content through a simple interface.
 // Currently offers functionality for extracting textual content.
-package extractor ;import (_fg "bytes";_fb "errors";_fa "fmt";_bg "github.com/unidoc/unipdf/v4/common";_af "github.com/unidoc/unipdf/v4/contentstream";_afa "github.com/unidoc/unipdf/v4/core";_bgf "github.com/unidoc/unipdf/v4/internal/license";_g "github.com/unidoc/unipdf/v4/internal/textencoding";
-_cd "github.com/unidoc/unipdf/v4/internal/transform";_ad "github.com/unidoc/unipdf/v4/model";_e "golang.org/x/image/draw";_f "golang.org/x/text/unicode/norm";_cg "image";_cb "image/color";_ef "io";_c "math";_eb "reflect";_ca "regexp";_eg "sort";_faf "strings";
-_bd "unicode";_a "unicode/utf8";);func (_dgccc *shapesState )fill (_begef *[]pathSection ){_acda :=pathSection {_fdgf :_dgccc ._fec ,Color :_dgccc ._affd .getFillColor ()};*_begef =append (*_begef ,_acda );if _feda {_agcf :=_acda .bbox ();_fa .Printf ("\u0020 \u0020\u0020\u0046\u0049\u004c\u004c\u003a %\u0032\u0064\u0020\u0066\u0069\u006c\u006c\u0073\u0020\u0028\u0025\u0064\u0020\u006ee\u0077\u0029 \u0073\u0073\u003d%\u0073\u0020\u0063\u006f\u006c\u006f\u0072\u003d\u0025\u0033\u0076\u0020\u0025\u0036\u002e\u0032f\u003d\u00256.\u0032\u0066\u0078%\u0036\u002e\u0032\u0066\u000a",len (*_begef ),len (_acda ._fdgf ),_dgccc ,_acda .Color ,_agcf ,_agcf .Width (),_agcf .Height ());
-if _aeff {for _gdba ,_gedc :=range _acda ._fdgf {_fa .Printf ("\u0025\u0038\u0064\u003a\u0020\u0025\u0073\u000a",_gdba ,_gedc );if _gdba ==10{break ;};};};};};func (_cfea *textObject )nextLine (){_cfea .moveLP (0,-_cfea ._dggef ._dgd )};func (_feeg *subpath )last ()_cd .Point {return _feeg ._bfgb [len (_feeg ._bfgb )-1]};
+package extractor
 
+import (
+	_fg "bytes"
+	_fb "errors"
+	_fa "fmt"
+	_bg "github.com/szwede/unipdf/v4/common"
+	_af "github.com/szwede/unipdf/v4/contentstream"
+	_afa "github.com/szwede/unipdf/v4/core"
+	_bgf "github.com/szwede/unipdf/v4/internal/license"
+	_g "github.com/szwede/unipdf/v4/internal/textencoding"
+	_cd "github.com/szwede/unipdf/v4/internal/transform"
+	_ad "github.com/szwede/unipdf/v4/model"
+	_e "golang.org/x/image/draw"
+	_f "golang.org/x/text/unicode/norm"
+	_cg "image"
+	_cb "image/color"
+	_ef "io"
+	_c "math"
+	_eb "reflect"
+	_ca "regexp"
+	_eg "sort"
+	_faf "strings"
+	_bd "unicode"
+	_a "unicode/utf8"
+)
+
+func (_dgccc *shapesState) fill(_begef *[]pathSection) {
+	_acda := pathSection{_fdgf: _dgccc._fec, Color: _dgccc._affd.getFillColor()}
+	*_begef = append(*_begef, _acda)
+	if _feda {
+		_agcf := _acda.bbox()
+		_fa.Printf("\u0020 \u0020\u0020\u0046\u0049\u004c\u004c\u003a %\u0032\u0064\u0020\u0066\u0069\u006c\u006c\u0073\u0020\u0028\u0025\u0064\u0020\u006ee\u0077\u0029 \u0073\u0073\u003d%\u0073\u0020\u0063\u006f\u006c\u006f\u0072\u003d\u0025\u0033\u0076\u0020\u0025\u0036\u002e\u0032f\u003d\u00256.\u0032\u0066\u0078%\u0036\u002e\u0032\u0066\u000a", len(*_begef), len(_acda._fdgf), _dgccc, _acda.Color, _agcf, _agcf.Width(), _agcf.Height())
+		if _aeff {
+			for _gdba, _gedc := range _acda._fdgf {
+				_fa.Printf("\u0025\u0038\u0064\u003a\u0020\u0025\u0073\u000a", _gdba, _gedc)
+				if _gdba == 10 {
+					break
+				}
+			}
+		}
+	}
+}
+
+func (_cfea *textObject) nextLine() { _cfea.moveLP(0, -_cfea._dggef._dgd) }
+
+func (_feeg *subpath) last() _cd.Point { return _feeg._bfgb[len(_feeg._bfgb)-1] }
 
 // Box represents the bounding box of a given textMark on pdf page.
 // This might be used for different kinds of high lighting after doing the search
-type Box struct{BBox _ad .PdfRectangle ;};func _fgee (_dgdc ,_aece _ad .PdfRectangle )bool {return _dgdc .Lly <=_aece .Ury &&_aece .Lly <=_dgdc .Ury ;};func (_geebc *textObject )newTextMark (_faagc string ,_bfagb _cd .Matrix ,_bgagf _cd .Point ,_bgce float64 ,_gfef *_ad .PdfFont ,_ggbdb float64 ,_gaff ,_gcgca _cb .Color ,_bbeeb _afa .PdfObject ,_baba []string ,_ddcg int ,_ddbac int )(textMark ,bool ){_ccfbe :=_bfagb .Angle ();
-_gbaga :=_gdcb (_ccfbe ,_aeeb );var _eccc float64 ;if _gbaga %180!=90{_eccc =_bfagb .ScalingFactorY ();}else {_eccc =_bfagb .ScalingFactorX ();};_dfddg :=_egbg (_bfagb );_aabe :=_ad .PdfRectangle {Llx :_dfddg .X ,Lly :_dfddg .Y ,Urx :_bgagf .X ,Ury :_bgagf .Y };
-switch _gbaga %360{case 90:_aabe .Urx -=_eccc ;case 180:_aabe .Ury -=_eccc ;case 270:_aabe .Urx +=_eccc ;case 0:_aabe .Ury +=_eccc ;default:_gbaga =0;_aabe .Ury +=_eccc ;};if _aabe .Llx > _aabe .Urx {_aabe .Llx ,_aabe .Urx =_aabe .Urx ,_aabe .Llx ;};if _aabe .Lly > _aabe .Ury {_aabe .Lly ,_aabe .Ury =_aabe .Ury ,_aabe .Lly ;
-};_aagg :=true ;if _geebc ._bgbb ._bgd .Width ()> 0{_dgaad ,_cdfed :=_dgde (_aabe ,_geebc ._bgbb ._bgd );if !_cdfed {_aagg =false ;_bg .Log .Debug ("\u0054\u0065\u0078\u0074\u0020m\u0061\u0072\u006b\u0020\u006f\u0075\u0074\u0073\u0069\u0064\u0065\u0020\u0070a\u0067\u0065\u002e\u0020\u0062\u0062\u006f\u0078\u003d\u0025\u0067\u0020\u006d\u0065\u0064\u0069\u0061\u0042\u006f\u0078\u003d\u0025\u0067\u0020\u0074\u0065\u0078\u0074\u003d\u0025q",_aabe ,_geebc ._bgbb ._bgd ,_faagc );
-};_aabe =_dgaad ;};_cfdbb :=_aabe ;_cfeag :=_geebc ._bgbb ._bgd ;switch _gbaga %360{case 90:_cfeag .Urx ,_cfeag .Ury =_cfeag .Ury ,_cfeag .Urx ;_cfdbb =_ad .PdfRectangle {Llx :_cfeag .Urx -_aabe .Ury ,Urx :_cfeag .Urx -_aabe .Lly ,Lly :_aabe .Llx ,Ury :_aabe .Urx };
-case 180:_cfdbb =_ad .PdfRectangle {Llx :_cfeag .Urx -_aabe .Llx ,Urx :_cfeag .Urx -_aabe .Urx ,Lly :_cfeag .Ury -_aabe .Lly ,Ury :_cfeag .Ury -_aabe .Ury };case 270:_cfeag .Urx ,_cfeag .Ury =_cfeag .Ury ,_cfeag .Urx ;_cfdbb =_ad .PdfRectangle {Llx :_aabe .Ury ,Urx :_aabe .Lly ,Lly :_cfeag .Ury -_aabe .Llx ,Ury :_cfeag .Ury -_aabe .Urx };
-};if _cfdbb .Llx > _cfdbb .Urx {_cfdbb .Llx ,_cfdbb .Urx =_cfdbb .Urx ,_cfdbb .Llx ;};if _cfdbb .Lly > _cfdbb .Ury {_cfdbb .Lly ,_cfdbb .Ury =_cfdbb .Ury ,_cfdbb .Lly ;};_eegc :=textMark {_acfa :_faagc ,PdfRectangle :_cfdbb ,_bdee :_aabe ,_beeb :_gfef ,_caadf :_eccc ,_cffbg :_ggbdb ,_eefe :_bfagb ,_dbcdf :_bgagf ,_cbgf :_gbaga ,_ceba :_gaff ,_ebede :_gcgca ,_bcag :_bbeeb ,_gbag :_baba ,Th :_geebc ._dggef ._deeee ,Tw :_geebc ._dggef ._ccda ,_daaf :_ddbac ,_ccga :_ddcg };
-if _ggcc {_bg .Log .Info ("n\u0065\u0077\u0054\u0065\u0078\u0074M\u0061\u0072\u006b\u003a\u0020\u0073t\u0061\u0072\u0074\u003d\u0025\u002e\u0032f\u0020\u0065\u006e\u0064\u003d\u0025\u002e\u0032\u0066\u0020%\u0073",_dfddg ,_bgagf ,_eegc .String ());};return _eegc ,_aagg ;
-};func _bbgef (_dcbfc []TextMark ,_ceff *int ,_dcaa TextMark )[]TextMark {_dcaa .Offset =*_ceff ;_dcbfc =append (_dcbfc ,_dcaa );*_ceff +=len (_dcaa .Text );return _dcbfc ;};func (_degd *textWord )absorb (_bccfg *textWord ){_degd .PdfRectangle =_faea (_degd .PdfRectangle ,_bccfg .PdfRectangle );
-_degd ._ddfc =append (_degd ._ddfc ,_bccfg ._ddfc ...);};var _gcgc =[]string {"\u2756","\u27a2","\u2713","\u2022","\uf0a7","\u25a1","\u2212","\u25a0","\u25aa","\u006f"};func _cdcb (_gffa *_ad .StructTreeRoot ,_bdbab map[int ][]*textLine ,_ccfb _afa .PdfObject )[]*list {if _gffa ==nil {_bg .Log .Debug ("\u0062\u0075\u0069\u006c\u0064\u004c\u0069\u0073\u0074\u003a\u0020t\u0072\u0065\u0065\u0052\u006f\u006f\u0074\u0020\u0069\u0073 \u006e\u0069\u006c");
-return nil ;};_cefe :=[]*_ad .KValue {};var _ddfe func (_cece *_ad .KValue );_ddfe =func (_gfbf *_ad .KValue ){if _aggd :=_gfbf .GetKDict ();_aggd !=nil {if _aggd .S .String ()=="\u004c"{_cefe =append (_cefe ,_gfbf );}else {for _ ,_fegfb :=range _aggd .GetChildren (){_ddfe (_fegfb );
-};};};};for _ ,_dcdae :=range _gffa .K {_cddae :=_ad .NewKValue ();_cddae .SetKDict (_dcdae );_ddfe (_cddae );};_cfca :=_aeebf (_cefe ,_bdbab ,_ccfb );var _fbaf []*list ;for _ ,_fecgg :=range _cfca {_faffa :=_beea (_fecgg );_fbaf =append (_fbaf ,_faffa ...);
-};return _fbaf ;};func _ee (_fe int )bool {return (_fe &1)!=0};func (_bfddb paraList )xNeighbours (_agbbe float64 )map[*textPara ][]int {_beegcd :=make ([]event ,2*len (_bfddb ));if _agbbe ==0{for _cacda ,_dbbd :=range _bfddb {_beegcd [2*_cacda ]=event {_dbbd .Llx ,true ,_cacda };
-_beegcd [2*_cacda +1]=event {_dbbd .Urx ,false ,_cacda };};}else {for _ddbgea ,_bfdbd :=range _bfddb {_beegcd [2*_ddbgea ]=event {_bfdbd .Llx -_agbbe *_bfdbd .fontsize (),true ,_ddbgea };_beegcd [2*_ddbgea +1]=event {_bfdbd .Urx +_agbbe *_bfdbd .fontsize (),false ,_ddbgea };
-};};return _bfddb .eventNeighbours (_beegcd );};func (_eefaa *textPara )isAtom ()*textTable {_ggcg :=_eefaa ;_daffg :=_eefaa ._badad ;_gcbd :=_eefaa ._gdae ;if _daffg .taken ()||_gcbd .taken (){return nil ;};_cdcbf :=_daffg ._gdae ;if _cdcbf .taken ()||_cdcbf !=_gcbd ._badad {return nil ;
-};return _aebed (_ggcg ,_daffg ,_gcbd ,_cdcbf );};
+type Box struct{ BBox _ad.PdfRectangle }
+
+func _fgee(_dgdc, _aece _ad.PdfRectangle) bool {
+	return _dgdc.Lly <= _aece.Ury && _aece.Lly <= _dgdc.Ury
+}
+
+func (_geebc *textObject) newTextMark(_faagc string, _bfagb _cd.Matrix, _bgagf _cd.Point, _bgce float64, _gfef *_ad.PdfFont, _ggbdb float64, _gaff, _gcgca _cb.Color, _bbeeb _afa.PdfObject, _baba []string, _ddcg int, _ddbac int) (textMark, bool) {
+	_ccfbe := _bfagb.Angle()
+	_gbaga := _gdcb(_ccfbe, _aeeb)
+	var _eccc float64
+	if _gbaga%180 != 90 {
+		_eccc = _bfagb.ScalingFactorY()
+	} else {
+		_eccc = _bfagb.ScalingFactorX()
+	}
+	_dfddg := _egbg(_bfagb)
+	_aabe := _ad.PdfRectangle{Llx: _dfddg.X, Lly: _dfddg.Y, Urx: _bgagf.X, Ury: _bgagf.Y}
+	switch _gbaga % 360 {
+	case 90:
+		_aabe.Urx -= _eccc
+	case 180:
+		_aabe.Ury -= _eccc
+	case 270:
+		_aabe.Urx += _eccc
+	case 0:
+		_aabe.Ury += _eccc
+	default:
+		_gbaga = 0
+		_aabe.Ury += _eccc
+	}
+	if _aabe.Llx > _aabe.Urx {
+		_aabe.Llx, _aabe.Urx = _aabe.Urx, _aabe.Llx
+	}
+	if _aabe.Lly > _aabe.Ury {
+		_aabe.Lly, _aabe.Ury = _aabe.Ury, _aabe.Lly
+	}
+	_aagg := true
+	if _geebc._bgbb._bgd.Width() > 0 {
+		_dgaad, _cdfed := _dgde(_aabe, _geebc._bgbb._bgd)
+		if !_cdfed {
+			_aagg = false
+			_bg.Log.Debug("\u0054\u0065\u0078\u0074\u0020m\u0061\u0072\u006b\u0020\u006f\u0075\u0074\u0073\u0069\u0064\u0065\u0020\u0070a\u0067\u0065\u002e\u0020\u0062\u0062\u006f\u0078\u003d\u0025\u0067\u0020\u006d\u0065\u0064\u0069\u0061\u0042\u006f\u0078\u003d\u0025\u0067\u0020\u0074\u0065\u0078\u0074\u003d\u0025q", _aabe, _geebc._bgbb._bgd, _faagc)
+		}
+		_aabe = _dgaad
+	}
+	_cfdbb := _aabe
+	_cfeag := _geebc._bgbb._bgd
+	switch _gbaga % 360 {
+	case 90:
+		_cfeag.Urx, _cfeag.Ury = _cfeag.Ury, _cfeag.Urx
+		_cfdbb = _ad.PdfRectangle{Llx: _cfeag.Urx - _aabe.Ury, Urx: _cfeag.Urx - _aabe.Lly, Lly: _aabe.Llx, Ury: _aabe.Urx}
+	case 180:
+		_cfdbb = _ad.PdfRectangle{Llx: _cfeag.Urx - _aabe.Llx, Urx: _cfeag.Urx - _aabe.Urx, Lly: _cfeag.Ury - _aabe.Lly, Ury: _cfeag.Ury - _aabe.Ury}
+	case 270:
+		_cfeag.Urx, _cfeag.Ury = _cfeag.Ury, _cfeag.Urx
+		_cfdbb = _ad.PdfRectangle{Llx: _aabe.Ury, Urx: _aabe.Lly, Lly: _cfeag.Ury - _aabe.Llx, Ury: _cfeag.Ury - _aabe.Urx}
+	}
+	if _cfdbb.Llx > _cfdbb.Urx {
+		_cfdbb.Llx, _cfdbb.Urx = _cfdbb.Urx, _cfdbb.Llx
+	}
+	if _cfdbb.Lly > _cfdbb.Ury {
+		_cfdbb.Lly, _cfdbb.Ury = _cfdbb.Ury, _cfdbb.Lly
+	}
+	_eegc := textMark{_acfa: _faagc, PdfRectangle: _cfdbb, _bdee: _aabe, _beeb: _gfef, _caadf: _eccc, _cffbg: _ggbdb, _eefe: _bfagb, _dbcdf: _bgagf, _cbgf: _gbaga, _ceba: _gaff, _ebede: _gcgca, _bcag: _bbeeb, _gbag: _baba, Th: _geebc._dggef._deeee, Tw: _geebc._dggef._ccda, _daaf: _ddbac, _ccga: _ddcg}
+	if _ggcc {
+		_bg.Log.Info("n\u0065\u0077\u0054\u0065\u0078\u0074M\u0061\u0072\u006b\u003a\u0020\u0073t\u0061\u0072\u0074\u003d\u0025\u002e\u0032f\u0020\u0065\u006e\u0064\u003d\u0025\u002e\u0032\u0066\u0020%\u0073", _dfddg, _bgagf, _eegc.String())
+	}
+	return _eegc, _aagg
+}
+
+func _bbgef(_dcbfc []TextMark, _ceff *int, _dcaa TextMark) []TextMark {
+	_dcaa.Offset = *_ceff
+	_dcbfc = append(_dcbfc, _dcaa)
+	*_ceff += len(_dcaa.Text)
+	return _dcbfc
+}
+
+func (_degd *textWord) absorb(_bccfg *textWord) {
+	_degd.PdfRectangle = _faea(_degd.PdfRectangle, _bccfg.PdfRectangle)
+	_degd._ddfc = append(_degd._ddfc, _bccfg._ddfc...)
+}
+
+var _gcgc = []string{"\u2756", "\u27a2", "\u2713", "\u2022", "\uf0a7", "\u25a1", "\u2212", "\u25a0", "\u25aa", "\u006f"}
+
+func _cdcb(_gffa *_ad.StructTreeRoot, _bdbab map[int][]*textLine, _ccfb _afa.PdfObject) []*list {
+	if _gffa == nil {
+		_bg.Log.Debug("\u0062\u0075\u0069\u006c\u0064\u004c\u0069\u0073\u0074\u003a\u0020t\u0072\u0065\u0065\u0052\u006f\u006f\u0074\u0020\u0069\u0073 \u006e\u0069\u006c")
+		return nil
+	}
+	_cefe := []*_ad.KValue{}
+	var _ddfe func(_cece *_ad.KValue)
+	_ddfe = func(_gfbf *_ad.KValue) {
+		if _aggd := _gfbf.GetKDict(); _aggd != nil {
+			if _aggd.S.String() == "\u004c" {
+				_cefe = append(_cefe, _gfbf)
+			} else {
+				for _, _fegfb := range _aggd.GetChildren() {
+					_ddfe(_fegfb)
+				}
+			}
+		}
+	}
+	for _, _dcdae := range _gffa.K {
+		_cddae := _ad.NewKValue()
+		_cddae.SetKDict(_dcdae)
+		_ddfe(_cddae)
+	}
+	_cfca := _aeebf(_cefe, _bdbab, _ccfb)
+	var _fbaf []*list
+	for _, _fecgg := range _cfca {
+		_faffa := _beea(_fecgg)
+		_fbaf = append(_fbaf, _faffa...)
+	}
+	return _fbaf
+}
+
+func _ee(_fe int) bool { return (_fe & 1) != 0 }
+
+func (_bfddb paraList) xNeighbours(_agbbe float64) map[*textPara][]int {
+	_beegcd := make([]event, 2*len(_bfddb))
+	if _agbbe == 0 {
+		for _cacda, _dbbd := range _bfddb {
+			_beegcd[2*_cacda] = event{_dbbd.Llx, true, _cacda}
+			_beegcd[2*_cacda+1] = event{_dbbd.Urx, false, _cacda}
+		}
+	} else {
+		for _ddbgea, _bfdbd := range _bfddb {
+			_beegcd[2*_ddbgea] = event{_bfdbd.Llx - _agbbe*_bfdbd.fontsize(), true, _ddbgea}
+			_beegcd[2*_ddbgea+1] = event{_bfdbd.Urx + _agbbe*_bfdbd.fontsize(), false, _ddbgea}
+		}
+	}
+	return _bfddb.eventNeighbours(_beegcd)
+}
+
+func (_eefaa *textPara) isAtom() *textTable {
+	_ggcg := _eefaa
+	_daffg := _eefaa._badad
+	_gcbd := _eefaa._gdae
+	if _daffg.taken() || _gcbd.taken() {
+		return nil
+	}
+	_cdcbf := _daffg._gdae
+	if _cdcbf.taken() || _cdcbf != _gcbd._badad {
+		return nil
+	}
+	return _aebed(_ggcg, _daffg, _gcbd, _cdcbf)
+}
 
 // Font represents the font properties on a PDF page.
-type Font struct{PdfFont *_ad .PdfFont ;
+type Font struct {
+	PdfFont *_ad.PdfFont
 
-// FontName represents Font Name from font properties.
-FontName string ;
+	// FontName represents Font Name from font properties.
+	FontName string
 
-// FontType represents Font Subtype entry in the font dictionary inside page resources.
-// Examples : type0, Type1, MMType1, Type3, TrueType, CIDFont.
-FontType string ;
+	// FontType represents Font Subtype entry in the font dictionary inside page resources.
+	// Examples : type0, Type1, MMType1, Type3, TrueType, CIDFont.
+	FontType string
 
-// ToUnicode is true if font provides a `ToUnicode` mapping.
-ToUnicode bool ;
+	// ToUnicode is true if font provides a `ToUnicode` mapping.
+	ToUnicode bool
 
-// IsCID is true if underlying font is a composite font.
-// Composite font is represented by a font dictionary whose Subtype is `Type0`
-IsCID bool ;
+	// IsCID is true if underlying font is a composite font.
+	// Composite font is represented by a font dictionary whose Subtype is `Type0`
+	IsCID bool
 
-// IsSimple is true if font is simple font.
-// A simple font is limited to only 8 bit (255) character codes.
-IsSimple bool ;
+	// IsSimple is true if font is simple font.
+	// A simple font is limited to only 8 bit (255) character codes.
+	IsSimple bool
 
-// FontData represents the raw data of the embedded font file.
-// It can have format TrueType (TTF), PostScript Font (PFB) or Compact Font Format (CCF).
-// FontData value can be indicates from `FontFile`, `FontFile2` or `FontFile3` inside Font Descriptor.
-// At most, only one of `FontFile`, `FontFile2` or `FontFile3` will be FontData value.
-FontData []byte ;
+	// FontData represents the raw data of the embedded font file.
+	// It can have format TrueType (TTF), PostScript Font (PFB) or Compact Font Format (CCF).
+	// FontData value can be indicates from `FontFile`, `FontFile2` or `FontFile3` inside Font Descriptor.
+	// At most, only one of `FontFile`, `FontFile2` or `FontFile3` will be FontData value.
+	FontData []byte
 
-// FontFileName is a name representing the font. it has format:
-// (Font Name) + (Font Type Extension), example: helvetica.ttf.
-FontFileName string ;
+	// FontFileName is a name representing the font. it has format:
+	// (Font Name) + (Font Type Extension), example: helvetica.ttf.
+	FontFileName string
 
-// FontDescriptor represents metrics and other attributes inside font properties from PDF Structure (Font Descriptor).
-FontDescriptor *_ad .PdfFontDescriptor ;};func (_cega lineRuling )xMean ()float64 {return 0.5*(_cega ._gfdac .X +_cega ._bfbed .X )};
+	// FontDescriptor represents metrics and other attributes inside font properties from PDF Structure (Font Descriptor).
+	FontDescriptor *_ad.PdfFontDescriptor
+}
+
+func (_cega lineRuling) xMean() float64 { return 0.5 * (_cega._gfdac.X + _cega._bfbed.X) }
 
 // Extractor stores and offers functionality for extracting content from PDF pages.
-type Extractor struct{_cgc string ;_gab *_ad .PdfPageResources ;_bgd _ad .PdfRectangle ;_gdf *_ad .PdfRectangle ;_efbg int ;_bef map[string ]fontEntry ;_gdfc map[string ]textResult ;_acd map[string ]textResult ;_fac int64 ;_fag *Options ;_gce *_ad .StructTreeRoot ;
-_caaa _afa .PdfObject ;_gfcg []*_ad .PdfAnnotation ;};func (_baab *textPara )writeCellText (_dacg _ef .Writer ){for _gfec ,_abad :=range _baab ._feea {_fdde :=_abad .text ();_egcba :=_bade &&_abad .endsInHyphen ()&&_gfec !=len (_baab ._feea )-1;if _egcba {_fdde =_ggec (_fdde );
-};_dacg .Write ([]byte (_fdde ));if !(_egcba ||_gfec ==len (_baab ._feea )-1){_dacg .Write ([]byte (_dcee (_abad ._adaa ,_baab ._feea [_gfec +1]._adaa )));};};};func (_cgbbdd paraList )topoOrder ()[]int {if _ebbaf {_bg .Log .Info ("\u0074\u006f\u0070\u006f\u004f\u0072\u0064\u0065\u0072\u003a");
-};_dbffd :=len (_cgbbdd );_eccad :=make ([]bool ,_dbffd );_ebcc :=make ([]int ,0,_dbffd );_cdcc :=_cgbbdd .llyOrdering ();var _dbeeb func (_ddada int );_dbeeb =func (_fgafb int ){_eccad [_fgafb ]=true ;for _decc :=0;_decc < _dbffd ;_decc ++{if !_eccad [_decc ]{if _cgbbdd .readBefore (_cdcc ,_fgafb ,_decc ){_dbeeb (_decc );
-};};};_ebcc =append (_ebcc ,_fgafb );};for _cfga :=0;_cfga < _dbffd ;_cfga ++{if !_eccad [_cfga ]{_dbeeb (_cfga );};};return _daff (_ebcc );};func (_eddbg *wordBag )highestWord (_cdee int ,_ccgfb ,_ffcd float64 )*textWord {for _ ,_eedb :=range _eddbg ._fdeg [_cdee ]{if _ccgfb <=_eedb ._fcgaa &&_eedb ._fcgaa <=_ffcd {return _eedb ;
-};};return nil ;};var _gde =false ;func (_fbab *stateStack )empty ()bool {return len (*_fbab )==0};
+type Extractor struct {
+	_cgc  string
+	_gab  *_ad.PdfPageResources
+	_bgd  _ad.PdfRectangle
+	_gdf  *_ad.PdfRectangle
+	_efbg int
+	_bef  map[string]fontEntry
+	_gdfc map[string]textResult
+	_acd  map[string]textResult
+	_fac  int64
+	_fag  *Options
+	_gce  *_ad.StructTreeRoot
+	_caaa _afa.PdfObject
+	_gfcg []*_ad.PdfAnnotation
+}
+
+func (_baab *textPara) writeCellText(_dacg _ef.Writer) {
+	for _gfec, _abad := range _baab._feea {
+		_fdde := _abad.text()
+		_egcba := _bade && _abad.endsInHyphen() && _gfec != len(_baab._feea)-1
+		if _egcba {
+			_fdde = _ggec(_fdde)
+		}
+		_dacg.Write([]byte(_fdde))
+		if !(_egcba || _gfec == len(_baab._feea)-1) {
+			_dacg.Write([]byte(_dcee(_abad._adaa, _baab._feea[_gfec+1]._adaa)))
+		}
+	}
+}
+
+func (_cgbbdd paraList) topoOrder() []int {
+	if _ebbaf {
+		_bg.Log.Info("\u0074\u006f\u0070\u006f\u004f\u0072\u0064\u0065\u0072\u003a")
+	}
+	_dbffd := len(_cgbbdd)
+	_eccad := make([]bool, _dbffd)
+	_ebcc := make([]int, 0, _dbffd)
+	_cdcc := _cgbbdd.llyOrdering()
+	var _dbeeb func(_ddada int)
+	_dbeeb = func(_fgafb int) {
+		_eccad[_fgafb] = true
+		for _decc := 0; _decc < _dbffd; _decc++ {
+			if !_eccad[_decc] {
+				if _cgbbdd.readBefore(_cdcc, _fgafb, _decc) {
+					_dbeeb(_decc)
+				}
+			}
+		}
+		_ebcc = append(_ebcc, _fgafb)
+	}
+	for _cfga := 0; _cfga < _dbffd; _cfga++ {
+		if !_eccad[_cfga] {
+			_dbeeb(_cfga)
+		}
+	}
+	return _daff(_ebcc)
+}
+
+func (_eddbg *wordBag) highestWord(_cdee int, _ccgfb, _ffcd float64) *textWord {
+	for _, _eedb := range _eddbg._fdeg[_cdee] {
+		if _ccgfb <= _eedb._fcgaa && _eedb._fcgaa <= _ffcd {
+			return _eedb
+		}
+	}
+	return nil
+}
+
+var _gde = false
+
+func (_fbab *stateStack) empty() bool { return len(*_fbab) == 0 }
 
 // Text gets the extracted text contained in `l`.
-func (_effg *list )Text ()string {_befe :=&_faf .Builder {};_ebcaf :="";_cdceb (_effg ,_befe ,&_ebcaf );return _befe .String ();};
+func (_effg *list) Text() string {
+	_befe := &_faf.Builder{}
+	_ebcaf := ""
+	_cdceb(_effg, _befe, &_ebcaf)
+	return _befe.String()
+}
 
 // PageText represents the layout of text on a device page.
-type PageText struct{_baaa []*textMark ;_dfcf string ;_abcd []TextMark ;_abcf []TextTable ;_gfag _ad .PdfRectangle ;_addcd []pathSection ;_ddfd []pathSection ;_acbg *_ad .StructTreeRoot ;_gaef _afa .PdfObject ;_cdgg *_af .ContentStreamOperations ;_acaf PageTextOptions ;
-};func (_bfbe *wordBag )pullWord (_ddbc *textWord ,_abge int ,_ggdeg map[int ]map[*textWord ]struct{}){_bfbe .PdfRectangle =_faea (_bfbe .PdfRectangle ,_ddbc .PdfRectangle );if _ddbc ._bbebf > _bfbe ._eagga {_bfbe ._eagga =_ddbc ._bbebf ;};_bfbe ._fdeg [_abge ]=append (_bfbe ._fdeg [_abge ],_ddbc );
-_ggdeg [_abge ][_ddbc ]=struct{}{};};
+type PageText struct {
+	_baaa  []*textMark
+	_dfcf  string
+	_abcd  []TextMark
+	_abcf  []TextTable
+	_gfag  _ad.PdfRectangle
+	_addcd []pathSection
+	_ddfd  []pathSection
+	_acbg  *_ad.StructTreeRoot
+	_gaef  _afa.PdfObject
+	_cdgg  *_af.ContentStreamOperations
+	_acaf  PageTextOptions
+}
+
+func (_bfbe *wordBag) pullWord(_ddbc *textWord, _abge int, _ggdeg map[int]map[*textWord]struct{}) {
+	_bfbe.PdfRectangle = _faea(_bfbe.PdfRectangle, _ddbc.PdfRectangle)
+	if _ddbc._bbebf > _bfbe._eagga {
+		_bfbe._eagga = _ddbc._bbebf
+	}
+	_bfbe._fdeg[_abge] = append(_bfbe._fdeg[_abge], _ddbc)
+	_ggdeg[_abge][_ddbc] = struct{}{}
+}
 
 // ExtractText processes and extracts all text data in content streams and returns as a string.
 // It takes into account character encodings in the PDF file, which are decoded by
 // CharcodeBytesToUnicode.
 // Characters that can't be decoded are replaced with MissingCodeRune ('\ufffd' = �).
-func (_ecde *Extractor )ExtractText ()(string ,error ){_cgcbd ,_ ,_ ,_aaf :=_ecde .ExtractTextWithStats ();return _cgcbd ,_aaf ;};func _cbda (_ccffd []*textLine ,_abdb string ,_feef []*list )*list {return &list {_aage :_ccffd ,_ebbb :_abdb ,_cgfag :_feef };
-};func _bgg (_dc []string ,_ea int ,_cdd int ,_gb string ){for _ge :=_ea ;_ge < _cdd ;_ge ++{_dc [_ge ]=_gb ;};};
+func (_ecde *Extractor) ExtractText() (string, error) {
+	_cgcbd, _, _, _aaf := _ecde.ExtractTextWithStats()
+	return _cgcbd, _aaf
+}
+
+func _cbda(_ccffd []*textLine, _abdb string, _feef []*list) *list {
+	return &list{_aage: _ccffd, _ebbb: _abdb, _cgfag: _feef}
+}
+
+func _bgg(_dc []string, _ea int, _cdd int, _gb string) {
+	for _ge := _ea; _ge < _cdd; _ge++ {
+		_dc[_ge] = _gb
+	}
+}
 
 // Replace takes a pattern and replaces all the texts that much the pattern with `replacement`.
-func (_dff *Editor )Replace (pattern string ,replacement string ,pages []int )error {_cgbe :=map[int ]Match {};for _ ,_eebf :=range pages {_cgcc ,_eegb :=_dff ._fba .GetPage (_eebf );if _eegb !=nil {return _eegb ;};_ffa ,_eegb :=New (_cgcc );if _eegb !=nil {return _eegb ;
-};_egbc ,_ ,_ ,_eegb :=_ffa .ExtractPageText ();if _eegb !=nil {return _eegb ;};_gag :="";_fcb :=_egbc .Text ();_ege ,_eegb :=_eefg (pattern ,_fcb );if _eegb !=nil {return _eegb ;};_bagf :=_egbc .Marks ();_cgf :=[]Box {};for _ ,_gbed :=range _ege {_eed ,_fee ,_aca :=_adgc (_gbed ,_bagf ,pattern );
-if _aca !=nil {return _aca ;};_dbg :=_dbba (_eed );_cgf =append (_cgf ,_fee );replacement ,_aca =_efgg (_dbg ,replacement ,pattern );if _aca !=nil {return _aca ;};};_gag =_egbc .GetContentStreamOps ().String ();_cfb :=Match {Pattern :pattern ,Indexes :_ege ,Locations :_cgf };
-_cgcc .SetContentStreams ([]string {_gag },_afa .NewFlateEncoder ());_cgbe [_eebf ]=_cfb ;};return nil ;};func (_dfdg compositeCell )String ()string {_egcg :="";if len (_dfdg .paraList )> 0{_egcg =_fagdg (_dfdg .paraList .merge ().text (),50);};return _fa .Sprintf ("\u0025\u0036\u002e\u0032\u0066\u0020\u0025\u0064\u0020\u0070\u0061\u0072a\u0073\u0020\u0025\u0071",_dfdg .PdfRectangle ,len (_dfdg .paraList ),_egcg );
-};type lineRuling struct{_efgdc rulingKind ;_bbdd markKind ;_cb .Color ;_gfdac ,_bfbed _cd .Point ;};
+func (_dff *Editor) Replace(pattern string, replacement string, pages []int) error {
+	_cgbe := map[int]Match{}
+	for _, _eebf := range pages {
+		_cgcc, _eegb := _dff._fba.GetPage(_eebf)
+		if _eegb != nil {
+			return _eegb
+		}
+		_ffa, _eegb := New(_cgcc)
+		if _eegb != nil {
+			return _eegb
+		}
+		_egbc, _, _, _eegb := _ffa.ExtractPageText()
+		if _eegb != nil {
+			return _eegb
+		}
+		_gag := ""
+		_fcb := _egbc.Text()
+		_ege, _eegb := _eefg(pattern, _fcb)
+		if _eegb != nil {
+			return _eegb
+		}
+		_bagf := _egbc.Marks()
+		_cgf := []Box{}
+		for _, _gbed := range _ege {
+			_eed, _fee, _aca := _adgc(_gbed, _bagf, pattern)
+			if _aca != nil {
+				return _aca
+			}
+			_dbg := _dbba(_eed)
+			_cgf = append(_cgf, _fee)
+			replacement, _aca = _efgg(_dbg, replacement, pattern)
+			if _aca != nil {
+				return _aca
+			}
+		}
+		_gag = _egbc.GetContentStreamOps().String()
+		_cfb := Match{Pattern: pattern, Indexes: _ege, Locations: _cgf}
+		_cgcc.SetContentStreams([]string{_gag}, _afa.NewFlateEncoder())
+		_cgbe[_eebf] = _cfb
+	}
+	return nil
+}
+
+func (_dfdg compositeCell) String() string {
+	_egcg := ""
+	if len(_dfdg.paraList) > 0 {
+		_egcg = _fagdg(_dfdg.paraList.merge().text(), 50)
+	}
+	return _fa.Sprintf("\u0025\u0036\u002e\u0032\u0066\u0020\u0025\u0064\u0020\u0070\u0061\u0072a\u0073\u0020\u0025\u0071", _dfdg.PdfRectangle, len(_dfdg.paraList), _egcg)
+}
+
+type lineRuling struct {
+	_efgdc rulingKind
+	_bbdd  markKind
+	_cb.Color
+	_gfdac, _bfbed _cd.Point
+}
 
 // PageFonts represents extracted fonts on a PDF page.
-type PageFonts struct{Fonts []Font ;};type markKind int ;func _fbbf (_gcaf ,_aeea _ad .PdfRectangle )bool {return _gcaf .Llx <=_aeea .Llx &&_aeea .Urx <=_gcaf .Urx &&_gcaf .Lly <=_aeea .Lly &&_aeea .Ury <=_gcaf .Ury ;};
+type PageFonts struct{ Fonts []Font }
+
+type markKind int
+
+func _fbbf(_gcaf, _aeea _ad.PdfRectangle) bool {
+	return _gcaf.Llx <= _aeea.Llx && _aeea.Urx <= _gcaf.Urx && _gcaf.Lly <= _aeea.Lly && _aeea.Ury <= _gcaf.Ury
+}
 
 // Len returns the number of TextMarks in `ma`.
-func (_gcda *TextMarkArray )Len ()int {if _gcda ==nil {return 0;};return len (_gcda ._fde );};func (_abg *PageText )computeViews (){if _abg ._acaf ._eedf ==ExtractionModePlain {_abg ._dfcf =_abg .getText ();return ;};_cfc :=_abg .getParagraphs ();_ecag :=new (_fg .Buffer );
-_cfc .writeText (_ecag );_abg ._dfcf =_ecag .String ();_abg ._abcd =_cfc .toTextMarks ();_abg ._abcf =_cfc .tables ();if _ggegb {_bg .Log .Info ("\u0063\u006f\u006dpu\u0074\u0065\u0056\u0069\u0065\u0077\u0073\u003a\u0020\u0074\u0061\u0062\u006c\u0065\u0073\u003d\u0025\u0064",len (_abg ._abcf ));
-};};
+func (_gcda *TextMarkArray) Len() int {
+	if _gcda == nil {
+		return 0
+	}
+	return len(_gcda._fde)
+}
+
+func (_abg *PageText) computeViews() {
+	if _abg._acaf._eedf == ExtractionModePlain {
+		_abg._dfcf = _abg.getText()
+		return
+	}
+	_cfc := _abg.getParagraphs()
+	_ecag := new(_fg.Buffer)
+	_cfc.writeText(_ecag)
+	_abg._dfcf = _ecag.String()
+	_abg._abcd = _cfc.toTextMarks()
+	_abg._abcf = _cfc.tables()
+	if _ggegb {
+		_bg.Log.Info("\u0063\u006f\u006dpu\u0074\u0065\u0056\u0069\u0065\u0077\u0073\u003a\u0020\u0074\u0061\u0062\u006c\u0065\u0073\u003d\u0025\u0064", len(_abg._abcf))
+	}
+}
 
 // TableCell is a cell in a TextTable.
-type TableCell struct{_ad .PdfRectangle ;
+type TableCell struct {
+	_ad.PdfRectangle
 
-// Text is the extracted text.
-Text string ;
+	// Text is the extracted text.
+	Text string
 
-// Marks returns the TextMarks corresponding to the text in Text.
-Marks TextMarkArray ;};
+	// Marks returns the TextMarks corresponding to the text in Text.
+	Marks TextMarkArray
+}
 
 // Editor represents a document editor object
-type Editor struct{_fba *_ad .PdfReader };func _adfe (_fdad *TextMarkArray ,_eab int )int {_bcd :=_fdad .Elements ();_ced :=_eab -1;_dcfb :=_eab +1;_aegg :=-1;if _ced >=0{_aab :=_bcd [_ced ];_fcdc :=_aab .ObjString ;_ccc :=len (_fcdc );_gcb :=_aab .Index ;
-if _gcb +1< _ccc {return _ced ;};};if _dcfb < len (_bcd ){_fab :=_bcd [_dcfb ];_gbc :=_fab .ObjString ;if _gbc [0]!=_fab .Text {return _dcfb ;};};if _aegg ==-1&&_bcd [_eab ].Text =="\u0020"{return _ced ;};return _aegg ;};func (_bdec *textWord )addDiacritic (_dcgf string ){_cdcff :=_bdec ._ddfc [len (_bdec ._ddfc )-1];
-_cdcff ._acfa +=_dcgf ;_cdcff ._acfa =_f .NFKC .String (_cdcff ._acfa );};func (_fcaf *shapesState )addPoint (_dddcc ,_dgab float64 ){_gafc :=_fcaf .establishSubpath ();_agcgb :=_fcaf .devicePoint (_dddcc ,_dgab );if _gafc ==nil {_fcaf ._eaba =true ;_fcaf ._aaba =_agcgb ;
-}else {_gafc .add (_agcgb );};};
+type Editor struct{ _fba *_ad.PdfReader }
+
+func _adfe(_fdad *TextMarkArray, _eab int) int {
+	_bcd := _fdad.Elements()
+	_ced := _eab - 1
+	_dcfb := _eab + 1
+	_aegg := -1
+	if _ced >= 0 {
+		_aab := _bcd[_ced]
+		_fcdc := _aab.ObjString
+		_ccc := len(_fcdc)
+		_gcb := _aab.Index
+		if _gcb+1 < _ccc {
+			return _ced
+		}
+	}
+	if _dcfb < len(_bcd) {
+		_fab := _bcd[_dcfb]
+		_gbc := _fab.ObjString
+		if _gbc[0] != _fab.Text {
+			return _dcfb
+		}
+	}
+	if _aegg == -1 && _bcd[_eab].Text == "\u0020" {
+		return _ced
+	}
+	return _aegg
+}
+
+func (_bdec *textWord) addDiacritic(_dcgf string) {
+	_cdcff := _bdec._ddfc[len(_bdec._ddfc)-1]
+	_cdcff._acfa += _dcgf
+	_cdcff._acfa = _f.NFKC.String(_cdcff._acfa)
+}
+
+func (_fcaf *shapesState) addPoint(_dddcc, _dgab float64) {
+	_gafc := _fcaf.establishSubpath()
+	_agcgb := _fcaf.devicePoint(_dddcc, _dgab)
+	if _gafc == nil {
+		_fcaf._eaba = true
+		_fcaf._aaba = _agcgb
+	} else {
+		_gafc.add(_agcgb)
+	}
+}
 
 // NewFromContents creates a new extractor from contents and page resources.
-func NewFromContents (contents string ,resources *_ad .PdfPageResources )(*Extractor ,error ){const _fce ="\u0065x\u0074\u0072\u0061\u0063t\u006f\u0072\u002e\u004e\u0065w\u0046r\u006fm\u0043\u006f\u006e\u0074\u0065\u006e\u0074s";_ddc :=&Extractor {_cgc :contents ,_gab :resources ,_bef :map[string ]fontEntry {},_gdfc :map[string ]textResult {}};
-_bgf .TrackUse (_fce );return _ddc ,nil ;};func _aacc (_beacad int ,_acgc func (int ,int )bool )[]int {_bedg :=make ([]int ,_beacad );for _bebge :=range _bedg {_bedg [_bebge ]=_bebge ;};_eg .Slice (_bedg ,func (_cbffd ,_bagec int )bool {return _acgc (_bedg [_cbffd ],_bedg [_bagec ])});
-return _bedg ;};func _ebgga (_dega _ad .PdfRectangle ,_cacg []*textLine )*textPara {return &textPara {PdfRectangle :_dega ,_feea :_cacg };};func (_eefed paraList )toTextMarks ()[]TextMark {_adgbcg :=0;var _fgfg []TextMark ;for _daedg ,_ccgac :=range _eefed {if _ccgac ._gddfg {continue ;
-};_caae :=_ccgac .toTextMarks (&_adgbcg );_fgfg =append (_fgfg ,_caae ...);if _daedg !=len (_eefed )-1{if _gcgf (_ccgac ,_eefed [_daedg +1]){_fgfg =_cfdbba (_fgfg ,&_adgbcg ,"\u0020");}else {_fgfg =_cfdbba (_fgfg ,&_adgbcg ,"\u000a");_fgfg =_cfdbba (_fgfg ,&_adgbcg ,"\u000a");
-};};};_fgfg =_cfdbba (_fgfg ,&_adgbcg ,"\u000a");_fgfg =_cfdbba (_fgfg ,&_adgbcg ,"\u000a");return _fgfg ;};type compositeCell struct{_ad .PdfRectangle ;paraList ;};func (_fef *wordBag )maxDepth ()float64 {return _fef ._gdca -_fef .Lly };func (_gfggb *textPara )getListLines ()[]*textLine {var _bdfg []*textLine ;
-_dccbd :=_bccd (_gfggb ._feea );for _ ,_gcaba :=range _gfggb ._feea {_eegd :=_gcaba ._gbaa [0]._fgaa [0];if _bdfc (_eegd ){_bdfg =append (_bdfg ,_gcaba );};};_bdfg =append (_bdfg ,_dccbd ...);return _bdfg ;};type intSet map[int ]struct{};func (_cbcg *textPara )bbox ()_ad .PdfRectangle {return _cbcg .PdfRectangle };
-func (_cbfe *textObject )setWordSpacing (_gdfcf float64 ){if _cbfe ==nil {return ;};_cbfe ._dggef ._ccda =_gdfcf ;};
+func NewFromContents(contents string, resources *_ad.PdfPageResources) (*Extractor, error) {
+	const _fce = "\u0065x\u0074\u0072\u0061\u0063t\u006f\u0072\u002e\u004e\u0065w\u0046r\u006fm\u0043\u006f\u006e\u0074\u0065\u006e\u0074s"
+	_ddc := &Extractor{_cgc: contents, _gab: resources, _bef: map[string]fontEntry{}, _gdfc: map[string]textResult{}}
+	_bgf.TrackUse(_fce)
+	return _ddc, nil
+}
+
+func _aacc(_beacad int, _acgc func(int, int) bool) []int {
+	_bedg := make([]int, _beacad)
+	for _bebge := range _bedg {
+		_bedg[_bebge] = _bebge
+	}
+	_eg.Slice(_bedg, func(_cbffd, _bagec int) bool { return _acgc(_bedg[_cbffd], _bedg[_bagec]) })
+	return _bedg
+}
+
+func _ebgga(_dega _ad.PdfRectangle, _cacg []*textLine) *textPara {
+	return &textPara{PdfRectangle: _dega, _feea: _cacg}
+}
+
+func (_eefed paraList) toTextMarks() []TextMark {
+	_adgbcg := 0
+	var _fgfg []TextMark
+	for _daedg, _ccgac := range _eefed {
+		if _ccgac._gddfg {
+			continue
+		}
+		_caae := _ccgac.toTextMarks(&_adgbcg)
+		_fgfg = append(_fgfg, _caae...)
+		if _daedg != len(_eefed)-1 {
+			if _gcgf(_ccgac, _eefed[_daedg+1]) {
+				_fgfg = _cfdbba(_fgfg, &_adgbcg, "\u0020")
+			} else {
+				_fgfg = _cfdbba(_fgfg, &_adgbcg, "\u000a")
+				_fgfg = _cfdbba(_fgfg, &_adgbcg, "\u000a")
+			}
+		}
+	}
+	_fgfg = _cfdbba(_fgfg, &_adgbcg, "\u000a")
+	_fgfg = _cfdbba(_fgfg, &_adgbcg, "\u000a")
+	return _fgfg
+}
+
+type compositeCell struct {
+	_ad.PdfRectangle
+	paraList
+}
+
+func (_fef *wordBag) maxDepth() float64 { return _fef._gdca - _fef.Lly }
+
+func (_gfggb *textPara) getListLines() []*textLine {
+	var _bdfg []*textLine
+	_dccbd := _bccd(_gfggb._feea)
+	for _, _gcaba := range _gfggb._feea {
+		_eegd := _gcaba._gbaa[0]._fgaa[0]
+		if _bdfc(_eegd) {
+			_bdfg = append(_bdfg, _gcaba)
+		}
+	}
+	_bdfg = append(_bdfg, _dccbd...)
+	return _bdfg
+}
+
+type intSet map[int]struct{}
+
+func (_cbcg *textPara) bbox() _ad.PdfRectangle { return _cbcg.PdfRectangle }
+
+func (_cbfe *textObject) setWordSpacing(_gdfcf float64) {
+	if _cbfe == nil {
+		return
+	}
+	_cbfe._dggef._ccda = _gdfcf
+}
 
 // GetContentStreamOps returns the contentStreamOps field of `pt`.
-func (_bfcf *PageText )GetContentStreamOps ()*_af .ContentStreamOperations {return _bfcf ._cdgg };func _ccdce (_bfdf ,_gbfcb ,_abdf float64 )rulingKind {if _bfdf >=_abdf &&_eedad (_gbfcb ,_bfdf ){return _cafa ;};if _gbfcb >=_abdf &&_eedad (_bfdf ,_gbfcb ){return _dcfdg ;
-};return _gbgfg ;};func _adgc (_dae []int ,_bac *TextMarkArray ,_ecd string )(*TextMarkArray ,Box ,error ){_geac :=Box {};_cfg :=_dae [0];_gaf :=_dae [1];_eee :=len (_ecd )-len (_faf .TrimLeft (_ecd ,"\u0020"));_befg :=len (_ecd )-len (_faf .TrimRight (_ecd ,"\u0020\u000a"));
-_cfg =_cfg +_eee ;_gaf =_gaf -_befg ;_abb ,_bdga :=_bac .RangeOffset (_cfg ,_gaf );if _bdga !=nil {return nil ,_geac ,_bdga ;};_bddb ,_dfa :=_abb .BBox ();if !_dfa {return nil ,_geac ,_fa .Errorf ("\u0073\u0070\u0061\u006e\u004d\u0061\u0072\u006bs\u002e\u0042\u0042ox\u0020\u0068\u0061\u0073\u0020\u006eo\u0020\u0062\u006f\u0075\u006e\u0064\u0069\u006e\u0067\u0020\u0062\u006f\u0078\u002e\u0020s\u0070\u0061\u006e\u004d\u0061\u0072\u006b\u0073=\u0025\u0073",_abb );
-};_geac =Box {BBox :_bddb };return _abb ,_geac ,nil ;};
+func (_bfcf *PageText) GetContentStreamOps() *_af.ContentStreamOperations { return _bfcf._cdgg }
+
+func _ccdce(_bfdf, _gbfcb, _abdf float64) rulingKind {
+	if _bfdf >= _abdf && _eedad(_gbfcb, _bfdf) {
+		return _cafa
+	}
+	if _gbfcb >= _abdf && _eedad(_bfdf, _gbfcb) {
+		return _dcfdg
+	}
+	return _gbgfg
+}
+
+func _adgc(_dae []int, _bac *TextMarkArray, _ecd string) (*TextMarkArray, Box, error) {
+	_geac := Box{}
+	_cfg := _dae[0]
+	_gaf := _dae[1]
+	_eee := len(_ecd) - len(_faf.TrimLeft(_ecd, "\u0020"))
+	_befg := len(_ecd) - len(_faf.TrimRight(_ecd, "\u0020\u000a"))
+	_cfg = _cfg + _eee
+	_gaf = _gaf - _befg
+	_abb, _bdga := _bac.RangeOffset(_cfg, _gaf)
+	if _bdga != nil {
+		return nil, _geac, _bdga
+	}
+	_bddb, _dfa := _abb.BBox()
+	if !_dfa {
+		return nil, _geac, _fa.Errorf("\u0073\u0070\u0061\u006e\u004d\u0061\u0072\u006bs\u002e\u0042\u0042ox\u0020\u0068\u0061\u0073\u0020\u006eo\u0020\u0062\u006f\u0075\u006e\u0064\u0069\u006e\u0067\u0020\u0062\u006f\u0078\u002e\u0020s\u0070\u0061\u006e\u004d\u0061\u0072\u006b\u0073=\u0025\u0073", _abb)
+	}
+	_geac = Box{BBox: _bddb}
+	return _abb, _geac, nil
+}
 
 // Append appends `mark` to the mark array.
-func (_dcbb *TextMarkArray )Append (mark TextMark ){_dcbb ._fde =append (_dcbb ._fde ,mark )};func _ceddf (_gedbbf map[int ][]float64 )[]int {_ebgae :=make ([]int ,len (_gedbbf ));_gdad :=0;for _dacce :=range _gedbbf {_ebgae [_gdad ]=_dacce ;_gdad ++;};
-_eg .Ints (_ebgae );return _ebgae ;};func (_cdda *textObject )setCharSpacing (_faac float64 ){if _cdda ==nil {return ;};_cdda ._dggef ._daab =_faac ;if _afga {_bg .Log .Info ("\u0073\u0065t\u0043\u0068\u0061\u0072\u0053\u0070\u0061\u0063\u0069\u006e\u0067\u003a\u0020\u0025\u002e\u0032\u0066\u0020\u0073\u0074\u0061\u0074e=\u0025\u0073",_faac ,_cdda ._dggef .String ());
-};};func (_dffb *shapesState )closePath (){if _dffb ._eaba {_dffb ._fec =append (_dffb ._fec ,_ffde (_dffb ._aaba ));_dffb ._eaba =false ;}else if len (_dffb ._fec )==0{if _acge {_bg .Log .Debug ("\u0063\u006c\u006f\u0073eP\u0061\u0074\u0068\u0020\u0077\u0069\u0074\u0068\u0020\u006e\u006f\u0020\u0070\u0061t\u0068");
-};_dffb ._eaba =false ;return ;};_dffb ._fec [len (_dffb ._fec )-1].close ();if _acge {_bg .Log .Info ("\u0063\u006c\u006f\u0073\u0065\u0050\u0061\u0074\u0068\u003a\u0020\u0025\u0073",_dffb );};};func (_ddeb rulingList )comp (_acgbd ,_bcdf int )bool {_bffc ,_gcdd :=_ddeb [_acgbd ],_ddeb [_bcdf ];
-_aebcag ,_fccba :=_bffc ._gafe ,_gcdd ._gafe ;if _aebcag !=_fccba {return _aebcag > _fccba ;};if _aebcag ==_gbgfg {return false ;};_bgbgf :=func (_cgff bool )bool {if _aebcag ==_cafa {return _cgff ;};return !_cgff ;};_fcdd ,_gdbf :=_bffc ._ecfb ,_gcdd ._ecfb ;
-if _fcdd !=_gdbf {return _bgbgf (_fcdd > _gdbf );};_fcdd ,_gdbf =_bffc ._ggecg ,_gcdd ._ggecg ;if _fcdd !=_gdbf {return _bgbgf (_fcdd < _gdbf );};return _bgbgf (_bffc ._gebf < _gcdd ._gebf );};func (_daeed *textTable )getComposite (_edfe ,_bffabd int )(paraList ,_ad .PdfRectangle ){_cfcdg ,_eeef :=_daeed ._cafd [_fffbe (_edfe ,_bffabd )];
-if _ggegb {_fa .Printf ("\u0020\u0020\u0020\u0020\u0020\u0020\u0020\u0020\u0067\u0065\u0074\u0043\u006f\u006d\u0070o\u0073i\u0074\u0065\u0028\u0025\u0064\u002c\u0025\u0064\u0029\u002d\u003e\u0025\u0073\u000a",_edfe ,_bffabd ,_cfcdg .String ());};if !_eeef {return nil ,_ad .PdfRectangle {};
-};return _cfcdg .parasBBox ();};func (_dcg *wordBag )empty (_gggba int )bool {_ ,_dafg :=_dcg ._fdeg [_gggba ];return !_dafg };
+func (_dcbb *TextMarkArray) Append(mark TextMark) { _dcbb._fde = append(_dcbb._fde, mark) }
+
+func _ceddf(_gedbbf map[int][]float64) []int {
+	_ebgae := make([]int, len(_gedbbf))
+	_gdad := 0
+	for _dacce := range _gedbbf {
+		_ebgae[_gdad] = _dacce
+		_gdad++
+	}
+	_eg.Ints(_ebgae)
+	return _ebgae
+}
+
+func (_cdda *textObject) setCharSpacing(_faac float64) {
+	if _cdda == nil {
+		return
+	}
+	_cdda._dggef._daab = _faac
+	if _afga {
+		_bg.Log.Info("\u0073\u0065t\u0043\u0068\u0061\u0072\u0053\u0070\u0061\u0063\u0069\u006e\u0067\u003a\u0020\u0025\u002e\u0032\u0066\u0020\u0073\u0074\u0061\u0074e=\u0025\u0073", _faac, _cdda._dggef.String())
+	}
+}
+
+func (_dffb *shapesState) closePath() {
+	if _dffb._eaba {
+		_dffb._fec = append(_dffb._fec, _ffde(_dffb._aaba))
+		_dffb._eaba = false
+	} else if len(_dffb._fec) == 0 {
+		if _acge {
+			_bg.Log.Debug("\u0063\u006c\u006f\u0073eP\u0061\u0074\u0068\u0020\u0077\u0069\u0074\u0068\u0020\u006e\u006f\u0020\u0070\u0061t\u0068")
+		}
+		_dffb._eaba = false
+		return
+	}
+	_dffb._fec[len(_dffb._fec)-1].close()
+	if _acge {
+		_bg.Log.Info("\u0063\u006c\u006f\u0073\u0065\u0050\u0061\u0074\u0068\u003a\u0020\u0025\u0073", _dffb)
+	}
+}
+
+func (_ddeb rulingList) comp(_acgbd, _bcdf int) bool {
+	_bffc, _gcdd := _ddeb[_acgbd], _ddeb[_bcdf]
+	_aebcag, _fccba := _bffc._gafe, _gcdd._gafe
+	if _aebcag != _fccba {
+		return _aebcag > _fccba
+	}
+	if _aebcag == _gbgfg {
+		return false
+	}
+	_bgbgf := func(_cgff bool) bool {
+		if _aebcag == _cafa {
+			return _cgff
+		}
+		return !_cgff
+	}
+	_fcdd, _gdbf := _bffc._ecfb, _gcdd._ecfb
+	if _fcdd != _gdbf {
+		return _bgbgf(_fcdd > _gdbf)
+	}
+	_fcdd, _gdbf = _bffc._ggecg, _gcdd._ggecg
+	if _fcdd != _gdbf {
+		return _bgbgf(_fcdd < _gdbf)
+	}
+	return _bgbgf(_bffc._gebf < _gcdd._gebf)
+}
+
+func (_daeed *textTable) getComposite(_edfe, _bffabd int) (paraList, _ad.PdfRectangle) {
+	_cfcdg, _eeef := _daeed._cafd[_fffbe(_edfe, _bffabd)]
+	if _ggegb {
+		_fa.Printf("\u0020\u0020\u0020\u0020\u0020\u0020\u0020\u0020\u0067\u0065\u0074\u0043\u006f\u006d\u0070o\u0073i\u0074\u0065\u0028\u0025\u0064\u002c\u0025\u0064\u0029\u002d\u003e\u0025\u0073\u000a", _edfe, _bffabd, _cfcdg.String())
+	}
+	if !_eeef {
+		return nil, _ad.PdfRectangle{}
+	}
+	return _cfcdg.parasBBox()
+}
+
+func (_dcg *wordBag) empty(_gggba int) bool { _, _dafg := _dcg._fdeg[_gggba]; return !_dafg }
 
 // Text returns the text content of the `bulletLists`.
-func (_bbcf *lists )Text ()string {_eafd :=&_faf .Builder {};for _ ,_adgb :=range *_bbcf {_ggdg :=_adgb .Text ();_eafd .WriteString (_ggdg );};return _eafd .String ();};func (_bece *textTable )markCells (){for _bdcc :=0;_bdcc < _bece ._aaga ;_bdcc ++{for _bgagg :=0;
-_bgagg < _bece ._cfadc ;_bgagg ++{_cbccf :=_bece .get (_bgagg ,_bdcc );if _cbccf !=nil {_cbccf ._bdfe =true ;};};};};func _dcff (_bea string ,_acf ,_eabc int ,_gdcf string )string {if _eabc > len (_bea )-1{return _bea [:_acf ]+_gdcf ;};return _bea [:_acf ]+_gdcf +_bea [_eabc :];
-};func _dbgc (_egg *TextMarkArray ,_dgba *string ,_gbf *int ,_daa string )error {var _agbc TextMark ;for _ ,_ccdec :=range _egg .Elements (){_cceg :=_ccdec .Text ;_abda :=_ccdec .Font ;_efag :="";_bfge :=*_dgba ;if len (_bfge )> *_gbf {_efag =_bfge [*_gbf :*_gbf +len (_cceg )];
-}else if *_gbf ==len (_daa )-1&&len (_bfge )> *_gbf {_efag =_bfge [*_gbf :];};_cec :=_ccdec .DirectObject ;if _cec ==nil &&_ccdec .Text =="\u0020"{_bafa :=_agbc .ObjString ;_ddcd :=_bafa [len (_bafa )-1];if _ddcd !=_ccdec .Text {_cec =_agbc .DirectObject ;
-_abda =_agbc .Font ;_gcg ,_bed :=_afa .GetString (_cec );if !_bed {return _fa .Errorf ("\u0075n\u0061\u0062l\u0065\u0020\u0074\u006f \u0067\u0065\u0074 \u0073\u0074\u0072\u0069\u006e\u0067\u0020\u0042\u0079te\u0073\u0020\u0066r\u006f\u006d \u0064\u0069\u0072\u0065\u0063\u0074O\u0062\u006ae\u0063\u0074");
-};_gfa ,_bed :=_afa .GetStringBytes (_cec );if !_bed {return _afa .ErrTypeError ;};_gccd :=_edc (_gfa ,_abda );_efag =_gccd +_efag ;_fffa (_gcg ,_efag ,_abda );*_gbf +=len (_cceg );continue ;};};_efgc ,_egeg :=_afa .GetString (_cec );if !_egeg {return _fa .Errorf ("\u0075n\u0061\u0062l\u0065\u0020\u0074\u006f \u0067\u0065\u0074 \u0073\u0074\u0072\u0069\u006e\u0067\u0020\u0042\u0079te\u0073\u0020\u0066r\u006f\u006d \u0064\u0069\u0072\u0065\u0063\u0074O\u0062\u006ae\u0063\u0074");
-};_afc :="";_ddcc ,_egeg :=_afa .GetStringBytes (_cec );if !_egeg {return _afa .ErrTypeError ;};_eaf :=_edc (_ddcc ,_abda );_afc =_faf .Replace (_eaf ,_cceg ,_efag ,1);_fffa (_efgc ,_afc ,_abda );*_gbf +=len (_cceg );_agbc =_ccdec ;};return nil ;};func (_aag *textObject )getStrokeColor ()_cb .Color {return _dbegde (_aag ._edcg .ColorspaceStroking ,_aag ._edcg .ColorStroking );
-};func (_cabe gridTiling )complete ()bool {for _ ,_gdffb :=range _cabe ._ggad {for _ ,_bgced :=range _gdffb {if !_bgced .complete (){return false ;};};};return true ;};func (_gfccc *textTable )compositeColCorridors ()map[int ][]float64 {_befda :=make (map[int ][]float64 ,_gfccc ._cfadc );
-if _ggegb {_bg .Log .Info ("\u0063\u006f\u006d\u0070o\u0073\u0069\u0074\u0065\u0043\u006f\u006c\u0043\u006f\u0072r\u0069d\u006f\u0072\u0073\u003a\u0020\u0077\u003d%\u0064\u0020",_gfccc ._cfadc );};for _cbddf :=0;_cbddf < _gfccc ._cfadc ;_cbddf ++{_befda [_cbddf ]=nil ;
-};return _befda ;};func (_acebb paraList )merge ()*textPara {_bg .Log .Trace ("\u006d\u0065\u0072\u0067\u0065:\u0020\u0070\u0061\u0072\u0061\u0073\u003d\u0025\u0064\u0020\u003d\u003d\u003d=\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u0078\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d",len (_acebb ));
-if len (_acebb )==0{return nil ;};_acebb .sortReadingOrder ();_gagf :=_acebb [0].PdfRectangle ;_daaa :=_acebb [0]._feea ;for _ ,_aecfa :=range _acebb [1:]{_gagf =_faea (_gagf ,_aecfa .PdfRectangle );_daaa =append (_daaa ,_aecfa ._feea ...);};return _ebgga (_gagf ,_daaa );
-};func (_dgbbd gridTile )numBorders ()int {_ecff :=0;if _dgbbd ._dgaae {_ecff ++;};if _dgbbd ._ebecd {_ecff ++;};if _dgbbd ._cegae {_ecff ++;};if _dgbbd ._eece {_ecff ++;};return _ecff ;};func (_dfdda compositeCell )split (_afcaa ,_edcbb []float64 )*textTable {_ggfcg :=len (_afcaa )+1;
-_gdcg :=len (_edcbb )+1;if _ggegb {_bg .Log .Info ("\u0063\u006f\u006d\u0070\u006f\u0073\u0069t\u0065\u0043\u0065l\u006c\u002e\u0073\u0070l\u0069\u0074\u003a\u0020\u0025\u0064\u0020\u0078\u0020\u0025\u0064\u000a\u0009\u0063\u006f\u006d\u0070\u006f\u0073\u0069\u0074\u0065\u003d\u0025\u0073\u000a"+"\u0009\u0072\u006f\u0077\u0043\u006f\u0072\u0072\u0069\u0064\u006f\u0072\u0073=\u0025\u0036\u002e\u0032\u0066\u000a\t\u0063\u006f\u006c\u0043\u006f\u0072\u0072\u0069\u0064\u006f\u0072\u0073\u003d%\u0036\u002e\u0032\u0066",_gdcg ,_ggfcg ,_dfdda ,_afcaa ,_edcbb );
-_fa .Printf ("\u0020\u0020\u0020\u0020\u0025\u0064\u0020\u0070\u0061\u0072\u0061\u0073\u000a",len (_dfdda .paraList ));for _efff ,_acbbb :=range _dfdda .paraList {_fa .Printf ("\u0025\u0034\u0064\u003a\u0020\u0025\u0073\u000a",_efff ,_acbbb .String ());
-};_fa .Printf ("\u0020\u0020\u0020\u0020\u0025\u0064\u0020\u006c\u0069\u006e\u0065\u0073\u000a",len (_dfdda .lines ()));for _fcac ,_cbegg :=range _dfdda .lines (){_fa .Printf ("\u0025\u0034\u0064\u003a\u0020\u0025\u0073\u000a",_fcac ,_cbegg );};};_afcaa =_facg (_afcaa ,_dfdda .Ury ,_dfdda .Lly );
-_edcbb =_facg (_edcbb ,_dfdda .Llx ,_dfdda .Urx );_afdea :=make (map[uint64 ]*textPara ,_gdcg *_ggfcg );_fedac :=textTable {_cfadc :_gdcg ,_aaga :_ggfcg ,_eccda :_afdea };_gfaa :=_dfdda .paraList ;_eg .Slice (_gfaa ,func (_aafc ,_gggf int )bool {_fddb ,_fgcad :=_gfaa [_aafc ],_gfaa [_gggf ];
-_adgge ,_dggag :=_fddb .Lly ,_fgcad .Lly ;if _adgge !=_dggag {return _adgge < _dggag ;};return _fddb .Llx < _fgcad .Llx ;});_aegc :=make (map[uint64 ]_ad .PdfRectangle ,_gdcg *_ggfcg );for _bdgb ,_afdbf :=range _afcaa [1:]{_fcbcc :=_afcaa [_bdgb ];for _babc ,_ecec :=range _edcbb [1:]{_eddfg :=_edcbb [_babc ];
-_aegc [_fffbe (_babc ,_bdgb )]=_ad .PdfRectangle {Llx :_eddfg ,Urx :_ecec ,Lly :_afdbf ,Ury :_fcbcc };};};if _ggegb {_bg .Log .Info ("\u0063\u006f\u006d\u0070\u006f\u0073\u0069\u0074\u0065\u0043\u0065l\u006c\u002e\u0073\u0070\u006c\u0069\u0074\u003a\u0020\u0072e\u0063\u0074\u0073");
-_fa .Printf ("\u0020\u0020\u0020\u0020");for _dbfd :=0;_dbfd < _gdcg ;_dbfd ++{_fa .Printf ("\u0025\u0033\u0030\u0064\u002c\u0020",_dbfd );};_fa .Println ();for _dcbe :=0;_dcbe < _ggfcg ;_dcbe ++{_fa .Printf ("\u0020\u0020\u0025\u0032\u0064\u003a",_dcbe );
-for _cdab :=0;_cdab < _gdcg ;_cdab ++{_fa .Printf ("\u00256\u002e\u0032\u0066\u002c\u0020",_aegc [_fffbe (_cdab ,_dcbe )]);};_fa .Println ();};};_gacg :=func (_ecf *textLine )(int ,int ){for _bdeg :=0;_bdeg < _ggfcg ;_bdeg ++{for _bdbb :=0;_bdbb < _gdcg ;
-_bdbb ++{if _fbbf (_aegc [_fffbe (_bdbb ,_bdeg )],_ecf .PdfRectangle ){return _bdbb ,_bdeg ;};};};return -1,-1;};_bbac :=make (map[uint64 ][]*textLine ,_gdcg *_ggfcg );for _ ,_ffbd :=range _gfaa .lines (){_abbeb ,_bccbf :=_gacg (_ffbd );if _abbeb < 0{continue ;
-};_bbac [_fffbe (_abbeb ,_bccbf )]=append (_bbac [_fffbe (_abbeb ,_bccbf )],_ffbd );};for _befb :=0;_befb < len (_afcaa )-1;_befb ++{_abe :=_afcaa [_befb ];_gbfgd :=_afcaa [_befb +1];for _ggab :=0;_ggab < len (_edcbb )-1;_ggab ++{_dccbf :=_edcbb [_ggab ];
-_gadef :=_edcbb [_ggab +1];_gefa :=_ad .PdfRectangle {Llx :_dccbf ,Urx :_gadef ,Lly :_gbfgd ,Ury :_abe };_fged :=_bbac [_fffbe (_ggab ,_befb )];if len (_fged )==0{continue ;};_abed :=_ebgga (_gefa ,_fged );_fedac .put (_ggab ,_befb ,_abed );};};return &_fedac ;
-};func (_bbgfc TextTable )getCellInfo (_cgbbb TextMark )[][]int {for _aebb ,_daed :=range _bbgfc .Cells {for _egdc :=range _daed {_fdab :=&_daed [_egdc ].Marks ;if _fdab .exists (_cgbbb ){return [][]int {{_aebb },{_egdc }};};};};return nil ;};func _cfdbba (_dgbf []TextMark ,_affcc *int ,_bfcb string )[]TextMark {_ggegf :=_gaeg ;
-_ggegf .Text =_bfcb ;return _bbgef (_dgbf ,_affcc ,_ggegf );};func (_cdc *PageFonts )extractPageResourcesToFont (_eff *_ad .PdfPageResources )error {if _eff .Font ==nil {return _fb .New (_eda );};_cba ,_dgge :=_afa .GetDict (_eff .Font );if !_dgge {return _fb .New (_afb );
-};for _ ,_acc :=range _cba .Keys (){var (_fgg =true ;_ddf []byte ;_fdb string ;);_agf ,_cfd :=_eff .GetFontByName (_acc );if !_cfd {return _fb .New (_gfg );};_ffc ,_afd :=_ad .NewPdfFontFromPdfObject (_agf );if _afd !=nil {return _afd ;};_ffcf :=_ffc .FontDescriptor ();
-_ggd :=_ffc .FontDescriptor ().FontName .String ();_ggfd :=_ffc .Subtype ();if _eae (_cdc .Fonts ,_ggd ){continue ;};if len (_ffc .ToUnicode ())==0{_fgg =false ;};if _ffcf .FontFile !=nil {if _efg ,_db :=_afa .GetStream (_ffcf .FontFile );_db {_ddf ,_afd =_afa .DecodeStream (_efg );
-if _afd !=nil {return _afd ;};_fdb =_ggd +"\u002e\u0070\u0066\u0062";};}else if _ffcf .FontFile2 !=nil {if _cab ,_abd :=_afa .GetStream (_ffcf .FontFile2 );_abd {_ddf ,_afd =_afa .DecodeStream (_cab );if _afd !=nil {return _afd ;};_fdb =_ggd +"\u002e\u0074\u0074\u0066";
-};}else if _ffcf .FontFile3 !=nil {if _feg ,_cgd :=_afa .GetStream (_ffcf .FontFile3 );_cgd {_ddf ,_afd =_afa .DecodeStream (_feg );if _afd !=nil {return _afd ;};_fdb =_ggd +"\u002e\u0063\u0066\u0066";};};if len (_fdb )< 1{_bg .Log .Debug (_fff );};_cee :=Font {FontName :_ggd ,PdfFont :_ffc ,IsCID :_ffc .IsCID (),IsSimple :_ffc .IsSimple (),ToUnicode :_fgg ,FontType :_ggfd ,FontData :_ddf ,FontFileName :_fdb ,FontDescriptor :_ffcf };
-_cdc .Fonts =append (_cdc .Fonts ,_cee );};return nil ;};func (_gecf rulingList )snapToGroupsDirection ()rulingList {_gecf .sortStrict ();_fgda :=make (map[*ruling ]rulingList ,len (_gecf ));_fdfg :=_gecf [0];_afgf :=func (_agegd *ruling ){_fdfg =_agegd ;
-_fgda [_fdfg ]=rulingList {_agegd }};_afgf (_gecf [0]);for _ ,_ecaa :=range _gecf [1:]{if _ecaa ._ecfb < _fdfg ._ecfb -_bff {_bg .Log .Error ("\u0073\u006e\u0061\u0070T\u006f\u0047\u0072\u006f\u0075\u0070\u0073\u0044\u0069r\u0065\u0063\u0074\u0069\u006f\u006e\u003a\u0020\u0057\u0072\u006f\u006e\u0067\u0020\u0070\u0072\u0069\u006da\u0072\u0079\u0020\u006f\u0072d\u0065\u0072\u002e\u000a\u0009\u0076\u0030\u003d\u0025\u0073\u000a\u0009\u0020\u0076\u003d\u0025\u0073",_fdfg ,_ecaa );
-};if _ecaa ._ecfb > _fdfg ._ecfb +_ddgfe {_afgf (_ecaa );}else {_fgda [_fdfg ]=append (_fgda [_fdfg ],_ecaa );};};_fcag :=make (map[*ruling ]float64 ,len (_fgda ));_begg :=make (map[*ruling ]*ruling ,len (_gecf ));for _bccgfb ,_caecd :=range _fgda {_fcag [_bccgfb ]=_caecd .mergePrimary ();
-for _ ,_bcacc :=range _caecd {_begg [_bcacc ]=_bccgfb ;};};for _ ,_cbbf :=range _gecf {_cbbf ._ecfb =_fcag [_begg [_cbbf ]];};_efae :=make (rulingList ,0,len (_gecf ));for _ ,_fdfa :=range _fgda {_caaag :=_fdfa .splitSec ();for _geab ,_dcbbf :=range _caaag {_fabgf :=_dcbbf .merge ();
-if len (_efae )> 0{_bgae :=_efae [len (_efae )-1];if _bgae .alignsPrimary (_fabgf )&&_bgae .alignsSec (_fabgf ){_bg .Log .Error ("\u0073\u006e\u0061\u0070\u0054\u006fG\u0072\u006f\u0075\u0070\u0073\u0044\u0069\u0072\u0065\u0063\u0074\u0069\u006f\u006e\u003a\u0020\u0044\u0075\u0070\u006ci\u0063\u0061\u0074\u0065\u0020\u0069\u003d\u0025\u0064\u000a\u0009\u0077\u003d\u0025s\u000a\t\u0076\u003d\u0025\u0073",_geab ,_bgae ,_fabgf );
-continue ;};};_efae =append (_efae ,_fabgf );};};_efae .sortStrict ();return _efae ;};func (_aedga *textObject )checkOp (_bcbe *_af .ContentStreamOperation ,_bccb int ,_addc bool )(_cedac bool ,_afac error ){if _aedga ==nil {var _gdfb []_afa .PdfObject ;
-if _bccb > 0{_gdfb =_bcbe .Params ;if len (_gdfb )> _bccb {_gdfb =_gdfb [:_bccb ];};};_bg .Log .Debug ("\u0025\u0023q \u006f\u0070\u0065r\u0061\u006e\u0064\u0020out\u0073id\u0065\u0020\u0074\u0065\u0078\u0074\u002e p\u0061\u0072\u0061\u006d\u0073\u003d\u0025+\u0076",_bcbe .Operand ,_gdfb );
-};if _bccb >=0{if len (_bcbe .Params )!=_bccb {if _addc {_afac =_fb .New ("\u0069n\u0063\u006f\u0072\u0072e\u0063\u0074\u0020\u0070\u0061r\u0061m\u0065t\u0065\u0072\u0020\u0063\u006f\u0075\u006et");};_bg .Log .Debug ("\u0045\u0052\u0052\u004f\u0052\u003a\u0020\u0025\u0023\u0071\u0020\u0073\u0068\u006f\u0075\u006c\u0064\u0020h\u0061\u0076\u0065\u0020\u0025\u0064\u0020i\u006e\u0070\u0075\u0074\u0020\u0070\u0061\u0072\u0061\u006d\u0073,\u0020\u0067\u006f\u0074\u0020\u0025\u0064\u0020\u0025\u002b\u0076",_bcbe .Operand ,_bccb ,len (_bcbe .Params ),_bcbe .Params );
-return false ,_afac ;};};return true ,nil ;};func _feced (_febae *PageText )error {_ddae :=_bgf .GetLicenseKey ();if _ddae !=nil &&_ddae .IsLicensed ()||_gde {return nil ;};_fa .Printf ("\u0055\u006e\u006c\u0069\u0063\u0065\u006e\u0073\u0065\u0064\u0020c\u006f\u0070\u0079\u0020\u006f\u0066\u0020\u0055\u006e\u0069P\u0044\u0046\u000a");
-_fa .Println ("-\u0020\u0047\u0065\u0074\u0020\u0061\u0020\u0066\u0072e\u0065\u0020\u0074\u0072\u0069\u0061\u006c l\u0069\u0063\u0065\u006es\u0065\u0020\u006f\u006e\u0020\u0068\u0074\u0074\u0070s:\u002f\u002fu\u006e\u0069\u0064\u006f\u0063\u002e\u0069\u006f");
-return _fb .New ("\u0075\u006e\u0069\u0070d\u0066\u0020\u006c\u0069\u0063\u0065\u006e\u0073\u0065\u0020c\u006fd\u0065\u0020\u0072\u0065\u0071\u0075\u0069r\u0065\u0064");};
+func (_bbcf *lists) Text() string {
+	_eafd := &_faf.Builder{}
+	for _, _adgb := range *_bbcf {
+		_ggdg := _adgb.Text()
+		_eafd.WriteString(_ggdg)
+	}
+	return _eafd.String()
+}
+
+func (_bece *textTable) markCells() {
+	for _bdcc := 0; _bdcc < _bece._aaga; _bdcc++ {
+		for _bgagg := 0; _bgagg < _bece._cfadc; _bgagg++ {
+			_cbccf := _bece.get(_bgagg, _bdcc)
+			if _cbccf != nil {
+				_cbccf._bdfe = true
+			}
+		}
+	}
+}
+
+func _dcff(_bea string, _acf, _eabc int, _gdcf string) string {
+	if _eabc > len(_bea)-1 {
+		return _bea[:_acf] + _gdcf
+	}
+	return _bea[:_acf] + _gdcf + _bea[_eabc:]
+}
+
+func _dbgc(_egg *TextMarkArray, _dgba *string, _gbf *int, _daa string) error {
+	var _agbc TextMark
+	for _, _ccdec := range _egg.Elements() {
+		_cceg := _ccdec.Text
+		_abda := _ccdec.Font
+		_efag := ""
+		_bfge := *_dgba
+		if len(_bfge) > *_gbf {
+			_efag = _bfge[*_gbf : *_gbf+len(_cceg)]
+		} else if *_gbf == len(_daa)-1 && len(_bfge) > *_gbf {
+			_efag = _bfge[*_gbf:]
+		}
+		_cec := _ccdec.DirectObject
+		if _cec == nil && _ccdec.Text == "\u0020" {
+			_bafa := _agbc.ObjString
+			_ddcd := _bafa[len(_bafa)-1]
+			if _ddcd != _ccdec.Text {
+				_cec = _agbc.DirectObject
+				_abda = _agbc.Font
+				_gcg, _bed := _afa.GetString(_cec)
+				if !_bed {
+					return _fa.Errorf("\u0075n\u0061\u0062l\u0065\u0020\u0074\u006f \u0067\u0065\u0074 \u0073\u0074\u0072\u0069\u006e\u0067\u0020\u0042\u0079te\u0073\u0020\u0066r\u006f\u006d \u0064\u0069\u0072\u0065\u0063\u0074O\u0062\u006ae\u0063\u0074")
+				}
+				_gfa, _bed := _afa.GetStringBytes(_cec)
+				if !_bed {
+					return _afa.ErrTypeError
+				}
+				_gccd := _edc(_gfa, _abda)
+				_efag = _gccd + _efag
+				_fffa(_gcg, _efag, _abda)
+				*_gbf += len(_cceg)
+				continue
+			}
+		}
+		_efgc, _egeg := _afa.GetString(_cec)
+		if !_egeg {
+			return _fa.Errorf("\u0075n\u0061\u0062l\u0065\u0020\u0074\u006f \u0067\u0065\u0074 \u0073\u0074\u0072\u0069\u006e\u0067\u0020\u0042\u0079te\u0073\u0020\u0066r\u006f\u006d \u0064\u0069\u0072\u0065\u0063\u0074O\u0062\u006ae\u0063\u0074")
+		}
+		_afc := ""
+		_ddcc, _egeg := _afa.GetStringBytes(_cec)
+		if !_egeg {
+			return _afa.ErrTypeError
+		}
+		_eaf := _edc(_ddcc, _abda)
+		_afc = _faf.Replace(_eaf, _cceg, _efag, 1)
+		_fffa(_efgc, _afc, _abda)
+		*_gbf += len(_cceg)
+		_agbc = _ccdec
+	}
+	return nil
+}
+
+func (_aag *textObject) getStrokeColor() _cb.Color {
+	return _dbegde(_aag._edcg.ColorspaceStroking, _aag._edcg.ColorStroking)
+}
+
+func (_cabe gridTiling) complete() bool {
+	for _, _gdffb := range _cabe._ggad {
+		for _, _bgced := range _gdffb {
+			if !_bgced.complete() {
+				return false
+			}
+		}
+	}
+	return true
+}
+
+func (_gfccc *textTable) compositeColCorridors() map[int][]float64 {
+	_befda := make(map[int][]float64, _gfccc._cfadc)
+	if _ggegb {
+		_bg.Log.Info("\u0063\u006f\u006d\u0070o\u0073\u0069\u0074\u0065\u0043\u006f\u006c\u0043\u006f\u0072r\u0069d\u006f\u0072\u0073\u003a\u0020\u0077\u003d%\u0064\u0020", _gfccc._cfadc)
+	}
+	for _cbddf := 0; _cbddf < _gfccc._cfadc; _cbddf++ {
+		_befda[_cbddf] = nil
+	}
+	return _befda
+}
+
+func (_acebb paraList) merge() *textPara {
+	_bg.Log.Trace("\u006d\u0065\u0072\u0067\u0065:\u0020\u0070\u0061\u0072\u0061\u0073\u003d\u0025\u0064\u0020\u003d\u003d\u003d=\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u0078\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d", len(_acebb))
+	if len(_acebb) == 0 {
+		return nil
+	}
+	_acebb.sortReadingOrder()
+	_gagf := _acebb[0].PdfRectangle
+	_daaa := _acebb[0]._feea
+	for _, _aecfa := range _acebb[1:] {
+		_gagf = _faea(_gagf, _aecfa.PdfRectangle)
+		_daaa = append(_daaa, _aecfa._feea...)
+	}
+	return _ebgga(_gagf, _daaa)
+}
+
+func (_dgbbd gridTile) numBorders() int {
+	_ecff := 0
+	if _dgbbd._dgaae {
+		_ecff++
+	}
+	if _dgbbd._ebecd {
+		_ecff++
+	}
+	if _dgbbd._cegae {
+		_ecff++
+	}
+	if _dgbbd._eece {
+		_ecff++
+	}
+	return _ecff
+}
+
+func (_dfdda compositeCell) split(_afcaa, _edcbb []float64) *textTable {
+	_ggfcg := len(_afcaa) + 1
+	_gdcg := len(_edcbb) + 1
+	if _ggegb {
+		_bg.Log.Info("\u0063\u006f\u006d\u0070\u006f\u0073\u0069t\u0065\u0043\u0065l\u006c\u002e\u0073\u0070l\u0069\u0074\u003a\u0020\u0025\u0064\u0020\u0078\u0020\u0025\u0064\u000a\u0009\u0063\u006f\u006d\u0070\u006f\u0073\u0069\u0074\u0065\u003d\u0025\u0073\u000a"+"\u0009\u0072\u006f\u0077\u0043\u006f\u0072\u0072\u0069\u0064\u006f\u0072\u0073=\u0025\u0036\u002e\u0032\u0066\u000a\t\u0063\u006f\u006c\u0043\u006f\u0072\u0072\u0069\u0064\u006f\u0072\u0073\u003d%\u0036\u002e\u0032\u0066", _gdcg, _ggfcg, _dfdda, _afcaa, _edcbb)
+		_fa.Printf("\u0020\u0020\u0020\u0020\u0025\u0064\u0020\u0070\u0061\u0072\u0061\u0073\u000a", len(_dfdda.paraList))
+		for _efff, _acbbb := range _dfdda.paraList {
+			_fa.Printf("\u0025\u0034\u0064\u003a\u0020\u0025\u0073\u000a", _efff, _acbbb.String())
+		}
+		_fa.Printf("\u0020\u0020\u0020\u0020\u0025\u0064\u0020\u006c\u0069\u006e\u0065\u0073\u000a", len(_dfdda.lines()))
+		for _fcac, _cbegg := range _dfdda.lines() {
+			_fa.Printf("\u0025\u0034\u0064\u003a\u0020\u0025\u0073\u000a", _fcac, _cbegg)
+		}
+	}
+	_afcaa = _facg(_afcaa, _dfdda.Ury, _dfdda.Lly)
+	_edcbb = _facg(_edcbb, _dfdda.Llx, _dfdda.Urx)
+	_afdea := make(map[uint64]*textPara, _gdcg*_ggfcg)
+	_fedac := textTable{_cfadc: _gdcg, _aaga: _ggfcg, _eccda: _afdea}
+	_gfaa := _dfdda.paraList
+	_eg.Slice(_gfaa, func(_aafc, _gggf int) bool {
+		_fddb, _fgcad := _gfaa[_aafc], _gfaa[_gggf]
+		_adgge, _dggag := _fddb.Lly, _fgcad.Lly
+		if _adgge != _dggag {
+			return _adgge < _dggag
+		}
+		return _fddb.Llx < _fgcad.Llx
+	})
+	_aegc := make(map[uint64]_ad.PdfRectangle, _gdcg*_ggfcg)
+	for _bdgb, _afdbf := range _afcaa[1:] {
+		_fcbcc := _afcaa[_bdgb]
+		for _babc, _ecec := range _edcbb[1:] {
+			_eddfg := _edcbb[_babc]
+			_aegc[_fffbe(_babc, _bdgb)] = _ad.PdfRectangle{Llx: _eddfg, Urx: _ecec, Lly: _afdbf, Ury: _fcbcc}
+		}
+	}
+	if _ggegb {
+		_bg.Log.Info("\u0063\u006f\u006d\u0070\u006f\u0073\u0069\u0074\u0065\u0043\u0065l\u006c\u002e\u0073\u0070\u006c\u0069\u0074\u003a\u0020\u0072e\u0063\u0074\u0073")
+		_fa.Printf("\u0020\u0020\u0020\u0020")
+		for _dbfd := 0; _dbfd < _gdcg; _dbfd++ {
+			_fa.Printf("\u0025\u0033\u0030\u0064\u002c\u0020", _dbfd)
+		}
+		_fa.Println()
+		for _dcbe := 0; _dcbe < _ggfcg; _dcbe++ {
+			_fa.Printf("\u0020\u0020\u0025\u0032\u0064\u003a", _dcbe)
+			for _cdab := 0; _cdab < _gdcg; _cdab++ {
+				_fa.Printf("\u00256\u002e\u0032\u0066\u002c\u0020", _aegc[_fffbe(_cdab, _dcbe)])
+			}
+			_fa.Println()
+		}
+	}
+	_gacg := func(_ecf *textLine) (int, int) {
+		for _bdeg := 0; _bdeg < _ggfcg; _bdeg++ {
+			for _bdbb := 0; _bdbb < _gdcg; _bdbb++ {
+				if _fbbf(_aegc[_fffbe(_bdbb, _bdeg)], _ecf.PdfRectangle) {
+					return _bdbb, _bdeg
+				}
+			}
+		}
+		return -1, -1
+	}
+	_bbac := make(map[uint64][]*textLine, _gdcg*_ggfcg)
+	for _, _ffbd := range _gfaa.lines() {
+		_abbeb, _bccbf := _gacg(_ffbd)
+		if _abbeb < 0 {
+			continue
+		}
+		_bbac[_fffbe(_abbeb, _bccbf)] = append(_bbac[_fffbe(_abbeb, _bccbf)], _ffbd)
+	}
+	for _befb := 0; _befb < len(_afcaa)-1; _befb++ {
+		_abe := _afcaa[_befb]
+		_gbfgd := _afcaa[_befb+1]
+		for _ggab := 0; _ggab < len(_edcbb)-1; _ggab++ {
+			_dccbf := _edcbb[_ggab]
+			_gadef := _edcbb[_ggab+1]
+			_gefa := _ad.PdfRectangle{Llx: _dccbf, Urx: _gadef, Lly: _gbfgd, Ury: _abe}
+			_fged := _bbac[_fffbe(_ggab, _befb)]
+			if len(_fged) == 0 {
+				continue
+			}
+			_abed := _ebgga(_gefa, _fged)
+			_fedac.put(_ggab, _befb, _abed)
+		}
+	}
+	return &_fedac
+}
+
+func (_bbgfc TextTable) getCellInfo(_cgbbb TextMark) [][]int {
+	for _aebb, _daed := range _bbgfc.Cells {
+		for _egdc := range _daed {
+			_fdab := &_daed[_egdc].Marks
+			if _fdab.exists(_cgbbb) {
+				return [][]int{{_aebb}, {_egdc}}
+			}
+		}
+	}
+	return nil
+}
+
+func _cfdbba(_dgbf []TextMark, _affcc *int, _bfcb string) []TextMark {
+	_ggegf := _gaeg
+	_ggegf.Text = _bfcb
+	return _bbgef(_dgbf, _affcc, _ggegf)
+}
+
+func (_cdc *PageFonts) extractPageResourcesToFont(_eff *_ad.PdfPageResources) error {
+	if _eff.Font == nil {
+		return _fb.New(_eda)
+	}
+	_cba, _dgge := _afa.GetDict(_eff.Font)
+	if !_dgge {
+		return _fb.New(_afb)
+	}
+	for _, _acc := range _cba.Keys() {
+		var (
+			_fgg = true
+			_ddf []byte
+			_fdb string
+		)
+		_agf, _cfd := _eff.GetFontByName(_acc)
+		if !_cfd {
+			return _fb.New(_gfg)
+		}
+		_ffc, _afd := _ad.NewPdfFontFromPdfObject(_agf)
+		if _afd != nil {
+			return _afd
+		}
+		_ffcf := _ffc.FontDescriptor()
+		_ggd := _ffc.FontDescriptor().FontName.String()
+		_ggfd := _ffc.Subtype()
+		if _eae(_cdc.Fonts, _ggd) {
+			continue
+		}
+		if len(_ffc.ToUnicode()) == 0 {
+			_fgg = false
+		}
+		if _ffcf.FontFile != nil {
+			if _efg, _db := _afa.GetStream(_ffcf.FontFile); _db {
+				_ddf, _afd = _afa.DecodeStream(_efg)
+				if _afd != nil {
+					return _afd
+				}
+				_fdb = _ggd + "\u002e\u0070\u0066\u0062"
+			}
+		} else if _ffcf.FontFile2 != nil {
+			if _cab, _abd := _afa.GetStream(_ffcf.FontFile2); _abd {
+				_ddf, _afd = _afa.DecodeStream(_cab)
+				if _afd != nil {
+					return _afd
+				}
+				_fdb = _ggd + "\u002e\u0074\u0074\u0066"
+			}
+		} else if _ffcf.FontFile3 != nil {
+			if _feg, _cgd := _afa.GetStream(_ffcf.FontFile3); _cgd {
+				_ddf, _afd = _afa.DecodeStream(_feg)
+				if _afd != nil {
+					return _afd
+				}
+				_fdb = _ggd + "\u002e\u0063\u0066\u0066"
+			}
+		}
+		if len(_fdb) < 1 {
+			_bg.Log.Debug(_fff)
+		}
+		_cee := Font{FontName: _ggd, PdfFont: _ffc, IsCID: _ffc.IsCID(), IsSimple: _ffc.IsSimple(), ToUnicode: _fgg, FontType: _ggfd, FontData: _ddf, FontFileName: _fdb, FontDescriptor: _ffcf}
+		_cdc.Fonts = append(_cdc.Fonts, _cee)
+	}
+	return nil
+}
+
+func (_gecf rulingList) snapToGroupsDirection() rulingList {
+	_gecf.sortStrict()
+	_fgda := make(map[*ruling]rulingList, len(_gecf))
+	_fdfg := _gecf[0]
+	_afgf := func(_agegd *ruling) {
+		_fdfg = _agegd
+		_fgda[_fdfg] = rulingList{_agegd}
+	}
+	_afgf(_gecf[0])
+	for _, _ecaa := range _gecf[1:] {
+		if _ecaa._ecfb < _fdfg._ecfb-_bff {
+			_bg.Log.Error("\u0073\u006e\u0061\u0070T\u006f\u0047\u0072\u006f\u0075\u0070\u0073\u0044\u0069r\u0065\u0063\u0074\u0069\u006f\u006e\u003a\u0020\u0057\u0072\u006f\u006e\u0067\u0020\u0070\u0072\u0069\u006da\u0072\u0079\u0020\u006f\u0072d\u0065\u0072\u002e\u000a\u0009\u0076\u0030\u003d\u0025\u0073\u000a\u0009\u0020\u0076\u003d\u0025\u0073", _fdfg, _ecaa)
+		}
+		if _ecaa._ecfb > _fdfg._ecfb+_ddgfe {
+			_afgf(_ecaa)
+		} else {
+			_fgda[_fdfg] = append(_fgda[_fdfg], _ecaa)
+		}
+	}
+	_fcag := make(map[*ruling]float64, len(_fgda))
+	_begg := make(map[*ruling]*ruling, len(_gecf))
+	for _bccgfb, _caecd := range _fgda {
+		_fcag[_bccgfb] = _caecd.mergePrimary()
+		for _, _bcacc := range _caecd {
+			_begg[_bcacc] = _bccgfb
+		}
+	}
+	for _, _cbbf := range _gecf {
+		_cbbf._ecfb = _fcag[_begg[_cbbf]]
+	}
+	_efae := make(rulingList, 0, len(_gecf))
+	for _, _fdfa := range _fgda {
+		_caaag := _fdfa.splitSec()
+		for _geab, _dcbbf := range _caaag {
+			_fabgf := _dcbbf.merge()
+			if len(_efae) > 0 {
+				_bgae := _efae[len(_efae)-1]
+				if _bgae.alignsPrimary(_fabgf) && _bgae.alignsSec(_fabgf) {
+					_bg.Log.Error("\u0073\u006e\u0061\u0070\u0054\u006fG\u0072\u006f\u0075\u0070\u0073\u0044\u0069\u0072\u0065\u0063\u0074\u0069\u006f\u006e\u003a\u0020\u0044\u0075\u0070\u006ci\u0063\u0061\u0074\u0065\u0020\u0069\u003d\u0025\u0064\u000a\u0009\u0077\u003d\u0025s\u000a\t\u0076\u003d\u0025\u0073", _geab, _bgae, _fabgf)
+					continue
+				}
+			}
+			_efae = append(_efae, _fabgf)
+		}
+	}
+	_efae.sortStrict()
+	return _efae
+}
+
+func (_aedga *textObject) checkOp(_bcbe *_af.ContentStreamOperation, _bccb int, _addc bool) (_cedac bool, _afac error) {
+	if _aedga == nil {
+		var _gdfb []_afa.PdfObject
+		if _bccb > 0 {
+			_gdfb = _bcbe.Params
+			if len(_gdfb) > _bccb {
+				_gdfb = _gdfb[:_bccb]
+			}
+		}
+		_bg.Log.Debug("\u0025\u0023q \u006f\u0070\u0065r\u0061\u006e\u0064\u0020out\u0073id\u0065\u0020\u0074\u0065\u0078\u0074\u002e p\u0061\u0072\u0061\u006d\u0073\u003d\u0025+\u0076", _bcbe.Operand, _gdfb)
+	}
+	if _bccb >= 0 {
+		if len(_bcbe.Params) != _bccb {
+			if _addc {
+				_afac = _fb.New("\u0069n\u0063\u006f\u0072\u0072e\u0063\u0074\u0020\u0070\u0061r\u0061m\u0065t\u0065\u0072\u0020\u0063\u006f\u0075\u006et")
+			}
+			_bg.Log.Debug("\u0045\u0052\u0052\u004f\u0052\u003a\u0020\u0025\u0023\u0071\u0020\u0073\u0068\u006f\u0075\u006c\u0064\u0020h\u0061\u0076\u0065\u0020\u0025\u0064\u0020i\u006e\u0070\u0075\u0074\u0020\u0070\u0061\u0072\u0061\u006d\u0073,\u0020\u0067\u006f\u0074\u0020\u0025\u0064\u0020\u0025\u002b\u0076", _bcbe.Operand, _bccb, len(_bcbe.Params), _bcbe.Params)
+			return false, _afac
+		}
+	}
+	return true, nil
+}
+
+func _feced(_febae *PageText) error {
+	_ddae := _bgf.GetLicenseKey()
+	if _ddae != nil && _ddae.IsLicensed() || _gde {
+		return nil
+	}
+	_fa.Printf("\u0055\u006e\u006c\u0069\u0063\u0065\u006e\u0073\u0065\u0064\u0020c\u006f\u0070\u0079\u0020\u006f\u0066\u0020\u0055\u006e\u0069P\u0044\u0046\u000a")
+	_fa.Println("-\u0020\u0047\u0065\u0074\u0020\u0061\u0020\u0066\u0072e\u0065\u0020\u0074\u0072\u0069\u0061\u006c l\u0069\u0063\u0065\u006es\u0065\u0020\u006f\u006e\u0020\u0068\u0074\u0074\u0070s:\u002f\u002fu\u006e\u0069\u0064\u006f\u0063\u002e\u0069\u006f")
+	return _fb.New("\u0075\u006e\u0069\u0070d\u0066\u0020\u006c\u0069\u0063\u0065\u006e\u0073\u0065\u0020c\u006fd\u0065\u0020\u0072\u0065\u0071\u0075\u0069r\u0065\u0064")
+}
 
 // NewWithOptions an Extractor instance for extracting content from the input PDF page with options.
-func NewWithOptions (page *_ad .PdfPage ,options *Options )(*Extractor ,error ){const _ede ="\u0065x\u0074\u0072\u0061\u0063\u0074\u006f\u0072\u002e\u004e\u0065\u0077W\u0069\u0074\u0068\u004f\u0070\u0074\u0069\u006f\u006e\u0073";_bca ,_cef :=page .GetAllContentStreams ();
-if _cef !=nil {return nil ,_cef ;};var _gge *_ad .StructTreeRoot ;_eea ,_fdd :=page .GetStructTreeRoot ();if !_fdd {_bg .Log .Debug ("T\u0068\u0065\u0020\u0070\u0064\u0066\u0020\u0064\u006f\u0063\u0075\u006d\u0065\u006e\u0074\u0020\u0069\u0073\u0020\u006e\u006f\u0074\u0020\u0074\u0061\u0067g\u0065d\u002e\u0020\u0053\u0074r\u0075\u0063t\u0054\u0072\u0065\u0065\u0052\u006f\u006f\u0074\u0020\u0064\u006f\u0065\u0073\u006e\u0027\u0074\u0020\u0065\u0078\u0069\u0073\u0074\u002e");
-}else {_gge ,_cef =_ad .NewStructTreeRootFromPdfObject (*_eea );if _cef !=nil {return nil ,_fa .Errorf ("\u0065\u0072\u0072or\u0020\u006c\u006f\u0061\u0064\u0069\u006e\u0067\u0020s\u0074r\u0075c\u0074 \u0074\u0072\u0065\u0065\u0020\u0072\u006f\u006f\u0074\u003a\u0020\u0025\u0076",_cef );
-};};_acb :=page .GetContainingPdfObject ();_gcd ,_cef :=page .GetMediaBox ();if _cef !=nil {return nil ,_fa .Errorf ("\u0065\u0078\u0074r\u0061\u0063\u0074\u006fr\u0020\u0072\u0065\u0071\u0075\u0069\u0072e\u0073\u0020\u006d\u0065\u0064\u0069\u0061\u0042\u006f\u0078\u002e\u0020\u0025\u0076",_cef );
-};_cgg :=&Extractor {_cgc :_bca ,_gab :page .Resources ,_bgd :*_gcd ,_gdf :page .CropBox ,_efbg :page .GetStructParentsKey (),_bef :map[string ]fontEntry {},_gdfc :map[string ]textResult {},_acd :map[string ]textResult {},_fag :options ,_gce :_gge ,_caaa :_acb };
-if _cgg ._bgd .Llx > _cgg ._bgd .Urx {_bg .Log .Info ("\u004d\u0065\u0064\u0069\u0061\u0042o\u0078\u0020\u0068\u0061\u0073\u0020\u0058\u0020\u0063\u006f\u006f\u0072\u0064\u0069\u006e\u0061\u0074\u0065\u0073\u0020r\u0065\u0076\u0065\u0072\u0073\u0065\u0064\u002e\u0020\u0025\u002e\u0032\u0066\u0020F\u0069x\u0069\u006e\u0067\u002e",_cgg ._bgd );
-_cgg ._bgd .Llx ,_cgg ._bgd .Urx =_cgg ._bgd .Urx ,_cgg ._bgd .Llx ;};if _cgg ._bgd .Lly > _cgg ._bgd .Ury {_bg .Log .Info ("\u004d\u0065\u0064\u0069\u0061\u0042o\u0078\u0020\u0068\u0061\u0073\u0020\u0059\u0020\u0063\u006f\u006f\u0072\u0064\u0069\u006e\u0061\u0074\u0065\u0073\u0020r\u0065\u0076\u0065\u0072\u0073\u0065\u0064\u002e\u0020\u0025\u002e\u0032\u0066\u0020F\u0069x\u0069\u006e\u0067\u002e",_cgg ._bgd );
-_cgg ._bgd .Lly ,_cgg ._bgd .Ury =_cgg ._bgd .Ury ,_cgg ._bgd .Lly ;};if _cgg ._fag !=nil {if _cgg ._fag .IncludeAnnotations {_cgg ._gfcg ,_cef =page .GetAnnotations ();if _cef !=nil {_bg .Log .Debug ("\u0045\u0072r\u006f\u0072\u0020\u0067\u0065\u0074\u0074\u0069\u006e\u0067\u0020\u0061\u006e\u006e\u006f\u0074\u0061\u0074\u0069\u006f\u006e\u0073: \u0025\u0076",_cef );
-};};};_bgf .TrackUse (_ede );return _cgg ,nil ;};func (_abag paraList )computeEBBoxes (){if _gagg {_bg .Log .Info ("\u0063o\u006dp\u0075\u0074\u0065\u0045\u0042\u0042\u006f\u0078\u0065\u0073\u003a");};for _ ,_fdbd :=range _abag {_fdbd ._cbfdb =_fdbd .PdfRectangle ;
-};_dceg :=_abag .yNeighbours (0);for _eaafe ,_ageb :=range _abag {_afde :=_ageb ._cbfdb ;_fgagf ,_dcfaga :=-1.0e9,+1.0e9;for _ ,_dabge :=range _dceg [_ageb ]{_eegga :=_abag [_dabge ]._cbfdb ;if _eegga .Urx < _afde .Llx {_fgagf =_c .Max (_fgagf ,_eegga .Urx );
-}else if _afde .Urx < _eegga .Llx {_dcfaga =_c .Min (_dcfaga ,_eegga .Llx );};};for _agca ,_bdbgc :=range _abag {_adda :=_bdbgc ._cbfdb ;if _eaafe ==_agca ||_adda .Ury > _afde .Lly {continue ;};if _fgagf <=_adda .Llx &&_adda .Llx < _afde .Llx {_afde .Llx =_adda .Llx ;
-}else if _adda .Urx <=_dcfaga &&_afde .Urx < _adda .Urx {_afde .Urx =_adda .Urx ;};};if _gagg {_fa .Printf ("\u0025\u0034\u0064\u003a %\u0036\u002e\u0032\u0066\u2192\u0025\u0036\u002e\u0032\u0066\u0020\u0025\u0071\u000a",_eaafe ,_ageb ._cbfdb ,_afde ,_fagdg (_ageb .text (),50));
-};_ageb ._cbfdb =_afde ;};if _ebgg {for _ ,_bgeg :=range _abag {_bgeg .PdfRectangle =_bgeg ._cbfdb ;};};};func (_deaba *textPara )fontsize ()float64 {return _deaba ._feea [0]._fgfb };func _fagdg (_beddd string ,_fgbf int )string {if len (_beddd )< _fgbf {return _beddd ;
-};return _beddd [:_fgbf ];};var _d =[]string {"\u0042\u004e","\u0042\u004e","\u0042\u004e","\u0042\u004e","\u0042\u004e","\u0042\u004e","\u0042\u004e","\u0042\u004e","\u0042\u004e","\u0053","\u0042","\u0053","\u0057\u0053","\u0042","\u0042\u004e","\u0042\u004e","\u0042\u004e","\u0042\u004e","\u0042\u004e","\u0042\u004e","\u0042\u004e","\u0042\u004e","\u0042\u004e","\u0042\u004e","\u0042\u004e","\u0042\u004e","\u0042\u004e","\u0042\u004e","\u0042","\u0042","\u0042","\u0053","\u0057\u0053","\u004f\u004e","\u004f\u004e","\u0045\u0054","\u0045\u0054","\u0045\u0054","\u004f\u004e","\u004f\u004e","\u004f\u004e","\u004f\u004e","\u004f\u004e","\u0045\u0053","\u0043\u0053","\u0045\u0053","\u0043\u0053","\u0043\u0053","\u0045\u004e","\u0045\u004e","\u0045\u004e","\u0045\u004e","\u0045\u004e","\u0045\u004e","\u0045\u004e","\u0045\u004e","\u0045\u004e","\u0045\u004e","\u0043\u0053","\u004f\u004e","\u004f\u004e","\u004f\u004e","\u004f\u004e","\u004f\u004e","\u004f\u004e","\u004c","\u004c","\u004c","\u004c","\u004c","\u004c","\u004c","\u004c","\u004c","\u004c","\u004c","\u004c","\u004c","\u004c","\u004c","\u004c","\u004c","\u004c","\u004c","\u004c","\u004c","\u004c","\u004c","\u004c","\u004c","\u004c","\u004f\u004e","\u004f\u004e","\u004f\u004e","\u004f\u004e","\u004f\u004e","\u004f\u004e","\u004c","\u004c","\u004c","\u004c","\u004c","\u004c","\u004c","\u004c","\u004c","\u004c","\u004c","\u004c","\u004c","\u004c","\u004c","\u004c","\u004c","\u004c","\u004c","\u004c","\u004c","\u004c","\u004c","\u004c","\u004c","\u004c","\u004f\u004e","\u004f\u004e","\u004f\u004e","\u004f\u004e","\u0042\u004e","\u0042\u004e","\u0042\u004e","\u0042\u004e","\u0042\u004e","\u0042\u004e","\u0042","\u0042\u004e","\u0042\u004e","\u0042\u004e","\u0042\u004e","\u0042\u004e","\u0042\u004e","\u0042\u004e","\u0042\u004e","\u0042\u004e","\u0042\u004e","\u0042\u004e","\u0042\u004e","\u0042\u004e","\u0042\u004e","\u0042\u004e","\u0042\u004e","\u0042\u004e","\u0042\u004e","\u0042\u004e","\u0042\u004e","\u0042\u004e","\u0042\u004e","\u0042\u004e","\u0042\u004e","\u0042\u004e","\u0042\u004e","\u0043\u0053","\u004f\u004e","\u0045\u0054","\u0045\u0054","\u0045\u0054","\u0045\u0054","\u004f\u004e","\u004f\u004e","\u004f\u004e","\u004f\u004e","\u004c","\u004f\u004e","\u004f\u004e","\u0042\u004e","\u004f\u004e","\u004f\u004e","\u0045\u0054","\u0045\u0054","\u0045\u004e","\u0045\u004e","\u004f\u004e","\u004c","\u004f\u004e","\u004f\u004e","\u004f\u004e","\u0045\u004e","\u004c","\u004f\u004e","\u004f\u004e","\u004f\u004e","\u004f\u004e","\u004f\u004e","\u004c","\u004c","\u004c","\u004c","\u004c","\u004c","\u004c","\u004c","\u004c","\u004c","\u004c","\u004c","\u004c","\u004c","\u004c","\u004c","\u004c","\u004c","\u004c","\u004c","\u004c","\u004c","\u004c","\u004f\u004e","\u004c","\u004c","\u004c","\u004c","\u004c","\u004c","\u004c","\u004c","\u004c","\u004c","\u004c","\u004c","\u004c","\u004c","\u004c","\u004c","\u004c","\u004c","\u004c","\u004c","\u004c","\u004c","\u004c","\u004c","\u004c","\u004c","\u004c","\u004c","\u004c","\u004c","\u004c","\u004f\u004e","\u004c","\u004c","\u004c","\u004c","\u004c","\u004c","\u004c","\u004c"};
-const (ExtractionModeLayout =iota ;ExtractionModePlain ;ExtractionModeLayoutNoBreaks ;);
+func NewWithOptions(page *_ad.PdfPage, options *Options) (*Extractor, error) {
+	const _ede = "\u0065x\u0074\u0072\u0061\u0063\u0074\u006f\u0072\u002e\u004e\u0065\u0077W\u0069\u0074\u0068\u004f\u0070\u0074\u0069\u006f\u006e\u0073"
+	_bca, _cef := page.GetAllContentStreams()
+	if _cef != nil {
+		return nil, _cef
+	}
+	var _gge *_ad.StructTreeRoot
+	_eea, _fdd := page.GetStructTreeRoot()
+	if !_fdd {
+		_bg.Log.Debug("T\u0068\u0065\u0020\u0070\u0064\u0066\u0020\u0064\u006f\u0063\u0075\u006d\u0065\u006e\u0074\u0020\u0069\u0073\u0020\u006e\u006f\u0074\u0020\u0074\u0061\u0067g\u0065d\u002e\u0020\u0053\u0074r\u0075\u0063t\u0054\u0072\u0065\u0065\u0052\u006f\u006f\u0074\u0020\u0064\u006f\u0065\u0073\u006e\u0027\u0074\u0020\u0065\u0078\u0069\u0073\u0074\u002e")
+	} else {
+		_gge, _cef = _ad.NewStructTreeRootFromPdfObject(*_eea)
+		if _cef != nil {
+			return nil, _fa.Errorf("\u0065\u0072\u0072or\u0020\u006c\u006f\u0061\u0064\u0069\u006e\u0067\u0020s\u0074r\u0075c\u0074 \u0074\u0072\u0065\u0065\u0020\u0072\u006f\u006f\u0074\u003a\u0020\u0025\u0076", _cef)
+		}
+	}
+	_acb := page.GetContainingPdfObject()
+	_gcd, _cef := page.GetMediaBox()
+	if _cef != nil {
+		return nil, _fa.Errorf("\u0065\u0078\u0074r\u0061\u0063\u0074\u006fr\u0020\u0072\u0065\u0071\u0075\u0069\u0072e\u0073\u0020\u006d\u0065\u0064\u0069\u0061\u0042\u006f\u0078\u002e\u0020\u0025\u0076", _cef)
+	}
+	_cgg := &Extractor{_cgc: _bca, _gab: page.Resources, _bgd: *_gcd, _gdf: page.CropBox, _efbg: page.GetStructParentsKey(), _bef: map[string]fontEntry{}, _gdfc: map[string]textResult{}, _acd: map[string]textResult{}, _fag: options, _gce: _gge, _caaa: _acb}
+	if _cgg._bgd.Llx > _cgg._bgd.Urx {
+		_bg.Log.Info("\u004d\u0065\u0064\u0069\u0061\u0042o\u0078\u0020\u0068\u0061\u0073\u0020\u0058\u0020\u0063\u006f\u006f\u0072\u0064\u0069\u006e\u0061\u0074\u0065\u0073\u0020r\u0065\u0076\u0065\u0072\u0073\u0065\u0064\u002e\u0020\u0025\u002e\u0032\u0066\u0020F\u0069x\u0069\u006e\u0067\u002e", _cgg._bgd)
+		_cgg._bgd.Llx, _cgg._bgd.Urx = _cgg._bgd.Urx, _cgg._bgd.Llx
+	}
+	if _cgg._bgd.Lly > _cgg._bgd.Ury {
+		_bg.Log.Info("\u004d\u0065\u0064\u0069\u0061\u0042o\u0078\u0020\u0068\u0061\u0073\u0020\u0059\u0020\u0063\u006f\u006f\u0072\u0064\u0069\u006e\u0061\u0074\u0065\u0073\u0020r\u0065\u0076\u0065\u0072\u0073\u0065\u0064\u002e\u0020\u0025\u002e\u0032\u0066\u0020F\u0069x\u0069\u006e\u0067\u002e", _cgg._bgd)
+		_cgg._bgd.Lly, _cgg._bgd.Ury = _cgg._bgd.Ury, _cgg._bgd.Lly
+	}
+	if _cgg._fag != nil {
+		if _cgg._fag.IncludeAnnotations {
+			_cgg._gfcg, _cef = page.GetAnnotations()
+			if _cef != nil {
+				_bg.Log.Debug("\u0045\u0072r\u006f\u0072\u0020\u0067\u0065\u0074\u0074\u0069\u006e\u0067\u0020\u0061\u006e\u006e\u006f\u0074\u0061\u0074\u0069\u006f\u006e\u0073: \u0025\u0076", _cef)
+			}
+		}
+	}
+	_bgf.TrackUse(_ede)
+	return _cgg, nil
+}
+
+func (_abag paraList) computeEBBoxes() {
+	if _gagg {
+		_bg.Log.Info("\u0063o\u006dp\u0075\u0074\u0065\u0045\u0042\u0042\u006f\u0078\u0065\u0073\u003a")
+	}
+	for _, _fdbd := range _abag {
+		_fdbd._cbfdb = _fdbd.PdfRectangle
+	}
+	_dceg := _abag.yNeighbours(0)
+	for _eaafe, _ageb := range _abag {
+		_afde := _ageb._cbfdb
+		_fgagf, _dcfaga := -1.0e9, +1.0e9
+		for _, _dabge := range _dceg[_ageb] {
+			_eegga := _abag[_dabge]._cbfdb
+			if _eegga.Urx < _afde.Llx {
+				_fgagf = _c.Max(_fgagf, _eegga.Urx)
+			} else if _afde.Urx < _eegga.Llx {
+				_dcfaga = _c.Min(_dcfaga, _eegga.Llx)
+			}
+		}
+		for _agca, _bdbgc := range _abag {
+			_adda := _bdbgc._cbfdb
+			if _eaafe == _agca || _adda.Ury > _afde.Lly {
+				continue
+			}
+			if _fgagf <= _adda.Llx && _adda.Llx < _afde.Llx {
+				_afde.Llx = _adda.Llx
+			} else if _adda.Urx <= _dcfaga && _afde.Urx < _adda.Urx {
+				_afde.Urx = _adda.Urx
+			}
+		}
+		if _gagg {
+			_fa.Printf("\u0025\u0034\u0064\u003a %\u0036\u002e\u0032\u0066\u2192\u0025\u0036\u002e\u0032\u0066\u0020\u0025\u0071\u000a", _eaafe, _ageb._cbfdb, _afde, _fagdg(_ageb.text(), 50))
+		}
+		_ageb._cbfdb = _afde
+	}
+	if _ebgg {
+		for _, _bgeg := range _abag {
+			_bgeg.PdfRectangle = _bgeg._cbfdb
+		}
+	}
+}
+
+func (_deaba *textPara) fontsize() float64 { return _deaba._feea[0]._fgfb }
+
+func _fagdg(_beddd string, _fgbf int) string {
+	if len(_beddd) < _fgbf {
+		return _beddd
+	}
+	return _beddd[:_fgbf]
+}
+
+var _d = []string{"\u0042\u004e", "\u0042\u004e", "\u0042\u004e", "\u0042\u004e", "\u0042\u004e", "\u0042\u004e", "\u0042\u004e", "\u0042\u004e", "\u0042\u004e", "\u0053", "\u0042", "\u0053", "\u0057\u0053", "\u0042", "\u0042\u004e", "\u0042\u004e", "\u0042\u004e", "\u0042\u004e", "\u0042\u004e", "\u0042\u004e", "\u0042\u004e", "\u0042\u004e", "\u0042\u004e", "\u0042\u004e", "\u0042\u004e", "\u0042\u004e", "\u0042\u004e", "\u0042\u004e", "\u0042", "\u0042", "\u0042", "\u0053", "\u0057\u0053", "\u004f\u004e", "\u004f\u004e", "\u0045\u0054", "\u0045\u0054", "\u0045\u0054", "\u004f\u004e", "\u004f\u004e", "\u004f\u004e", "\u004f\u004e", "\u004f\u004e", "\u0045\u0053", "\u0043\u0053", "\u0045\u0053", "\u0043\u0053", "\u0043\u0053", "\u0045\u004e", "\u0045\u004e", "\u0045\u004e", "\u0045\u004e", "\u0045\u004e", "\u0045\u004e", "\u0045\u004e", "\u0045\u004e", "\u0045\u004e", "\u0045\u004e", "\u0043\u0053", "\u004f\u004e", "\u004f\u004e", "\u004f\u004e", "\u004f\u004e", "\u004f\u004e", "\u004f\u004e", "\u004c", "\u004c", "\u004c", "\u004c", "\u004c", "\u004c", "\u004c", "\u004c", "\u004c", "\u004c", "\u004c", "\u004c", "\u004c", "\u004c", "\u004c", "\u004c", "\u004c", "\u004c", "\u004c", "\u004c", "\u004c", "\u004c", "\u004c", "\u004c", "\u004c", "\u004c", "\u004f\u004e", "\u004f\u004e", "\u004f\u004e", "\u004f\u004e", "\u004f\u004e", "\u004f\u004e", "\u004c", "\u004c", "\u004c", "\u004c", "\u004c", "\u004c", "\u004c", "\u004c", "\u004c", "\u004c", "\u004c", "\u004c", "\u004c", "\u004c", "\u004c", "\u004c", "\u004c", "\u004c", "\u004c", "\u004c", "\u004c", "\u004c", "\u004c", "\u004c", "\u004c", "\u004c", "\u004f\u004e", "\u004f\u004e", "\u004f\u004e", "\u004f\u004e", "\u0042\u004e", "\u0042\u004e", "\u0042\u004e", "\u0042\u004e", "\u0042\u004e", "\u0042\u004e", "\u0042", "\u0042\u004e", "\u0042\u004e", "\u0042\u004e", "\u0042\u004e", "\u0042\u004e", "\u0042\u004e", "\u0042\u004e", "\u0042\u004e", "\u0042\u004e", "\u0042\u004e", "\u0042\u004e", "\u0042\u004e", "\u0042\u004e", "\u0042\u004e", "\u0042\u004e", "\u0042\u004e", "\u0042\u004e", "\u0042\u004e", "\u0042\u004e", "\u0042\u004e", "\u0042\u004e", "\u0042\u004e", "\u0042\u004e", "\u0042\u004e", "\u0042\u004e", "\u0042\u004e", "\u0043\u0053", "\u004f\u004e", "\u0045\u0054", "\u0045\u0054", "\u0045\u0054", "\u0045\u0054", "\u004f\u004e", "\u004f\u004e", "\u004f\u004e", "\u004f\u004e", "\u004c", "\u004f\u004e", "\u004f\u004e", "\u0042\u004e", "\u004f\u004e", "\u004f\u004e", "\u0045\u0054", "\u0045\u0054", "\u0045\u004e", "\u0045\u004e", "\u004f\u004e", "\u004c", "\u004f\u004e", "\u004f\u004e", "\u004f\u004e", "\u0045\u004e", "\u004c", "\u004f\u004e", "\u004f\u004e", "\u004f\u004e", "\u004f\u004e", "\u004f\u004e", "\u004c", "\u004c", "\u004c", "\u004c", "\u004c", "\u004c", "\u004c", "\u004c", "\u004c", "\u004c", "\u004c", "\u004c", "\u004c", "\u004c", "\u004c", "\u004c", "\u004c", "\u004c", "\u004c", "\u004c", "\u004c", "\u004c", "\u004c", "\u004f\u004e", "\u004c", "\u004c", "\u004c", "\u004c", "\u004c", "\u004c", "\u004c", "\u004c", "\u004c", "\u004c", "\u004c", "\u004c", "\u004c", "\u004c", "\u004c", "\u004c", "\u004c", "\u004c", "\u004c", "\u004c", "\u004c", "\u004c", "\u004c", "\u004c", "\u004c", "\u004c", "\u004c", "\u004c", "\u004c", "\u004c", "\u004c", "\u004f\u004e", "\u004c", "\u004c", "\u004c", "\u004c", "\u004c", "\u004c", "\u004c", "\u004c"}
+
+const (
+	ExtractionModeLayout = iota
+	ExtractionModePlain
+	ExtractionModeLayoutNoBreaks
+)
 
 // String returns a description of `state`.
-func (_agg *textState )String ()string {_baeb :="\u005bN\u004f\u0054\u0020\u0053\u0045\u0054]";if _agg ._gdd !=nil {_baeb =_agg ._gdd .BaseFont ();};return _fa .Sprintf ("\u0074\u0063\u003d\u0025\u002e\u0032\u0066\u0020\u0074\u0077\u003d\u0025\u002e\u0032\u0066 \u0074f\u0073\u003d\u0025\u002e\u0032\u0066\u0020\u0066\u006f\u006e\u0074\u003d\u0025\u0071",_agg ._daab ,_agg ._ccda ,_agg ._dba ,_baeb );
-};func (_fccd *textTable )depth ()float64 {_agbdc :=1e10;for _facba :=0;_facba < _fccd ._cfadc ;_facba ++{_eggec :=_fccd .get (_facba ,0);if _eggec ==nil ||_eggec ._gddfg {continue ;};_agbdc =_c .Min (_agbdc ,_eggec .depth ());};return _agbdc ;};
+func (_agg *textState) String() string {
+	_baeb := "\u005bN\u004f\u0054\u0020\u0053\u0045\u0054]"
+	if _agg._gdd != nil {
+		_baeb = _agg._gdd.BaseFont()
+	}
+	return _fa.Sprintf("\u0074\u0063\u003d\u0025\u002e\u0032\u0066\u0020\u0074\u0077\u003d\u0025\u002e\u0032\u0066 \u0074f\u0073\u003d\u0025\u002e\u0032\u0066\u0020\u0066\u006f\u006e\u0074\u003d\u0025\u0071", _agg._daab, _agg._ccda, _agg._dba, _baeb)
+}
+
+func (_fccd *textTable) depth() float64 {
+	_agbdc := 1e10
+	for _facba := 0; _facba < _fccd._cfadc; _facba++ {
+		_eggec := _fccd.get(_facba, 0)
+		if _eggec == nil || _eggec._gddfg {
+			continue
+		}
+		_agbdc = _c.Min(_agbdc, _eggec.depth())
+	}
+	return _agbdc
+}
 
 // Elements returns the TextMarks in `ma`.
-func (_dadd *TextMarkArray )Elements ()[]TextMark {return _dadd ._fde };func _cbff (_bebe ,_gdfca bounded )float64 {return _acfd (_bebe )-_acfd (_gdfca )};func (_afad paraList )sortTopoOrder (){_dafde :=_afad .topoOrder ();_afad .reorder (_dafde )};func _efdaf (_edcf string )(string ,bool ){_fdege :=[]rune (_edcf );
-if len (_fdege )!=1{return "",false ;};_ddcde ,_eeaa :=_ccaba [_fdege [0]];return _ddcde ,_eeaa ;};func (_gcac *subpath )clear (){*_gcac =subpath {}};func (_gecg *textPara )writeText (_ecdf _ef .Writer ){if _gecg ._fbbfg ==nil {_gecg .writeCellText (_ecdf );
-return ;};for _adgga :=0;_adgga < _gecg ._fbbfg ._aaga ;_adgga ++{for _fgcd :=0;_fgcd < _gecg ._fbbfg ._cfadc ;_fgcd ++{_feag :=_gecg ._fbbfg .get (_fgcd ,_adgga );if _feag ==nil {_ecdf .Write ([]byte ("\u0009"));}else {_egef (_feag ._feea );_feag .writeCellText (_ecdf );
-};_ecdf .Write ([]byte ("\u0020"));};if _adgga < _gecg ._fbbfg ._aaga -1{_ecdf .Write ([]byte ("\u000a"));};};};func (_fega *shapesState )drawRectangle (_dfbde ,_dfgd ,_afeg ,_gbga float64 ){if _acge {_cddf :=_fega .devicePoint (_dfbde ,_dfgd );_ddfgb :=_fega .devicePoint (_dfbde +_afeg ,_dfgd +_gbga );
-_aaca :=_ad .PdfRectangle {Llx :_cddf .X ,Lly :_cddf .Y ,Urx :_ddfgb .X ,Ury :_ddfgb .Y };_bg .Log .Info ("d\u0072a\u0077\u0052\u0065\u0063\u0074\u0061\u006e\u0067l\u0065\u003a\u0020\u00256.\u0032\u0066",_aaca );};_fega .newSubPath ();_fega .moveTo (_dfbde ,_dfgd );
-_fega .lineTo (_dfbde +_afeg ,_dfgd );_fega .lineTo (_dfbde +_afeg ,_dfgd +_gbga );_fega .lineTo (_dfbde ,_dfgd +_gbga );_fega .closePath ();};func (_abc *imageExtractContext )extractFormImages (_afaf *_afa .PdfObjectName ,_gabb _af .GraphicsState ,_dbc *_ad .PdfPageResources )error {_cbae ,_bafe :=_dbc .GetXObjectFormByName (*_afaf );
-if _bafe !=nil {return _bafe ;};if _cbae ==nil {return nil ;};_dde ,_bafe :=_cbae .GetContentStream ();if _bafe !=nil {return _bafe ;};_dbb :=_cbae .Resources ;if _dbb ==nil {_dbb =_dbc ;};_bafe =_abc .extractContentStreamImages (string (_dde ),_dbb );
-if _bafe !=nil {return _bafe ;};_abc ._bcc ++;return nil ;};func (_dfgg *textObject )setFont (_egfb string ,_febb float64 )error {if _dfgg ==nil {return nil ;};_dfgg ._dggef ._dba =_febb ;_fafe ,_bedc :=_dfgg .getFont (_egfb );if _bedc !=nil {return _bedc ;
-};_dfgg ._dggef ._gdd =_fafe ;return nil ;};func _fefdb (_cbdd []*textLine ,_bcab ,_bfca float64 )[]*textLine {var _aebbg []*textLine ;for _ ,_cgbbd :=range _cbdd {if _bcab ==-1{if _cgbbd ._adaa > _bfca {_aebbg =append (_aebbg ,_cgbbd );};}else {if _cgbbd ._adaa > _bfca &&_cgbbd ._adaa < _bcab {_aebbg =append (_aebbg ,_cgbbd );
-};};};return _aebbg ;};func (_fcee *ruling )encloses (_dddf ,_ebgce float64 )bool {return _fcee ._ggecg -_edcb <=_dddf &&_ebgce <=_fcee ._gebf +_edcb ;};
+func (_dadd *TextMarkArray) Elements() []TextMark { return _dadd._fde }
+
+func _cbff(_bebe, _gdfca bounded) float64 { return _acfd(_bebe) - _acfd(_gdfca) }
+
+func (_afad paraList) sortTopoOrder() { _dafde := _afad.topoOrder(); _afad.reorder(_dafde) }
+
+func _efdaf(_edcf string) (string, bool) {
+	_fdege := []rune(_edcf)
+	if len(_fdege) != 1 {
+		return "", false
+	}
+	_ddcde, _eeaa := _ccaba[_fdege[0]]
+	return _ddcde, _eeaa
+}
+
+func (_gcac *subpath) clear() { *_gcac = subpath{} }
+
+func (_gecg *textPara) writeText(_ecdf _ef.Writer) {
+	if _gecg._fbbfg == nil {
+		_gecg.writeCellText(_ecdf)
+		return
+	}
+	for _adgga := 0; _adgga < _gecg._fbbfg._aaga; _adgga++ {
+		for _fgcd := 0; _fgcd < _gecg._fbbfg._cfadc; _fgcd++ {
+			_feag := _gecg._fbbfg.get(_fgcd, _adgga)
+			if _feag == nil {
+				_ecdf.Write([]byte("\u0009"))
+			} else {
+				_egef(_feag._feea)
+				_feag.writeCellText(_ecdf)
+			}
+			_ecdf.Write([]byte("\u0020"))
+		}
+		if _adgga < _gecg._fbbfg._aaga-1 {
+			_ecdf.Write([]byte("\u000a"))
+		}
+	}
+}
+
+func (_fega *shapesState) drawRectangle(_dfbde, _dfgd, _afeg, _gbga float64) {
+	if _acge {
+		_cddf := _fega.devicePoint(_dfbde, _dfgd)
+		_ddfgb := _fega.devicePoint(_dfbde+_afeg, _dfgd+_gbga)
+		_aaca := _ad.PdfRectangle{Llx: _cddf.X, Lly: _cddf.Y, Urx: _ddfgb.X, Ury: _ddfgb.Y}
+		_bg.Log.Info("d\u0072a\u0077\u0052\u0065\u0063\u0074\u0061\u006e\u0067l\u0065\u003a\u0020\u00256.\u0032\u0066", _aaca)
+	}
+	_fega.newSubPath()
+	_fega.moveTo(_dfbde, _dfgd)
+	_fega.lineTo(_dfbde+_afeg, _dfgd)
+	_fega.lineTo(_dfbde+_afeg, _dfgd+_gbga)
+	_fega.lineTo(_dfbde, _dfgd+_gbga)
+	_fega.closePath()
+}
+
+func (_abc *imageExtractContext) extractFormImages(_afaf *_afa.PdfObjectName, _gabb _af.GraphicsState, _dbc *_ad.PdfPageResources) error {
+	_cbae, _bafe := _dbc.GetXObjectFormByName(*_afaf)
+	if _bafe != nil {
+		return _bafe
+	}
+	if _cbae == nil {
+		return nil
+	}
+	_dde, _bafe := _cbae.GetContentStream()
+	if _bafe != nil {
+		return _bafe
+	}
+	_dbb := _cbae.Resources
+	if _dbb == nil {
+		_dbb = _dbc
+	}
+	_bafe = _abc.extractContentStreamImages(string(_dde), _dbb)
+	if _bafe != nil {
+		return _bafe
+	}
+	_abc._bcc++
+	return nil
+}
+
+func (_dfgg *textObject) setFont(_egfb string, _febb float64) error {
+	if _dfgg == nil {
+		return nil
+	}
+	_dfgg._dggef._dba = _febb
+	_fafe, _bedc := _dfgg.getFont(_egfb)
+	if _bedc != nil {
+		return _bedc
+	}
+	_dfgg._dggef._gdd = _fafe
+	return nil
+}
+
+func _fefdb(_cbdd []*textLine, _bcab, _bfca float64) []*textLine {
+	var _aebbg []*textLine
+	for _, _cgbbd := range _cbdd {
+		if _bcab == -1 {
+			if _cgbbd._adaa > _bfca {
+				_aebbg = append(_aebbg, _cgbbd)
+			}
+		} else {
+			if _cgbbd._adaa > _bfca && _cgbbd._adaa < _bcab {
+				_aebbg = append(_aebbg, _cgbbd)
+			}
+		}
+	}
+	return _aebbg
+}
+
+func (_fcee *ruling) encloses(_dddf, _ebgce float64) bool {
+	return _fcee._ggecg-_edcb <= _dddf && _ebgce <= _fcee._gebf+_edcb
+}
 
 // String returns a human readable description of `vecs`.
-func (_bbbac rulingList )String ()string {if len (_bbbac )==0{return "\u007b \u0045\u004d\u0050\u0054\u0059\u0020}";};_aebe ,_aafa :=_bbbac .vertsHorzs ();_fegd :=len (_aebe );_acebf :=len (_aafa );if _fegd ==0||_acebf ==0{return _fa .Sprintf ("\u007b%\u0064\u0020\u0078\u0020\u0025\u0064}",_fegd ,_acebf );
-};_dgaeb :=_ad .PdfRectangle {Llx :_aebe [0]._ecfb ,Urx :_aebe [_fegd -1]._ecfb ,Lly :_aafa [_acebf -1]._ecfb ,Ury :_aafa [0]._ecfb };return _fa .Sprintf ("\u007b\u0025d\u0020\u0078\u0020%\u0064\u003a\u0020\u0025\u0036\u002e\u0032\u0066\u007d",_fegd ,_acebf ,_dgaeb );
-};func _efgg (_fdgd []*TextMarkArray ,_eeff ,_ccg string )(string ,error ){_ccde :=0;for _ ,_eag :=range _fdgd {_add :=_eag ._fde [0].DirectObject ;if _add ==nil {continue ;};_cccf :=_add .String ();if len (_cccf )> 1{_beef :=_cbd (_eag ,&_eeff ,&_ccde ,_ccg );
-if _beef !=nil {return _eeff ,_beef ;};}else if len (_cccf )==1{_bfc :=_dbgc (_eag ,&_eeff ,&_ccde ,_ccg );if _bfc !=nil {return _eeff ,_bfc ;};};};return _eeff ,nil ;};func _gdcbe (_efcb []*textMark ,_agfab _ad .PdfRectangle )string {_bg .Log .Trace ("\u006d\u0061\u006b\u0065\u0053i\u006d\u0070\u006c\u0065\u0054\u0065\u0078\u0074\u003a\u0020\u0025\u0064\u0020e\u006c\u0065\u006d\u0065\u006e\u0074\u0073\u0020\u0070\u0061\u0067\u0065\u0053\u0069\u007a\u0065\u003d\u0025\u002e\u0032\u0066",len (_efcb ),_agfab );
-_bcec :="";if len (_efcb )==0{return _bcec ;};_acfgg :=_fgcfa (_efcb ,_agfab ,true );if len (_acfgg )==0{return _bcec ;};_fced :=0.0;_eacb :=true ;_ffcac :="";for _ ,_ceddc :=range _acfgg {_aadf :=_ceddc ._bbebf ;if _aadf > _fafdg {_aadf =_fafdg ;};if (_ceddc ._fcgaa -_fced > _acdag *_aadf &&_fced !=0.0)||(_fced -_ceddc ._fcgaa > _aadf *10){_ebga :=_afg ([]rune (_ffcac ));
-_ffcac =_ebga ._cac ;_ffcac +="\u000a";_bcec +=_ffcac ;_ffcac ="";}else {if !_eacb {_ffcac +="\u0020";};};_ffcac +=_ceddc ._fgaa ;_eacb =false ;_fced =_ceddc ._fcgaa ;};if _ffcac !=""{_ddeeb :=_afg ([]rune (_ffcac ));_ffcac =_ddeeb ._cac ;_ffcac +="\u000a";
-_bcec +=_ffcac ;};return _bcec ;};func (_acfad paraList )lines ()[]*textLine {var _fbgbe []*textLine ;for _ ,_caaab :=range _acfad {_fbgbe =append (_fbgbe ,_caaab ._feea ...);};return _fbgbe ;};func _cbege (_dfge string )bool {if _a .RuneCountInString (_dfge )< _acba {return false ;
-};_facd ,_dacc :=_a .DecodeLastRuneInString (_dfge );if _dacc <=0||!_bd .Is (_bd .Hyphen ,_facd ){return false ;};_facd ,_dacc =_a .DecodeLastRuneInString (_dfge [:len (_dfge )-_dacc ]);return _dacc > 0&&!_bd .IsSpace (_facd );};func (_fbagd rulingList )connections (_cabcc map[int ]intSet ,_gbaf int )intSet {_ddaaa :=make (intSet );
-_eegbb :=make (intSet );var _fbcef func (int );_fbcef =func (_bbcfd int ){if !_eegbb .has (_bbcfd ){_eegbb .add (_bbcfd );for _gdgdfa :=range _fbagd {if _cabcc [_gdgdfa ].has (_bbcfd ){_ddaaa .add (_gdgdfa );};};for _fcfd :=range _fbagd {if _ddaaa .has (_fcfd ){_fbcef (_fcfd );
-};};};};_fbcef (_gbaf );return _ddaaa ;};func (_gbgg *wordBag )firstReadingIndex (_agaa int )int {_gbb :=_gbgg .firstWord (_agaa )._bbebf ;_bebg :=float64 (_agaa +1)*_bbbb ;_cfcfe :=_bebg +_ddbe *_gbb ;_ccfd :=_agaa ;for _ ,_eage :=range _gbgg .depthBand (_bebg ,_cfcfe ){if _cedab (_gbgg .firstWord (_eage ),_gbgg .firstWord (_ccfd ))< 0{_ccfd =_eage ;
-};};return _ccfd ;};func (_ggba rulingList )mergePrimary ()float64 {_ggcf :=_ggba [0]._ecfb ;for _ ,_gdebe :=range _ggba [1:]{_ggcf +=_gdebe ._ecfb ;};return _ggcf /float64 (len (_ggba ));};func (_gbgf *shapesState )lineTo (_gaedd ,_dbbe float64 ){if _acge {_bg .Log .Info ("\u006c\u0069\u006eeT\u006f\u0028\u0025\u002e\u0032\u0066\u002c\u0025\u002e\u0032\u0066\u0020\u0070\u003d\u0025\u002e\u0032\u0066",_gaedd ,_dbbe ,_gbgf .devicePoint (_gaedd ,_dbbe ));
-};_gbgf .addPoint (_gaedd ,_dbbe );};type textResult struct{_fafd PageText ;_ggde int ;_eccf int ;};type imageExtractContext struct{_fdc []ImageMark ;_cff int ;_ada int ;_bcc int ;_gcc map[*_afa .PdfObjectStream ]*cachedImage ;_dbe *ImageExtractOptions ;
-_cfe bool ;};func (_ebcf *wordBag )allWords ()[]*textWord {var _dfcc []*textWord ;for _ ,_cead :=range _ebcf ._fdeg {_dfcc =append (_dfcc ,_cead ...);};return _dfcc ;};func _df (_caa []string ,_bb int ,_gea int ){for _bde ,_eeg :=_bb ,_gea -1;_bde < _eeg ;
-_bde ,_eeg =_bde +1,_eeg -1{_dfd :=_caa [_bde ];_caa [_bde ]=_caa [_eeg ];_caa [_eeg ]=_dfd ;};};type textMark struct{_ad .PdfRectangle ;_cbgf int ;_acfa string ;_fbdg string ;_beeb *_ad .PdfFont ;_caadf float64 ;_cffbg float64 ;_eefe _cd .Matrix ;_dbcdf _cd .Point ;
-_bdee _ad .PdfRectangle ;_ceba _cb .Color ;_ebede _cb .Color ;_bcag _afa .PdfObject ;_gbag []string ;Tw float64 ;Th float64 ;_daaf int ;_ccga int ;};type ruling struct{_gafe rulingKind ;_abddg markKind ;_cb .Color ;_ecfb float64 ;_ggecg float64 ;_gebf float64 ;
-_bdbgf float64 ;};func (_gace *textTable )put (_eceb ,_bbbf int ,_gcec *textPara ){_gace ._eccda [_fffbe (_eceb ,_bbbf )]=_gcec ;};func (_bbca *wordBag )depthIndexes ()[]int {if len (_bbca ._fdeg )==0{return nil ;};_dgeb :=make ([]int ,len (_bbca ._fdeg ));
-_fbfa :=0;for _bfeba :=range _bbca ._fdeg {_dgeb [_fbfa ]=_bfeba ;_fbfa ++;};_eg .Ints (_dgeb );return _dgeb ;};func (_acca *textWord )computeText ()string {_dcad :=make ([]string ,len (_acca ._ddfc ));for _gcafd ,_ddcfd :=range _acca ._ddfc {_dcad [_gcafd ]=_ddcfd ._acfa ;
-};return _faf .Join (_dcad ,"");};func (_gdaf *wordBag )arrangeText (_efccd bool )*textPara {_gdaf .sort ();if _gefc {_gdaf .removeDuplicates ();};var _dgdbc []*textLine ;for _ ,_efeeb :=range _gdaf .depthIndexes (){for !_gdaf .empty (_efeeb ){_cdgcb :=_gdaf .firstReadingIndex (_efeeb );
-_gabad :=_gdaf .firstWord (_cdgcb );_ffgf :=_daad (_gdaf ,_cdgcb );_agbe :=_gabad ._bbebf ;if _agbe < _fafdg {_agbe =_fafdg ;};_aagd :=_gabad ._fcgaa -_acdag *_agbe ;_ebgd :=_gabad ._fcgaa +_acdag *_agbe ;_bfbc :=_cdbe *_agbe ;_efbf :=_fegfe *_agbe ;_dffc :for {var _gddb *textWord ;
-_cbedc :=0;for _ ,_eccd :=range _gdaf .depthBand (_aagd ,_ebgd ){_dedea :=_gdaf .highestWord (_eccd ,_aagd ,_ebgd );if _dedea ==nil {continue ;};_aaag :=_baca (_dedea ,_ffgf ._gbaa [len (_ffgf ._gbaa )-1]);if _aaag < -_efbf {break _dffc ;};if !_efccd &&_aaag > _bfbc {continue ;
-};if _gddb !=nil &&_cedab (_dedea ,_gddb )>=0{continue ;};_gddb =_dedea ;_cbedc =_eccd ;};if _gddb ==nil {break ;};_ffgf .pullWord (_gdaf ,_gddb ,_cbedc );};_ffgf .markWordBoundaries ();_dgdbc =append (_dgdbc ,_ffgf );};};if len (_dgdbc )==0{return nil ;
-};_eg .Slice (_dgdbc ,func (_aegb ,_cccad int )bool {return _cecdc (_dgdbc [_aegb ],_dgdbc [_cccad ])< 0});_ebbf :=_ebgga (_gdaf .PdfRectangle ,_dgdbc );if _aggg {_bg .Log .Info ("\u0061\u0072\u0072an\u0067\u0065\u0054\u0065\u0078\u0074\u0020\u0021\u0021\u0021\u0020\u0070\u0061\u0072\u0061\u003d\u0025\u0073",_ebbf .String ());
-if _fcbc {for _adaac ,_eaecg :=range _ebbf ._feea {_fa .Printf ("\u0025\u0034\u0064\u003a\u0020\u0025\u0073\u000a",_adaac ,_eaecg .String ());if _dac {for _badb ,_ddfef :=range _eaecg ._gbaa {_fa .Printf ("\u0025\u0038\u0064\u003a\u0020\u0025\u0073\u000a",_badb ,_ddfef .String ());
-for _cfcfef ,_eeea :=range _ddfef ._ddfc {_fa .Printf ("\u00251\u0032\u0064\u003a\u0020\u0025\u0073\n",_cfcfef ,_eeea .String ());};};};};};};return _ebbf ;};func _faea (_bgfbd ,_fbfag _ad .PdfRectangle )_ad .PdfRectangle {return _ad .PdfRectangle {Llx :_c .Min (_bgfbd .Llx ,_fbfag .Llx ),Lly :_c .Min (_bgfbd .Lly ,_fbfag .Lly ),Urx :_c .Max (_bgfbd .Urx ,_fbfag .Urx ),Ury :_c .Max (_bgfbd .Ury ,_fbfag .Ury )};
-};func (_gdbd rectRuling )checkWidth (_aeec ,_bgcfd float64 )(float64 ,bool ){_dcegd :=_bgcfd -_aeec ;_fded :=_dcegd <=_ddgfe ;return _dcegd ,_fded ;};func (_ccegb paraList )tables ()[]TextTable {var _eeggg []TextTable ;if _ggegb {_bg .Log .Info ("\u0070\u0061\u0072\u0061\u0073\u002e\u0074\u0061\u0062\u006c\u0065\u0073\u003a");
-};for _ ,_dage :=range _ccegb {_ddgd :=_dage ._fbbfg ;if _ddgd !=nil &&_ddgd .isExportable (){_eeggg =append (_eeggg ,_ddgd .toTextTable ());};};return _eeggg ;};func _cdgae (_edfg ,_cgeda _cd .Point )bool {_gagc :=_c .Abs (_edfg .X -_cgeda .X );_cgfg :=_c .Abs (_edfg .Y -_cgeda .Y );
-return _eedad (_gagc ,_cgfg );};func (_ggdge rulingList )isActualGrid ()(rulingList ,bool ){_fbad ,_faafb :=_ggdge .augmentGrid ();if !(len (_fbad )>=_adgg +1&&len (_faafb )>=_eabb +1){if _feda {_bg .Log .Info ("\u0069s\u0041\u0063t\u0075\u0061\u006c\u0047r\u0069\u0064\u003a \u004e\u006f\u0074\u0020\u0061\u006c\u0069\u0067\u006eed\u002e\u0020\u0025d\u0020\u0078 \u0025\u0064\u0020\u003c\u0020\u0025d\u0020\u0078 \u0025\u0064",len (_fbad ),len (_faafb ),_adgg +1,_eabb +1);
-};return nil ,false ;};if _feda {_bg .Log .Info ("\u0069\u0073\u0041\u0063\u0074\u0075a\u006c\u0047\u0072\u0069\u0064\u003a\u0020\u0025\u0073\u0020\u003a\u0020\u0025t\u0020\u0026\u0020\u0025\u0074\u0020\u2192 \u0025\u0074",_ggdge ,len (_fbad )>=2,len (_faafb )>=2,len (_fbad )>=2&&len (_faafb )>=2);
-for _eega ,_adad :=range _ggdge {_fa .Printf ("\u0025\u0034\u0064\u003a\u0020\u0025\u0076\u000a",_eega ,_adad );};};if _fccb {_defg ,_acgfb :=_fbad [0],_fbad [len (_fbad )-1];_abab ,_aaeg :=_faafb [0],_faafb [len (_faafb )-1];if !(_cacef (_defg ._ecfb -_abab ._ggecg )&&_cacef (_acgfb ._ecfb -_abab ._gebf )&&_cacef (_abab ._ecfb -_defg ._gebf )&&_cacef (_aaeg ._ecfb -_defg ._ggecg )){if _feda {_bg .Log .Info ("\u0069\u0073\u0041\u0063\u0074\u0075\u0061l\u0047\u0072\u0069d\u003a\u0020\u0020N\u006f\u0074 \u0061\u006c\u0069\u0067\u006e\u0065d\u002e\n\t\u0076\u0030\u003d\u0025\u0073\u000a\u0009\u0076\u0031\u003d\u0025\u0073\u000a\u0009\u0068\u0030\u003d\u0025\u0073\u000a\u0009\u0068\u0031\u003d\u0025\u0073",_defg ,_acgfb ,_abab ,_aaeg );
-};return nil ,false ;};}else {if !_fbad .aligned (){if _abcba {_bg .Log .Info ("i\u0073\u0041\u0063\u0074\u0075\u0061l\u0047\u0072\u0069\u0064\u003a\u0020N\u006f\u0074\u0020\u0061\u006c\u0069\u0067n\u0065\u0064\u0020\u0076\u0065\u0072\u0074\u0073\u002e\u0020%\u0064",len (_fbad ));
-};return nil ,false ;};if !_faafb .aligned (){if _feda {_bg .Log .Info ("i\u0073\u0041\u0063\u0074\u0075\u0061l\u0047\u0072\u0069\u0064\u003a\u0020N\u006f\u0074\u0020\u0061\u006c\u0069\u0067n\u0065\u0064\u0020\u0068\u006f\u0072\u007a\u0073\u002e\u0020%\u0064",len (_faafb ));
-};return nil ,false ;};};_gbaeba :=append (_fbad ,_faafb ...);return _gbaeba ,true ;};func (_bce *textObject )showText (_dgff _afa .PdfObject ,_adgd []byte ,_fcf int ,_dggg string )error {return _bce .renderText (_dgff ,_adgd ,_fcf ,_dggg );};func _edgdf (_dbeee []*textWord ,_egaa int )[]*textWord {_bgfbc :=len (_dbeee );
-copy (_dbeee [_egaa :],_dbeee [_egaa +1:]);return _dbeee [:_bgfbc -1];};func (_dbgcd *textObject )setHorizScaling (_cfgg float64 ){if _dbgcd ==nil {return ;};_dbgcd ._dggef ._deeee =_cfgg ;};func (_gbadb *textTable )subdivide ()*textTable {_gbadb .logComposite ("\u0073u\u0062\u0064\u0069\u0076\u0069\u0064e");
-_fcgg :=_gbadb .compositeRowCorridors ();_ccbf :=_gbadb .compositeColCorridors ();if _ggegb {_bg .Log .Info ("\u0073u\u0062\u0064i\u0076\u0069\u0064\u0065:\u000a\u0009\u0072o\u0077\u0043\u006f\u0072\u0072\u0069\u0064\u006f\u0072s=\u0025\u0073\u000a\t\u0063\u006fl\u0043\u006f\u0072\u0072\u0069\u0064o\u0072\u0073=\u0025\u0073",_geef (_fcgg ),_geef (_ccbf ));
-};if len (_fcgg )==0||len (_ccbf )==0{return _gbadb ;};_gedde (_fcgg );_gedde (_ccbf );if _ggegb {_bg .Log .Info ("\u0073\u0075\u0062\u0064\u0069\u0076\u0069\u0064\u0065\u0020\u0066\u0069\u0078\u0065\u0064\u003a\u000a\u0009r\u006f\u0077\u0043\u006f\u0072\u0072\u0069d\u006f\u0072\u0073\u003d\u0025\u0073\u000a\u0009\u0063\u006f\u006cC\u006f\u0072\u0072\u0069\u0064\u006f\u0072\u0073\u003d\u0025\u0073",_geef (_fcgg ),_geef (_ccbf ));
-};_feae ,_gdgf :=_agdf (_gbadb ._aaga ,_fcgg );_ecgbfa ,_cegaa :=_agdf (_gbadb ._cfadc ,_ccbf );_daacc :=make (map[uint64 ]*textPara ,_cegaa *_gdgf );_ggabg :=&textTable {PdfRectangle :_gbadb .PdfRectangle ,_cegab :_gbadb ._cegab ,_aaga :_gdgf ,_cfadc :_cegaa ,_eccda :_daacc };
-if _ggegb {_bg .Log .Info ("\u0073\u0075b\u0064\u0069\u0076\u0069\u0064\u0065\u003a\u0020\u0063\u006f\u006d\u0070\u006f\u0073\u0069\u0074\u0065\u0020\u003d\u0020\u0025\u0064\u0020\u0078\u0020\u0025\u0064\u0020\u0063\u0065\u006c\u006c\u0073\u003d\u0020\u0025\u0064\u0020\u0078\u0020\u0025\u0064\u000a"+"\u0009\u0072\u006f\u0077\u0043\u006f\u0072\u0072\u0069\u0064\u006f\u0072s\u003d\u0025\u0073\u000a"+"\u0009\u0063\u006f\u006c\u0043\u006f\u0072\u0072\u0069\u0064\u006f\u0072s\u003d\u0025\u0073\u000a"+"\u0009\u0079\u004f\u0066\u0066\u0073\u0065\u0074\u0073=\u0025\u002b\u0076\u000a"+"\u0009\u0078\u004f\u0066\u0066\u0073\u0065\u0074\u0073\u003d\u0025\u002b\u0076",_gbadb ._cfadc ,_gbadb ._aaga ,_cegaa ,_gdgf ,_geef (_fcgg ),_geef (_ccbf ),_feae ,_ecgbfa );
-};for _cfedb :=0;_cfedb < _gbadb ._aaga ;_cfedb ++{_ecdgd :=_feae [_cfedb ];for _gcacd :=0;_gcacd < _gbadb ._cfadc ;_gcacd ++{_gbbd :=_ecgbfa [_gcacd ];if _ggegb {_fa .Printf ("\u0025\u0036\u0064\u002c %\u0032\u0064\u003a\u0020\u0078\u0030\u003d\u0025\u0064\u0020\u0079\u0030\u003d\u0025d\u000a",_gcacd ,_cfedb ,_gbbd ,_ecdgd );
-};_aabc ,_gcgb :=_gbadb ._cafd [_fffbe (_gcacd ,_cfedb )];if !_gcgb {continue ;};_efdab :=_aabc .split (_fcgg [_cfedb ],_ccbf [_gcacd ]);for _acde :=0;_acde < _efdab ._aaga ;_acde ++{for _ffdf :=0;_ffdf < _efdab ._cfadc ;_ffdf ++{_daec :=_efdab .get (_ffdf ,_acde );
-_ggabg .put (_gbbd +_ffdf ,_ecdgd +_acde ,_daec );if _ggegb {_fa .Printf ("\u0025\u0038\u0064\u002c\u0020\u0025\u0032\u0064\u003a\u0020\u0025\u0073\u000a",_gbbd +_ffdf ,_ecdgd +_acde ,_daec );};};};};};return _ggabg ;};const (_gbgfg rulingKind =iota ;_cafa ;
-_dcfdg ;);type gridTile struct{_ad .PdfRectangle ;_eece ,_dgaae ,_cegae ,_ebecd bool ;};func _baca (_deage ,_acfgb bounded )float64 {return _deage .bbox ().Llx -_acfgb .bbox ().Urx };func (_cfegc *PageText )getText ()string {_afaff :="";_cfac :=len (_cfegc ._baaa );
-for _aaa :=0;_aaa < 360&&_cfac > 0;_aaa +=90{_aded :=make ([]*textMark ,0,len (_cfegc ._baaa )-_cfac );for _ ,_fafa :=range _cfegc ._baaa {if _fafa ._cbgf ==_aaa {_aded =append (_aded ,_fafa );};};if len (_aded )> 0{_afaff +=_gdcbe (_aded ,_cfegc ._gfag );
-_cfac -=len (_aded );};};return _afaff ;};func (_cdbd *wordBag )depthRange (_baec ,_fcgae int )[]int {var _caac []int ;for _abfa :=range _cdbd ._fdeg {if _baec <=_abfa &&_abfa <=_fcgae {_caac =append (_caac ,_abfa );};};if len (_caac )==0{return nil ;};
-_eg .Ints (_caac );return _caac ;};func _gaad (_ccfcb ,_aadeb _cd .Point ,_ggdaf _cb .Color )(*ruling ,bool ){_dfcb :=lineRuling {_gfdac :_ccfcb ,_bfbed :_aadeb ,_efgdc :_agada (_ccfcb ,_aadeb ),Color :_ggdaf };if _dfcb ._efgdc ==_gbgfg {return nil ,false ;
-};return _dfcb .asRuling ();};func _gfgb (_acfba []pathSection )rulingList {_edabd (_acfba );if _feda {_bg .Log .Info ("\u006d\u0061k\u0065\u0053\u0074\u0072\u006f\u006b\u0065\u0052\u0075\u006c\u0069\u006e\u0067\u0073\u003a\u0020\u0025\u0064\u0020\u0073\u0074\u0072ok\u0065\u0073",len (_acfba ));
-};var _fffd rulingList ;for _ ,_bfbgg :=range _acfba {for _ ,_ddfde :=range _bfbgg ._fdgf {if len (_ddfde ._bfgb )< 2{continue ;};_cfdbc :=_ddfde ._bfgb [0];for _ ,_afcce :=range _ddfde ._bfgb [1:]{if _efcf ,_fgaed :=_gaad (_cfdbc ,_afcce ,_bfbgg .Color );
-_fgaed {_fffd =append (_fffd ,_efcf );};_cfdbc =_afcce ;};};};if _feda {_bg .Log .Info ("m\u0061\u006b\u0065\u0053tr\u006fk\u0065\u0052\u0075\u006c\u0069n\u0067\u0073\u003a\u0020\u0025\u0073",_fffd );};return _fffd ;};
+func (_bbbac rulingList) String() string {
+	if len(_bbbac) == 0 {
+		return "\u007b \u0045\u004d\u0050\u0054\u0059\u0020}"
+	}
+	_aebe, _aafa := _bbbac.vertsHorzs()
+	_fegd := len(_aebe)
+	_acebf := len(_aafa)
+	if _fegd == 0 || _acebf == 0 {
+		return _fa.Sprintf("\u007b%\u0064\u0020\u0078\u0020\u0025\u0064}", _fegd, _acebf)
+	}
+	_dgaeb := _ad.PdfRectangle{Llx: _aebe[0]._ecfb, Urx: _aebe[_fegd-1]._ecfb, Lly: _aafa[_acebf-1]._ecfb, Ury: _aafa[0]._ecfb}
+	return _fa.Sprintf("\u007b\u0025d\u0020\u0078\u0020%\u0064\u003a\u0020\u0025\u0036\u002e\u0032\u0066\u007d", _fegd, _acebf, _dgaeb)
+}
+
+func _efgg(_fdgd []*TextMarkArray, _eeff, _ccg string) (string, error) {
+	_ccde := 0
+	for _, _eag := range _fdgd {
+		_add := _eag._fde[0].DirectObject
+		if _add == nil {
+			continue
+		}
+		_cccf := _add.String()
+		if len(_cccf) > 1 {
+			_beef := _cbd(_eag, &_eeff, &_ccde, _ccg)
+			if _beef != nil {
+				return _eeff, _beef
+			}
+		} else if len(_cccf) == 1 {
+			_bfc := _dbgc(_eag, &_eeff, &_ccde, _ccg)
+			if _bfc != nil {
+				return _eeff, _bfc
+			}
+		}
+	}
+	return _eeff, nil
+}
+
+func _gdcbe(_efcb []*textMark, _agfab _ad.PdfRectangle) string {
+	_bg.Log.Trace("\u006d\u0061\u006b\u0065\u0053i\u006d\u0070\u006c\u0065\u0054\u0065\u0078\u0074\u003a\u0020\u0025\u0064\u0020e\u006c\u0065\u006d\u0065\u006e\u0074\u0073\u0020\u0070\u0061\u0067\u0065\u0053\u0069\u007a\u0065\u003d\u0025\u002e\u0032\u0066", len(_efcb), _agfab)
+	_bcec := ""
+	if len(_efcb) == 0 {
+		return _bcec
+	}
+	_acfgg := _fgcfa(_efcb, _agfab, true)
+	if len(_acfgg) == 0 {
+		return _bcec
+	}
+	_fced := 0.0
+	_eacb := true
+	_ffcac := ""
+	for _, _ceddc := range _acfgg {
+		_aadf := _ceddc._bbebf
+		if _aadf > _fafdg {
+			_aadf = _fafdg
+		}
+		if (_ceddc._fcgaa-_fced > _acdag*_aadf && _fced != 0.0) || (_fced-_ceddc._fcgaa > _aadf*10) {
+			_ebga := _afg([]rune(_ffcac))
+			_ffcac = _ebga._cac
+			_ffcac += "\u000a"
+			_bcec += _ffcac
+			_ffcac = ""
+		} else {
+			if !_eacb {
+				_ffcac += "\u0020"
+			}
+		}
+		_ffcac += _ceddc._fgaa
+		_eacb = false
+		_fced = _ceddc._fcgaa
+	}
+	if _ffcac != "" {
+		_ddeeb := _afg([]rune(_ffcac))
+		_ffcac = _ddeeb._cac
+		_ffcac += "\u000a"
+		_bcec += _ffcac
+	}
+	return _bcec
+}
+
+func (_acfad paraList) lines() []*textLine {
+	var _fbgbe []*textLine
+	for _, _caaab := range _acfad {
+		_fbgbe = append(_fbgbe, _caaab._feea...)
+	}
+	return _fbgbe
+}
+
+func _cbege(_dfge string) bool {
+	if _a.RuneCountInString(_dfge) < _acba {
+		return false
+	}
+	_facd, _dacc := _a.DecodeLastRuneInString(_dfge)
+	if _dacc <= 0 || !_bd.Is(_bd.Hyphen, _facd) {
+		return false
+	}
+	_facd, _dacc = _a.DecodeLastRuneInString(_dfge[:len(_dfge)-_dacc])
+	return _dacc > 0 && !_bd.IsSpace(_facd)
+}
+
+func (_fbagd rulingList) connections(_cabcc map[int]intSet, _gbaf int) intSet {
+	_ddaaa := make(intSet)
+	_eegbb := make(intSet)
+	var _fbcef func(int)
+	_fbcef = func(_bbcfd int) {
+		if !_eegbb.has(_bbcfd) {
+			_eegbb.add(_bbcfd)
+			for _gdgdfa := range _fbagd {
+				if _cabcc[_gdgdfa].has(_bbcfd) {
+					_ddaaa.add(_gdgdfa)
+				}
+			}
+			for _fcfd := range _fbagd {
+				if _ddaaa.has(_fcfd) {
+					_fbcef(_fcfd)
+				}
+			}
+		}
+	}
+	_fbcef(_gbaf)
+	return _ddaaa
+}
+
+func (_gbgg *wordBag) firstReadingIndex(_agaa int) int {
+	_gbb := _gbgg.firstWord(_agaa)._bbebf
+	_bebg := float64(_agaa+1) * _bbbb
+	_cfcfe := _bebg + _ddbe*_gbb
+	_ccfd := _agaa
+	for _, _eage := range _gbgg.depthBand(_bebg, _cfcfe) {
+		if _cedab(_gbgg.firstWord(_eage), _gbgg.firstWord(_ccfd)) < 0 {
+			_ccfd = _eage
+		}
+	}
+	return _ccfd
+}
+
+func (_ggba rulingList) mergePrimary() float64 {
+	_ggcf := _ggba[0]._ecfb
+	for _, _gdebe := range _ggba[1:] {
+		_ggcf += _gdebe._ecfb
+	}
+	return _ggcf / float64(len(_ggba))
+}
+
+func (_gbgf *shapesState) lineTo(_gaedd, _dbbe float64) {
+	if _acge {
+		_bg.Log.Info("\u006c\u0069\u006eeT\u006f\u0028\u0025\u002e\u0032\u0066\u002c\u0025\u002e\u0032\u0066\u0020\u0070\u003d\u0025\u002e\u0032\u0066", _gaedd, _dbbe, _gbgf.devicePoint(_gaedd, _dbbe))
+	}
+	_gbgf.addPoint(_gaedd, _dbbe)
+}
+
+type textResult struct {
+	_fafd PageText
+	_ggde int
+	_eccf int
+}
+
+type imageExtractContext struct {
+	_fdc []ImageMark
+	_cff int
+	_ada int
+	_bcc int
+	_gcc map[*_afa.PdfObjectStream]*cachedImage
+	_dbe *ImageExtractOptions
+	_cfe bool
+}
+
+func (_ebcf *wordBag) allWords() []*textWord {
+	var _dfcc []*textWord
+	for _, _cead := range _ebcf._fdeg {
+		_dfcc = append(_dfcc, _cead...)
+	}
+	return _dfcc
+}
+
+func _df(_caa []string, _bb int, _gea int) {
+	for _bde, _eeg := _bb, _gea-1; _bde < _eeg; _bde, _eeg = _bde+1, _eeg-1 {
+		_dfd := _caa[_bde]
+		_caa[_bde] = _caa[_eeg]
+		_caa[_eeg] = _dfd
+	}
+}
+
+type textMark struct {
+	_ad.PdfRectangle
+	_cbgf  int
+	_acfa  string
+	_fbdg  string
+	_beeb  *_ad.PdfFont
+	_caadf float64
+	_cffbg float64
+	_eefe  _cd.Matrix
+	_dbcdf _cd.Point
+	_bdee  _ad.PdfRectangle
+	_ceba  _cb.Color
+	_ebede _cb.Color
+	_bcag  _afa.PdfObject
+	_gbag  []string
+	Tw     float64
+	Th     float64
+	_daaf  int
+	_ccga  int
+}
+
+type ruling struct {
+	_gafe  rulingKind
+	_abddg markKind
+	_cb.Color
+	_ecfb  float64
+	_ggecg float64
+	_gebf  float64
+	_bdbgf float64
+}
+
+func (_gace *textTable) put(_eceb, _bbbf int, _gcec *textPara) {
+	_gace._eccda[_fffbe(_eceb, _bbbf)] = _gcec
+}
+
+func (_bbca *wordBag) depthIndexes() []int {
+	if len(_bbca._fdeg) == 0 {
+		return nil
+	}
+	_dgeb := make([]int, len(_bbca._fdeg))
+	_fbfa := 0
+	for _bfeba := range _bbca._fdeg {
+		_dgeb[_fbfa] = _bfeba
+		_fbfa++
+	}
+	_eg.Ints(_dgeb)
+	return _dgeb
+}
+
+func (_acca *textWord) computeText() string {
+	_dcad := make([]string, len(_acca._ddfc))
+	for _gcafd, _ddcfd := range _acca._ddfc {
+		_dcad[_gcafd] = _ddcfd._acfa
+	}
+	return _faf.Join(_dcad, "")
+}
+
+func (_gdaf *wordBag) arrangeText(_efccd bool) *textPara {
+	_gdaf.sort()
+	if _gefc {
+		_gdaf.removeDuplicates()
+	}
+	var _dgdbc []*textLine
+	for _, _efeeb := range _gdaf.depthIndexes() {
+		for !_gdaf.empty(_efeeb) {
+			_cdgcb := _gdaf.firstReadingIndex(_efeeb)
+			_gabad := _gdaf.firstWord(_cdgcb)
+			_ffgf := _daad(_gdaf, _cdgcb)
+			_agbe := _gabad._bbebf
+			if _agbe < _fafdg {
+				_agbe = _fafdg
+			}
+			_aagd := _gabad._fcgaa - _acdag*_agbe
+			_ebgd := _gabad._fcgaa + _acdag*_agbe
+			_bfbc := _cdbe * _agbe
+			_efbf := _fegfe * _agbe
+		_dffc:
+			for {
+				var _gddb *textWord
+				_cbedc := 0
+				for _, _eccd := range _gdaf.depthBand(_aagd, _ebgd) {
+					_dedea := _gdaf.highestWord(_eccd, _aagd, _ebgd)
+					if _dedea == nil {
+						continue
+					}
+					_aaag := _baca(_dedea, _ffgf._gbaa[len(_ffgf._gbaa)-1])
+					if _aaag < -_efbf {
+						break _dffc
+					}
+					if !_efccd && _aaag > _bfbc {
+						continue
+					}
+					if _gddb != nil && _cedab(_dedea, _gddb) >= 0 {
+						continue
+					}
+					_gddb = _dedea
+					_cbedc = _eccd
+				}
+				if _gddb == nil {
+					break
+				}
+				_ffgf.pullWord(_gdaf, _gddb, _cbedc)
+			}
+			_ffgf.markWordBoundaries()
+			_dgdbc = append(_dgdbc, _ffgf)
+		}
+	}
+	if len(_dgdbc) == 0 {
+		return nil
+	}
+	_eg.Slice(_dgdbc, func(_aegb, _cccad int) bool { return _cecdc(_dgdbc[_aegb], _dgdbc[_cccad]) < 0 })
+	_ebbf := _ebgga(_gdaf.PdfRectangle, _dgdbc)
+	if _aggg {
+		_bg.Log.Info("\u0061\u0072\u0072an\u0067\u0065\u0054\u0065\u0078\u0074\u0020\u0021\u0021\u0021\u0020\u0070\u0061\u0072\u0061\u003d\u0025\u0073", _ebbf.String())
+		if _fcbc {
+			for _adaac, _eaecg := range _ebbf._feea {
+				_fa.Printf("\u0025\u0034\u0064\u003a\u0020\u0025\u0073\u000a", _adaac, _eaecg.String())
+				if _dac {
+					for _badb, _ddfef := range _eaecg._gbaa {
+						_fa.Printf("\u0025\u0038\u0064\u003a\u0020\u0025\u0073\u000a", _badb, _ddfef.String())
+						for _cfcfef, _eeea := range _ddfef._ddfc {
+							_fa.Printf("\u00251\u0032\u0064\u003a\u0020\u0025\u0073\n", _cfcfef, _eeea.String())
+						}
+					}
+				}
+			}
+		}
+	}
+	return _ebbf
+}
+
+func _faea(_bgfbd, _fbfag _ad.PdfRectangle) _ad.PdfRectangle {
+	return _ad.PdfRectangle{Llx: _c.Min(_bgfbd.Llx, _fbfag.Llx), Lly: _c.Min(_bgfbd.Lly, _fbfag.Lly), Urx: _c.Max(_bgfbd.Urx, _fbfag.Urx), Ury: _c.Max(_bgfbd.Ury, _fbfag.Ury)}
+}
+
+func (_gdbd rectRuling) checkWidth(_aeec, _bgcfd float64) (float64, bool) {
+	_dcegd := _bgcfd - _aeec
+	_fded := _dcegd <= _ddgfe
+	return _dcegd, _fded
+}
+
+func (_ccegb paraList) tables() []TextTable {
+	var _eeggg []TextTable
+	if _ggegb {
+		_bg.Log.Info("\u0070\u0061\u0072\u0061\u0073\u002e\u0074\u0061\u0062\u006c\u0065\u0073\u003a")
+	}
+	for _, _dage := range _ccegb {
+		_ddgd := _dage._fbbfg
+		if _ddgd != nil && _ddgd.isExportable() {
+			_eeggg = append(_eeggg, _ddgd.toTextTable())
+		}
+	}
+	return _eeggg
+}
+
+func _cdgae(_edfg, _cgeda _cd.Point) bool {
+	_gagc := _c.Abs(_edfg.X - _cgeda.X)
+	_cgfg := _c.Abs(_edfg.Y - _cgeda.Y)
+	return _eedad(_gagc, _cgfg)
+}
+
+func (_ggdge rulingList) isActualGrid() (rulingList, bool) {
+	_fbad, _faafb := _ggdge.augmentGrid()
+	if !(len(_fbad) >= _adgg+1 && len(_faafb) >= _eabb+1) {
+		if _feda {
+			_bg.Log.Info("\u0069s\u0041\u0063t\u0075\u0061\u006c\u0047r\u0069\u0064\u003a \u004e\u006f\u0074\u0020\u0061\u006c\u0069\u0067\u006eed\u002e\u0020\u0025d\u0020\u0078 \u0025\u0064\u0020\u003c\u0020\u0025d\u0020\u0078 \u0025\u0064", len(_fbad), len(_faafb), _adgg+1, _eabb+1)
+		}
+		return nil, false
+	}
+	if _feda {
+		_bg.Log.Info("\u0069\u0073\u0041\u0063\u0074\u0075a\u006c\u0047\u0072\u0069\u0064\u003a\u0020\u0025\u0073\u0020\u003a\u0020\u0025t\u0020\u0026\u0020\u0025\u0074\u0020\u2192 \u0025\u0074", _ggdge, len(_fbad) >= 2, len(_faafb) >= 2, len(_fbad) >= 2 && len(_faafb) >= 2)
+		for _eega, _adad := range _ggdge {
+			_fa.Printf("\u0025\u0034\u0064\u003a\u0020\u0025\u0076\u000a", _eega, _adad)
+		}
+	}
+	if _fccb {
+		_defg, _acgfb := _fbad[0], _fbad[len(_fbad)-1]
+		_abab, _aaeg := _faafb[0], _faafb[len(_faafb)-1]
+		if !(_cacef(_defg._ecfb-_abab._ggecg) && _cacef(_acgfb._ecfb-_abab._gebf) && _cacef(_abab._ecfb-_defg._gebf) && _cacef(_aaeg._ecfb-_defg._ggecg)) {
+			if _feda {
+				_bg.Log.Info("\u0069\u0073\u0041\u0063\u0074\u0075\u0061l\u0047\u0072\u0069d\u003a\u0020\u0020N\u006f\u0074 \u0061\u006c\u0069\u0067\u006e\u0065d\u002e\n\t\u0076\u0030\u003d\u0025\u0073\u000a\u0009\u0076\u0031\u003d\u0025\u0073\u000a\u0009\u0068\u0030\u003d\u0025\u0073\u000a\u0009\u0068\u0031\u003d\u0025\u0073", _defg, _acgfb, _abab, _aaeg)
+			}
+			return nil, false
+		}
+	} else {
+		if !_fbad.aligned() {
+			if _abcba {
+				_bg.Log.Info("i\u0073\u0041\u0063\u0074\u0075\u0061l\u0047\u0072\u0069\u0064\u003a\u0020N\u006f\u0074\u0020\u0061\u006c\u0069\u0067n\u0065\u0064\u0020\u0076\u0065\u0072\u0074\u0073\u002e\u0020%\u0064", len(_fbad))
+			}
+			return nil, false
+		}
+		if !_faafb.aligned() {
+			if _feda {
+				_bg.Log.Info("i\u0073\u0041\u0063\u0074\u0075\u0061l\u0047\u0072\u0069\u0064\u003a\u0020N\u006f\u0074\u0020\u0061\u006c\u0069\u0067n\u0065\u0064\u0020\u0068\u006f\u0072\u007a\u0073\u002e\u0020%\u0064", len(_faafb))
+			}
+			return nil, false
+		}
+	}
+	_gbaeba := append(_fbad, _faafb...)
+	return _gbaeba, true
+}
+
+func (_bce *textObject) showText(_dgff _afa.PdfObject, _adgd []byte, _fcf int, _dggg string) error {
+	return _bce.renderText(_dgff, _adgd, _fcf, _dggg)
+}
+
+func _edgdf(_dbeee []*textWord, _egaa int) []*textWord {
+	_bgfbc := len(_dbeee)
+	copy(_dbeee[_egaa:], _dbeee[_egaa+1:])
+	return _dbeee[:_bgfbc-1]
+}
+
+func (_dbgcd *textObject) setHorizScaling(_cfgg float64) {
+	if _dbgcd == nil {
+		return
+	}
+	_dbgcd._dggef._deeee = _cfgg
+}
+
+func (_gbadb *textTable) subdivide() *textTable {
+	_gbadb.logComposite("\u0073u\u0062\u0064\u0069\u0076\u0069\u0064e")
+	_fcgg := _gbadb.compositeRowCorridors()
+	_ccbf := _gbadb.compositeColCorridors()
+	if _ggegb {
+		_bg.Log.Info("\u0073u\u0062\u0064i\u0076\u0069\u0064\u0065:\u000a\u0009\u0072o\u0077\u0043\u006f\u0072\u0072\u0069\u0064\u006f\u0072s=\u0025\u0073\u000a\t\u0063\u006fl\u0043\u006f\u0072\u0072\u0069\u0064o\u0072\u0073=\u0025\u0073", _geef(_fcgg), _geef(_ccbf))
+	}
+	if len(_fcgg) == 0 || len(_ccbf) == 0 {
+		return _gbadb
+	}
+	_gedde(_fcgg)
+	_gedde(_ccbf)
+	if _ggegb {
+		_bg.Log.Info("\u0073\u0075\u0062\u0064\u0069\u0076\u0069\u0064\u0065\u0020\u0066\u0069\u0078\u0065\u0064\u003a\u000a\u0009r\u006f\u0077\u0043\u006f\u0072\u0072\u0069d\u006f\u0072\u0073\u003d\u0025\u0073\u000a\u0009\u0063\u006f\u006cC\u006f\u0072\u0072\u0069\u0064\u006f\u0072\u0073\u003d\u0025\u0073", _geef(_fcgg), _geef(_ccbf))
+	}
+	_feae, _gdgf := _agdf(_gbadb._aaga, _fcgg)
+	_ecgbfa, _cegaa := _agdf(_gbadb._cfadc, _ccbf)
+	_daacc := make(map[uint64]*textPara, _cegaa*_gdgf)
+	_ggabg := &textTable{PdfRectangle: _gbadb.PdfRectangle, _cegab: _gbadb._cegab, _aaga: _gdgf, _cfadc: _cegaa, _eccda: _daacc}
+	if _ggegb {
+		_bg.Log.Info("\u0073\u0075b\u0064\u0069\u0076\u0069\u0064\u0065\u003a\u0020\u0063\u006f\u006d\u0070\u006f\u0073\u0069\u0074\u0065\u0020\u003d\u0020\u0025\u0064\u0020\u0078\u0020\u0025\u0064\u0020\u0063\u0065\u006c\u006c\u0073\u003d\u0020\u0025\u0064\u0020\u0078\u0020\u0025\u0064\u000a"+"\u0009\u0072\u006f\u0077\u0043\u006f\u0072\u0072\u0069\u0064\u006f\u0072s\u003d\u0025\u0073\u000a"+"\u0009\u0063\u006f\u006c\u0043\u006f\u0072\u0072\u0069\u0064\u006f\u0072s\u003d\u0025\u0073\u000a"+"\u0009\u0079\u004f\u0066\u0066\u0073\u0065\u0074\u0073=\u0025\u002b\u0076\u000a"+"\u0009\u0078\u004f\u0066\u0066\u0073\u0065\u0074\u0073\u003d\u0025\u002b\u0076", _gbadb._cfadc, _gbadb._aaga, _cegaa, _gdgf, _geef(_fcgg), _geef(_ccbf), _feae, _ecgbfa)
+	}
+	for _cfedb := 0; _cfedb < _gbadb._aaga; _cfedb++ {
+		_ecdgd := _feae[_cfedb]
+		for _gcacd := 0; _gcacd < _gbadb._cfadc; _gcacd++ {
+			_gbbd := _ecgbfa[_gcacd]
+			if _ggegb {
+				_fa.Printf("\u0025\u0036\u0064\u002c %\u0032\u0064\u003a\u0020\u0078\u0030\u003d\u0025\u0064\u0020\u0079\u0030\u003d\u0025d\u000a", _gcacd, _cfedb, _gbbd, _ecdgd)
+			}
+			_aabc, _gcgb := _gbadb._cafd[_fffbe(_gcacd, _cfedb)]
+			if !_gcgb {
+				continue
+			}
+			_efdab := _aabc.split(_fcgg[_cfedb], _ccbf[_gcacd])
+			for _acde := 0; _acde < _efdab._aaga; _acde++ {
+				for _ffdf := 0; _ffdf < _efdab._cfadc; _ffdf++ {
+					_daec := _efdab.get(_ffdf, _acde)
+					_ggabg.put(_gbbd+_ffdf, _ecdgd+_acde, _daec)
+					if _ggegb {
+						_fa.Printf("\u0025\u0038\u0064\u002c\u0020\u0025\u0032\u0064\u003a\u0020\u0025\u0073\u000a", _gbbd+_ffdf, _ecdgd+_acde, _daec)
+					}
+				}
+			}
+		}
+	}
+	return _ggabg
+}
+
+const (
+	_gbgfg rulingKind = iota
+	_cafa
+	_dcfdg
+)
+
+type gridTile struct {
+	_ad.PdfRectangle
+	_eece, _dgaae, _cegae, _ebecd bool
+}
+
+func _baca(_deage, _acfgb bounded) float64 { return _deage.bbox().Llx - _acfgb.bbox().Urx }
+
+func (_cfegc *PageText) getText() string {
+	_afaff := ""
+	_cfac := len(_cfegc._baaa)
+	for _aaa := 0; _aaa < 360 && _cfac > 0; _aaa += 90 {
+		_aded := make([]*textMark, 0, len(_cfegc._baaa)-_cfac)
+		for _, _fafa := range _cfegc._baaa {
+			if _fafa._cbgf == _aaa {
+				_aded = append(_aded, _fafa)
+			}
+		}
+		if len(_aded) > 0 {
+			_afaff += _gdcbe(_aded, _cfegc._gfag)
+			_cfac -= len(_aded)
+		}
+	}
+	return _afaff
+}
+
+func (_cdbd *wordBag) depthRange(_baec, _fcgae int) []int {
+	var _caac []int
+	for _abfa := range _cdbd._fdeg {
+		if _baec <= _abfa && _abfa <= _fcgae {
+			_caac = append(_caac, _abfa)
+		}
+	}
+	if len(_caac) == 0 {
+		return nil
+	}
+	_eg.Ints(_caac)
+	return _caac
+}
+
+func _gaad(_ccfcb, _aadeb _cd.Point, _ggdaf _cb.Color) (*ruling, bool) {
+	_dfcb := lineRuling{_gfdac: _ccfcb, _bfbed: _aadeb, _efgdc: _agada(_ccfcb, _aadeb), Color: _ggdaf}
+	if _dfcb._efgdc == _gbgfg {
+		return nil, false
+	}
+	return _dfcb.asRuling()
+}
+
+func _gfgb(_acfba []pathSection) rulingList {
+	_edabd(_acfba)
+	if _feda {
+		_bg.Log.Info("\u006d\u0061k\u0065\u0053\u0074\u0072\u006f\u006b\u0065\u0052\u0075\u006c\u0069\u006e\u0067\u0073\u003a\u0020\u0025\u0064\u0020\u0073\u0074\u0072ok\u0065\u0073", len(_acfba))
+	}
+	var _fffd rulingList
+	for _, _bfbgg := range _acfba {
+		for _, _ddfde := range _bfbgg._fdgf {
+			if len(_ddfde._bfgb) < 2 {
+				continue
+			}
+			_cfdbc := _ddfde._bfgb[0]
+			for _, _afcce := range _ddfde._bfgb[1:] {
+				if _efcf, _fgaed := _gaad(_cfdbc, _afcce, _bfbgg.Color); _fgaed {
+					_fffd = append(_fffd, _efcf)
+				}
+				_cfdbc = _afcce
+			}
+		}
+	}
+	if _feda {
+		_bg.Log.Info("m\u0061\u006b\u0065\u0053tr\u006fk\u0065\u0052\u0075\u006c\u0069n\u0067\u0073\u003a\u0020\u0025\u0073", _fffd)
+	}
+	return _fffd
+}
 
 // RangeOffset returns the TextMarks in `ma` that overlap text[start:end] in the extracted text.
 // These are tm: `start` <= tm.Offset + len(tm.Text) && tm.Offset < `end` where
 // `start` and `end` are offsets in the extracted text.
 // NOTE: TextMarks can contain multiple characters. e.g. "ffi" for the ﬃ ligature so the first and
 // last elements of the returned TextMarkArray may only partially overlap text[start:end].
-func (_fgc *TextMarkArray )RangeOffset (start ,end int )(*TextMarkArray ,error ){if _fgc ==nil {return nil ,_fb .New ("\u006da\u003d\u003d\u006e\u0069\u006c");};if end < start {return nil ,_fa .Errorf ("\u0065\u006e\u0064\u0020\u003c\u0020\u0073\u0074\u0061\u0072\u0074\u002e\u0020\u0052\u0061n\u0067\u0065\u004f\u0066\u0066\u0073\u0065\u0074\u0020\u006e\u006f\u0074\u0020d\u0065\u0066\u0069\u006e\u0065\u0064\u002e\u0020\u0073\u0074\u0061\u0072t=\u0025\u0064\u0020\u0065\u006e\u0064\u003d\u0025\u0064\u0020",start ,end );
-};_efef :=len (_fgc ._fde );if _efef ==0{return _fgc ,nil ;};if start < _fgc ._fde [0].Offset {start =_fgc ._fde [0].Offset ;};if end > _fgc ._fde [_efef -1].Offset +1{end =_fgc ._fde [_efef -1].Offset +1;};_dfgc :=_eg .Search (_efef ,func (_ddbf int )bool {return _fgc ._fde [_ddbf ].Offset +len (_fgc ._fde [_ddbf ].Text )-1>=start });
-if !(0<=_dfgc &&_dfgc < _efef ){_gbeb :=_fa .Errorf ("\u004f\u0075\u0074\u0020\u006f\u0066\u0020\u0072\u0061\u006e\u0067\u0065\u002e\u0020\u0073\u0074\u0061\u0072\u0074\u003d%\u0064\u0020\u0069\u0053\u0074\u0061\u0072\u0074\u003d\u0025\u0064\u0020\u006c\u0065\u006e\u003d\u0025\u0064\u000a\u0009\u0066\u0069\u0072\u0073\u0074\u003d\u0025\u0076\u000a\u0009 \u006c\u0061\u0073\u0074\u003d%\u0076",start ,_dfgc ,_efef ,_fgc ._fde [0],_fgc ._fde [_efef -1]);
-return nil ,_gbeb ;};_gef :=_eg .Search (_efef ,func (_daac int )bool {return _fgc ._fde [_daac ].Offset > end -1});if !(0<=_gef &&_gef < _efef ){_abfcb :=_fa .Errorf ("\u004f\u0075\u0074\u0020\u006f\u0066\u0020r\u0061\u006e\u0067e\u002e\u0020\u0065n\u0064\u003d%\u0064\u0020\u0069\u0045\u006e\u0064=\u0025d \u006c\u0065\u006e\u003d\u0025\u0064\u000a\u0009\u0066\u0069\u0072\u0073\u0074\u003d\u0025\u0076\u000a\u0009\u0020\u006c\u0061\u0073\u0074\u003d\u0025\u0076",end ,_gef ,_efef ,_fgc ._fde [0],_fgc ._fde [_efef -1]);
-return nil ,_abfcb ;};if _gef <=_dfgc {return nil ,_fa .Errorf ("\u0069\u0045\u006e\u0064\u0020\u003c=\u0020\u0069\u0053\u0074\u0061\u0072\u0074\u003a\u0020\u0073\u0074\u0061\u0072\u0074\u003d\u0025\u0064\u0020\u0065\u006ed\u003d\u0025\u0064\u0020\u0069\u0053\u0074\u0061\u0072\u0074\u003d\u0025\u0064\u0020i\u0045n\u0064\u003d\u0025\u0064",start ,end ,_dfgc ,_gef );
-};return &TextMarkArray {_fde :_fgc ._fde [_dfgc :_gef ]},nil ;};
+func (_fgc *TextMarkArray) RangeOffset(start, end int) (*TextMarkArray, error) {
+	if _fgc == nil {
+		return nil, _fb.New("\u006da\u003d\u003d\u006e\u0069\u006c")
+	}
+	if end < start {
+		return nil, _fa.Errorf("\u0065\u006e\u0064\u0020\u003c\u0020\u0073\u0074\u0061\u0072\u0074\u002e\u0020\u0052\u0061n\u0067\u0065\u004f\u0066\u0066\u0073\u0065\u0074\u0020\u006e\u006f\u0074\u0020d\u0065\u0066\u0069\u006e\u0065\u0064\u002e\u0020\u0073\u0074\u0061\u0072t=\u0025\u0064\u0020\u0065\u006e\u0064\u003d\u0025\u0064\u0020", start, end)
+	}
+	_efef := len(_fgc._fde)
+	if _efef == 0 {
+		return _fgc, nil
+	}
+	if start < _fgc._fde[0].Offset {
+		start = _fgc._fde[0].Offset
+	}
+	if end > _fgc._fde[_efef-1].Offset+1 {
+		end = _fgc._fde[_efef-1].Offset + 1
+	}
+	_dfgc := _eg.Search(_efef, func(_ddbf int) bool { return _fgc._fde[_ddbf].Offset+len(_fgc._fde[_ddbf].Text)-1 >= start })
+	if !(0 <= _dfgc && _dfgc < _efef) {
+		_gbeb := _fa.Errorf("\u004f\u0075\u0074\u0020\u006f\u0066\u0020\u0072\u0061\u006e\u0067\u0065\u002e\u0020\u0073\u0074\u0061\u0072\u0074\u003d%\u0064\u0020\u0069\u0053\u0074\u0061\u0072\u0074\u003d\u0025\u0064\u0020\u006c\u0065\u006e\u003d\u0025\u0064\u000a\u0009\u0066\u0069\u0072\u0073\u0074\u003d\u0025\u0076\u000a\u0009 \u006c\u0061\u0073\u0074\u003d%\u0076", start, _dfgc, _efef, _fgc._fde[0], _fgc._fde[_efef-1])
+		return nil, _gbeb
+	}
+	_gef := _eg.Search(_efef, func(_daac int) bool { return _fgc._fde[_daac].Offset > end-1 })
+	if !(0 <= _gef && _gef < _efef) {
+		_abfcb := _fa.Errorf("\u004f\u0075\u0074\u0020\u006f\u0066\u0020r\u0061\u006e\u0067e\u002e\u0020\u0065n\u0064\u003d%\u0064\u0020\u0069\u0045\u006e\u0064=\u0025d \u006c\u0065\u006e\u003d\u0025\u0064\u000a\u0009\u0066\u0069\u0072\u0073\u0074\u003d\u0025\u0076\u000a\u0009\u0020\u006c\u0061\u0073\u0074\u003d\u0025\u0076", end, _gef, _efef, _fgc._fde[0], _fgc._fde[_efef-1])
+		return nil, _abfcb
+	}
+	if _gef <= _dfgc {
+		return nil, _fa.Errorf("\u0069\u0045\u006e\u0064\u0020\u003c=\u0020\u0069\u0053\u0074\u0061\u0072\u0074\u003a\u0020\u0073\u0074\u0061\u0072\u0074\u003d\u0025\u0064\u0020\u0065\u006ed\u003d\u0025\u0064\u0020\u0069\u0053\u0074\u0061\u0072\u0074\u003d\u0025\u0064\u0020i\u0045n\u0064\u003d\u0025\u0064", start, end, _dfgc, _gef)
+	}
+	return &TextMarkArray{_fde: _fgc._fde[_dfgc:_gef]}, nil
+}
 
 // String returns a human readable description of `path`.
-func (_fgafg *subpath )String ()string {_dfbb :=_fgafg ._bfgb ;_ccedg :=len (_dfbb );if _ccedg <=5{return _fa .Sprintf ("\u0025d\u003a\u0020\u0025\u0036\u002e\u0032f",_ccedg ,_dfbb );};return _fa .Sprintf ("\u0025d\u003a\u0020\u0025\u0036.\u0032\u0066\u0020\u0025\u0036.\u0032f\u0020.\u002e\u002e\u0020\u0025\u0036\u002e\u0032f",_ccedg ,_dfbb [0],_dfbb [1],_dfbb [_ccedg -1]);
-};func _dfabb (_dfag *_af .ContentStreamOperation )(float64 ,error ){if len (_dfag .Params )!=1{_bcee :=_fb .New ("\u0069n\u0063\u006f\u0072\u0072e\u0063\u0074\u0020\u0070\u0061r\u0061m\u0065t\u0065\u0072\u0020\u0063\u006f\u0075\u006et");_bg .Log .Debug ("\u0045\u0052\u0052\u004f\u0052\u003a\u0020\u0025\u0023\u0071\u0020\u0073\u0068\u006f\u0075\u006c\u0064\u0020h\u0061\u0076\u0065\u0020\u0025\u0064\u0020i\u006e\u0070\u0075\u0074\u0020\u0070\u0061\u0072\u0061\u006d\u0073,\u0020\u0067\u006f\u0074\u0020\u0025\u0064\u0020\u0025\u002b\u0076",_dfag .Operand ,1,len (_dfag .Params ),_dfag .Params );
-return 0.0,_bcee ;};return _afa .GetNumberAsFloat (_dfag .Params [0]);};func _dgde (_fdace ,_gafb _ad .PdfRectangle )(_ad .PdfRectangle ,bool ){if !_affce (_fdace ,_gafb ){return _ad .PdfRectangle {},false ;};return _ad .PdfRectangle {Llx :_c .Max (_fdace .Llx ,_gafb .Llx ),Urx :_c .Min (_fdace .Urx ,_gafb .Urx ),Lly :_c .Max (_fdace .Lly ,_gafb .Lly ),Ury :_c .Min (_fdace .Ury ,_gafb .Ury )},true ;
-};func (_faff *textLine )endsInHyphen ()bool {_decdf :=_faff ._gbaa [len (_faff ._gbaa )-1];_fdfef :=_decdf ._fgaa ;_eaefa ,_gceb :=_a .DecodeLastRuneInString (_fdfef );if _gceb <=0||!_bd .Is (_bd .Hyphen ,_eaefa ){return false ;};if _decdf ._efccdf &&_cbege (_fdfef ){return true ;
-};return _cbege (_faff .text ());};func (_adgdf rulingList )asTiling ()gridTiling {if _cefd {_bg .Log .Info ("r\u0075\u006ci\u006e\u0067\u004c\u0069\u0073\u0074\u002e\u0061\u0073\u0054\u0069\u006c\u0069\u006e\u0067\u003a\u0020\u0076\u0065\u0063s\u003d\u0025\u0064\u0020\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d=\u003d\u003d\u003d\u003d\u003d\u002b\u002b\u002b\u0020\u003d\u003d\u003d\u003d=\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d=\u003d",len (_adgdf ));
-};for _fdedg ,_dbcbb :=range _adgdf [1:]{_cgda :=_adgdf [_fdedg ];if _cgda .alignsPrimary (_dbcbb )&&_cgda .alignsSec (_dbcbb ){_bg .Log .Error ("a\u0073\u0054\u0069\u006c\u0069\u006e\u0067\u003a\u0020\u0044\u0075\u0070\u006c\u0069\u0063\u0061\u0074\u0065 \u0072\u0075\u006c\u0069\u006e\u0067\u0073\u002e\u000a\u0009v=\u0025\u0073\u000a\t\u0077=\u0025\u0073",_dbcbb ,_cgda );
-};};_adgdf .sortStrict ();_adgdf .log ("\u0073n\u0061\u0070\u0070\u0065\u0064");_gfcge ,_cgad :=_adgdf .vertsHorzs ();_dbdcf :=_gfcge .primaries ();_gcdbe :=_cgad .primaries ();_ecdee :=len (_dbdcf )-1;_gcag :=len (_gcdbe )-1;if _ecdee ==0||_gcag ==0{return gridTiling {};
-};_bccdg :=_ad .PdfRectangle {Llx :_dbdcf [0],Urx :_dbdcf [_ecdee ],Lly :_gcdbe [0],Ury :_gcdbe [_gcag ]};if _cefd {_bg .Log .Info ("\u0072\u0075l\u0069\u006e\u0067\u004c\u0069\u0073\u0074\u002e\u0061\u0073\u0054\u0069\u006c\u0069\u006e\u0067\u003a\u0020\u0076\u0065\u0072\u0074s=\u0025\u0064",len (_gfcge ));
-for _dgddc ,_gbde :=range _gfcge {_fa .Printf ("\u0025\u0034\u0064\u003a\u0020\u0025\u0073\u000a",_dgddc ,_gbde );};_bg .Log .Info ("\u0072\u0075l\u0069\u006e\u0067\u004c\u0069\u0073\u0074\u002e\u0061\u0073\u0054\u0069\u006c\u0069\u006e\u0067\u003a\u0020\u0068\u006f\u0072\u007as=\u0025\u0064",len (_cgad ));
-for _gfcda ,_ccfgf :=range _cgad {_fa .Printf ("\u0025\u0034\u0064\u003a\u0020\u0025\u0073\u000a",_gfcda ,_ccfgf );};_bg .Log .Info ("\u0072\u0075\u006c\u0069\u006eg\u004c\u0069\u0073\u0074\u002e\u0061\u0073\u0054\u0069\u006c\u0069\u006e\u0067:\u0020\u0020\u0077\u0078\u0068\u003d\u0025\u0064\u0078\u0025\u0064\u000a\u0009\u006c\u006c\u0078\u003d\u0025\u002e\u0032\u0066\u000a\u0009\u006c\u006c\u0079\u003d\u0025\u002e\u0032f",_ecdee ,_gcag ,_dbdcf ,_gcdbe );
-};_gdea :=make ([]gridTile ,_ecdee *_gcag );for _cfba :=_gcag -1;_cfba >=0;_cfba --{_bbad :=_gcdbe [_cfba ];_fdfbg :=_gcdbe [_cfba +1];for _gfad :=0;_gfad < _ecdee ;_gfad ++{_fddf :=_dbdcf [_gfad ];_geeef :=_dbdcf [_gfad +1];_cgbaf :=_gfcge .findPrimSec (_fddf ,_bbad );
-_badae :=_gfcge .findPrimSec (_geeef ,_bbad );_bdac :=_cgad .findPrimSec (_bbad ,_fddf );_aefbf :=_cgad .findPrimSec (_fdfbg ,_fddf );_fgddd :=_ad .PdfRectangle {Llx :_fddf ,Urx :_geeef ,Lly :_bbad ,Ury :_fdfbg };_ccgcg :=_beda (_fgddd ,_cgbaf ,_badae ,_bdac ,_aefbf );
-_gdea [_cfba *_ecdee +_gfad ]=_ccgcg ;if _cefd {_fa .Printf ("\u0020\u0020\u0078\u003d\u0025\u0032\u0064\u0020\u0079\u003d\u0025\u0032\u0064\u003a\u0020%\u0073 \u0025\u0036\u002e\u0032\u0066\u0020\u0078\u0020\u0025\u0036\u002e\u0032\u0066\u000a",_gfad ,_cfba ,_ccgcg .String (),_ccgcg .Width (),_ccgcg .Height ());
-};};};if _cefd {_bg .Log .Info ("r\u0075\u006c\u0069\u006e\u0067\u004c\u0069\u0073\u0074.\u0061\u0073\u0054\u0069\u006c\u0069\u006eg:\u0020\u0063\u006f\u0061l\u0065\u0073\u0063\u0065\u0020\u0068\u006f\u0072\u0069zo\u006e\u0074a\u006c\u002e\u0020\u0025\u0036\u002e\u0032\u0066",_bccdg );
-};_afdgb :=make ([]map[float64 ]gridTile ,_gcag );for _bdgab :=_gcag -1;_bdgab >=0;_bdgab --{if _cefd {_fa .Printf ("\u0020\u0020\u0079\u003d\u0025\u0032\u0064\u000a",_bdgab );};_afdgb [_bdgab ]=make (map[float64 ]gridTile ,_ecdee );for _ebegf :=0;_ebegf < _ecdee ;
-_ebegf ++{_bfcd :=_gdea [_bdgab *_ecdee +_ebegf ];if _cefd {_fa .Printf ("\u0020\u0020\u0025\u0034\u0064\u003a\u0020\u0025\u0073\u000a",_ebegf ,_bfcd );};if !_bfcd ._dgaae {continue ;};_deeeg :=_ebegf ;for _bdbe :=_ebegf +1;!_bfcd ._ebecd &&_bdbe < _ecdee ;
-_bdbe ++{_facae :=_gdea [_bdgab *_ecdee +_bdbe ];_bfcd .Urx =_facae .Urx ;_bfcd ._eece =_bfcd ._eece ||_facae ._eece ;_bfcd ._cegae =_bfcd ._cegae ||_facae ._cegae ;_bfcd ._ebecd =_facae ._ebecd ;if _cefd {_fa .Printf ("\u0020 \u0020%\u0034\u0064\u003a\u0020\u0025s\u0020\u2192 \u0025\u0073\u000a",_bdbe ,_facae ,_bfcd );
-};_deeeg =_bdbe ;};if _cefd {_fa .Printf (" \u0020 \u0025\u0032\u0064\u0020\u002d\u0020\u0025\u0032d\u0020\u2192\u0020\u0025s\n",_ebegf ,_deeeg ,_bfcd );};_ebegf =_deeeg ;_afdgb [_bdgab ][_bfcd .Llx ]=_bfcd ;};};_ggee :=make (map[float64 ]map[float64 ]gridTile ,_gcag );
-_gegde :=make (map[float64 ]map[float64 ]struct{},_gcag );for _gdcab :=_gcag -1;_gdcab >=0;_gdcab --{_acae :=_gdea [_gdcab *_ecdee ].Lly ;_ggee [_acae ]=make (map[float64 ]gridTile ,_ecdee );_gegde [_acae ]=make (map[float64 ]struct{},_ecdee );};if _cefd {_bg .Log .Info ("\u0072u\u006c\u0069n\u0067\u004c\u0069s\u0074\u002e\u0061\u0073\u0054\u0069\u006ci\u006e\u0067\u003a\u0020\u0063\u006fa\u006c\u0065\u0073\u0063\u0065\u0020\u0076\u0065\u0072\u0074\u0069c\u0061\u006c\u002e\u0020\u0025\u0036\u002e\u0032\u0066",_bccdg );
-};for _cgea :=_gcag -1;_cgea >=0;_cgea --{_bgfg :=_gdea [_cgea *_ecdee ].Lly ;_cdec :=_afdgb [_cgea ];if _cefd {_fa .Printf ("\u0020\u0020\u0079\u003d\u0025\u0032\u0064\u000a",_cgea );};for _ ,_fgaec :=range _bbgff (_cdec ){if _ ,_edfc :=_gegde [_bgfg ][_fgaec ];
-_edfc {continue ;};_caba :=_cdec [_fgaec ];if _cefd {_fa .Printf (" \u0020\u0020\u0020\u0020\u0076\u0030\u003d\u0025\u0073\u000a",_caba .String ());};for _bdfab :=_cgea -1;_bdfab >=0;_bdfab --{if _caba ._cegae {break ;};_bffcg :=_afdgb [_bdfab ];_dfbgd ,_fgac :=_bffcg [_fgaec ];
-if !_fgac {break ;};if _dfbgd .Urx !=_caba .Urx {break ;};_caba ._cegae =_dfbgd ._cegae ;_caba .Lly =_dfbgd .Lly ;if _cefd {_fa .Printf ("\u0020\u0020\u0020\u0020  \u0020\u0020\u0076\u003d\u0025\u0073\u0020\u0076\u0030\u003d\u0025\u0073\u000a",_dfbgd .String (),_caba .String ());
-};_gegde [_dfbgd .Lly ][_dfbgd .Llx ]=struct{}{};};if _cgea ==0{_caba ._cegae =true ;};if _caba .complete (){_ggee [_bgfg ][_fgaec ]=_caba ;};};};_gdeeb :=gridTiling {PdfRectangle :_bccdg ,_eced :_ebcfa (_ggee ),_bcgge :_dcbbd (_ggee ),_ggad :_ggee };_gdeeb .log ("\u0043r\u0065\u0061\u0074\u0065\u0064");
-return _gdeeb ;};
+func (_fgafg *subpath) String() string {
+	_dfbb := _fgafg._bfgb
+	_ccedg := len(_dfbb)
+	if _ccedg <= 5 {
+		return _fa.Sprintf("\u0025d\u003a\u0020\u0025\u0036\u002e\u0032f", _ccedg, _dfbb)
+	}
+	return _fa.Sprintf("\u0025d\u003a\u0020\u0025\u0036.\u0032\u0066\u0020\u0025\u0036.\u0032f\u0020.\u002e\u002e\u0020\u0025\u0036\u002e\u0032f", _ccedg, _dfbb[0], _dfbb[1], _dfbb[_ccedg-1])
+}
+
+func _dfabb(_dfag *_af.ContentStreamOperation) (float64, error) {
+	if len(_dfag.Params) != 1 {
+		_bcee := _fb.New("\u0069n\u0063\u006f\u0072\u0072e\u0063\u0074\u0020\u0070\u0061r\u0061m\u0065t\u0065\u0072\u0020\u0063\u006f\u0075\u006et")
+		_bg.Log.Debug("\u0045\u0052\u0052\u004f\u0052\u003a\u0020\u0025\u0023\u0071\u0020\u0073\u0068\u006f\u0075\u006c\u0064\u0020h\u0061\u0076\u0065\u0020\u0025\u0064\u0020i\u006e\u0070\u0075\u0074\u0020\u0070\u0061\u0072\u0061\u006d\u0073,\u0020\u0067\u006f\u0074\u0020\u0025\u0064\u0020\u0025\u002b\u0076", _dfag.Operand, 1, len(_dfag.Params), _dfag.Params)
+		return 0.0, _bcee
+	}
+	return _afa.GetNumberAsFloat(_dfag.Params[0])
+}
+
+func _dgde(_fdace, _gafb _ad.PdfRectangle) (_ad.PdfRectangle, bool) {
+	if !_affce(_fdace, _gafb) {
+		return _ad.PdfRectangle{}, false
+	}
+	return _ad.PdfRectangle{Llx: _c.Max(_fdace.Llx, _gafb.Llx), Urx: _c.Min(_fdace.Urx, _gafb.Urx), Lly: _c.Max(_fdace.Lly, _gafb.Lly), Ury: _c.Min(_fdace.Ury, _gafb.Ury)}, true
+}
+
+func (_faff *textLine) endsInHyphen() bool {
+	_decdf := _faff._gbaa[len(_faff._gbaa)-1]
+	_fdfef := _decdf._fgaa
+	_eaefa, _gceb := _a.DecodeLastRuneInString(_fdfef)
+	if _gceb <= 0 || !_bd.Is(_bd.Hyphen, _eaefa) {
+		return false
+	}
+	if _decdf._efccdf && _cbege(_fdfef) {
+		return true
+	}
+	return _cbege(_faff.text())
+}
+
+func (_adgdf rulingList) asTiling() gridTiling {
+	if _cefd {
+		_bg.Log.Info("r\u0075\u006ci\u006e\u0067\u004c\u0069\u0073\u0074\u002e\u0061\u0073\u0054\u0069\u006c\u0069\u006e\u0067\u003a\u0020\u0076\u0065\u0063s\u003d\u0025\u0064\u0020\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d=\u003d\u003d\u003d\u003d\u003d\u002b\u002b\u002b\u0020\u003d\u003d\u003d\u003d=\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d=\u003d", len(_adgdf))
+	}
+	for _fdedg, _dbcbb := range _adgdf[1:] {
+		_cgda := _adgdf[_fdedg]
+		if _cgda.alignsPrimary(_dbcbb) && _cgda.alignsSec(_dbcbb) {
+			_bg.Log.Error("a\u0073\u0054\u0069\u006c\u0069\u006e\u0067\u003a\u0020\u0044\u0075\u0070\u006c\u0069\u0063\u0061\u0074\u0065 \u0072\u0075\u006c\u0069\u006e\u0067\u0073\u002e\u000a\u0009v=\u0025\u0073\u000a\t\u0077=\u0025\u0073", _dbcbb, _cgda)
+		}
+	}
+	_adgdf.sortStrict()
+	_adgdf.log("\u0073n\u0061\u0070\u0070\u0065\u0064")
+	_gfcge, _cgad := _adgdf.vertsHorzs()
+	_dbdcf := _gfcge.primaries()
+	_gcdbe := _cgad.primaries()
+	_ecdee := len(_dbdcf) - 1
+	_gcag := len(_gcdbe) - 1
+	if _ecdee == 0 || _gcag == 0 {
+		return gridTiling{}
+	}
+	_bccdg := _ad.PdfRectangle{Llx: _dbdcf[0], Urx: _dbdcf[_ecdee], Lly: _gcdbe[0], Ury: _gcdbe[_gcag]}
+	if _cefd {
+		_bg.Log.Info("\u0072\u0075l\u0069\u006e\u0067\u004c\u0069\u0073\u0074\u002e\u0061\u0073\u0054\u0069\u006c\u0069\u006e\u0067\u003a\u0020\u0076\u0065\u0072\u0074s=\u0025\u0064", len(_gfcge))
+		for _dgddc, _gbde := range _gfcge {
+			_fa.Printf("\u0025\u0034\u0064\u003a\u0020\u0025\u0073\u000a", _dgddc, _gbde)
+		}
+		_bg.Log.Info("\u0072\u0075l\u0069\u006e\u0067\u004c\u0069\u0073\u0074\u002e\u0061\u0073\u0054\u0069\u006c\u0069\u006e\u0067\u003a\u0020\u0068\u006f\u0072\u007as=\u0025\u0064", len(_cgad))
+		for _gfcda, _ccfgf := range _cgad {
+			_fa.Printf("\u0025\u0034\u0064\u003a\u0020\u0025\u0073\u000a", _gfcda, _ccfgf)
+		}
+		_bg.Log.Info("\u0072\u0075\u006c\u0069\u006eg\u004c\u0069\u0073\u0074\u002e\u0061\u0073\u0054\u0069\u006c\u0069\u006e\u0067:\u0020\u0020\u0077\u0078\u0068\u003d\u0025\u0064\u0078\u0025\u0064\u000a\u0009\u006c\u006c\u0078\u003d\u0025\u002e\u0032\u0066\u000a\u0009\u006c\u006c\u0079\u003d\u0025\u002e\u0032f", _ecdee, _gcag, _dbdcf, _gcdbe)
+	}
+	_gdea := make([]gridTile, _ecdee*_gcag)
+	for _cfba := _gcag - 1; _cfba >= 0; _cfba-- {
+		_bbad := _gcdbe[_cfba]
+		_fdfbg := _gcdbe[_cfba+1]
+		for _gfad := 0; _gfad < _ecdee; _gfad++ {
+			_fddf := _dbdcf[_gfad]
+			_geeef := _dbdcf[_gfad+1]
+			_cgbaf := _gfcge.findPrimSec(_fddf, _bbad)
+			_badae := _gfcge.findPrimSec(_geeef, _bbad)
+			_bdac := _cgad.findPrimSec(_bbad, _fddf)
+			_aefbf := _cgad.findPrimSec(_fdfbg, _fddf)
+			_fgddd := _ad.PdfRectangle{Llx: _fddf, Urx: _geeef, Lly: _bbad, Ury: _fdfbg}
+			_ccgcg := _beda(_fgddd, _cgbaf, _badae, _bdac, _aefbf)
+			_gdea[_cfba*_ecdee+_gfad] = _ccgcg
+			if _cefd {
+				_fa.Printf("\u0020\u0020\u0078\u003d\u0025\u0032\u0064\u0020\u0079\u003d\u0025\u0032\u0064\u003a\u0020%\u0073 \u0025\u0036\u002e\u0032\u0066\u0020\u0078\u0020\u0025\u0036\u002e\u0032\u0066\u000a", _gfad, _cfba, _ccgcg.String(), _ccgcg.Width(), _ccgcg.Height())
+			}
+		}
+	}
+	if _cefd {
+		_bg.Log.Info("r\u0075\u006c\u0069\u006e\u0067\u004c\u0069\u0073\u0074.\u0061\u0073\u0054\u0069\u006c\u0069\u006eg:\u0020\u0063\u006f\u0061l\u0065\u0073\u0063\u0065\u0020\u0068\u006f\u0072\u0069zo\u006e\u0074a\u006c\u002e\u0020\u0025\u0036\u002e\u0032\u0066", _bccdg)
+	}
+	_afdgb := make([]map[float64]gridTile, _gcag)
+	for _bdgab := _gcag - 1; _bdgab >= 0; _bdgab-- {
+		if _cefd {
+			_fa.Printf("\u0020\u0020\u0079\u003d\u0025\u0032\u0064\u000a", _bdgab)
+		}
+		_afdgb[_bdgab] = make(map[float64]gridTile, _ecdee)
+		for _ebegf := 0; _ebegf < _ecdee; _ebegf++ {
+			_bfcd := _gdea[_bdgab*_ecdee+_ebegf]
+			if _cefd {
+				_fa.Printf("\u0020\u0020\u0025\u0034\u0064\u003a\u0020\u0025\u0073\u000a", _ebegf, _bfcd)
+			}
+			if !_bfcd._dgaae {
+				continue
+			}
+			_deeeg := _ebegf
+			for _bdbe := _ebegf + 1; !_bfcd._ebecd && _bdbe < _ecdee; _bdbe++ {
+				_facae := _gdea[_bdgab*_ecdee+_bdbe]
+				_bfcd.Urx = _facae.Urx
+				_bfcd._eece = _bfcd._eece || _facae._eece
+				_bfcd._cegae = _bfcd._cegae || _facae._cegae
+				_bfcd._ebecd = _facae._ebecd
+				if _cefd {
+					_fa.Printf("\u0020 \u0020%\u0034\u0064\u003a\u0020\u0025s\u0020\u2192 \u0025\u0073\u000a", _bdbe, _facae, _bfcd)
+				}
+				_deeeg = _bdbe
+			}
+			if _cefd {
+				_fa.Printf(" \u0020 \u0025\u0032\u0064\u0020\u002d\u0020\u0025\u0032d\u0020\u2192\u0020\u0025s\n", _ebegf, _deeeg, _bfcd)
+			}
+			_ebegf = _deeeg
+			_afdgb[_bdgab][_bfcd.Llx] = _bfcd
+		}
+	}
+	_ggee := make(map[float64]map[float64]gridTile, _gcag)
+	_gegde := make(map[float64]map[float64]struct{}, _gcag)
+	for _gdcab := _gcag - 1; _gdcab >= 0; _gdcab-- {
+		_acae := _gdea[_gdcab*_ecdee].Lly
+		_ggee[_acae] = make(map[float64]gridTile, _ecdee)
+		_gegde[_acae] = make(map[float64]struct{}, _ecdee)
+	}
+	if _cefd {
+		_bg.Log.Info("\u0072u\u006c\u0069n\u0067\u004c\u0069s\u0074\u002e\u0061\u0073\u0054\u0069\u006ci\u006e\u0067\u003a\u0020\u0063\u006fa\u006c\u0065\u0073\u0063\u0065\u0020\u0076\u0065\u0072\u0074\u0069c\u0061\u006c\u002e\u0020\u0025\u0036\u002e\u0032\u0066", _bccdg)
+	}
+	for _cgea := _gcag - 1; _cgea >= 0; _cgea-- {
+		_bgfg := _gdea[_cgea*_ecdee].Lly
+		_cdec := _afdgb[_cgea]
+		if _cefd {
+			_fa.Printf("\u0020\u0020\u0079\u003d\u0025\u0032\u0064\u000a", _cgea)
+		}
+		for _, _fgaec := range _bbgff(_cdec) {
+			if _, _edfc := _gegde[_bgfg][_fgaec]; _edfc {
+				continue
+			}
+			_caba := _cdec[_fgaec]
+			if _cefd {
+				_fa.Printf(" \u0020\u0020\u0020\u0020\u0076\u0030\u003d\u0025\u0073\u000a", _caba.String())
+			}
+			for _bdfab := _cgea - 1; _bdfab >= 0; _bdfab-- {
+				if _caba._cegae {
+					break
+				}
+				_bffcg := _afdgb[_bdfab]
+				_dfbgd, _fgac := _bffcg[_fgaec]
+				if !_fgac {
+					break
+				}
+				if _dfbgd.Urx != _caba.Urx {
+					break
+				}
+				_caba._cegae = _dfbgd._cegae
+				_caba.Lly = _dfbgd.Lly
+				if _cefd {
+					_fa.Printf("\u0020\u0020\u0020\u0020  \u0020\u0020\u0076\u003d\u0025\u0073\u0020\u0076\u0030\u003d\u0025\u0073\u000a", _dfbgd.String(), _caba.String())
+				}
+				_gegde[_dfbgd.Lly][_dfbgd.Llx] = struct{}{}
+			}
+			if _cgea == 0 {
+				_caba._cegae = true
+			}
+			if _caba.complete() {
+				_ggee[_bgfg][_fgaec] = _caba
+			}
+		}
+	}
+	_gdeeb := gridTiling{PdfRectangle: _bccdg, _eced: _ebcfa(_ggee), _bcgge: _dcbbd(_ggee), _ggad: _ggee}
+	_gdeeb.log("\u0043r\u0065\u0061\u0074\u0065\u0064")
+	return _gdeeb
+}
 
 // ApplyArea processes the page text only within the specified area `bbox`.
 // Each time ApplyArea is called, it updates the result set in `pt`.
 // Can be called multiple times in a row with different bounding boxes.
-func (_cabd *PageText )ApplyArea (bbox _ad .PdfRectangle ){_acaa :=make ([]*textMark ,0,len (_cabd ._baaa ));for _ ,_fbgb :=range _cabd ._baaa {if _affce (_fbgb .bbox (),bbox ){_acaa =append (_acaa ,_fbgb );};};var _dcca paraList ;_cdbg :="";_fegf :=len (_acaa );
-for _aced :=0;_aced < 360&&_fegf > 0;_aced +=90{_dgfb :=make ([]*textMark ,0,len (_acaa )-_fegf );for _ ,_gbfb :=range _acaa {if _gbfb ._cbgf ==_aced {_dgfb =append (_dgfb ,_gbfb );};};if len (_dgfb )> 0{if _cabd ._acaf ._eedf ==ExtractionModePlain {_cdbg +=_gdcbe (_dgfb ,_cabd ._gfag );
-}else {_cbde :=_gbcge (_dgfb ,_cabd ._gfag ,nil ,nil ,_cabd ._acaf ._eedf ==ExtractionModeLayoutNoBreaks );_dcca =append (_dcca ,_cbde ...);};_fegf -=len (_dgfb );};};if _cabd ._acaf ._eedf ==ExtractionModePlain {_cabd ._dfcf =_cdbg ;}else {_abfce :=new (_fg .Buffer );
-_dcca .writeText (_abfce );_cabd ._dfcf =_abfce .String ();_cabd ._abcd =_dcca .toTextMarks ();_cabd ._abcf =_dcca .tables ();};};var (_ccaba =map[rune ]string {0x0060:"\u0300",0x02CB:"\u0300",0x0027:"\u0301",0x00B4:"\u0301",0x02B9:"\u0301",0x02CA:"\u0301",0x005E:"\u0302",0x02C6:"\u0302",0x007E:"\u0303",0x02DC:"\u0303",0x00AF:"\u0304",0x02C9:"\u0304",0x02D8:"\u0306",0x02D9:"\u0307",0x00A8:"\u0308",0x00B0:"\u030a",0x02DA:"\u030a",0x02BA:"\u030b",0x02DD:"\u030b",0x02C7:"\u030c",0x02C8:"\u030d",0x0022:"\u030e",0x02BB:"\u0312",0x02BC:"\u0313",0x0486:"\u0313",0x055A:"\u0313",0x02BD:"\u0314",0x0485:"\u0314",0x0559:"\u0314",0x02D4:"\u031d",0x02D5:"\u031e",0x02D6:"\u031f",0x02D7:"\u0320",0x02B2:"\u0321",0x00B8:"\u0327",0x02CC:"\u0329",0x02B7:"\u032b",0x02CD:"\u0331",0x005F:"\u0332",0x204E:"\u0359"};
-);func (_aba *Extractor )extractPageText (_dfbd string ,_bbea *_ad .PdfPageResources ,_ecb _cd .Matrix ,_fbf int ,_bfcg bool )(*PageText ,int ,int ,error ){_bg .Log .Trace ("\u0065x\u0074\u0072\u0061\u0063t\u0050\u0061\u0067\u0065\u0054e\u0078t\u003a \u006c\u0065\u0076\u0065\u006c\u003d\u0025d",_fbf );
-_ebf :=&PageText {_gfag :_aba ._bgd ,_acbg :_aba ._gce ,_gaef :_aba ._caaa };_bbfe :=_ccdg (_aba ._bgd );var _fca stateStack ;_fbd :=_bggb (_aba ,_bbea ,_af .GraphicsState {},&_bbfe ,&_fca );_gadf :=shapesState {_dcfcb :_ecb ,_fggg :_cd .IdentityMatrix (),_affd :_fbd };
-var _fgeg bool ;_dea :=-1;_aad :="";if _fbf > _ggfc {_agde :=_fb .New ("\u0066\u006f\u0072\u006d s\u0074\u0061\u0063\u006b\u0020\u006f\u0076\u0065\u0072\u0066\u006c\u006f\u0077");_bg .Log .Debug ("\u0045\u0052\u0052\u004f\u0052\u003a \u0065\u0078\u0074\u0072\u0061\u0063\u0074\u0050\u0061\u0067\u0065\u0054\u0065\u0078\u0074\u002e\u0020\u0072\u0065\u0063u\u0072\u0073\u0069\u006f\u006e\u0020\u006c\u0065\u0076\u0065\u006c\u003d\u0025\u0064 \u0065r\u0072\u003d\u0025\u0076",_fbf ,_agde );
-return _ebf ,_bbfe ._fbef ,_bbfe ._edabg ,_agde ;};_cgcf :=_af .NewContentStreamParser (_dfbd );_dbga ,_becc :=_cgcf .Parse ();if _becc !=nil {_bg .Log .Debug ("\u0045\u0052\u0052\u004f\u0052\u003a\u0020e\u0078\u0074\u0072a\u0063\u0074\u0050\u0061g\u0065\u0054\u0065\u0078\u0074\u0020\u0070\u0061\u0072\u0073\u0065\u0020\u0066\u0061\u0069\u006c\u0065\u0064\u002e\u0020\u0065\u0072\u0072\u003d\u0025\u0076",_becc );
-return _ebf ,_bbfe ._fbef ,_bbfe ._edabg ,_becc ;};_ebf ._cdgg =_dbga ;_cfa :=_af .NewContentStreamProcessor (*_dbga );if _aba ._fag !=nil {_cfa .SetRelaxedMode (_aba ._fag .RelaxedMode );};_cfa .AddHandler (_af .HandlerConditionEnumAllOperands ,"",func (_dded *_af .ContentStreamOperation ,_gadfd _af .GraphicsState ,_ggg *_ad .PdfPageResources )error {_gged :=_dded .Operand ;
-if _bacad {_bg .Log .Info ("\u0026&\u0026\u0020\u006f\u0070\u003d\u0025s",_dded );};switch _gged {case "\u0071":if _acge {_bg .Log .Info ("\u0063\u0074\u006d\u003d\u0025\u0073",_gadf ._fggg );};_fca .push (&_bbfe );case "\u0051":if !_fca .empty (){_bbfe =*_fca .pop ();
-};_gadf ._fggg =_gadfd .CTM ;if _acge {_bg .Log .Info ("\u0063\u0074\u006d\u003d\u0025\u0073",_gadf ._fggg );};case "\u0042\u0044\u0043":_baad ,_ggff :=_afa .GetDict (_dded .Params [1]);if !_ggff {_bg .Log .Debug ("\u0045\u0052\u0052O\u0052\u003a\u0020\u0042D\u0043\u0020\u006f\u0070\u003d\u0025\u0073 \u0047\u0065\u0074\u0044\u0069\u0063\u0074\u0020\u0066\u0061\u0069\u006c\u0065\u0064",_dded );
-return _becc ;};_gae :=_baad .Get ("\u004d\u0043\u0049\u0044");if _gae !=nil {_eaeg ,_gbcg :=_afa .GetIntVal (_gae );if !_gbcg {_bg .Log .Debug ("\u0045R\u0052\u004fR\u003a\u0020\u0042\u0044C\u0020\u006f\u0070=\u0025\u0073\u002e\u0020\u0042\u0061\u0064\u0020\u006eum\u0065\u0072\u0069c\u0061\u006c \u006f\u0062\u006a\u0065\u0063\u0074.\u0020\u006f=\u0025\u0073",_dded ,_gae );
-};_dea =_eaeg ;}else {_dea =-1;};if _aba ._gce !=nil &&_dea !=-1&&_aba ._efbg !=-1&&_aba ._gce .ParentTree !=nil {_dge :=_aba ._efbg ;var _afeb func (_fbgd []*_ad .KValue )bool ;_afeb =func (_gfge []*_ad .KValue )bool {for _ ,_cae :=range _gfge {if _bged :=_cae .GetKDict ();
-_bged !=nil {_ggedg :=_bged .GetChildren ();if len (_ggedg )==1&&_ggedg [0].GetMCID ()!=nil {if *_ggedg [0].GetMCID ()==_dea {if _bged .ActualText !=nil {_aad =_faf .TrimSpace (_bged .ActualText .Str ());return true ;};return false ;};}else {return _afeb (_ggedg );
-};};};return false ;};if _egd :=_aba ._gce .ParentTree .Get ("\u004e\u0075\u006d\u0073");_egd !=nil {_bbdc ,_eacf :=_afa .GetArray (_egd );if !_eacf {_bg .Log .Debug ("\u0045\u0052\u0052\u004f\u0052\u003a\u0020\u0042\u0044\u0043\u0020\u006f\u0070\u003d\u0025\u0073\u002e\u0020\u0042\u0061\u0064\u0020\u004e\u0075m\u0073\u0020\u0061\u0072\u0072a\u0079\u002e \u006f\u003d\u0025\u0073",_dded ,_egd );
-}else {for _cdcf :=0;_cdcf < _bbdc .Len ();_cdcf +=2{if _abbe ,_geb :=_afa .GetInt (_bbdc .Get (_cdcf ));_geb {if int (*_abbe )==_dge {if _ccba :=_bbdc .Get (_cdcf +1);_ccba !=nil {if _fdaa ,_fcef :=_afa .GetArray (_ccba );_fcef {for _ ,_ega :=range _fdaa .Elements (){_ddb ,_cegf :=_ad .NewKDictFromPdfObject (_ega );
-if _cegf !=nil {_bg .Log .Debug ("\u0045\u0052\u0052\u004f\u0052\u003a \u0042\u0044\u0043\u0020\u006f\u0070\u003d\u0025\u0073\u002e\u0020\u0042\u0061d\u0020\u004b\u0044\u0069\u0063\u0074\u002e \u006f\u003d\u0025\u0073",_dded ,_ega );continue ;};_eec :=_ddb .GetChildren ();
-if len (_eec )==1&&_eec [0].GetMCID ()!=nil {if *_eec [0].GetMCID ()==_dea {if _ddb .ActualText !=nil {_aad =_faf .TrimSpace (_ddb .ActualText .Str ());};break ;}else if _afeb (_eec ){break ;};};};};};};};};};};};if _aad ==""{_edd :=_baad .Get ("\u0041\u0063\u0074\u0075\u0061\u006c\u0054\u0065\u0078\u0074");
-if _edd !=nil {_aad =_faf .TrimSpace (_edd .String ());};};case "\u0045\u004d\u0043":_dea =-1;_aad ="";case "\u0042\u0054":if _fgeg {_bg .Log .Debug ("\u0042\u0054\u0020\u0063\u0061\u006c\u006c\u0065\u0064\u0020\u0077\u0068\u0069\u006c\u0065 \u0069n\u0020\u0061\u0020\u0074\u0065\u0078\u0074\u0020\u006f\u0062\u006a\u0065\u0063\u0074");
-_ebf ._baaa =append (_ebf ._baaa ,_fbd ._fcbb ...);};_fgeg =true ;_bdea :=_gadfd ;if _bfcg {_bdea =_af .GraphicsState {};_bdea .CTM =_gadf ._fggg ;};_bdea .CTM =_ecb .Mult (_bdea .CTM );_fbd =_bggb (_aba ,_ggg ,_bdea ,&_bbfe ,&_fca );_gadf ._affd =_fbd ;
-case "\u0045\u0054":if !_fgeg {_bg .Log .Debug ("\u0045\u0054\u0020ca\u006c\u006c\u0065\u0064\u0020\u006f\u0075\u0074\u0073i\u0064e\u0020o\u0066 \u0061\u0020\u0074\u0065\u0078\u0074\u0020\u006f\u0062\u006a\u0065\u0063\u0074");};_fgeg =false ;_ebf ._baaa =append (_ebf ._baaa ,_fbd ._fcbb ...);
-_fbd .reset ();case "\u0054\u002a":_fbd .nextLine ();case "\u0054\u0064":if _ebba ,_ecg :=_fbd .checkOp (_dded ,2,true );!_ebba {_bg .Log .Debug ("\u0045\u0052\u0052\u004f\u0052\u003a\u0020\u0065\u0072\u0072\u003d\u0025\u0076",_ecg );return _ecg ;};_efabf ,_bggd ,_aed :=_ceae (_dded .Params );
-if _aed !=nil {return _aed ;};_fbd .moveText (_efabf ,_bggd );case "\u0054\u0044":if _gbfg ,_bdgg :=_fbd .checkOp (_dded ,2,true );!_gbfg {_bg .Log .Debug ("\u0045\u0052\u0052\u004f\u0052\u003a\u0020\u0065\u0072\u0072\u003d\u0025\u0076",_bdgg );return _bdgg ;
-};_egc ,_cfeg ,_cfad :=_ceae (_dded .Params );if _cfad !=nil {_bg .Log .Debug ("\u0045\u0052\u0052\u004f\u0052\u003a\u0020\u0065\u0072\u0072\u003d\u0025\u0076",_cfad );return _cfad ;};_fbd .moveTextSetLeading (_egc ,_cfeg );case "\u0054\u006a":if _deda ,_acfb :=_fbd .checkOp (_dded ,1,true );
-!_deda {_bg .Log .Debug ("\u0045\u0052\u0052\u004fR:\u0020\u0054\u006a\u0020\u006f\u0070\u003d\u0025\u0073\u0020\u0065\u0072\u0072\u003d%\u0076",_dded ,_acfb );return _acfb ;};_cefb :=_afa .TraceToDirectObject (_dded .Params [0]);_gbd ,_fga :=_afa .GetStringBytes (_cefb );
-if !_fga {_bg .Log .Debug ("\u0045\u0052R\u004f\u0052\u003a\u0020T\u006a\u0020o\u0070\u003d\u0025\u0073\u0020\u0047\u0065\u0074S\u0074\u0072\u0069\u006e\u0067\u0042\u0079\u0074\u0065\u0073\u0020\u0066a\u0069\u006c\u0065\u0064",_dded );return _afa .ErrTypeError ;
-};return _fbd .showText (_cefb ,_gbd ,_dea ,_aad );case "\u0054\u004a":if _acce ,_fbedf :=_fbd .checkOp (_dded ,1,true );!_acce {_bg .Log .Debug ("\u0045\u0052R\u004f\u0052\u003a \u0054\u004a\u0020\u0065\u0072\u0072\u003d\u0025\u0076",_fbedf );return _fbedf ;
-};_cde ,_eded :=_afa .GetArray (_dded .Params [0]);if !_eded {_bg .Log .Debug ("\u0045\u0052\u0052OR\u003a\u0020\u0054\u004a\u0020\u006f\u0070\u003d\u0025s\u0020G\u0065t\u0041r\u0072\u0061\u0079\u0056\u0061\u006c\u0020\u0066\u0061\u0069\u006c\u0065\u0064",_dded );
-return _becc ;};return _fbd .showTextAdjusted (_cde ,_dea ,_aad );case "\u0027":if _aff ,_gfbc :=_fbd .checkOp (_dded ,1,true );!_aff {_bg .Log .Debug ("\u0045R\u0052O\u0052\u003a\u0020\u0027\u0020\u0065\u0072\u0072\u003d\u0025\u0076",_gfbc );return _gfbc ;
-};_abfd :=_afa .TraceToDirectObject (_dded .Params [0]);_gaed ,_dfe :=_afa .GetStringBytes (_abfd );if !_dfe {_bg .Log .Debug ("\u0045\u0052RO\u0052\u003a\u0020'\u0020\u006f\u0070\u003d%s \u0047et\u0053\u0074\u0072\u0069\u006e\u0067\u0042yt\u0065\u0073\u0020\u0066\u0061\u0069\u006ce\u0064",_dded );
-return _afa .ErrTypeError ;};_fbd .nextLine ();return _fbd .showText (_abfd ,_gaed ,_dea ,_aad );case "\u0022":if _gcce ,_bfggb :=_fbd .checkOp (_dded ,3,true );!_gcce {_bg .Log .Debug ("\u0045R\u0052O\u0052\u003a\u0020\u0022\u0020\u0065\u0072\u0072\u003d\u0025\u0076",_bfggb );
-return _bfggb ;};_fgge ,_cgef ,_bfeb :=_ceae (_dded .Params [:2]);if _bfeb !=nil {return _bfeb ;};_gcgd :=_afa .TraceToDirectObject (_dded .Params [2]);_beae ,_acfg :=_afa .GetStringBytes (_gcgd );if !_acfg {_bg .Log .Debug ("\u0045\u0052RO\u0052\u003a\u0020\"\u0020\u006f\u0070\u003d%s \u0047et\u0053\u0074\u0072\u0069\u006e\u0067\u0042yt\u0065\u0073\u0020\u0066\u0061\u0069\u006ce\u0064",_dded );
-return _afa .ErrTypeError ;};_fbd .setCharSpacing (_fgge );_fbd .setWordSpacing (_cgef );_fbd .nextLine ();return _fbd .showText (_gcgd ,_beae ,_dea ,_aad );case "\u0054\u004c":_gfgdg ,_fagbb :=_dfabb (_dded );if _fagbb !=nil {_bg .Log .Debug ("\u0045\u0052R\u004f\u0052\u003a \u0054\u004c\u0020\u0065\u0072\u0072\u003d\u0025\u0076",_fagbb );
-return _fagbb ;};_fbd .setTextLeading (_gfgdg );case "\u0054\u0063":_fbc ,_fdgaa :=_dfabb (_dded );if _fdgaa !=nil {_bg .Log .Debug ("\u0045\u0052R\u004f\u0052\u003a \u0054\u0063\u0020\u0065\u0072\u0072\u003d\u0025\u0076",_fdgaa );return _fdgaa ;};_fbd .setCharSpacing (_fbc );
-case "\u0054\u0066":if _dga ,_geca :=_fbd .checkOp (_dded ,2,true );!_dga {_bg .Log .Debug ("\u0045\u0052R\u004f\u0052\u003a \u0054\u0066\u0020\u0065\u0072\u0072\u003d\u0025\u0076",_geca );return _geca ;};_efge ,_fdaf :=_afa .GetNameVal (_dded .Params [0]);
-if !_fdaf {_bg .Log .Debug ("\u0045\u0052\u0052\u004f\u0052\u003a \u0054\u0066\u0020\u006f\u0070\u003d\u0025\u0073\u0020\u0047\u0065\u0074\u004ea\u006d\u0065\u0056\u0061\u006c\u0020\u0066a\u0069\u006c\u0065\u0064",_dded );return _afa .ErrTypeError ;};_cfbd ,_bae :=_afa .GetNumberAsFloat (_dded .Params [1]);
-if !_fdaf {_bg .Log .Debug ("\u0045\u0052\u0052O\u0052\u003a\u0020\u0054\u0066\u0020\u006f\u0070\u003d\u0025\u0073\u0020\u0047\u0065\u0074\u0046\u006c\u006f\u0061\u0074\u0056\u0061\u006c\u0020\u0066\u0061\u0069\u006c\u0065d\u002e\u0020\u0065\u0072\u0072\u003d\u0025\u0076",_dded ,_bae );
-return _bae ;};_bae =_fbd .setFont (_efge ,_cfbd );_fbd ._fgad =_fb .Is (_bae ,_afa .ErrNotSupported );if _bae !=nil &&!_fbd ._fgad {return _bae ;};case "\u0054\u006d":if _cffb ,_afag :=_fbd .checkOp (_dded ,6,true );!_cffb {_bg .Log .Debug ("\u0045\u0052R\u004f\u0052\u003a \u0054\u006d\u0020\u0065\u0072\u0072\u003d\u0025\u0076",_afag );
-return _afag ;};_fbgdf ,_efe :=_afa .GetNumbersAsFloat (_dded .Params );if _efe !=nil {_bg .Log .Debug ("\u0045\u0052\u0052\u004f\u0052\u003a\u0020\u0065\u0072\u0072\u003d\u0025\u0076",_efe );return _efe ;};_fbd .setTextMatrix (_fbgdf );case "\u0054\u0072":if _fcga ,_gcca :=_fbd .checkOp (_dded ,1,true );
-!_fcga {_bg .Log .Debug ("\u0045\u0052R\u004f\u0052\u003a \u0054\u0072\u0020\u0065\u0072\u0072\u003d\u0025\u0076",_gcca );return _gcca ;};_bbfb ,_acdb :=_afa .GetIntVal (_dded .Params [0]);if !_acdb {_bg .Log .Debug ("\u0045\u0052\u0052\u004f\u0052\u003a\u0020\u0054\u0072\u0020\u006f\u0070\u003d\u0025\u0073 \u0047e\u0074\u0049\u006e\u0074\u0056\u0061\u006c\u0020\u0066\u0061\u0069\u006c\u0065\u0064",_dded );
-return _afa .ErrTypeError ;};_fbd .setTextRenderMode (_bbfb );case "\u0054\u0073":if _cagdg ,_cada :=_fbd .checkOp (_dded ,1,true );!_cagdg {_bg .Log .Debug ("\u0045\u0052R\u004f\u0052\u003a \u0054\u0073\u0020\u0065\u0072\u0072\u003d\u0025\u0076",_cada );
-return _cada ;};_dag ,_gecad :=_afa .GetNumberAsFloat (_dded .Params [0]);if _gecad !=nil {_bg .Log .Debug ("\u0045\u0052\u0052\u004f\u0052\u003a\u0020\u0065\u0072\u0072\u003d\u0025\u0076",_gecad );return _gecad ;};_fbd .setTextRise (_dag );case "\u0054\u0077":if _egbd ,_dfbf :=_fbd .checkOp (_dded ,1,true );
-!_egbd {_bg .Log .Debug ("\u0045\u0052\u0052\u004f\u0052\u003a\u0020\u0065\u0072\u0072\u003d\u0025\u0076",_dfbf );return _dfbf ;};_dfec ,_dce :=_afa .GetNumberAsFloat (_dded .Params [0]);if _dce !=nil {_bg .Log .Debug ("\u0045\u0052\u0052\u004f\u0052\u003a\u0020\u0065\u0072\u0072\u003d\u0025\u0076",_dce );
-return _dce ;};_fbd .setWordSpacing (_dfec );case "\u0054\u007a":if _abdae ,_bcad :=_fbd .checkOp (_dded ,1,true );!_abdae {_bg .Log .Debug ("\u0045\u0052\u0052\u004f\u0052\u003a\u0020\u0065\u0072\u0072\u003d\u0025\u0076",_bcad );return _bcad ;};_fbag ,_fadf :=_afa .GetNumberAsFloat (_dded .Params [0]);
-if _fadf !=nil {_bg .Log .Debug ("\u0045\u0052\u0052\u004f\u0052\u003a\u0020\u0065\u0072\u0072\u003d\u0025\u0076",_fadf );return _fadf ;};_fbd .setHorizScaling (_fbag );case "\u0063\u006d":if !_bfcg {_gadf ._fggg =_gadfd .CTM ;};if _gadf ._fggg .Singular (){_gada :=_cd .IdentityMatrix ().Translate (_gadf ._fggg .Translation ());
-_bg .Log .Debug ("S\u0069n\u0067\u0075\u006c\u0061\u0072\u0020\u0063\u0074m\u003d\u0025\u0073\u2192%s",_gadf ._fggg ,_gada );_gadf ._fggg =_gada ;};if _acge {_bg .Log .Info ("\u0063\u0074\u006d\u003d\u0025\u0073",_gadf ._fggg );};case "\u006d":if len (_dded .Params )!=2{_bg .Log .Debug ("\u0057\u0041\u0052\u004e\u003a\u0020\u0065\u0072\u0072o\u0072\u0020\u0077\u0068\u0069\u006c\u0065\u0020\u0070\u0072\u006f\u0063\u0065\u0073\u0073\u0069\u006e\u0067\u0020\u0060\u006d\u0060\u0020o\u0070\u0065r\u0061\u0074o\u0072\u003a\u0020\u0025\u0076\u002e\u0020\u004f\u0075\u0074\u0070\u0075\u0074 m\u0061\u0079\u0020\u0062\u0065\u0020\u0069\u006e\u0063o\u0072\u0072\u0065\u0063\u0074\u002e",_bf );
-return nil ;};_fdcb ,_dfbfb :=_afa .GetNumbersAsFloat (_dded .Params );if _dfbfb !=nil {return _dfbfb ;};_gadf .moveTo (_fdcb [0],_fdcb [1]);case "\u006c":if len (_dded .Params )!=2{_bg .Log .Debug ("\u0057\u0041\u0052\u004e\u003a\u0020\u0065\u0072\u0072o\u0072\u0020\u0077\u0068\u0069\u006c\u0065\u0020\u0070\u0072\u006f\u0063\u0065\u0073\u0073\u0069\u006e\u0067\u0020\u0060\u006c\u0060\u0020o\u0070\u0065r\u0061\u0074o\u0072\u003a\u0020\u0025\u0076\u002e\u0020\u004f\u0075\u0074\u0070\u0075\u0074 m\u0061\u0079\u0020\u0062\u0065\u0020\u0069\u006e\u0063o\u0072\u0072\u0065\u0063\u0074\u002e",_bf );
-return nil ;};_egce ,_gdb :=_afa .GetNumbersAsFloat (_dded .Params );if _gdb !=nil {return _gdb ;};_gadf .lineTo (_egce [0],_egce [1]);case "\u0063":if len (_dded .Params )!=6{return _bf ;};_cbe ,_ceda :=_afa .GetNumbersAsFloat (_dded .Params );if _ceda !=nil {return _ceda ;
-};_bg .Log .Debug ("\u0043u\u0062\u0069\u0063\u0020b\u0065\u007a\u0069\u0065\u0072 \u0070a\u0072a\u006d\u0073\u003a\u0020\u0025\u002e\u0032f",_cbe );_gadf .cubicTo (_cbe [0],_cbe [1],_cbe [2],_cbe [3],_cbe [4],_cbe [5]);case "\u0076","\u0079":if len (_dded .Params )!=4{return _bf ;
-};_edee ,_cfbdg :=_afa .GetNumbersAsFloat (_dded .Params );if _cfbdg !=nil {return _cfbdg ;};_bg .Log .Debug ("\u0043u\u0062\u0069\u0063\u0020b\u0065\u007a\u0069\u0065\u0072 \u0070a\u0072a\u006d\u0073\u003a\u0020\u0025\u002e\u0032f",_edee );_gadf .quadraticTo (_edee [0],_edee [1],_edee [2],_edee [3]);
-case "\u0068":_gadf .closePath ();case "\u0072\u0065":if len (_dded .Params )!=4{return _bf ;};_aadd ,_cfeb :=_afa .GetNumbersAsFloat (_dded .Params );if _cfeb !=nil {return _cfeb ;};_gadf .drawRectangle (_aadd [0],_aadd [1],_aadd [2],_aadd [3]);_gadf .closePath ();
-case "\u0053":_gadf .stroke (&_ebf ._addcd );_gadf .clearPath ();case "\u0073":_gadf .closePath ();_gadf .stroke (&_ebf ._addcd );_gadf .clearPath ();case "\u0046":_gadf .fill (&_ebf ._ddfd );_gadf .clearPath ();case "\u0066","\u0066\u002a":_gadf .closePath ();
-_gadf .fill (&_ebf ._ddfd );_gadf .clearPath ();case "\u0042","\u0042\u002a":_gadf .fill (&_ebf ._ddfd );_gadf .stroke (&_ebf ._addcd );_gadf .clearPath ();case "\u0062","\u0062\u002a":_gadf .closePath ();_gadf .fill (&_ebf ._ddfd );_gadf .stroke (&_ebf ._addcd );
-_gadf .clearPath ();case "\u006e":_gadf .clearPath ();case "\u0044\u006f":if len (_dded .Params )==0{_bg .Log .Debug ("\u0045\u0052\u0052\u004f\u0052\u003a\u0020\u0065\u0078\u0070\u0065\u0063\u0074\u0065\u0064\u0020\u0058\u004fbj\u0065c\u0074\u0020\u006e\u0061\u006d\u0065\u0020\u006f\u0070\u0065\u0072\u0061n\u0064\u0020\u0066\u006f\u0072\u0020\u0044\u006f\u0020\u006f\u0070\u0065\u0072\u0061\u0074\u006f\u0072.\u0020\u0047\u006f\u0074\u0020\u0025\u002b\u0076\u002e",_dded .Params );
-return _afa .ErrRangeError ;};_efeb ,_efbd :=_afa .GetName (_dded .Params [0]);if !_efbd {_bg .Log .Debug ("\u0045\u0052\u0052\u004f\u0052\u003a\u0020\u0069\u006e\u0076\u0061l\u0069\u0064\u0020\u0044\u006f\u0020\u006f\u0070e\u0072a\u0074\u006f\u0072\u0020\u0058\u004f\u0062\u006a\u0065\u0063\u0074\u0020\u006e\u0061\u006d\u0065\u0020\u006fp\u0065\u0072\u0061\u006e\u0064\u003a\u0020\u0025\u002b\u0076\u002e",_dded .Params [0]);
-return _afa .ErrTypeError ;};_ ,_dgce :=_ggg .GetXObjectByName (*_efeb );if _dgce !=_ad .XObjectTypeForm {break ;};_ffd ,_efbd :=_aba ._gdfc [_efeb .String ()];if !_efbd {_agcg ,_dbbg :=_ggg .GetXObjectFormByName (*_efeb );if _dbbg !=nil {_bg .Log .Debug ("\u0045R\u0052\u004f\u0052\u003a\u0020\u0025v",_dbbg );
-return _dbbg ;};_ecbdb ,_dbbg :=_agcg .GetContentStream ();if _dbbg !=nil {_bg .Log .Debug ("\u0045R\u0052\u004f\u0052\u003a\u0020\u0025v",_dbbg );return _dbbg ;};_cbad :=_agcg .Resources ;if _cbad ==nil {_cbad =_ggg ;};_bbgb :=_gadfd .CTM ;if _aedg ,_efdd :=_afa .GetArray (_agcg .Matrix );
-_efdd {_dbcd ,_dfbge :=_aedg .GetAsFloat64Slice ();if _dfbge !=nil {return _dfbge ;};if len (_dbcd )!=6{return _bf ;};_ecgc :=_cd .NewMatrix (_dbcd [0],_dbcd [1],_dbcd [2],_dbcd [3],_dbcd [4],_dbcd [5]);_bbgb =_gadfd .CTM .Mult (_ecgc );};_deb ,_gaba ,_dcc ,_dbbg :=_aba .extractPageText (string (_ecbdb ),_cbad ,_ecb .Mult (_bbgb ),_fbf +1,false );
-if _dbbg !=nil {_bg .Log .Debug ("\u0045R\u0052\u004f\u0052\u003a\u0020\u0025v",_dbbg );return _dbbg ;};_ffd =textResult {*_deb ,_gaba ,_dcc };_aba ._gdfc [_efeb .String ()]=_ffd ;};_gadf ._fggg =_gadfd .CTM ;if _acge {_bg .Log .Info ("\u0063\u0074\u006d\u003d\u0025\u0073",_gadf ._fggg );
-};_ebf ._baaa =append (_ebf ._baaa ,_ffd ._fafd ._baaa ...);_ebf ._addcd =append (_ebf ._addcd ,_ffd ._fafd ._addcd ...);_ebf ._ddfd =append (_ebf ._ddfd ,_ffd ._fafd ._ddfd ...);_bbfe ._fbef +=_ffd ._ggde ;_bbfe ._edabg +=_ffd ._eccf ;case "\u0072\u0067","\u0067","\u006b","\u0063\u0073","\u0073\u0063","\u0073\u0063\u006e":_fbd ._edcg .ColorspaceNonStroking =_gadfd .ColorspaceNonStroking ;
-_fbd ._edcg .ColorNonStroking =_gadfd .ColorNonStroking ;case "\u0052\u0047","\u0047","\u004b","\u0043\u0053","\u0053\u0043","\u0053\u0043\u004e":_fbd ._edcg .ColorspaceStroking =_gadfd .ColorspaceStroking ;_fbd ._edcg .ColorStroking =_gadfd .ColorStroking ;
-};return nil ;});_becc =_cfa .Process (_bbea );if _aba ._fag !=nil &&_aba ._fag .IncludeAnnotations &&!_bfcg {for _ ,_bcae :=range _aba ._gfcg {_bbge ,_beb :=_afa .GetDict (_bcae .AP );if !_beb {continue ;};_ggb ,_beb :=_bbge .Get ("\u004e").(*_afa .PdfObjectStream );
-if !_beb {continue ;};_febd ,_ebae :=_afa .DecodeStream (_ggb );if _ebae !=nil {_bg .Log .Debug ("\u0045\u0072\u0072\u006f\u0072\u0020\u006f\u006e\u0020\u0064\u0065c\u006f\u0064\u0065\u0020\u0073\u0074\u0072\u0065\u0061\u006d:\u0020\u0025\u0076",_ebae );
-continue ;};_caef :=_ggb .PdfObjectDictionary .Get ("\u0052e\u0073\u006f\u0075\u0072\u0063\u0065s");_ebab ,_ebae :=_ad .NewPdfPageResourcesFromDict (_caef .(*_afa .PdfObjectDictionary ));if _ebae !=nil {_bg .Log .Debug ("\u0045\u0072\u0072\u006f\u0072 \u006f\u006e\u0020\u0067\u0065\u0074\u0074\u0069\u006e\u0067\u0020\u0061\u006en\u006f\u0074\u0061\u0074\u0069\u006f\u006e\u0020\u0072\u0065\u0073\u006f\u0075\u0072\u0063\u0065\u0073\u003a\u0020\u0025\u0076",_ebae );
-continue ;};_aefg :=_cd .IdentityMatrix ();_fdfe ,_beb :=_ggb .PdfObjectDictionary .Get ("\u004d\u0061\u0074\u0072\u0069\u0078").(*_afa .PdfObjectArray );if _beb {_bfaa ,_dfdf :=_fdfe .GetAsFloat64Slice ();if _dfdf !=nil {_bg .Log .Debug ("\u0045\u0072\u0072or\u0020\u006f\u006e\u0020\u0067\u0065\u0074\u0074\u0069n\u0067 \u0066l\u006fa\u0074\u0036\u0034\u0020\u0073\u006c\u0069\u0063\u0065\u003a\u0020\u0025\u0076",_dfdf );
-continue ;};if len (_bfaa )!=6{_bg .Log .Debug ("I\u006e\u0076\u0061\u006c\u0069\u0064 \u006d\u0061\u0074\u0072\u0069\u0078\u0020\u0073\u006ci\u0063\u0065\u0020l\u0065n\u0067\u0074\u0068");continue ;};_aefg =_cd .NewMatrix (_bfaa [0],_bfaa [1],_bfaa [2],_bfaa [3],_bfaa [4],_bfaa [5]);
-};_cgbb ,_beb :=_aba ._acd [_ggb .String ()];if !_beb {_adae ,_eddb ,_dabe ,_gbfc :=_aba .extractPageText (string (_febd ),_ebab ,_aefg ,_fbf +1,true );if _gbfc !=nil {_bg .Log .Debug ("\u0045\u0052R\u004f\u0052\u0020\u0065x\u0074\u0072a\u0063\u0074\u0069\u006e\u0067\u0020\u0061\u006en\u006f\u0074\u0061\u0074\u0069\u006f\u006e\u0020\u0074\u0065\u0078\u0074s\u003a\u0020\u0025\u0076",_gbfc );
-continue ;};_cgbb =textResult {*_adae ,_eddb ,_dabe };_aba ._acd [_ggb .String ()]=_cgbb ;};_ebf ._baaa =append (_ebf ._baaa ,_cgbb ._fafd ._baaa ...);_ebf ._addcd =append (_ebf ._addcd ,_cgbb ._fafd ._addcd ...);_ebf ._ddfd =append (_ebf ._ddfd ,_cgbb ._fafd ._ddfd ...);
-_bbfe ._fbef +=_cgbb ._ggde ;_bbfe ._edabg +=_cgbb ._eccf ;};};return _ebf ,_bbfe ._fbef ,_bbfe ._edabg ,_becc ;};func _cbd (_adg *TextMarkArray ,_adb *string ,_bfb *int ,_gedd string )error {_caaac :=_adg .Elements ()[0].DirectObject ;_gfda ,_aec :=_afa .GetString (_caaac );
-if !_aec {return _fa .Errorf ("\u0075n\u0061\u0062l\u0065\u0020\u0074\u006f \u0067\u0065\u0074 \u0073\u0074\u0072\u0069\u006e\u0067\u0020\u0042\u0079te\u0073\u0020\u0066r\u006f\u006d \u0064\u0069\u0072\u0065\u0063\u0074O\u0062\u006ae\u0063\u0074");};_bbaa :=_cgcb (_adg );
-_dab ,_aec :=_afa .GetStringBytes (_caaac );if !_aec {return _afa .ErrTypeError ;};_cbg :=_adg .Elements ()[0].Font ;_acdf :=_edc (_dab ,_cbg );_bfa :="";_adc :=*_adb ;if len (_adc )> *_bfb {_bfa =_adc [*_bfb :*_bfb +len (_bbaa )];}else if *_bfb ==len (_gedd )-1&&len (_adc )> *_bfb {_bfa =_adc [*_bfb :];
-};_fagb :="";_aefd :=_faf .Split (_acdf ,"\u0020");_ceb :=_aefd [len (_aefd )-1];if _ceb ==_bbaa &&*_bfb ==0{_bcg :=_faf .LastIndex (_acdf ,_bbaa );_fagb =_dcff (_acdf ,_bcg ,len (_bbaa )+_bcg ,_bfa );}else if *_bfb ==len (_gedd )-1&&len (_adc )> *_bfb {_fagb =_faf .Replace (_acdf ,_bbaa ,_adc [*_bfb :],-1);
-}else {_fagb =_faf .Replace (_acdf ,_bbaa ,_bfa ,1);};_fffa (_gfda ,_fagb ,_cbg );*_bfb +=len (_bbaa );return nil ;};func (_edfa rulingList )tidied (_dbge string )rulingList {_abdc :=_edfa .removeDuplicates ();_abdc .log ("\u0075n\u0069\u0071\u0075\u0065\u0073");
-_dfgda :=_abdc .snapToGroups ();if _dfgda ==nil {return nil ;};_dfgda .sort ();if _feda {_bg .Log .Info ("\u0074\u0069\u0064i\u0065\u0064\u003a\u0020\u0025\u0071\u0020\u0076\u0065\u0063\u0073\u003d\u0025\u0064\u0020\u0075\u006e\u0069\u0071\u0075\u0065\u0073\u003d\u0025\u0064\u0020\u0063\u006f\u0061l\u0065\u0073\u0063\u0065\u0064\u003d\u0025\u0064",_dbge ,len (_edfa ),len (_abdc ),len (_dfgda ));
-};_dfgda .log ("\u0063o\u0061\u006c\u0065\u0073\u0063\u0065d");return _dfgda ;};
+func (_cabd *PageText) ApplyArea(bbox _ad.PdfRectangle) {
+	_acaa := make([]*textMark, 0, len(_cabd._baaa))
+	for _, _fbgb := range _cabd._baaa {
+		if _affce(_fbgb.bbox(), bbox) {
+			_acaa = append(_acaa, _fbgb)
+		}
+	}
+	var _dcca paraList
+	_cdbg := ""
+	_fegf := len(_acaa)
+	for _aced := 0; _aced < 360 && _fegf > 0; _aced += 90 {
+		_dgfb := make([]*textMark, 0, len(_acaa)-_fegf)
+		for _, _gbfb := range _acaa {
+			if _gbfb._cbgf == _aced {
+				_dgfb = append(_dgfb, _gbfb)
+			}
+		}
+		if len(_dgfb) > 0 {
+			if _cabd._acaf._eedf == ExtractionModePlain {
+				_cdbg += _gdcbe(_dgfb, _cabd._gfag)
+			} else {
+				_cbde := _gbcge(_dgfb, _cabd._gfag, nil, nil, _cabd._acaf._eedf == ExtractionModeLayoutNoBreaks)
+				_dcca = append(_dcca, _cbde...)
+			}
+			_fegf -= len(_dgfb)
+		}
+	}
+	if _cabd._acaf._eedf == ExtractionModePlain {
+		_cabd._dfcf = _cdbg
+	} else {
+		_abfce := new(_fg.Buffer)
+		_dcca.writeText(_abfce)
+		_cabd._dfcf = _abfce.String()
+		_cabd._abcd = _dcca.toTextMarks()
+		_cabd._abcf = _dcca.tables()
+	}
+}
+
+var (
+	_ccaba = map[rune]string{0x0060: "\u0300", 0x02CB: "\u0300", 0x0027: "\u0301", 0x00B4: "\u0301", 0x02B9: "\u0301", 0x02CA: "\u0301", 0x005E: "\u0302", 0x02C6: "\u0302", 0x007E: "\u0303", 0x02DC: "\u0303", 0x00AF: "\u0304", 0x02C9: "\u0304", 0x02D8: "\u0306", 0x02D9: "\u0307", 0x00A8: "\u0308", 0x00B0: "\u030a", 0x02DA: "\u030a", 0x02BA: "\u030b", 0x02DD: "\u030b", 0x02C7: "\u030c", 0x02C8: "\u030d", 0x0022: "\u030e", 0x02BB: "\u0312", 0x02BC: "\u0313", 0x0486: "\u0313", 0x055A: "\u0313", 0x02BD: "\u0314", 0x0485: "\u0314", 0x0559: "\u0314", 0x02D4: "\u031d", 0x02D5: "\u031e", 0x02D6: "\u031f", 0x02D7: "\u0320", 0x02B2: "\u0321", 0x00B8: "\u0327", 0x02CC: "\u0329", 0x02B7: "\u032b", 0x02CD: "\u0331", 0x005F: "\u0332", 0x204E: "\u0359"}
+)
+
+func (_aba *Extractor) extractPageText(_dfbd string, _bbea *_ad.PdfPageResources, _ecb _cd.Matrix, _fbf int, _bfcg bool) (*PageText, int, int, error) {
+	_bg.Log.Trace("\u0065x\u0074\u0072\u0061\u0063t\u0050\u0061\u0067\u0065\u0054e\u0078t\u003a \u006c\u0065\u0076\u0065\u006c\u003d\u0025d", _fbf)
+	_ebf := &PageText{_gfag: _aba._bgd, _acbg: _aba._gce, _gaef: _aba._caaa}
+	_bbfe := _ccdg(_aba._bgd)
+	var _fca stateStack
+	_fbd := _bggb(_aba, _bbea, _af.GraphicsState{}, &_bbfe, &_fca)
+	_gadf := shapesState{_dcfcb: _ecb, _fggg: _cd.IdentityMatrix(), _affd: _fbd}
+	var _fgeg bool
+	_dea := -1
+	_aad := ""
+	if _fbf > _ggfc {
+		_agde := _fb.New("\u0066\u006f\u0072\u006d s\u0074\u0061\u0063\u006b\u0020\u006f\u0076\u0065\u0072\u0066\u006c\u006f\u0077")
+		_bg.Log.Debug("\u0045\u0052\u0052\u004f\u0052\u003a \u0065\u0078\u0074\u0072\u0061\u0063\u0074\u0050\u0061\u0067\u0065\u0054\u0065\u0078\u0074\u002e\u0020\u0072\u0065\u0063u\u0072\u0073\u0069\u006f\u006e\u0020\u006c\u0065\u0076\u0065\u006c\u003d\u0025\u0064 \u0065r\u0072\u003d\u0025\u0076", _fbf, _agde)
+		return _ebf, _bbfe._fbef, _bbfe._edabg, _agde
+	}
+	_cgcf := _af.NewContentStreamParser(_dfbd)
+	_dbga, _becc := _cgcf.Parse()
+	if _becc != nil {
+		_bg.Log.Debug("\u0045\u0052\u0052\u004f\u0052\u003a\u0020e\u0078\u0074\u0072a\u0063\u0074\u0050\u0061g\u0065\u0054\u0065\u0078\u0074\u0020\u0070\u0061\u0072\u0073\u0065\u0020\u0066\u0061\u0069\u006c\u0065\u0064\u002e\u0020\u0065\u0072\u0072\u003d\u0025\u0076", _becc)
+		return _ebf, _bbfe._fbef, _bbfe._edabg, _becc
+	}
+	_ebf._cdgg = _dbga
+	_cfa := _af.NewContentStreamProcessor(*_dbga)
+	if _aba._fag != nil {
+		_cfa.SetRelaxedMode(_aba._fag.RelaxedMode)
+	}
+	_cfa.AddHandler(_af.HandlerConditionEnumAllOperands, "", func(_dded *_af.ContentStreamOperation, _gadfd _af.GraphicsState, _ggg *_ad.PdfPageResources) error {
+		_gged := _dded.Operand
+		if _bacad {
+			_bg.Log.Info("\u0026&\u0026\u0020\u006f\u0070\u003d\u0025s", _dded)
+		}
+		switch _gged {
+		case "\u0071":
+			if _acge {
+				_bg.Log.Info("\u0063\u0074\u006d\u003d\u0025\u0073", _gadf._fggg)
+			}
+			_fca.push(&_bbfe)
+		case "\u0051":
+			if !_fca.empty() {
+				_bbfe = *_fca.pop()
+			}
+			_gadf._fggg = _gadfd.CTM
+			if _acge {
+				_bg.Log.Info("\u0063\u0074\u006d\u003d\u0025\u0073", _gadf._fggg)
+			}
+		case "\u0042\u0044\u0043":
+			_baad, _ggff := _afa.GetDict(_dded.Params[1])
+			if !_ggff {
+				_bg.Log.Debug("\u0045\u0052\u0052O\u0052\u003a\u0020\u0042D\u0043\u0020\u006f\u0070\u003d\u0025\u0073 \u0047\u0065\u0074\u0044\u0069\u0063\u0074\u0020\u0066\u0061\u0069\u006c\u0065\u0064", _dded)
+				return _becc
+			}
+			_gae := _baad.Get("\u004d\u0043\u0049\u0044")
+			if _gae != nil {
+				_eaeg, _gbcg := _afa.GetIntVal(_gae)
+				if !_gbcg {
+					_bg.Log.Debug("\u0045R\u0052\u004fR\u003a\u0020\u0042\u0044C\u0020\u006f\u0070=\u0025\u0073\u002e\u0020\u0042\u0061\u0064\u0020\u006eum\u0065\u0072\u0069c\u0061\u006c \u006f\u0062\u006a\u0065\u0063\u0074.\u0020\u006f=\u0025\u0073", _dded, _gae)
+				}
+				_dea = _eaeg
+			} else {
+				_dea = -1
+			}
+			if _aba._gce != nil && _dea != -1 && _aba._efbg != -1 && _aba._gce.ParentTree != nil {
+				_dge := _aba._efbg
+				var _afeb func(_fbgd []*_ad.KValue) bool
+				_afeb = func(_gfge []*_ad.KValue) bool {
+					for _, _cae := range _gfge {
+						if _bged := _cae.GetKDict(); _bged != nil {
+							_ggedg := _bged.GetChildren()
+							if len(_ggedg) == 1 && _ggedg[0].GetMCID() != nil {
+								if *_ggedg[0].GetMCID() == _dea {
+									if _bged.ActualText != nil {
+										_aad = _faf.TrimSpace(_bged.ActualText.Str())
+										return true
+									}
+									return false
+								}
+							} else {
+								return _afeb(_ggedg)
+							}
+						}
+					}
+					return false
+				}
+				if _egd := _aba._gce.ParentTree.Get("\u004e\u0075\u006d\u0073"); _egd != nil {
+					_bbdc, _eacf := _afa.GetArray(_egd)
+					if !_eacf {
+						_bg.Log.Debug("\u0045\u0052\u0052\u004f\u0052\u003a\u0020\u0042\u0044\u0043\u0020\u006f\u0070\u003d\u0025\u0073\u002e\u0020\u0042\u0061\u0064\u0020\u004e\u0075m\u0073\u0020\u0061\u0072\u0072a\u0079\u002e \u006f\u003d\u0025\u0073", _dded, _egd)
+					} else {
+						for _cdcf := 0; _cdcf < _bbdc.Len(); _cdcf += 2 {
+							if _abbe, _geb := _afa.GetInt(_bbdc.Get(_cdcf)); _geb {
+								if int(*_abbe) == _dge {
+									if _ccba := _bbdc.Get(_cdcf + 1); _ccba != nil {
+										if _fdaa, _fcef := _afa.GetArray(_ccba); _fcef {
+											for _, _ega := range _fdaa.Elements() {
+												_ddb, _cegf := _ad.NewKDictFromPdfObject(_ega)
+												if _cegf != nil {
+													_bg.Log.Debug("\u0045\u0052\u0052\u004f\u0052\u003a \u0042\u0044\u0043\u0020\u006f\u0070\u003d\u0025\u0073\u002e\u0020\u0042\u0061d\u0020\u004b\u0044\u0069\u0063\u0074\u002e \u006f\u003d\u0025\u0073", _dded, _ega)
+													continue
+												}
+												_eec := _ddb.GetChildren()
+												if len(_eec) == 1 && _eec[0].GetMCID() != nil {
+													if *_eec[0].GetMCID() == _dea {
+														if _ddb.ActualText != nil {
+															_aad = _faf.TrimSpace(_ddb.ActualText.Str())
+														}
+														break
+													} else if _afeb(_eec) {
+														break
+													}
+												}
+											}
+										}
+									}
+								}
+							}
+						}
+					}
+				}
+			}
+			if _aad == "" {
+				_edd := _baad.Get("\u0041\u0063\u0074\u0075\u0061\u006c\u0054\u0065\u0078\u0074")
+				if _edd != nil {
+					_aad = _faf.TrimSpace(_edd.String())
+				}
+			}
+		case "\u0045\u004d\u0043":
+			_dea = -1
+			_aad = ""
+		case "\u0042\u0054":
+			if _fgeg {
+				_bg.Log.Debug("\u0042\u0054\u0020\u0063\u0061\u006c\u006c\u0065\u0064\u0020\u0077\u0068\u0069\u006c\u0065 \u0069n\u0020\u0061\u0020\u0074\u0065\u0078\u0074\u0020\u006f\u0062\u006a\u0065\u0063\u0074")
+				_ebf._baaa = append(_ebf._baaa, _fbd._fcbb...)
+			}
+			_fgeg = true
+			_bdea := _gadfd
+			if _bfcg {
+				_bdea = _af.GraphicsState{}
+				_bdea.CTM = _gadf._fggg
+			}
+			_bdea.CTM = _ecb.Mult(_bdea.CTM)
+			_fbd = _bggb(_aba, _ggg, _bdea, &_bbfe, &_fca)
+			_gadf._affd = _fbd
+		case "\u0045\u0054":
+			if !_fgeg {
+				_bg.Log.Debug("\u0045\u0054\u0020ca\u006c\u006c\u0065\u0064\u0020\u006f\u0075\u0074\u0073i\u0064e\u0020o\u0066 \u0061\u0020\u0074\u0065\u0078\u0074\u0020\u006f\u0062\u006a\u0065\u0063\u0074")
+			}
+			_fgeg = false
+			_ebf._baaa = append(_ebf._baaa, _fbd._fcbb...)
+			_fbd.reset()
+		case "\u0054\u002a":
+			_fbd.nextLine()
+		case "\u0054\u0064":
+			if _ebba, _ecg := _fbd.checkOp(_dded, 2, true); !_ebba {
+				_bg.Log.Debug("\u0045\u0052\u0052\u004f\u0052\u003a\u0020\u0065\u0072\u0072\u003d\u0025\u0076", _ecg)
+				return _ecg
+			}
+			_efabf, _bggd, _aed := _ceae(_dded.Params)
+			if _aed != nil {
+				return _aed
+			}
+			_fbd.moveText(_efabf, _bggd)
+		case "\u0054\u0044":
+			if _gbfg, _bdgg := _fbd.checkOp(_dded, 2, true); !_gbfg {
+				_bg.Log.Debug("\u0045\u0052\u0052\u004f\u0052\u003a\u0020\u0065\u0072\u0072\u003d\u0025\u0076", _bdgg)
+				return _bdgg
+			}
+			_egc, _cfeg, _cfad := _ceae(_dded.Params)
+			if _cfad != nil {
+				_bg.Log.Debug("\u0045\u0052\u0052\u004f\u0052\u003a\u0020\u0065\u0072\u0072\u003d\u0025\u0076", _cfad)
+				return _cfad
+			}
+			_fbd.moveTextSetLeading(_egc, _cfeg)
+		case "\u0054\u006a":
+			if _deda, _acfb := _fbd.checkOp(_dded, 1, true); !_deda {
+				_bg.Log.Debug("\u0045\u0052\u0052\u004fR:\u0020\u0054\u006a\u0020\u006f\u0070\u003d\u0025\u0073\u0020\u0065\u0072\u0072\u003d%\u0076", _dded, _acfb)
+				return _acfb
+			}
+			_cefb := _afa.TraceToDirectObject(_dded.Params[0])
+			_gbd, _fga := _afa.GetStringBytes(_cefb)
+			if !_fga {
+				_bg.Log.Debug("\u0045\u0052R\u004f\u0052\u003a\u0020T\u006a\u0020o\u0070\u003d\u0025\u0073\u0020\u0047\u0065\u0074S\u0074\u0072\u0069\u006e\u0067\u0042\u0079\u0074\u0065\u0073\u0020\u0066a\u0069\u006c\u0065\u0064", _dded)
+				return _afa.ErrTypeError
+			}
+			return _fbd.showText(_cefb, _gbd, _dea, _aad)
+		case "\u0054\u004a":
+			if _acce, _fbedf := _fbd.checkOp(_dded, 1, true); !_acce {
+				_bg.Log.Debug("\u0045\u0052R\u004f\u0052\u003a \u0054\u004a\u0020\u0065\u0072\u0072\u003d\u0025\u0076", _fbedf)
+				return _fbedf
+			}
+			_cde, _eded := _afa.GetArray(_dded.Params[0])
+			if !_eded {
+				_bg.Log.Debug("\u0045\u0052\u0052OR\u003a\u0020\u0054\u004a\u0020\u006f\u0070\u003d\u0025s\u0020G\u0065t\u0041r\u0072\u0061\u0079\u0056\u0061\u006c\u0020\u0066\u0061\u0069\u006c\u0065\u0064", _dded)
+				return _becc
+			}
+			return _fbd.showTextAdjusted(_cde, _dea, _aad)
+		case "\u0027":
+			if _aff, _gfbc := _fbd.checkOp(_dded, 1, true); !_aff {
+				_bg.Log.Debug("\u0045R\u0052O\u0052\u003a\u0020\u0027\u0020\u0065\u0072\u0072\u003d\u0025\u0076", _gfbc)
+				return _gfbc
+			}
+			_abfd := _afa.TraceToDirectObject(_dded.Params[0])
+			_gaed, _dfe := _afa.GetStringBytes(_abfd)
+			if !_dfe {
+				_bg.Log.Debug("\u0045\u0052RO\u0052\u003a\u0020'\u0020\u006f\u0070\u003d%s \u0047et\u0053\u0074\u0072\u0069\u006e\u0067\u0042yt\u0065\u0073\u0020\u0066\u0061\u0069\u006ce\u0064", _dded)
+				return _afa.ErrTypeError
+			}
+			_fbd.nextLine()
+			return _fbd.showText(_abfd, _gaed, _dea, _aad)
+		case "\u0022":
+			if _gcce, _bfggb := _fbd.checkOp(_dded, 3, true); !_gcce {
+				_bg.Log.Debug("\u0045R\u0052O\u0052\u003a\u0020\u0022\u0020\u0065\u0072\u0072\u003d\u0025\u0076", _bfggb)
+				return _bfggb
+			}
+			_fgge, _cgef, _bfeb := _ceae(_dded.Params[:2])
+			if _bfeb != nil {
+				return _bfeb
+			}
+			_gcgd := _afa.TraceToDirectObject(_dded.Params[2])
+			_beae, _acfg := _afa.GetStringBytes(_gcgd)
+			if !_acfg {
+				_bg.Log.Debug("\u0045\u0052RO\u0052\u003a\u0020\"\u0020\u006f\u0070\u003d%s \u0047et\u0053\u0074\u0072\u0069\u006e\u0067\u0042yt\u0065\u0073\u0020\u0066\u0061\u0069\u006ce\u0064", _dded)
+				return _afa.ErrTypeError
+			}
+			_fbd.setCharSpacing(_fgge)
+			_fbd.setWordSpacing(_cgef)
+			_fbd.nextLine()
+			return _fbd.showText(_gcgd, _beae, _dea, _aad)
+		case "\u0054\u004c":
+			_gfgdg, _fagbb := _dfabb(_dded)
+			if _fagbb != nil {
+				_bg.Log.Debug("\u0045\u0052R\u004f\u0052\u003a \u0054\u004c\u0020\u0065\u0072\u0072\u003d\u0025\u0076", _fagbb)
+				return _fagbb
+			}
+			_fbd.setTextLeading(_gfgdg)
+		case "\u0054\u0063":
+			_fbc, _fdgaa := _dfabb(_dded)
+			if _fdgaa != nil {
+				_bg.Log.Debug("\u0045\u0052R\u004f\u0052\u003a \u0054\u0063\u0020\u0065\u0072\u0072\u003d\u0025\u0076", _fdgaa)
+				return _fdgaa
+			}
+			_fbd.setCharSpacing(_fbc)
+		case "\u0054\u0066":
+			if _dga, _geca := _fbd.checkOp(_dded, 2, true); !_dga {
+				_bg.Log.Debug("\u0045\u0052R\u004f\u0052\u003a \u0054\u0066\u0020\u0065\u0072\u0072\u003d\u0025\u0076", _geca)
+				return _geca
+			}
+			_efge, _fdaf := _afa.GetNameVal(_dded.Params[0])
+			if !_fdaf {
+				_bg.Log.Debug("\u0045\u0052\u0052\u004f\u0052\u003a \u0054\u0066\u0020\u006f\u0070\u003d\u0025\u0073\u0020\u0047\u0065\u0074\u004ea\u006d\u0065\u0056\u0061\u006c\u0020\u0066a\u0069\u006c\u0065\u0064", _dded)
+				return _afa.ErrTypeError
+			}
+			_cfbd, _bae := _afa.GetNumberAsFloat(_dded.Params[1])
+			if !_fdaf {
+				_bg.Log.Debug("\u0045\u0052\u0052O\u0052\u003a\u0020\u0054\u0066\u0020\u006f\u0070\u003d\u0025\u0073\u0020\u0047\u0065\u0074\u0046\u006c\u006f\u0061\u0074\u0056\u0061\u006c\u0020\u0066\u0061\u0069\u006c\u0065d\u002e\u0020\u0065\u0072\u0072\u003d\u0025\u0076", _dded, _bae)
+				return _bae
+			}
+			_bae = _fbd.setFont(_efge, _cfbd)
+			_fbd._fgad = _fb.Is(_bae, _afa.ErrNotSupported)
+			if _bae != nil && !_fbd._fgad {
+				return _bae
+			}
+		case "\u0054\u006d":
+			if _cffb, _afag := _fbd.checkOp(_dded, 6, true); !_cffb {
+				_bg.Log.Debug("\u0045\u0052R\u004f\u0052\u003a \u0054\u006d\u0020\u0065\u0072\u0072\u003d\u0025\u0076", _afag)
+				return _afag
+			}
+			_fbgdf, _efe := _afa.GetNumbersAsFloat(_dded.Params)
+			if _efe != nil {
+				_bg.Log.Debug("\u0045\u0052\u0052\u004f\u0052\u003a\u0020\u0065\u0072\u0072\u003d\u0025\u0076", _efe)
+				return _efe
+			}
+			_fbd.setTextMatrix(_fbgdf)
+		case "\u0054\u0072":
+			if _fcga, _gcca := _fbd.checkOp(_dded, 1, true); !_fcga {
+				_bg.Log.Debug("\u0045\u0052R\u004f\u0052\u003a \u0054\u0072\u0020\u0065\u0072\u0072\u003d\u0025\u0076", _gcca)
+				return _gcca
+			}
+			_bbfb, _acdb := _afa.GetIntVal(_dded.Params[0])
+			if !_acdb {
+				_bg.Log.Debug("\u0045\u0052\u0052\u004f\u0052\u003a\u0020\u0054\u0072\u0020\u006f\u0070\u003d\u0025\u0073 \u0047e\u0074\u0049\u006e\u0074\u0056\u0061\u006c\u0020\u0066\u0061\u0069\u006c\u0065\u0064", _dded)
+				return _afa.ErrTypeError
+			}
+			_fbd.setTextRenderMode(_bbfb)
+		case "\u0054\u0073":
+			if _cagdg, _cada := _fbd.checkOp(_dded, 1, true); !_cagdg {
+				_bg.Log.Debug("\u0045\u0052R\u004f\u0052\u003a \u0054\u0073\u0020\u0065\u0072\u0072\u003d\u0025\u0076", _cada)
+				return _cada
+			}
+			_dag, _gecad := _afa.GetNumberAsFloat(_dded.Params[0])
+			if _gecad != nil {
+				_bg.Log.Debug("\u0045\u0052\u0052\u004f\u0052\u003a\u0020\u0065\u0072\u0072\u003d\u0025\u0076", _gecad)
+				return _gecad
+			}
+			_fbd.setTextRise(_dag)
+		case "\u0054\u0077":
+			if _egbd, _dfbf := _fbd.checkOp(_dded, 1, true); !_egbd {
+				_bg.Log.Debug("\u0045\u0052\u0052\u004f\u0052\u003a\u0020\u0065\u0072\u0072\u003d\u0025\u0076", _dfbf)
+				return _dfbf
+			}
+			_dfec, _dce := _afa.GetNumberAsFloat(_dded.Params[0])
+			if _dce != nil {
+				_bg.Log.Debug("\u0045\u0052\u0052\u004f\u0052\u003a\u0020\u0065\u0072\u0072\u003d\u0025\u0076", _dce)
+				return _dce
+			}
+			_fbd.setWordSpacing(_dfec)
+		case "\u0054\u007a":
+			if _abdae, _bcad := _fbd.checkOp(_dded, 1, true); !_abdae {
+				_bg.Log.Debug("\u0045\u0052\u0052\u004f\u0052\u003a\u0020\u0065\u0072\u0072\u003d\u0025\u0076", _bcad)
+				return _bcad
+			}
+			_fbag, _fadf := _afa.GetNumberAsFloat(_dded.Params[0])
+			if _fadf != nil {
+				_bg.Log.Debug("\u0045\u0052\u0052\u004f\u0052\u003a\u0020\u0065\u0072\u0072\u003d\u0025\u0076", _fadf)
+				return _fadf
+			}
+			_fbd.setHorizScaling(_fbag)
+		case "\u0063\u006d":
+			if !_bfcg {
+				_gadf._fggg = _gadfd.CTM
+			}
+			if _gadf._fggg.Singular() {
+				_gada := _cd.IdentityMatrix().Translate(_gadf._fggg.Translation())
+				_bg.Log.Debug("S\u0069n\u0067\u0075\u006c\u0061\u0072\u0020\u0063\u0074m\u003d\u0025\u0073\u2192%s", _gadf._fggg, _gada)
+				_gadf._fggg = _gada
+			}
+			if _acge {
+				_bg.Log.Info("\u0063\u0074\u006d\u003d\u0025\u0073", _gadf._fggg)
+			}
+		case "\u006d":
+			if len(_dded.Params) != 2 {
+				_bg.Log.Debug("\u0057\u0041\u0052\u004e\u003a\u0020\u0065\u0072\u0072o\u0072\u0020\u0077\u0068\u0069\u006c\u0065\u0020\u0070\u0072\u006f\u0063\u0065\u0073\u0073\u0069\u006e\u0067\u0020\u0060\u006d\u0060\u0020o\u0070\u0065r\u0061\u0074o\u0072\u003a\u0020\u0025\u0076\u002e\u0020\u004f\u0075\u0074\u0070\u0075\u0074 m\u0061\u0079\u0020\u0062\u0065\u0020\u0069\u006e\u0063o\u0072\u0072\u0065\u0063\u0074\u002e", _bf)
+				return nil
+			}
+			_fdcb, _dfbfb := _afa.GetNumbersAsFloat(_dded.Params)
+			if _dfbfb != nil {
+				return _dfbfb
+			}
+			_gadf.moveTo(_fdcb[0], _fdcb[1])
+		case "\u006c":
+			if len(_dded.Params) != 2 {
+				_bg.Log.Debug("\u0057\u0041\u0052\u004e\u003a\u0020\u0065\u0072\u0072o\u0072\u0020\u0077\u0068\u0069\u006c\u0065\u0020\u0070\u0072\u006f\u0063\u0065\u0073\u0073\u0069\u006e\u0067\u0020\u0060\u006c\u0060\u0020o\u0070\u0065r\u0061\u0074o\u0072\u003a\u0020\u0025\u0076\u002e\u0020\u004f\u0075\u0074\u0070\u0075\u0074 m\u0061\u0079\u0020\u0062\u0065\u0020\u0069\u006e\u0063o\u0072\u0072\u0065\u0063\u0074\u002e", _bf)
+				return nil
+			}
+			_egce, _gdb := _afa.GetNumbersAsFloat(_dded.Params)
+			if _gdb != nil {
+				return _gdb
+			}
+			_gadf.lineTo(_egce[0], _egce[1])
+		case "\u0063":
+			if len(_dded.Params) != 6 {
+				return _bf
+			}
+			_cbe, _ceda := _afa.GetNumbersAsFloat(_dded.Params)
+			if _ceda != nil {
+				return _ceda
+			}
+			_bg.Log.Debug("\u0043u\u0062\u0069\u0063\u0020b\u0065\u007a\u0069\u0065\u0072 \u0070a\u0072a\u006d\u0073\u003a\u0020\u0025\u002e\u0032f", _cbe)
+			_gadf.cubicTo(_cbe[0], _cbe[1], _cbe[2], _cbe[3], _cbe[4], _cbe[5])
+		case "\u0076", "\u0079":
+			if len(_dded.Params) != 4 {
+				return _bf
+			}
+			_edee, _cfbdg := _afa.GetNumbersAsFloat(_dded.Params)
+			if _cfbdg != nil {
+				return _cfbdg
+			}
+			_bg.Log.Debug("\u0043u\u0062\u0069\u0063\u0020b\u0065\u007a\u0069\u0065\u0072 \u0070a\u0072a\u006d\u0073\u003a\u0020\u0025\u002e\u0032f", _edee)
+			_gadf.quadraticTo(_edee[0], _edee[1], _edee[2], _edee[3])
+		case "\u0068":
+			_gadf.closePath()
+		case "\u0072\u0065":
+			if len(_dded.Params) != 4 {
+				return _bf
+			}
+			_aadd, _cfeb := _afa.GetNumbersAsFloat(_dded.Params)
+			if _cfeb != nil {
+				return _cfeb
+			}
+			_gadf.drawRectangle(_aadd[0], _aadd[1], _aadd[2], _aadd[3])
+			_gadf.closePath()
+		case "\u0053":
+			_gadf.stroke(&_ebf._addcd)
+			_gadf.clearPath()
+		case "\u0073":
+			_gadf.closePath()
+			_gadf.stroke(&_ebf._addcd)
+			_gadf.clearPath()
+		case "\u0046":
+			_gadf.fill(&_ebf._ddfd)
+			_gadf.clearPath()
+		case "\u0066", "\u0066\u002a":
+			_gadf.closePath()
+			_gadf.fill(&_ebf._ddfd)
+			_gadf.clearPath()
+		case "\u0042", "\u0042\u002a":
+			_gadf.fill(&_ebf._ddfd)
+			_gadf.stroke(&_ebf._addcd)
+			_gadf.clearPath()
+		case "\u0062", "\u0062\u002a":
+			_gadf.closePath()
+			_gadf.fill(&_ebf._ddfd)
+			_gadf.stroke(&_ebf._addcd)
+			_gadf.clearPath()
+		case "\u006e":
+			_gadf.clearPath()
+		case "\u0044\u006f":
+			if len(_dded.Params) == 0 {
+				_bg.Log.Debug("\u0045\u0052\u0052\u004f\u0052\u003a\u0020\u0065\u0078\u0070\u0065\u0063\u0074\u0065\u0064\u0020\u0058\u004fbj\u0065c\u0074\u0020\u006e\u0061\u006d\u0065\u0020\u006f\u0070\u0065\u0072\u0061n\u0064\u0020\u0066\u006f\u0072\u0020\u0044\u006f\u0020\u006f\u0070\u0065\u0072\u0061\u0074\u006f\u0072.\u0020\u0047\u006f\u0074\u0020\u0025\u002b\u0076\u002e", _dded.Params)
+				return _afa.ErrRangeError
+			}
+			_efeb, _efbd := _afa.GetName(_dded.Params[0])
+			if !_efbd {
+				_bg.Log.Debug("\u0045\u0052\u0052\u004f\u0052\u003a\u0020\u0069\u006e\u0076\u0061l\u0069\u0064\u0020\u0044\u006f\u0020\u006f\u0070e\u0072a\u0074\u006f\u0072\u0020\u0058\u004f\u0062\u006a\u0065\u0063\u0074\u0020\u006e\u0061\u006d\u0065\u0020\u006fp\u0065\u0072\u0061\u006e\u0064\u003a\u0020\u0025\u002b\u0076\u002e", _dded.Params[0])
+				return _afa.ErrTypeError
+			}
+			_, _dgce := _ggg.GetXObjectByName(*_efeb)
+			if _dgce != _ad.XObjectTypeForm {
+				break
+			}
+			_ffd, _efbd := _aba._gdfc[_efeb.String()]
+			if !_efbd {
+				_agcg, _dbbg := _ggg.GetXObjectFormByName(*_efeb)
+				if _dbbg != nil {
+					_bg.Log.Debug("\u0045R\u0052\u004f\u0052\u003a\u0020\u0025v", _dbbg)
+					return _dbbg
+				}
+				_ecbdb, _dbbg := _agcg.GetContentStream()
+				if _dbbg != nil {
+					_bg.Log.Debug("\u0045R\u0052\u004f\u0052\u003a\u0020\u0025v", _dbbg)
+					return _dbbg
+				}
+				_cbad := _agcg.Resources
+				if _cbad == nil {
+					_cbad = _ggg
+				}
+				_bbgb := _gadfd.CTM
+				if _aedg, _efdd := _afa.GetArray(_agcg.Matrix); _efdd {
+					_dbcd, _dfbge := _aedg.GetAsFloat64Slice()
+					if _dfbge != nil {
+						return _dfbge
+					}
+					if len(_dbcd) != 6 {
+						return _bf
+					}
+					_ecgc := _cd.NewMatrix(_dbcd[0], _dbcd[1], _dbcd[2], _dbcd[3], _dbcd[4], _dbcd[5])
+					_bbgb = _gadfd.CTM.Mult(_ecgc)
+				}
+				_deb, _gaba, _dcc, _dbbg := _aba.extractPageText(string(_ecbdb), _cbad, _ecb.Mult(_bbgb), _fbf+1, false)
+				if _dbbg != nil {
+					_bg.Log.Debug("\u0045R\u0052\u004f\u0052\u003a\u0020\u0025v", _dbbg)
+					return _dbbg
+				}
+				_ffd = textResult{*_deb, _gaba, _dcc}
+				_aba._gdfc[_efeb.String()] = _ffd
+			}
+			_gadf._fggg = _gadfd.CTM
+			if _acge {
+				_bg.Log.Info("\u0063\u0074\u006d\u003d\u0025\u0073", _gadf._fggg)
+			}
+			_ebf._baaa = append(_ebf._baaa, _ffd._fafd._baaa...)
+			_ebf._addcd = append(_ebf._addcd, _ffd._fafd._addcd...)
+			_ebf._ddfd = append(_ebf._ddfd, _ffd._fafd._ddfd...)
+			_bbfe._fbef += _ffd._ggde
+			_bbfe._edabg += _ffd._eccf
+		case "\u0072\u0067", "\u0067", "\u006b", "\u0063\u0073", "\u0073\u0063", "\u0073\u0063\u006e":
+			_fbd._edcg.ColorspaceNonStroking = _gadfd.ColorspaceNonStroking
+			_fbd._edcg.ColorNonStroking = _gadfd.ColorNonStroking
+		case "\u0052\u0047", "\u0047", "\u004b", "\u0043\u0053", "\u0053\u0043", "\u0053\u0043\u004e":
+			_fbd._edcg.ColorspaceStroking = _gadfd.ColorspaceStroking
+			_fbd._edcg.ColorStroking = _gadfd.ColorStroking
+		}
+		return nil
+	})
+	_becc = _cfa.Process(_bbea)
+	if _aba._fag != nil && _aba._fag.IncludeAnnotations && !_bfcg {
+		for _, _bcae := range _aba._gfcg {
+			_bbge, _beb := _afa.GetDict(_bcae.AP)
+			if !_beb {
+				continue
+			}
+			_ggb, _beb := _bbge.Get("\u004e").(*_afa.PdfObjectStream)
+			if !_beb {
+				continue
+			}
+			_febd, _ebae := _afa.DecodeStream(_ggb)
+			if _ebae != nil {
+				_bg.Log.Debug("\u0045\u0072\u0072\u006f\u0072\u0020\u006f\u006e\u0020\u0064\u0065c\u006f\u0064\u0065\u0020\u0073\u0074\u0072\u0065\u0061\u006d:\u0020\u0025\u0076", _ebae)
+				continue
+			}
+			_caef := _ggb.PdfObjectDictionary.Get("\u0052e\u0073\u006f\u0075\u0072\u0063\u0065s")
+			_ebab, _ebae := _ad.NewPdfPageResourcesFromDict(_caef.(*_afa.PdfObjectDictionary))
+			if _ebae != nil {
+				_bg.Log.Debug("\u0045\u0072\u0072\u006f\u0072 \u006f\u006e\u0020\u0067\u0065\u0074\u0074\u0069\u006e\u0067\u0020\u0061\u006en\u006f\u0074\u0061\u0074\u0069\u006f\u006e\u0020\u0072\u0065\u0073\u006f\u0075\u0072\u0063\u0065\u0073\u003a\u0020\u0025\u0076", _ebae)
+				continue
+			}
+			_aefg := _cd.IdentityMatrix()
+			_fdfe, _beb := _ggb.PdfObjectDictionary.Get("\u004d\u0061\u0074\u0072\u0069\u0078").(*_afa.PdfObjectArray)
+			if _beb {
+				_bfaa, _dfdf := _fdfe.GetAsFloat64Slice()
+				if _dfdf != nil {
+					_bg.Log.Debug("\u0045\u0072\u0072or\u0020\u006f\u006e\u0020\u0067\u0065\u0074\u0074\u0069n\u0067 \u0066l\u006fa\u0074\u0036\u0034\u0020\u0073\u006c\u0069\u0063\u0065\u003a\u0020\u0025\u0076", _dfdf)
+					continue
+				}
+				if len(_bfaa) != 6 {
+					_bg.Log.Debug("I\u006e\u0076\u0061\u006c\u0069\u0064 \u006d\u0061\u0074\u0072\u0069\u0078\u0020\u0073\u006ci\u0063\u0065\u0020l\u0065n\u0067\u0074\u0068")
+					continue
+				}
+				_aefg = _cd.NewMatrix(_bfaa[0], _bfaa[1], _bfaa[2], _bfaa[3], _bfaa[4], _bfaa[5])
+			}
+			_cgbb, _beb := _aba._acd[_ggb.String()]
+			if !_beb {
+				_adae, _eddb, _dabe, _gbfc := _aba.extractPageText(string(_febd), _ebab, _aefg, _fbf+1, true)
+				if _gbfc != nil {
+					_bg.Log.Debug("\u0045\u0052R\u004f\u0052\u0020\u0065x\u0074\u0072a\u0063\u0074\u0069\u006e\u0067\u0020\u0061\u006en\u006f\u0074\u0061\u0074\u0069\u006f\u006e\u0020\u0074\u0065\u0078\u0074s\u003a\u0020\u0025\u0076", _gbfc)
+					continue
+				}
+				_cgbb = textResult{*_adae, _eddb, _dabe}
+				_aba._acd[_ggb.String()] = _cgbb
+			}
+			_ebf._baaa = append(_ebf._baaa, _cgbb._fafd._baaa...)
+			_ebf._addcd = append(_ebf._addcd, _cgbb._fafd._addcd...)
+			_ebf._ddfd = append(_ebf._ddfd, _cgbb._fafd._ddfd...)
+			_bbfe._fbef += _cgbb._ggde
+			_bbfe._edabg += _cgbb._eccf
+		}
+	}
+	return _ebf, _bbfe._fbef, _bbfe._edabg, _becc
+}
+
+func _cbd(_adg *TextMarkArray, _adb *string, _bfb *int, _gedd string) error {
+	_caaac := _adg.Elements()[0].DirectObject
+	_gfda, _aec := _afa.GetString(_caaac)
+	if !_aec {
+		return _fa.Errorf("\u0075n\u0061\u0062l\u0065\u0020\u0074\u006f \u0067\u0065\u0074 \u0073\u0074\u0072\u0069\u006e\u0067\u0020\u0042\u0079te\u0073\u0020\u0066r\u006f\u006d \u0064\u0069\u0072\u0065\u0063\u0074O\u0062\u006ae\u0063\u0074")
+	}
+	_bbaa := _cgcb(_adg)
+	_dab, _aec := _afa.GetStringBytes(_caaac)
+	if !_aec {
+		return _afa.ErrTypeError
+	}
+	_cbg := _adg.Elements()[0].Font
+	_acdf := _edc(_dab, _cbg)
+	_bfa := ""
+	_adc := *_adb
+	if len(_adc) > *_bfb {
+		_bfa = _adc[*_bfb : *_bfb+len(_bbaa)]
+	} else if *_bfb == len(_gedd)-1 && len(_adc) > *_bfb {
+		_bfa = _adc[*_bfb:]
+	}
+	_fagb := ""
+	_aefd := _faf.Split(_acdf, "\u0020")
+	_ceb := _aefd[len(_aefd)-1]
+	if _ceb == _bbaa && *_bfb == 0 {
+		_bcg := _faf.LastIndex(_acdf, _bbaa)
+		_fagb = _dcff(_acdf, _bcg, len(_bbaa)+_bcg, _bfa)
+	} else if *_bfb == len(_gedd)-1 && len(_adc) > *_bfb {
+		_fagb = _faf.Replace(_acdf, _bbaa, _adc[*_bfb:], -1)
+	} else {
+		_fagb = _faf.Replace(_acdf, _bbaa, _bfa, 1)
+	}
+	_fffa(_gfda, _fagb, _cbg)
+	*_bfb += len(_bbaa)
+	return nil
+}
+
+func (_edfa rulingList) tidied(_dbge string) rulingList {
+	_abdc := _edfa.removeDuplicates()
+	_abdc.log("\u0075n\u0069\u0071\u0075\u0065\u0073")
+	_dfgda := _abdc.snapToGroups()
+	if _dfgda == nil {
+		return nil
+	}
+	_dfgda.sort()
+	if _feda {
+		_bg.Log.Info("\u0074\u0069\u0064i\u0065\u0064\u003a\u0020\u0025\u0071\u0020\u0076\u0065\u0063\u0073\u003d\u0025\u0064\u0020\u0075\u006e\u0069\u0071\u0075\u0065\u0073\u003d\u0025\u0064\u0020\u0063\u006f\u0061l\u0065\u0073\u0063\u0065\u0064\u003d\u0025\u0064", _dbge, len(_edfa), len(_abdc), len(_dfgda))
+	}
+	_dfgda.log("\u0063o\u0061\u006c\u0065\u0073\u0063\u0065d")
+	return _dfgda
+}
 
 // List returns all the list objects detected on the page.
 // It detects all the bullet point Lists from a given pdf page and builds a slice of bullet list objects.
@@ -410,319 +2727,2537 @@ _dfgda :=_abdc .snapToGroups ();if _dfgda ==nil {return nil ;};_dfgda .sort ();i
 //	    // handle error
 //	    lists := pageText.List()
 //	    txt := lists.Text()
-func (_cfeca PageText )List ()lists {_fcdcg :=!_cfeca ._acaf ._dfda ;_ggfce :=_cfeca .getParagraphs ();_dgfdd :=_ggfce .list ();if _cfeca ._acbg !=nil &&_fcdcg {_gbeg :=_ebeg (&_ggfce );if len (_cfeca ._acbg .K )==0{_bg .Log .Debug ("\u004c\u0069\u0073\u0074\u003a\u0020\u0073t\u0072\u0075\u0063\u0074\u0054\u0072\u0065\u0065\u0052\u006f\u006f\u0074\u0020\u0064\u006f\u0065\u0073\u006e'\u0074\u0020\u0068\u0061\u0076e\u0020\u0061\u006e\u0079\u0020\u0063\u006f\u006e\u0074e\u006e\u0074\u002c\u0020\u0075\u0073\u0069\u006e\u0067\u0020\u0074\u0065\u0078\u0074\u0020\u006d\u0061\u0074\u0063\u0068\u0069\u006e\u0067\u0020\u006d\u0065\u0074\u0068\u006f\u0064\u0020\u0069\u006e\u0073\u0074\u0065\u0061\u0064\u002e");
-return _dgfdd ;};_dgfdd =_cdcb (_cfeca ._acbg ,_gbeg ,_cfeca ._gaef );};return _dgfdd ;};
+func (_cfeca PageText) List() lists {
+	_fcdcg := !_cfeca._acaf._dfda
+	_ggfce := _cfeca.getParagraphs()
+	_dgfdd := _ggfce.list()
+	if _cfeca._acbg != nil && _fcdcg {
+		_gbeg := _ebeg(&_ggfce)
+		if len(_cfeca._acbg.K) == 0 {
+			_bg.Log.Debug("\u004c\u0069\u0073\u0074\u003a\u0020\u0073t\u0072\u0075\u0063\u0074\u0054\u0072\u0065\u0065\u0052\u006f\u006f\u0074\u0020\u0064\u006f\u0065\u0073\u006e'\u0074\u0020\u0068\u0061\u0076e\u0020\u0061\u006e\u0079\u0020\u0063\u006f\u006e\u0074e\u006e\u0074\u002c\u0020\u0075\u0073\u0069\u006e\u0067\u0020\u0074\u0065\u0078\u0074\u0020\u006d\u0061\u0074\u0063\u0068\u0069\u006e\u0067\u0020\u006d\u0065\u0074\u0068\u006f\u0064\u0020\u0069\u006e\u0073\u0074\u0065\u0061\u0064\u002e")
+			return _dgfdd
+		}
+		_dgfdd = _cdcb(_cfeca._acbg, _gbeg, _cfeca._gaef)
+	}
+	return _dgfdd
+}
 
 // ExtractPageText returns the text contents of `e` (an Extractor for a page) as a PageText.
 // TODO(peterwilliams97): The stats complicate this function signature and aren't very useful.
 //
 //	Replace with a function like Extract() (*PageText, error)
-func (_eefa *Extractor )ExtractPageText ()(*PageText ,int ,int ,error ){_fbg ,_cced ,_dca ,_gdg :=_eefa .extractPageText (_eefa ._cgc ,_eefa ._gab ,_cd .IdentityMatrix (),0,false );if _gdg !=nil &&_gdg !=_ad .ErrColorOutOfRange {return nil ,0,0,_gdg ;};
-if _eefa ._fag !=nil {_fbg ._acaf ._eedf =_eefa ._fag .ExtractionMode ;};_fbg .computeViews ();_gdg =_feced (_fbg );if _gdg !=nil {return nil ,0,0,_gdg ;};if _eefa ._fag !=nil {if _eefa ._fag .ApplyCropBox &&_eefa ._gdf !=nil {_fbg .ApplyArea (*_eefa ._gdf );
-};_fbg ._acaf ._dfda =_eefa ._fag .DisableDocumentTags ;};return _fbg ,_cced ,_dca ,nil ;};
+func (_eefa *Extractor) ExtractPageText() (*PageText, int, int, error) {
+	_fbg, _cced, _dca, _gdg := _eefa.extractPageText(_eefa._cgc, _eefa._gab, _cd.IdentityMatrix(), 0, false)
+	if _gdg != nil && _gdg != _ad.ErrColorOutOfRange {
+		return nil, 0, 0, _gdg
+	}
+	if _eefa._fag != nil {
+		_fbg._acaf._eedf = _eefa._fag.ExtractionMode
+	}
+	_fbg.computeViews()
+	_gdg = _feced(_fbg)
+	if _gdg != nil {
+		return nil, 0, 0, _gdg
+	}
+	if _eefa._fag != nil {
+		if _eefa._fag.ApplyCropBox && _eefa._gdf != nil {
+			_fbg.ApplyArea(*_eefa._gdf)
+		}
+		_fbg._acaf._dfda = _eefa._fag.DisableDocumentTags
+	}
+	return _fbg, _cced, _dca, nil
+}
 
 // String returns a description of `k`.
-func (_ddbge rulingKind )String ()string {_dgda ,_dcfe :=_gccbe [_ddbge ];if !_dcfe {return _fa .Sprintf ("\u004e\u006ft\u0020\u0061\u0020r\u0075\u006c\u0069\u006e\u0067\u003a\u0020\u0025\u0064",_ddbge );};return _dgda ;};
+func (_ddbge rulingKind) String() string {
+	_dgda, _dcfe := _gccbe[_ddbge]
+	if !_dcfe {
+		return _fa.Sprintf("\u004e\u006ft\u0020\u0061\u0020r\u0075\u006c\u0069\u006e\u0067\u003a\u0020\u0025\u0064", _ddbge)
+	}
+	return _dgda
+}
 
 // NewEditor returns a new Editor object
-func NewEditor (reader *_ad .PdfReader )*Editor {return &Editor {_fba :reader }};func (_efee *textObject )getFontDict (_fbaaf string )(_dbff _afa .PdfObject ,_cbdbc error ){_dafd :=_efee ._dfece ;if _dafd ==nil {_bg .Log .Debug ("g\u0065\u0074\u0046\u006f\u006e\u0074D\u0069\u0063\u0074\u002e\u0020\u004eo\u0020\u0072\u0065\u0073\u006f\u0075\u0072c\u0065\u0073\u002e\u0020\u006e\u0061\u006d\u0065\u003d\u0025#\u0071",_fbaaf );
-return nil ,nil ;};_dbff ,_ebda :=_dafd .GetFontByName (_afa .PdfObjectName (_fbaaf ));if !_ebda {_bg .Log .Debug ("\u0045R\u0052\u004fR\u003a\u0020\u0067\u0065t\u0046\u006f\u006et\u0044\u0069\u0063\u0074\u003a\u0020\u0046\u006f\u006et \u006e\u006f\u0074 \u0066\u006fu\u006e\u0064\u003a\u0020\u006e\u0061m\u0065\u003d%\u0023\u0071",_fbaaf );
-return nil ,_fb .New ("f\u006f\u006e\u0074\u0020no\u0074 \u0069\u006e\u0020\u0072\u0065s\u006f\u0075\u0072\u0063\u0065\u0073");};return _dbff ,nil ;};
+func NewEditor(reader *_ad.PdfReader) *Editor { return &Editor{_fba: reader} }
+
+func (_efee *textObject) getFontDict(_fbaaf string) (_dbff _afa.PdfObject, _cbdbc error) {
+	_dafd := _efee._dfece
+	if _dafd == nil {
+		_bg.Log.Debug("g\u0065\u0074\u0046\u006f\u006e\u0074D\u0069\u0063\u0074\u002e\u0020\u004eo\u0020\u0072\u0065\u0073\u006f\u0075\u0072c\u0065\u0073\u002e\u0020\u006e\u0061\u006d\u0065\u003d\u0025#\u0071", _fbaaf)
+		return nil, nil
+	}
+	_dbff, _ebda := _dafd.GetFontByName(_afa.PdfObjectName(_fbaaf))
+	if !_ebda {
+		_bg.Log.Debug("\u0045R\u0052\u004fR\u003a\u0020\u0067\u0065t\u0046\u006f\u006et\u0044\u0069\u0063\u0074\u003a\u0020\u0046\u006f\u006et \u006e\u006f\u0074 \u0066\u006fu\u006e\u0064\u003a\u0020\u006e\u0061m\u0065\u003d%\u0023\u0071", _fbaaf)
+		return nil, _fb.New("f\u006f\u006e\u0074\u0020no\u0074 \u0069\u006e\u0020\u0072\u0065s\u006f\u0075\u0072\u0063\u0065\u0073")
+	}
+	return _dbff, nil
+}
 
 // TextTable represents a table.
 // Cells are ordered top-to-bottom, left-to-right.
 // Cells[y] is the (0-offset) y'th row in the table.
 // Cells[y][x] is the (0-offset) x'th column in the table.
-type TextTable struct{_ad .PdfRectangle ;W ,H int ;Cells [][]TableCell ;};func _gd (_ba int )bool {return (_ba &1)==0};
+type TextTable struct {
+	_ad.PdfRectangle
+	W, H  int
+	Cells [][]TableCell
+}
+
+func _gd(_ba int) bool { return (_ba & 1) == 0 }
 
 // String returns a string descibing `i`.
-func (_afdc gridTile )String ()string {_bacdc :=func (_acdbe bool ,_debde string )string {if _acdbe {return _debde ;};return "\u005f";};return _fa .Sprintf ("\u00256\u002e2\u0066\u0020\u0025\u0031\u0073%\u0031\u0073%\u0031\u0073\u0025\u0031\u0073",_afdc .PdfRectangle ,_bacdc (_afdc ._dgaae ,"\u004c"),_bacdc (_afdc ._ebecd ,"\u0052"),_bacdc (_afdc ._cegae ,"\u0042"),_bacdc (_afdc ._eece ,"\u0054"));
-};func _bggg (_cagb _ad .PdfRectangle )*ruling {return &ruling {_gafe :_cafa ,_ecfb :_cagb .Ury ,_ggecg :_cagb .Llx ,_gebf :_cagb .Urx };};const (_gagg =false ;_ggcc =false ;_bacad =false ;_deea =false ;_acge =false ;_afga =false ;_aebc =false ;_ebbaf =false ;
-_aggg =false ;_fcbc =_aggg &&true ;_dac =_fcbc &&false ;_aggf =_aggg &&true ;_ggegb =false ;_gbef =_ggegb &&false ;_gade =_ggegb &&true ;_feda =false ;_aeff =_feda &&false ;_abcba =_feda &&false ;_cefd =_feda &&true ;_gdgd =_feda &&false ;_dgcca =_feda &&false ;
-);func (_gabag *textObject )getFontDirect (_bdf string )(*_ad .PdfFont ,error ){_fgf ,_abce :=_gabag .getFontDict (_bdf );if _abce !=nil {return nil ,_abce ;};_acab ,_abce :=_ad .NewPdfFontFromPdfObject (_fgf );if _abce !=nil {_bg .Log .Debug ("\u0067\u0065\u0074\u0046\u006f\u006e\u0074\u0044\u0069\u0072\u0065\u0063\u0074\u003a\u0020\u004e\u0065\u0077Pd\u0066F\u006f\u006e\u0074\u0046\u0072\u006f\u006d\u0050\u0064\u0066\u004f\u0062j\u0065\u0063\u0074\u0020\u0066\u0061\u0069\u006c\u0065\u0064\u002e\u0020\u006e\u0061\u006d\u0065\u003d%\u0023\u0071\u0020\u0065\u0072\u0072\u003d\u0025\u0076",_bdf ,_abce );
-};return _acab ,_abce ;};func (_dfca paraList )llyRange (_gcdbd []int ,_bbfbc ,_abca float64 )[]int {_bafg :=len (_dfca );if _abca < _dfca [_gcdbd [0]].Lly ||_bbfbc > _dfca [_gcdbd [_bafg -1]].Lly {return nil ;};_cbcf :=_eg .Search (_bafg ,func (_gfcd int )bool {return _dfca [_gcdbd [_gfcd ]].Lly >=_bbfbc });
-_fgbc :=_eg .Search (_bafg ,func (_abfff int )bool {return _dfca [_gcdbd [_abfff ]].Lly > _abca });return _gcdbd [_cbcf :_fgbc ];};func (_fecg *wordBag )minDepth ()float64 {return _fecg ._gdca -(_fecg .Ury -_fecg ._eagga )};func _daff (_ddgba []int )[]int {_egec :=make ([]int ,len (_ddgba ));
-for _gcfg ,_gedcf :=range _ddgba {_egec [len (_ddgba )-1-_gcfg ]=_gedcf ;};return _egec ;};
+func (_afdc gridTile) String() string {
+	_bacdc := func(_acdbe bool, _debde string) string {
+		if _acdbe {
+			return _debde
+		}
+		return "\u005f"
+	}
+	return _fa.Sprintf("\u00256\u002e2\u0066\u0020\u0025\u0031\u0073%\u0031\u0073%\u0031\u0073\u0025\u0031\u0073", _afdc.PdfRectangle, _bacdc(_afdc._dgaae, "\u004c"), _bacdc(_afdc._ebecd, "\u0052"), _bacdc(_afdc._cegae, "\u0042"), _bacdc(_afdc._eece, "\u0054"))
+}
+
+func _bggg(_cagb _ad.PdfRectangle) *ruling {
+	return &ruling{_gafe: _cafa, _ecfb: _cagb.Ury, _ggecg: _cagb.Llx, _gebf: _cagb.Urx}
+}
+
+const (
+	_gagg  = false
+	_ggcc  = false
+	_bacad = false
+	_deea  = false
+	_acge  = false
+	_afga  = false
+	_aebc  = false
+	_ebbaf = false
+	_aggg  = false
+	_fcbc  = _aggg && true
+	_dac   = _fcbc && false
+	_aggf  = _aggg && true
+	_ggegb = false
+	_gbef  = _ggegb && false
+	_gade  = _ggegb && true
+	_feda  = false
+	_aeff  = _feda && false
+	_abcba = _feda && false
+	_cefd  = _feda && true
+	_gdgd  = _feda && false
+	_dgcca = _feda && false
+)
+
+func (_gabag *textObject) getFontDirect(_bdf string) (*_ad.PdfFont, error) {
+	_fgf, _abce := _gabag.getFontDict(_bdf)
+	if _abce != nil {
+		return nil, _abce
+	}
+	_acab, _abce := _ad.NewPdfFontFromPdfObject(_fgf)
+	if _abce != nil {
+		_bg.Log.Debug("\u0067\u0065\u0074\u0046\u006f\u006e\u0074\u0044\u0069\u0072\u0065\u0063\u0074\u003a\u0020\u004e\u0065\u0077Pd\u0066F\u006f\u006e\u0074\u0046\u0072\u006f\u006d\u0050\u0064\u0066\u004f\u0062j\u0065\u0063\u0074\u0020\u0066\u0061\u0069\u006c\u0065\u0064\u002e\u0020\u006e\u0061\u006d\u0065\u003d%\u0023\u0071\u0020\u0065\u0072\u0072\u003d\u0025\u0076", _bdf, _abce)
+	}
+	return _acab, _abce
+}
+
+func (_dfca paraList) llyRange(_gcdbd []int, _bbfbc, _abca float64) []int {
+	_bafg := len(_dfca)
+	if _abca < _dfca[_gcdbd[0]].Lly || _bbfbc > _dfca[_gcdbd[_bafg-1]].Lly {
+		return nil
+	}
+	_cbcf := _eg.Search(_bafg, func(_gfcd int) bool { return _dfca[_gcdbd[_gfcd]].Lly >= _bbfbc })
+	_fgbc := _eg.Search(_bafg, func(_abfff int) bool { return _dfca[_gcdbd[_abfff]].Lly > _abca })
+	return _gcdbd[_cbcf:_fgbc]
+}
+
+func (_fecg *wordBag) minDepth() float64 { return _fecg._gdca - (_fecg.Ury - _fecg._eagga) }
+
+func _daff(_ddgba []int) []int {
+	_egec := make([]int, len(_ddgba))
+	for _gcfg, _gedcf := range _ddgba {
+		_egec[len(_ddgba)-1-_gcfg] = _gedcf
+	}
+	return _egec
+}
 
 // PageImages represents extracted images on a PDF page with spatial information:
 // display position and size.
-type PageImages struct{Images []ImageMark ;};func (_dcdc *textObject )getFont (_bbda string )(*_ad .PdfFont ,error ){if _dcdc ._bgbb ._bef !=nil {_bafc ,_bbeb :=_dcdc .getFontDict (_bbda );if _bbeb !=nil {_bg .Log .Debug ("\u0045\u0052\u0052OR\u003a\u0020\u0067\u0065\u0074\u0046\u006f\u006e\u0074:\u0020n\u0061m\u0065=\u0025\u0073\u002c\u0020\u0065\u0072\u0072\u006f\u0072\u003a\u0020\u0025\u0073",_bbda ,_bbeb .Error ());
-return nil ,_bbeb ;};_dcdc ._bgbb ._fac ++;_gdbc ,_decb :=_dcdc ._bgbb ._bef [_bafc .String ()];if _decb {_gdbc ._bad =_dcdc ._bgbb ._fac ;return _gdbc ._cggf ,nil ;};};_fabc ,_fed :=_dcdc .getFontDict (_bbda );if _fed !=nil {return nil ,_fed ;};_bfd ,_fed :=_dcdc .getFontDirect (_bbda );
-if _fed !=nil {return nil ,_fed ;};if _dcdc ._bgbb ._bef !=nil {_aae :=fontEntry {_bfd ,_dcdc ._bgbb ._fac };if len (_dcdc ._bgbb ._bef )>=_fbca {var _bgad []string ;for _fafab :=range _dcdc ._bgbb ._bef {_bgad =append (_bgad ,_fafab );};_eg .Slice (_bgad ,func (_deag ,_dgbb int )bool {return _dcdc ._bgbb ._bef [_bgad [_deag ]]._bad < _dcdc ._bgbb ._bef [_bgad [_dgbb ]]._bad ;
-});delete (_dcdc ._bgbb ._bef ,_bgad [0]);};_dcdc ._bgbb ._bef [_fabc .String ()]=_aae ;};return _bfd ,nil ;};func (_ecaf *wordBag )depthBand (_bcbab ,_bbeg float64 )[]int {if len (_ecaf ._fdeg )==0{return nil ;};return _ecaf .depthRange (_ecaf .getDepthIdx (_bcbab ),_ecaf .getDepthIdx (_bbeg ));
-};func (_gbdd *textTable )getRight ()paraList {_ffdc :=make (paraList ,_gbdd ._aaga );for _abfgf :=0;_abfgf < _gbdd ._aaga ;_abfgf ++{_dffe :=_gbdd .get (_gbdd ._cfadc -1,_abfgf )._badad ;if _dffe .taken (){return nil ;};_ffdc [_abfgf ]=_dffe ;};for _dadb :=0;
-_dadb < _gbdd ._aaga -1;_dadb ++{if _ffdc [_dadb ]._gdae !=_ffdc [_dadb +1]{return nil ;};};return _ffdc ;};func (_cegd *textObject )setTextRenderMode (_cbfa int ){if _cegd ==nil {return ;};_cegd ._dggef ._caad =RenderMode (_cbfa );};func (_acag *textObject )moveLP (_bede ,_gaga float64 ){_acag ._feec .Concat (_cd .NewMatrix (1,0,0,1,_bede ,_gaga ));
-_acag ._dfde =_acag ._feec ;};func _edc (_cace []byte ,_acg *_ad .PdfFont )string {_gad :=_acg .BytesToCharcodes (_cace );_bec ,_febgf ,_gfgd :=_acg .CharcodesToStrings (_gad ,"");if _gfgd > 0{_bg .Log .Debug ("\u0072\u0065nd\u0065\u0072\u0054e\u0078\u0074\u003a\u0020num\u0043ha\u0072\u0073\u003d\u0025\u0064\u0020\u006eum\u004d\u0069\u0073\u0073\u0065\u0073\u003d%\u0064",_febgf ,_gfgd );
-};_age :=_faf .Join (_bec ,"");return _age ;};func (_acbge intSet )has (_cfcfa int )bool {_ ,_ggaf :=_acbge [_cfcfa ];return _ggaf };
+type PageImages struct{ Images []ImageMark }
+
+func (_dcdc *textObject) getFont(_bbda string) (*_ad.PdfFont, error) {
+	if _dcdc._bgbb._bef != nil {
+		_bafc, _bbeb := _dcdc.getFontDict(_bbda)
+		if _bbeb != nil {
+			_bg.Log.Debug("\u0045\u0052\u0052OR\u003a\u0020\u0067\u0065\u0074\u0046\u006f\u006e\u0074:\u0020n\u0061m\u0065=\u0025\u0073\u002c\u0020\u0065\u0072\u0072\u006f\u0072\u003a\u0020\u0025\u0073", _bbda, _bbeb.Error())
+			return nil, _bbeb
+		}
+		_dcdc._bgbb._fac++
+		_gdbc, _decb := _dcdc._bgbb._bef[_bafc.String()]
+		if _decb {
+			_gdbc._bad = _dcdc._bgbb._fac
+			return _gdbc._cggf, nil
+		}
+	}
+	_fabc, _fed := _dcdc.getFontDict(_bbda)
+	if _fed != nil {
+		return nil, _fed
+	}
+	_bfd, _fed := _dcdc.getFontDirect(_bbda)
+	if _fed != nil {
+		return nil, _fed
+	}
+	if _dcdc._bgbb._bef != nil {
+		_aae := fontEntry{_bfd, _dcdc._bgbb._fac}
+		if len(_dcdc._bgbb._bef) >= _fbca {
+			var _bgad []string
+			for _fafab := range _dcdc._bgbb._bef {
+				_bgad = append(_bgad, _fafab)
+			}
+			_eg.Slice(_bgad, func(_deag, _dgbb int) bool {
+				return _dcdc._bgbb._bef[_bgad[_deag]]._bad < _dcdc._bgbb._bef[_bgad[_dgbb]]._bad
+			})
+			delete(_dcdc._bgbb._bef, _bgad[0])
+		}
+		_dcdc._bgbb._bef[_fabc.String()] = _aae
+	}
+	return _bfd, nil
+}
+
+func (_ecaf *wordBag) depthBand(_bcbab, _bbeg float64) []int {
+	if len(_ecaf._fdeg) == 0 {
+		return nil
+	}
+	return _ecaf.depthRange(_ecaf.getDepthIdx(_bcbab), _ecaf.getDepthIdx(_bbeg))
+}
+
+func (_gbdd *textTable) getRight() paraList {
+	_ffdc := make(paraList, _gbdd._aaga)
+	for _abfgf := 0; _abfgf < _gbdd._aaga; _abfgf++ {
+		_dffe := _gbdd.get(_gbdd._cfadc-1, _abfgf)._badad
+		if _dffe.taken() {
+			return nil
+		}
+		_ffdc[_abfgf] = _dffe
+	}
+	for _dadb := 0; _dadb < _gbdd._aaga-1; _dadb++ {
+		if _ffdc[_dadb]._gdae != _ffdc[_dadb+1] {
+			return nil
+		}
+	}
+	return _ffdc
+}
+
+func (_cegd *textObject) setTextRenderMode(_cbfa int) {
+	if _cegd == nil {
+		return
+	}
+	_cegd._dggef._caad = RenderMode(_cbfa)
+}
+
+func (_acag *textObject) moveLP(_bede, _gaga float64) {
+	_acag._feec.Concat(_cd.NewMatrix(1, 0, 0, 1, _bede, _gaga))
+	_acag._dfde = _acag._feec
+}
+
+func _edc(_cace []byte, _acg *_ad.PdfFont) string {
+	_gad := _acg.BytesToCharcodes(_cace)
+	_bec, _febgf, _gfgd := _acg.CharcodesToStrings(_gad, "")
+	if _gfgd > 0 {
+		_bg.Log.Debug("\u0072\u0065nd\u0065\u0072\u0054e\u0078\u0074\u003a\u0020num\u0043ha\u0072\u0073\u003d\u0025\u0064\u0020\u006eum\u004d\u0069\u0073\u0073\u0065\u0073\u003d%\u0064", _febgf, _gfgd)
+	}
+	_age := _faf.Join(_bec, "")
+	return _age
+}
+
+func (_acbge intSet) has(_cfcfa int) bool { _, _ggaf := _acbge[_cfcfa]; return _ggaf }
 
 // StrokePath is a stroked path.
-type StrokePath struct{Points []_cd .Point ;_cb .Color ;};func (_bccba *wordBag )text ()string {_fagcc :=_bccba .allWords ();_faag :=make ([]string ,len (_fagcc ));for _adec ,_ddee :=range _fagcc {_faag [_adec ]=_ddee ._fgaa ;};return _faf .Join (_faag ,"\u0020");
-};func (_fdg *imageExtractContext )extractXObjectImage (_geg *_afa .PdfObjectName ,_faa _af .GraphicsState ,_fdac *_ad .PdfPageResources )error {_bgfb ,_ :=_fdac .GetXObjectByName (*_geg );if _bgfb ==nil {return nil ;};_de ,_fae :=_fdg ._gcc [_bgfb ];if !_fae {_cce ,_adff :=_fdac .GetXObjectImageByName (*_geg );
-if _adff !=nil {return _adff ;};if _cce ==nil {return nil ;};_aefb ,_adff :=_cce .ToImage ();if _adff !=nil {return _adff ;};var _dgb _cg .Image ;if _cce .Mask !=nil {if _dgb ,_adff =_ffad (_cce .Mask ,_cb .Opaque );_adff !=nil {_bg .Log .Debug ("\u0057\u0041\u0052\u004e\u003a \u0063\u006f\u0075\u006c\u0064 \u006eo\u0074\u0020\u0067\u0065\u0074\u0020\u0065\u0078\u0070\u006c\u0069\u0063\u0069\u0074\u0020\u0069\u006d\u0061\u0067e\u0020\u006d\u0061\u0073\u006b\u002e\u0020\u004f\u0075\u0074\u0070\u0075\u0074\u0020\u006d\u0061\u0079\u0020\u0062\u0065\u0020\u0069\u006e\u0063o\u0072\u0072\u0065\u0063\u0074\u002e");
-};}else if _cce .SMask !=nil {_dgb ,_adff =_feaga (_cce .SMask ,_cb .Opaque );if _adff !=nil {_bg .Log .Debug ("W\u0041\u0052\u004e\u003a\u0020\u0063\u006f\u0075\u006c\u0064\u0020\u006e\u006f\u0074\u0020\u0067\u0065\u0074\u0020\u0073\u006f\u0066\u0074\u0020\u0069\u006da\u0067e\u0020\u006d\u0061\u0073k\u002e\u0020O\u0075\u0074\u0070\u0075\u0074\u0020\u006d\u0061\u0079\u0020\u0062\u0065\u0020\u0069\u006e\u0063\u006f\u0072\u0072\u0065\u0063\u0074\u002e");
-};};if _dgb !=nil {_cagd ,_faaf :=_aefb .ToGoImage ();if _faaf !=nil {return _faaf ;};_cagd =_dfbfba (_cagd ,_dgb );switch _cce .ColorSpace .String (){case "\u0044\u0065\u0076\u0069\u0063\u0065\u0047\u0072\u0061\u0079","\u0049n\u0064\u0065\u0078\u0065\u0064":_aefb ,_faaf =_ad .ImageHandling .NewGrayImageFromGoImage (_cagd );
-if _faaf !=nil {return _faaf ;};default:_aefb ,_faaf =_ad .ImageHandling .NewImageFromGoImage (_cagd );if _faaf !=nil {return _faaf ;};};};_de =&cachedImage {_bab :_aefb ,_ebaa :_cce .ColorSpace };_fdg ._gcc [_bgfb ]=_de ;};_dgfd :=_de ._bab ;_cabc :=_de ._ebaa ;
-_cgb ,_fffg :=_cabc .ImageToRGB (*_dgfd );if _fffg !=nil {return _fffg ;};_bg .Log .Debug ("@\u0044\u006f\u0020\u0043\u0054\u004d\u003a\u0020\u0025\u0073",_faa .CTM .String ());_ccd :=ImageMark {Image :&_cgb ,Width :_faa .CTM .ScalingFactorX (),Height :_faa .CTM .ScalingFactorY (),Angle :_faa .CTM .Angle ()};
-_ccd .X ,_ccd .Y =_faa .CTM .Translation ();_fdg ._fdc =append (_fdg ._fdc ,_ccd );_fdg ._ada ++;return nil ;};func _aabb (_aabg func (*wordBag ,*textWord ,float64 )bool ,_acfga float64 )func (*wordBag ,*textWord )bool {return func (_cefc *wordBag ,_feca *textWord )bool {return _aabg (_cefc ,_feca ,_acfga )};
-};func (_gfdga *textTable )toTextTable ()TextTable {if _ggegb {_bg .Log .Info ("t\u006fT\u0065\u0078\u0074\u0054\u0061\u0062\u006c\u0065:\u0020\u0025\u0064\u0020x \u0025\u0064",_gfdga ._cfadc ,_gfdga ._aaga );};_cbea :=make ([][]TableCell ,_gfdga ._aaga );
-for _baag :=0;_baag < _gfdga ._aaga ;_baag ++{_cbea [_baag ]=make ([]TableCell ,_gfdga ._cfadc );for _agfad :=0;_agfad < _gfdga ._cfadc ;_agfad ++{_dabb :=_gfdga .get (_agfad ,_baag );if _dabb ==nil {continue ;};_egef (_dabb ._feea );if _ggegb {_fa .Printf ("\u0025\u0034\u0064 \u0025\u0032\u0064\u003a\u0020\u0025\u0073\u000a",_agfad ,_baag ,_dabb );
-};_cbea [_baag ][_agfad ].Text =_dabb .text ();_gefce :=0;_cbea [_baag ][_agfad ].Marks ._fde =_dabb .toTextMarks (&_gefce );};};_cdff :=TextTable {W :_gfdga ._cfadc ,H :_gfdga ._aaga ,Cells :_cbea };_cdff .PdfRectangle =_gfdga .bbox ();return _cdff ;};
-func (_eggfc rulingList )toTilings ()(rulingList ,[]gridTiling ){_eggfc .log ("\u0074o\u0054\u0069\u006c\u0069\u006e\u0067s");if len (_eggfc )==0{return nil ,nil ;};_eggfc =_eggfc .tidied ("\u0061\u006c\u006c");_eggfc .log ("\u0074\u0069\u0064\u0069\u0065\u0064");
-_cdfdd :=_eggfc .toGrids ();_abef :=make ([]gridTiling ,len (_cdfdd ));for _cggfd ,_egfd :=range _cdfdd {_abef [_cggfd ]=_egfd .asTiling ();};return _eggfc ,_abef ;};func (_bgff *textPara )toCellTextMarks (_cffbc *int )[]TextMark {var _aaad []TextMark ;
-for _caadee ,_aecc :=range _bgff ._feea {_efabb :=_aecc .toTextMarks (_cffbc );_bfeg :=_bade &&_aecc .endsInHyphen ()&&_caadee !=len (_bgff ._feea )-1;if _bfeg {_efabb =_eecfb (_efabb ,_cffbc );};_aaad =append (_aaad ,_efabb ...);if !(_bfeg ||_caadee ==len (_bgff ._feea )-1){_aaad =_cfdbba (_aaad ,_cffbc ,_dcee (_aecc ._adaa ,_bgff ._feea [_caadee +1]._adaa ));
-};};return _aaad ;};func (_fgab lineRuling )asRuling ()(*ruling ,bool ){_acfc :=ruling {_gafe :_fgab ._efgdc ,Color :_fgab .Color ,_abddg :_ffcacd };switch _fgab ._efgdc {case _dcfdg :_acfc ._ecfb =_fgab .xMean ();_acfc ._ggecg =_c .Min (_fgab ._gfdac .Y ,_fgab ._bfbed .Y );
-_acfc ._gebf =_c .Max (_fgab ._gfdac .Y ,_fgab ._bfbed .Y );case _cafa :_acfc ._ecfb =_fgab .yMean ();_acfc ._ggecg =_c .Min (_fgab ._gfdac .X ,_fgab ._bfbed .X );_acfc ._gebf =_c .Max (_fgab ._gfdac .X ,_fgab ._bfbed .X );default:_bg .Log .Error ("\u0062\u0061\u0064\u0020pr\u0069\u006d\u0061\u0072\u0079\u0020\u006b\u0069\u006e\u0064\u003d\u0025\u0064",_fgab ._efgdc );
-return nil ,false ;};return &_acfc ,true ;};func (_agd *Editor )getMatches (_afgc string ,_ggda []int )(map[int ]Match ,map[int ][]*TextMarkArray ,error ){_gfd :=map[int ]Match {};_bag :=map[int ][]*TextMarkArray {};for _ ,_ceef :=range _ggda {_edb ,_ggc :=_agd ._fba .GetPage (_ceef );
-if _ggc !=nil {return nil ,nil ,_ggc ;};_cbf ,_ggc :=New (_edb );if _ggc !=nil {return nil ,nil ,_ggc ;};_fad ,_ ,_ ,_ggc :=_cbf .ExtractPageText ();if _ggc !=nil {return nil ,nil ,_ggc ;};_afdb :=_fad .Text ();_ec ,_ggc :=_eefg (_afgc ,_afdb );if _ggc !=nil {return nil ,nil ,_ggc ;
-};if len (_ec )==0{_bg .Log .Info ("\u004e\u006f\u0020\u006d\u0061\u0074\u0063\u0068\u0020\u0066\u006f\u0075\u006e\u0064\u0020f\u006fr\u0020\u0025\u0073\u0020\u006f\u006e\u0020\u0070\u0061\u0067\u0065\u0020\u0025\u0064",_afgc ,_ceef );};_gdc :=_fad .Marks ();
-_ggfa :=[]Box {};for _ ,_cca :=range _ec {_ ,_bcccf ,_ebd :=_adgc (_cca ,_gdc ,_afgc );if _ebd !=nil {return nil ,nil ,_ebd ;};_ggfa =append (_ggfa ,_bcccf );};_ceg :=Match {Pattern :_afgc ,Indexes :_ec ,Locations :_ggfa };_gfd [_ceef ]=_ceg ;};return _gfd ,_bag ,nil ;
-};func (_dgaa *wordBag )sort (){for _ ,_eeda :=range _dgaa ._fdeg {_eg .Slice (_eeda ,func (_fecf ,_gddg int )bool {return _cedab (_eeda [_fecf ],_eeda [_gddg ])< 0});};};func (_acdbf *textLine )bbox ()_ad .PdfRectangle {return _acdbf .PdfRectangle };func (_fefca gridTile )contains (_dbddb _ad .PdfRectangle )bool {if _fefca .numBorders ()< 3{return false ;
-};if _fefca ._dgaae &&_dbddb .Llx < _fefca .Llx -_cfed {return false ;};if _fefca ._ebecd &&_dbddb .Urx > _fefca .Urx +_cfed {return false ;};if _fefca ._cegae &&_dbddb .Lly < _fefca .Lly -_cfed {return false ;};if _fefca ._eece &&_dbddb .Ury > _fefca .Ury +_cfed {return false ;
-};return true ;};const (_bff =1.0e-6;_aebca =1.0e-4;_aeeb =10;_bbbb =6;_acdag =0.5;_egdcb =0.12;_degc =0.19;_dfdd =0.04;_ebed =1.0;_ccdd =0.04;_fafdg =12;_dgfc =0.4;_gdged =0.7;_cbcd =1.0;_fbeca =0.1;_cdbe =1.4;_fegfe =0.46;_gcdc =0.02;_edae =0.2;_fbdbe =0.5;
-_acba =4;_ddbe =4.0;_fdacb =6;_ddbg =0.3;_ffg =0.01;_eddbgd =0.02;_adgg =2;_eabb =2;_bdgd =500;_cfda =4.0;_efba =0.05;_fbcg =0.1;_edcb =2.0;_ddgfe =2.0;_cfed =1.5;_ccff =3.0;_fegg =0.25;);type lists []*list ;func _daaca (_dede *textLine ,_facbb []*textLine ,_acgf ,_ccbaa float64 )[]*textLine {_fcfef :=[]*textLine {};
-for _ ,_ggefb :=range _facbb {if _ggefb ._adaa >=_acgf {if _ccbaa !=-1&&_ggefb ._adaa < _ccbaa {if _ggefb .text ()!=_dede .text (){if _c .Round (_ggefb .Llx )< _c .Round (_dede .Llx ){break ;};_fcfef =append (_fcfef ,_ggefb );};}else if _ccbaa ==-1{if _ggefb ._adaa ==_dede ._adaa {if _ggefb .text ()!=_dede .text (){_fcfef =append (_fcfef ,_ggefb );
-};continue ;};_cbgd :=_fgdc (_dede ,_facbb );if _cbgd !=-1&&_ggefb ._adaa <=_cbgd {_fcfef =append (_fcfef ,_ggefb );};};};};return _fcfef ;};func (_bdaae rulingList )aligned ()bool {if len (_bdaae )< 2{return false ;};_baaba :=make (map[*ruling ]int );
-_baaba [_bdaae [0]]=0;for _ ,_acfca :=range _bdaae [1:]{_ecccd :=false ;for _feff :=range _baaba {if _acfca .gridIntersecting (_feff ){_baaba [_feff ]++;_ecccd =true ;break ;};};if !_ecccd {_baaba [_acfca ]=0;};};_fadbg :=0;for _ ,_ccfg :=range _baaba {if _ccfg ==0{_fadbg ++;
-};};_ecba :=float64 (_fadbg )/float64 (len (_bdaae ));_gcdgb :=_ecba <=1.0-_fegg ;if _feda {_bg .Log .Info ("\u0061\u006c\u0069\u0067\u006e\u0065\u0064\u003d\u0025\u0074\u0020\u0075\u006em\u0061\u0074\u0063\u0068\u0065\u0064=\u0025\u002e\u0032\u0066\u003d\u0025\u0064\u002f\u0025\u0064\u0020\u0076\u0065c\u0073\u003d\u0025\u0073",_gcdgb ,_ecba ,_fadbg ,len (_bdaae ),_bdaae .String ());
-};return _gcdgb ;};var _gaeg =TextMark {Text :"\u005b\u0058\u005d",Original :"\u0020",Meta :true ,FillColor :_cb .White ,StrokeColor :_cb .White };func (_cfbgf paraList )findTextTables ()[]*textTable {var _bdae []*textTable ;for _ ,_egfe :=range _cfbgf {if _egfe .taken ()||_egfe .Width ()==0{continue ;
-};_bbbc :=_egfe .isAtom ();if _bbbc ==nil {continue ;};_bbbc .growTable ();if _bbbc ._cfadc *_bbbc ._aaga < _fdacb {continue ;};_bbbc .markCells ();_bbbc .log ("\u0067\u0072\u006fw\u006e");_bdae =append (_bdae ,_bbbc );};return _bdae ;};
+type StrokePath struct {
+	Points []_cd.Point
+	_cb.Color
+}
+
+func (_bccba *wordBag) text() string {
+	_fagcc := _bccba.allWords()
+	_faag := make([]string, len(_fagcc))
+	for _adec, _ddee := range _fagcc {
+		_faag[_adec] = _ddee._fgaa
+	}
+	return _faf.Join(_faag, "\u0020")
+}
+
+func (_fdg *imageExtractContext) extractXObjectImage(_geg *_afa.PdfObjectName, _faa _af.GraphicsState, _fdac *_ad.PdfPageResources) error {
+	_bgfb, _ := _fdac.GetXObjectByName(*_geg)
+	if _bgfb == nil {
+		return nil
+	}
+	_de, _fae := _fdg._gcc[_bgfb]
+	if !_fae {
+		_cce, _adff := _fdac.GetXObjectImageByName(*_geg)
+		if _adff != nil {
+			return _adff
+		}
+		if _cce == nil {
+			return nil
+		}
+		_aefb, _adff := _cce.ToImage()
+		if _adff != nil {
+			return _adff
+		}
+		var _dgb _cg.Image
+		if _cce.Mask != nil {
+			if _dgb, _adff = _ffad(_cce.Mask, _cb.Opaque); _adff != nil {
+				_bg.Log.Debug("\u0057\u0041\u0052\u004e\u003a \u0063\u006f\u0075\u006c\u0064 \u006eo\u0074\u0020\u0067\u0065\u0074\u0020\u0065\u0078\u0070\u006c\u0069\u0063\u0069\u0074\u0020\u0069\u006d\u0061\u0067e\u0020\u006d\u0061\u0073\u006b\u002e\u0020\u004f\u0075\u0074\u0070\u0075\u0074\u0020\u006d\u0061\u0079\u0020\u0062\u0065\u0020\u0069\u006e\u0063o\u0072\u0072\u0065\u0063\u0074\u002e")
+			}
+		} else if _cce.SMask != nil {
+			_dgb, _adff = _feaga(_cce.SMask, _cb.Opaque)
+			if _adff != nil {
+				_bg.Log.Debug("W\u0041\u0052\u004e\u003a\u0020\u0063\u006f\u0075\u006c\u0064\u0020\u006e\u006f\u0074\u0020\u0067\u0065\u0074\u0020\u0073\u006f\u0066\u0074\u0020\u0069\u006da\u0067e\u0020\u006d\u0061\u0073k\u002e\u0020O\u0075\u0074\u0070\u0075\u0074\u0020\u006d\u0061\u0079\u0020\u0062\u0065\u0020\u0069\u006e\u0063\u006f\u0072\u0072\u0065\u0063\u0074\u002e")
+			}
+		}
+		if _dgb != nil {
+			_cagd, _faaf := _aefb.ToGoImage()
+			if _faaf != nil {
+				return _faaf
+			}
+			_cagd = _dfbfba(_cagd, _dgb)
+			switch _cce.ColorSpace.String() {
+			case "\u0044\u0065\u0076\u0069\u0063\u0065\u0047\u0072\u0061\u0079", "\u0049n\u0064\u0065\u0078\u0065\u0064":
+				_aefb, _faaf = _ad.ImageHandling.NewGrayImageFromGoImage(_cagd)
+				if _faaf != nil {
+					return _faaf
+				}
+			default:
+				_aefb, _faaf = _ad.ImageHandling.NewImageFromGoImage(_cagd)
+				if _faaf != nil {
+					return _faaf
+				}
+			}
+		}
+		_de = &cachedImage{_bab: _aefb, _ebaa: _cce.ColorSpace}
+		_fdg._gcc[_bgfb] = _de
+	}
+	_dgfd := _de._bab
+	_cabc := _de._ebaa
+	_cgb, _fffg := _cabc.ImageToRGB(*_dgfd)
+	if _fffg != nil {
+		return _fffg
+	}
+	_bg.Log.Debug("@\u0044\u006f\u0020\u0043\u0054\u004d\u003a\u0020\u0025\u0073", _faa.CTM.String())
+	_ccd := ImageMark{Image: &_cgb, Width: _faa.CTM.ScalingFactorX(), Height: _faa.CTM.ScalingFactorY(), Angle: _faa.CTM.Angle()}
+	_ccd.X, _ccd.Y = _faa.CTM.Translation()
+	_fdg._fdc = append(_fdg._fdc, _ccd)
+	_fdg._ada++
+	return nil
+}
+
+func _aabb(_aabg func(*wordBag, *textWord, float64) bool, _acfga float64) func(*wordBag, *textWord) bool {
+	return func(_cefc *wordBag, _feca *textWord) bool { return _aabg(_cefc, _feca, _acfga) }
+}
+
+func (_gfdga *textTable) toTextTable() TextTable {
+	if _ggegb {
+		_bg.Log.Info("t\u006fT\u0065\u0078\u0074\u0054\u0061\u0062\u006c\u0065:\u0020\u0025\u0064\u0020x \u0025\u0064", _gfdga._cfadc, _gfdga._aaga)
+	}
+	_cbea := make([][]TableCell, _gfdga._aaga)
+	for _baag := 0; _baag < _gfdga._aaga; _baag++ {
+		_cbea[_baag] = make([]TableCell, _gfdga._cfadc)
+		for _agfad := 0; _agfad < _gfdga._cfadc; _agfad++ {
+			_dabb := _gfdga.get(_agfad, _baag)
+			if _dabb == nil {
+				continue
+			}
+			_egef(_dabb._feea)
+			if _ggegb {
+				_fa.Printf("\u0025\u0034\u0064 \u0025\u0032\u0064\u003a\u0020\u0025\u0073\u000a", _agfad, _baag, _dabb)
+			}
+			_cbea[_baag][_agfad].Text = _dabb.text()
+			_gefce := 0
+			_cbea[_baag][_agfad].Marks._fde = _dabb.toTextMarks(&_gefce)
+		}
+	}
+	_cdff := TextTable{W: _gfdga._cfadc, H: _gfdga._aaga, Cells: _cbea}
+	_cdff.PdfRectangle = _gfdga.bbox()
+	return _cdff
+}
+
+func (_eggfc rulingList) toTilings() (rulingList, []gridTiling) {
+	_eggfc.log("\u0074o\u0054\u0069\u006c\u0069\u006e\u0067s")
+	if len(_eggfc) == 0 {
+		return nil, nil
+	}
+	_eggfc = _eggfc.tidied("\u0061\u006c\u006c")
+	_eggfc.log("\u0074\u0069\u0064\u0069\u0065\u0064")
+	_cdfdd := _eggfc.toGrids()
+	_abef := make([]gridTiling, len(_cdfdd))
+	for _cggfd, _egfd := range _cdfdd {
+		_abef[_cggfd] = _egfd.asTiling()
+	}
+	return _eggfc, _abef
+}
+
+func (_bgff *textPara) toCellTextMarks(_cffbc *int) []TextMark {
+	var _aaad []TextMark
+	for _caadee, _aecc := range _bgff._feea {
+		_efabb := _aecc.toTextMarks(_cffbc)
+		_bfeg := _bade && _aecc.endsInHyphen() && _caadee != len(_bgff._feea)-1
+		if _bfeg {
+			_efabb = _eecfb(_efabb, _cffbc)
+		}
+		_aaad = append(_aaad, _efabb...)
+		if !(_bfeg || _caadee == len(_bgff._feea)-1) {
+			_aaad = _cfdbba(_aaad, _cffbc, _dcee(_aecc._adaa, _bgff._feea[_caadee+1]._adaa))
+		}
+	}
+	return _aaad
+}
+
+func (_fgab lineRuling) asRuling() (*ruling, bool) {
+	_acfc := ruling{_gafe: _fgab._efgdc, Color: _fgab.Color, _abddg: _ffcacd}
+	switch _fgab._efgdc {
+	case _dcfdg:
+		_acfc._ecfb = _fgab.xMean()
+		_acfc._ggecg = _c.Min(_fgab._gfdac.Y, _fgab._bfbed.Y)
+		_acfc._gebf = _c.Max(_fgab._gfdac.Y, _fgab._bfbed.Y)
+	case _cafa:
+		_acfc._ecfb = _fgab.yMean()
+		_acfc._ggecg = _c.Min(_fgab._gfdac.X, _fgab._bfbed.X)
+		_acfc._gebf = _c.Max(_fgab._gfdac.X, _fgab._bfbed.X)
+	default:
+		_bg.Log.Error("\u0062\u0061\u0064\u0020pr\u0069\u006d\u0061\u0072\u0079\u0020\u006b\u0069\u006e\u0064\u003d\u0025\u0064", _fgab._efgdc)
+		return nil, false
+	}
+	return &_acfc, true
+}
+
+func (_agd *Editor) getMatches(_afgc string, _ggda []int) (map[int]Match, map[int][]*TextMarkArray, error) {
+	_gfd := map[int]Match{}
+	_bag := map[int][]*TextMarkArray{}
+	for _, _ceef := range _ggda {
+		_edb, _ggc := _agd._fba.GetPage(_ceef)
+		if _ggc != nil {
+			return nil, nil, _ggc
+		}
+		_cbf, _ggc := New(_edb)
+		if _ggc != nil {
+			return nil, nil, _ggc
+		}
+		_fad, _, _, _ggc := _cbf.ExtractPageText()
+		if _ggc != nil {
+			return nil, nil, _ggc
+		}
+		_afdb := _fad.Text()
+		_ec, _ggc := _eefg(_afgc, _afdb)
+		if _ggc != nil {
+			return nil, nil, _ggc
+		}
+		if len(_ec) == 0 {
+			_bg.Log.Info("\u004e\u006f\u0020\u006d\u0061\u0074\u0063\u0068\u0020\u0066\u006f\u0075\u006e\u0064\u0020f\u006fr\u0020\u0025\u0073\u0020\u006f\u006e\u0020\u0070\u0061\u0067\u0065\u0020\u0025\u0064", _afgc, _ceef)
+		}
+		_gdc := _fad.Marks()
+		_ggfa := []Box{}
+		for _, _cca := range _ec {
+			_, _bcccf, _ebd := _adgc(_cca, _gdc, _afgc)
+			if _ebd != nil {
+				return nil, nil, _ebd
+			}
+			_ggfa = append(_ggfa, _bcccf)
+		}
+		_ceg := Match{Pattern: _afgc, Indexes: _ec, Locations: _ggfa}
+		_gfd[_ceef] = _ceg
+	}
+	return _gfd, _bag, nil
+}
+
+func (_dgaa *wordBag) sort() {
+	for _, _eeda := range _dgaa._fdeg {
+		_eg.Slice(_eeda, func(_fecf, _gddg int) bool { return _cedab(_eeda[_fecf], _eeda[_gddg]) < 0 })
+	}
+}
+
+func (_acdbf *textLine) bbox() _ad.PdfRectangle { return _acdbf.PdfRectangle }
+
+func (_fefca gridTile) contains(_dbddb _ad.PdfRectangle) bool {
+	if _fefca.numBorders() < 3 {
+		return false
+	}
+	if _fefca._dgaae && _dbddb.Llx < _fefca.Llx-_cfed {
+		return false
+	}
+	if _fefca._ebecd && _dbddb.Urx > _fefca.Urx+_cfed {
+		return false
+	}
+	if _fefca._cegae && _dbddb.Lly < _fefca.Lly-_cfed {
+		return false
+	}
+	if _fefca._eece && _dbddb.Ury > _fefca.Ury+_cfed {
+		return false
+	}
+	return true
+}
+
+const (
+	_bff    = 1.0e-6
+	_aebca  = 1.0e-4
+	_aeeb   = 10
+	_bbbb   = 6
+	_acdag  = 0.5
+	_egdcb  = 0.12
+	_degc   = 0.19
+	_dfdd   = 0.04
+	_ebed   = 1.0
+	_ccdd   = 0.04
+	_fafdg  = 12
+	_dgfc   = 0.4
+	_gdged  = 0.7
+	_cbcd   = 1.0
+	_fbeca  = 0.1
+	_cdbe   = 1.4
+	_fegfe  = 0.46
+	_gcdc   = 0.02
+	_edae   = 0.2
+	_fbdbe  = 0.5
+	_acba   = 4
+	_ddbe   = 4.0
+	_fdacb  = 6
+	_ddbg   = 0.3
+	_ffg    = 0.01
+	_eddbgd = 0.02
+	_adgg   = 2
+	_eabb   = 2
+	_bdgd   = 500
+	_cfda   = 4.0
+	_efba   = 0.05
+	_fbcg   = 0.1
+	_edcb   = 2.0
+	_ddgfe  = 2.0
+	_cfed   = 1.5
+	_ccff   = 3.0
+	_fegg   = 0.25
+)
+
+type lists []*list
+
+func _daaca(_dede *textLine, _facbb []*textLine, _acgf, _ccbaa float64) []*textLine {
+	_fcfef := []*textLine{}
+	for _, _ggefb := range _facbb {
+		if _ggefb._adaa >= _acgf {
+			if _ccbaa != -1 && _ggefb._adaa < _ccbaa {
+				if _ggefb.text() != _dede.text() {
+					if _c.Round(_ggefb.Llx) < _c.Round(_dede.Llx) {
+						break
+					}
+					_fcfef = append(_fcfef, _ggefb)
+				}
+			} else if _ccbaa == -1 {
+				if _ggefb._adaa == _dede._adaa {
+					if _ggefb.text() != _dede.text() {
+						_fcfef = append(_fcfef, _ggefb)
+					}
+					continue
+				}
+				_cbgd := _fgdc(_dede, _facbb)
+				if _cbgd != -1 && _ggefb._adaa <= _cbgd {
+					_fcfef = append(_fcfef, _ggefb)
+				}
+			}
+		}
+	}
+	return _fcfef
+}
+
+func (_bdaae rulingList) aligned() bool {
+	if len(_bdaae) < 2 {
+		return false
+	}
+	_baaba := make(map[*ruling]int)
+	_baaba[_bdaae[0]] = 0
+	for _, _acfca := range _bdaae[1:] {
+		_ecccd := false
+		for _feff := range _baaba {
+			if _acfca.gridIntersecting(_feff) {
+				_baaba[_feff]++
+				_ecccd = true
+				break
+			}
+		}
+		if !_ecccd {
+			_baaba[_acfca] = 0
+		}
+	}
+	_fadbg := 0
+	for _, _ccfg := range _baaba {
+		if _ccfg == 0 {
+			_fadbg++
+		}
+	}
+	_ecba := float64(_fadbg) / float64(len(_bdaae))
+	_gcdgb := _ecba <= 1.0-_fegg
+	if _feda {
+		_bg.Log.Info("\u0061\u006c\u0069\u0067\u006e\u0065\u0064\u003d\u0025\u0074\u0020\u0075\u006em\u0061\u0074\u0063\u0068\u0065\u0064=\u0025\u002e\u0032\u0066\u003d\u0025\u0064\u002f\u0025\u0064\u0020\u0076\u0065c\u0073\u003d\u0025\u0073", _gcdgb, _ecba, _fadbg, len(_bdaae), _bdaae.String())
+	}
+	return _gcdgb
+}
+
+var _gaeg = TextMark{Text: "\u005b\u0058\u005d", Original: "\u0020", Meta: true, FillColor: _cb.White, StrokeColor: _cb.White}
+
+func (_cfbgf paraList) findTextTables() []*textTable {
+	var _bdae []*textTable
+	for _, _egfe := range _cfbgf {
+		if _egfe.taken() || _egfe.Width() == 0 {
+			continue
+		}
+		_bbbc := _egfe.isAtom()
+		if _bbbc == nil {
+			continue
+		}
+		_bbbc.growTable()
+		if _bbbc._cfadc*_bbbc._aaga < _fdacb {
+			continue
+		}
+		_bbbc.markCells()
+		_bbbc.log("\u0067\u0072\u006fw\u006e")
+		_bdae = append(_bdae, _bbbc)
+	}
+	return _bdae
+}
 
 // ExtractStrokePaths processes and extracts all stroke paths in content streams.
-func (_gedb *Extractor )ExtractStrokePaths ()([]StrokePath ,error ){_dbf ,_ ,_ ,_ebb :=_gedb .ExtractPageText ();if _ebb !=nil {return nil ,_ebb ;};_cggb :=[]StrokePath {};for _ ,_fdcd :=range _dbf ._addcd {_edab :=StrokePath {Color :_fdcd .Color ,Points :[]_cd .Point {}};
-for _ ,_dad :=range _fdcd ._fdgf {_edab .Points =append (_edab .Points ,_dad ._bfgb ...);};_cggb =append (_cggb ,_edab );};return _cggb ,nil ;};func _cfcef (_fdcdb ,_edbaf _ad .PdfRectangle )bool {return _edbaf .Llx <=_fdcdb .Urx &&_fdcdb .Llx <=_edbaf .Urx ;
-};func (_fgcg paraList )reorder (_ccfc []int ){_ccgfc :=make (paraList ,len (_fgcg ));for _gaaa ,_bcff :=range _ccfc {_ccgfc [_gaaa ]=_fgcg [_bcff ];};copy (_fgcg ,_ccgfc );};func _cedab (_bedcc ,_efgb bounded )float64 {return _bedcc .bbox ().Llx -_efgb .bbox ().Llx };
-func _afg (_bdb []rune )BidiText {_dg :=-1;_bc :=false ;_gg :=true ;_cge :=len (_bdb );_ab :=make ([]string ,_cge );_fcd :=make ([]string ,_cge );if _cge ==0||_bc {return _ae (string (_bdb ),_gg ,_bc );};_dd :=0;for _cdb ,_dgg :=range _bdb {_ab [_cdb ]=string (_dgg );
-_fdf :="\u004c";if _dgg <=0x00ff{_fdf =_d [_dgg ];}else if 0x0590<=_dgg &&_dgg <=0x05f4{_fdf ="\u0052";}else if 0x0600<=_dgg &&_dgg <=0x06ff{_bbb :=_dgg &0xff;if int (_bbb )>=len (_cbb ){_bg .Log .Debug ("\u0042\u0069\u0064\u0069\u003a\u0020\u0069\u006e\u0076\u0061\u006c\u0069\u0064\u0020\u0055n\u0069c\u006f\u0064\u0065\u0020\u0063\u0068\u0061\u0072\u0061\u0063\u0074\u0065\u0072\u0020"+string (_dgg ));
-};_fdf =_cbb [_dgg &0xff];}else if (0x0700<=_dgg &&_dgg <=0x08ac)||(0xfb50<=_dgg &&_dgg <=0xfdff)||(0xfe70<=_dgg &&_dgg <=0xfeff){_fdf ="\u0041\u004c";};if _fdf =="\u0052"||_fdf =="\u0041\u004c"||_fdf =="\u0041\u004e"{_dd ++;};_fcd [_cdb ]=_fdf ;};if _dd ==0{_gg =true ;
-return _ae (string (_bdb ),_gg ,false );};if _dg ==-1{if float64 (_dd )/float64 (_cge )< 0.3&&_cge > 4{_gg =true ;_dg =0;}else {_gg =false ;_dg =1;};};var _agb []int ;for range _bdb {_agb =append (_agb ,_dg );};_fda :="\u004c";if _ee (_dg ){_fda ="\u0052";
-};_ddg :=_fda ;_bbd :=_ddg ;_cf :=_ddg ;for _efb :=range _bdb {if _fcd [_efb ]=="\u004e\u0053\u004d"{_fcd [_efb ]=_cf ;}else {_cf =_fcd [_efb ];};};_cf =_ddg ;var _ce string ;for _bdg :=range _bdb {_ce =_fcd [_bdg ];if _ce =="\u0045\u004e"{if _cf =="\u0041\u004c"{_fcd [_bdg ]="\u0041\u004e";
-}else {_fcd [_bdg ]="\u0045\u004e";};}else if _ce =="\u0052"||_ce =="\u004c"||_ce =="\u0041\u004c"{_cf =_ce ;};};for _agc :=range _bdb {_gfc :=_fcd [_agc ];if _gfc =="\u0041\u004c"{_fcd [_agc ]="\u0052";};};for _dda :=1;_dda < (len (_bdb )-1);_dda ++{if _fcd [_dda ]=="\u0045\u0053"&&_fcd [_dda -1]=="\u0045\u004e"&&_fcd [_dda +1]=="\u0045\u004e"{_fcd [_dda ]="\u0045\u004e";
-};if _fcd [_dda ]=="\u0043\u0053"&&(_fcd [_dda -1]=="\u0045\u004e"||_fcd [_dda -1]=="\u0041\u004e")&&_fcd [_dda +1]==_fcd [_dda -1]{_fcd [_dda ]=_fcd [_dda -1];};};for _abf :=range _bdb {if _fcd [_abf ]=="\u0045\u004e"{for _cdf :=_abf -1;_cdf >=0;_cdf --{if _fcd [_cdf ]!="\u0045\u0054"{break ;
-};_fcd [_cdf ]="\u0045\u004e";};for _efd :=_abf +1;_efd < _cge ;_efd ++{if _fcd [_efd ]!="\u0045\u0054"{break ;};_fcd [_efd ]="\u0045\u004e";};};};for _gc :=range _bdb {_aef :=_fcd [_gc ];if _aef =="\u0057\u0053"||_aef =="\u0045\u0053"||_aef =="\u0045\u0054"||_aef =="\u0043\u0053"{_fcd [_gc ]="\u004f\u004e";
-};};_cf ="\u0073\u006f\u0072";for _ebe :=range _bdb {_aeg :=_fcd [_ebe ];if _aeg =="\u0045\u004e"{if _cf =="\u004c"{_fcd [_ebe ]="\u004c";}else {_fcd [_ebe ]="\u0045\u004e";};}else if _aeg =="\u0052"||_aeg =="\u004c"{_cf =_aeg ;};};for _ed :=0;_ed < len (_bdb );
-_ed ++{if _fcd [_ed ]=="\u004f\u004e"{_dfb :=_ebc (_fcd ,_ed +1,"\u004f\u004e");_ggf :=_bbd ;if _ed > 0{_ggf =_fcd [_ed -1];};_fgb :=_bbd ;if _dfb +1< _cge {_fgb =_fcd [_dfb +1];};if _ggf !="\u004c"{_ggf ="\u0052";};if _fgb !="\u004c"{_fgb ="\u0052";};
-if _ggf ==_fgb {_bgg (_fcd ,_ed ,_dfb ,_ggf );};_ed =_dfb -1;};};for _ddgb :=range _bdb {if _fcd [_ddgb ]=="\u004f\u004e"{_fcd [_ddgb ]=_fda ;};};for _bcf :=range _bdb {_gcf :=_fcd [_bcf ];if _gd (_agb [_bcf ]){if _gcf =="\u0052"{_agb [_bcf ]++;}else if _gcf =="\u0041\u004e"||_gcf =="\u0045\u004e"{_agb [_bcf ]+=2;
-};}else if _gcf =="\u004c"||_gcf =="\u0041\u004e"||_gcf =="\u0045\u004e"{_agb [_bcf ]++;};};_bbf :=-1;_gba :=99;var _cddg int ;for _gff :=0;_gff < len (_agb );_gff ++{_cddg =_agb [_gff ];if _bbf < _cddg {_bbf =_cddg ;};if _gba > _cddg &&_ee (_cddg ){_gba =_cddg ;
-};};for _edg :=_bbf ;_edg >=_gba ;_edg --{_ff :=-1;for _ac :=0;_ac < len (_agb );_ac ++{if _agb [_ac ]< _edg {if _ff >=0{_df (_ab ,_ff ,_ac );_ff =-1;};}else if _ff < 0{_ff =_ac ;};};if _ff >=0{_df (_ab ,_ff ,len (_agb ));};};for _ffe :=0;_ffe < len (_ab );
-_ffe ++{_bgb :=_ab [_ffe ];if _bgb =="\u003c"||_bgb =="\u003e"{_ab [_ffe ]="";};};return _ae (_faf .Join (_ab ,""),_gg ,false );};func _acfd (_cfdb bounded )float64 {return -_cfdb .bbox ().Lly };func _fgdc (_bgcga *textLine ,_cebc []*textLine )float64 {var _fefd float64 =-1;
-for _ ,_bbgcg :=range _cebc {if _bbgcg ._adaa > _bgcga ._adaa {if _c .Round (_bbgcg .Llx )>=_c .Round (_bgcga .Llx ){_fefd =_bbgcg ._adaa ;}else {break ;};};};return _fefd ;};func (_edaa *stateStack )top ()*textState {if _edaa .empty (){return nil ;};return (*_edaa )[_edaa .size ()-1];
-};func (_bfbf *wordBag )applyRemovals (_egcb map[int ]map[*textWord ]struct{}){for _gcdf ,_dabd :=range _egcb {if len (_dabd )==0{continue ;};_dbffb :=_bfbf ._fdeg [_gcdf ];_gaegg :=len (_dbffb )-len (_dabd );if _gaegg ==0{delete (_bfbf ._fdeg ,_gcdf );
-continue ;};_fcfc :=make ([]*textWord ,_gaegg );_decd :=0;for _ ,_bgbg :=range _dbffb {if _ ,_cfdf :=_dabd [_bgbg ];!_cfdf {_fcfc [_decd ]=_bgbg ;_decd ++;};};_bfbf ._fdeg [_gcdf ]=_fcfc ;};};func (_cccdc *textTable )isExportable ()bool {if _cccdc ._cegab {return true ;
-};_beca :=func (_ffgd int )bool {_gdafa :=_cccdc .get (0,_ffgd );if _gdafa ==nil {return false ;};_agbaf :=_gdafa .text ();_bgfeb :=_a .RuneCountInString (_agbaf );_ebfe :=_cadaa .MatchString (_agbaf );return _bgfeb <=1||_ebfe ;};for _fbefe :=0;_fbefe < _cccdc ._aaga ;
-_fbefe ++{if !_beca (_fbefe ){return true ;};};return false ;};
+func (_gedb *Extractor) ExtractStrokePaths() ([]StrokePath, error) {
+	_dbf, _, _, _ebb := _gedb.ExtractPageText()
+	if _ebb != nil {
+		return nil, _ebb
+	}
+	_cggb := []StrokePath{}
+	for _, _fdcd := range _dbf._addcd {
+		_edab := StrokePath{Color: _fdcd.Color, Points: []_cd.Point{}}
+		for _, _dad := range _fdcd._fdgf {
+			_edab.Points = append(_edab.Points, _dad._bfgb...)
+		}
+		_cggb = append(_cggb, _edab)
+	}
+	return _cggb, nil
+}
+
+func _cfcef(_fdcdb, _edbaf _ad.PdfRectangle) bool {
+	return _edbaf.Llx <= _fdcdb.Urx && _fdcdb.Llx <= _edbaf.Urx
+}
+
+func (_fgcg paraList) reorder(_ccfc []int) {
+	_ccgfc := make(paraList, len(_fgcg))
+	for _gaaa, _bcff := range _ccfc {
+		_ccgfc[_gaaa] = _fgcg[_bcff]
+	}
+	copy(_fgcg, _ccgfc)
+}
+
+func _cedab(_bedcc, _efgb bounded) float64 { return _bedcc.bbox().Llx - _efgb.bbox().Llx }
+
+func _afg(_bdb []rune) BidiText {
+	_dg := -1
+	_bc := false
+	_gg := true
+	_cge := len(_bdb)
+	_ab := make([]string, _cge)
+	_fcd := make([]string, _cge)
+	if _cge == 0 || _bc {
+		return _ae(string(_bdb), _gg, _bc)
+	}
+	_dd := 0
+	for _cdb, _dgg := range _bdb {
+		_ab[_cdb] = string(_dgg)
+		_fdf := "\u004c"
+		if _dgg <= 0x00ff {
+			_fdf = _d[_dgg]
+		} else if 0x0590 <= _dgg && _dgg <= 0x05f4 {
+			_fdf = "\u0052"
+		} else if 0x0600 <= _dgg && _dgg <= 0x06ff {
+			_bbb := _dgg & 0xff
+			if int(_bbb) >= len(_cbb) {
+				_bg.Log.Debug("\u0042\u0069\u0064\u0069\u003a\u0020\u0069\u006e\u0076\u0061\u006c\u0069\u0064\u0020\u0055n\u0069c\u006f\u0064\u0065\u0020\u0063\u0068\u0061\u0072\u0061\u0063\u0074\u0065\u0072\u0020" + string(_dgg))
+			}
+			_fdf = _cbb[_dgg&0xff]
+		} else if (0x0700 <= _dgg && _dgg <= 0x08ac) || (0xfb50 <= _dgg && _dgg <= 0xfdff) || (0xfe70 <= _dgg && _dgg <= 0xfeff) {
+			_fdf = "\u0041\u004c"
+		}
+		if _fdf == "\u0052" || _fdf == "\u0041\u004c" || _fdf == "\u0041\u004e" {
+			_dd++
+		}
+		_fcd[_cdb] = _fdf
+	}
+	if _dd == 0 {
+		_gg = true
+		return _ae(string(_bdb), _gg, false)
+	}
+	if _dg == -1 {
+		if float64(_dd)/float64(_cge) < 0.3 && _cge > 4 {
+			_gg = true
+			_dg = 0
+		} else {
+			_gg = false
+			_dg = 1
+		}
+	}
+	var _agb []int
+	for range _bdb {
+		_agb = append(_agb, _dg)
+	}
+	_fda := "\u004c"
+	if _ee(_dg) {
+		_fda = "\u0052"
+	}
+	_ddg := _fda
+	_bbd := _ddg
+	_cf := _ddg
+	for _efb := range _bdb {
+		if _fcd[_efb] == "\u004e\u0053\u004d" {
+			_fcd[_efb] = _cf
+		} else {
+			_cf = _fcd[_efb]
+		}
+	}
+	_cf = _ddg
+	var _ce string
+	for _bdg := range _bdb {
+		_ce = _fcd[_bdg]
+		if _ce == "\u0045\u004e" {
+			if _cf == "\u0041\u004c" {
+				_fcd[_bdg] = "\u0041\u004e"
+			} else {
+				_fcd[_bdg] = "\u0045\u004e"
+			}
+		} else if _ce == "\u0052" || _ce == "\u004c" || _ce == "\u0041\u004c" {
+			_cf = _ce
+		}
+	}
+	for _agc := range _bdb {
+		_gfc := _fcd[_agc]
+		if _gfc == "\u0041\u004c" {
+			_fcd[_agc] = "\u0052"
+		}
+	}
+	for _dda := 1; _dda < (len(_bdb) - 1); _dda++ {
+		if _fcd[_dda] == "\u0045\u0053" && _fcd[_dda-1] == "\u0045\u004e" && _fcd[_dda+1] == "\u0045\u004e" {
+			_fcd[_dda] = "\u0045\u004e"
+		}
+		if _fcd[_dda] == "\u0043\u0053" && (_fcd[_dda-1] == "\u0045\u004e" || _fcd[_dda-1] == "\u0041\u004e") && _fcd[_dda+1] == _fcd[_dda-1] {
+			_fcd[_dda] = _fcd[_dda-1]
+		}
+	}
+	for _abf := range _bdb {
+		if _fcd[_abf] == "\u0045\u004e" {
+			for _cdf := _abf - 1; _cdf >= 0; _cdf-- {
+				if _fcd[_cdf] != "\u0045\u0054" {
+					break
+				}
+				_fcd[_cdf] = "\u0045\u004e"
+			}
+			for _efd := _abf + 1; _efd < _cge; _efd++ {
+				if _fcd[_efd] != "\u0045\u0054" {
+					break
+				}
+				_fcd[_efd] = "\u0045\u004e"
+			}
+		}
+	}
+	for _gc := range _bdb {
+		_aef := _fcd[_gc]
+		if _aef == "\u0057\u0053" || _aef == "\u0045\u0053" || _aef == "\u0045\u0054" || _aef == "\u0043\u0053" {
+			_fcd[_gc] = "\u004f\u004e"
+		}
+	}
+	_cf = "\u0073\u006f\u0072"
+	for _ebe := range _bdb {
+		_aeg := _fcd[_ebe]
+		if _aeg == "\u0045\u004e" {
+			if _cf == "\u004c" {
+				_fcd[_ebe] = "\u004c"
+			} else {
+				_fcd[_ebe] = "\u0045\u004e"
+			}
+		} else if _aeg == "\u0052" || _aeg == "\u004c" {
+			_cf = _aeg
+		}
+	}
+	for _ed := 0; _ed < len(_bdb); _ed++ {
+		if _fcd[_ed] == "\u004f\u004e" {
+			_dfb := _ebc(_fcd, _ed+1, "\u004f\u004e")
+			_ggf := _bbd
+			if _ed > 0 {
+				_ggf = _fcd[_ed-1]
+			}
+			_fgb := _bbd
+			if _dfb+1 < _cge {
+				_fgb = _fcd[_dfb+1]
+			}
+			if _ggf != "\u004c" {
+				_ggf = "\u0052"
+			}
+			if _fgb != "\u004c" {
+				_fgb = "\u0052"
+			}
+			if _ggf == _fgb {
+				_bgg(_fcd, _ed, _dfb, _ggf)
+			}
+			_ed = _dfb - 1
+		}
+	}
+	for _ddgb := range _bdb {
+		if _fcd[_ddgb] == "\u004f\u004e" {
+			_fcd[_ddgb] = _fda
+		}
+	}
+	for _bcf := range _bdb {
+		_gcf := _fcd[_bcf]
+		if _gd(_agb[_bcf]) {
+			if _gcf == "\u0052" {
+				_agb[_bcf]++
+			} else if _gcf == "\u0041\u004e" || _gcf == "\u0045\u004e" {
+				_agb[_bcf] += 2
+			}
+		} else if _gcf == "\u004c" || _gcf == "\u0041\u004e" || _gcf == "\u0045\u004e" {
+			_agb[_bcf]++
+		}
+	}
+	_bbf := -1
+	_gba := 99
+	var _cddg int
+	for _gff := 0; _gff < len(_agb); _gff++ {
+		_cddg = _agb[_gff]
+		if _bbf < _cddg {
+			_bbf = _cddg
+		}
+		if _gba > _cddg && _ee(_cddg) {
+			_gba = _cddg
+		}
+	}
+	for _edg := _bbf; _edg >= _gba; _edg-- {
+		_ff := -1
+		for _ac := 0; _ac < len(_agb); _ac++ {
+			if _agb[_ac] < _edg {
+				if _ff >= 0 {
+					_df(_ab, _ff, _ac)
+					_ff = -1
+				}
+			} else if _ff < 0 {
+				_ff = _ac
+			}
+		}
+		if _ff >= 0 {
+			_df(_ab, _ff, len(_agb))
+		}
+	}
+	for _ffe := 0; _ffe < len(_ab); _ffe++ {
+		_bgb := _ab[_ffe]
+		if _bgb == "\u003c" || _bgb == "\u003e" {
+			_ab[_ffe] = ""
+		}
+	}
+	return _ae(_faf.Join(_ab, ""), _gg, false)
+}
+
+func _acfd(_cfdb bounded) float64 { return -_cfdb.bbox().Lly }
+
+func _fgdc(_bgcga *textLine, _cebc []*textLine) float64 {
+	var _fefd float64 = -1
+	for _, _bbgcg := range _cebc {
+		if _bbgcg._adaa > _bgcga._adaa {
+			if _c.Round(_bbgcg.Llx) >= _c.Round(_bgcga.Llx) {
+				_fefd = _bbgcg._adaa
+			} else {
+				break
+			}
+		}
+	}
+	return _fefd
+}
+
+func (_edaa *stateStack) top() *textState {
+	if _edaa.empty() {
+		return nil
+	}
+	return (*_edaa)[_edaa.size()-1]
+}
+
+func (_bfbf *wordBag) applyRemovals(_egcb map[int]map[*textWord]struct{}) {
+	for _gcdf, _dabd := range _egcb {
+		if len(_dabd) == 0 {
+			continue
+		}
+		_dbffb := _bfbf._fdeg[_gcdf]
+		_gaegg := len(_dbffb) - len(_dabd)
+		if _gaegg == 0 {
+			delete(_bfbf._fdeg, _gcdf)
+			continue
+		}
+		_fcfc := make([]*textWord, _gaegg)
+		_decd := 0
+		for _, _bgbg := range _dbffb {
+			if _, _cfdf := _dabd[_bgbg]; !_cfdf {
+				_fcfc[_decd] = _bgbg
+				_decd++
+			}
+		}
+		_bfbf._fdeg[_gcdf] = _fcfc
+	}
+}
+
+func (_cccdc *textTable) isExportable() bool {
+	if _cccdc._cegab {
+		return true
+	}
+	_beca := func(_ffgd int) bool {
+		_gdafa := _cccdc.get(0, _ffgd)
+		if _gdafa == nil {
+			return false
+		}
+		_agbaf := _gdafa.text()
+		_bgfeb := _a.RuneCountInString(_agbaf)
+		_ebfe := _cadaa.MatchString(_agbaf)
+		return _bgfeb <= 1 || _ebfe
+	}
+	for _fbefe := 0; _fbefe < _cccdc._aaga; _fbefe++ {
+		if !_beca(_fbefe) {
+			return true
+		}
+	}
+	return false
+}
 
 // WriteToFile writes the edited content to `outputPath`.
-func (_ggeg *Editor )WriteToFile (outputPath string )error {_dee ,_cdfe :=_ggeg ._fba .ToWriter (nil );if _cdfe !=nil {return _fa .Errorf ("\u0066\u0061\u0069\u006c\u0065\u0064\u0020\u0074\u006f\u0020c\u006f\u006e\u0076\u0065\u0072\u0074\u0020t\u006f\u0020\u0077\u0072\u0069\u0074\u0065\u0072\u0020\u0025\u0076",_cdfe );
-};_dee .WriteToFile (outputPath );return nil ;};func (_bdggg *textTable )emptyCompositeColumn (_ccegbe int )bool {for _bdfb :=0;_bdfb < _bdggg ._aaga ;_bdfb ++{if _eaae ,_agdea :=_bdggg ._cafd [_fffbe (_ccegbe ,_bdfb )];_agdea {if len (_eaae .paraList )> 0{return false ;
-};};};return true ;};func (_dcfd *shapesState )cubicTo (_aefgf ,_dfba ,_ecbf ,_adfeb ,_cdfb ,_gdgeb float64 ){if _acge {_bg .Log .Info ("\u0063\u0075\u0062\u0069\u0063\u0054\u006f\u003a");};_dcfd .addPoint (_cdfb ,_gdgeb );};func (_gfgg *textLine )text ()string {var _gafd []string ;
-for _ ,_ggaa :=range _gfgg ._gbaa {if _ggaa ._efccdf {_gafd =append (_gafd ,"\u0020");};_gafd =append (_gafd ,_ggaa ._fgaa );};_fdba :=_faf .Join (_gafd ,"");_cbdc :=_afg ([]rune (_fdba ));return _cbdc ._cac ;};func _bead (_gcdba []TextMark ,_fbfae *TextTable )[]TextMark {var _eefc []TextMark ;
-for _ ,_eaadf :=range _gcdba {_eaadf ._eace =true ;_eaadf ._ggdea =_fbfae ;_eefc =append (_eefc ,_eaadf );};return _eefc ;};func _ebcfa (_fcea map[float64 ]map[float64 ]gridTile )[]float64 {_bcdae :=make ([]float64 ,0,len (_fcea ));_gdde :=make (map[float64 ]struct{},len (_fcea ));
-for _ ,_adbf :=range _fcea {for _fcfdd :=range _adbf {if _ ,_ddagg :=_gdde [_fcfdd ];_ddagg {continue ;};_bcdae =append (_bcdae ,_fcfdd );_gdde [_fcfdd ]=struct{}{};};};_eg .Float64s (_bcdae );return _bcdae ;};type rulingList []*ruling ;const (_bade =true ;
-_gefc =true ;_dbdb =true ;_ebgg =false ;_eecf =true ;_egdb =true ;_ffaa =true ;_bbfaf =true ;_fccb =false ;);func _agad (_bgcf _ad .PdfRectangle )*ruling {return &ruling {_gafe :_dcfdg ,_ecfb :_bgcf .Llx ,_ggecg :_bgcf .Lly ,_gebf :_bgcf .Ury };};func (_edgde *textObject )moveTextSetLeading (_gbfgf ,_gda float64 ){_edgde ._dggef ._dgd =-_gda ;
-_edgde .moveLP (_gbfgf ,_gda );};func (_aebd *textTable )reduce ()*textTable {_daccc :=make ([]int ,0,_aebd ._aaga );_abcaa :=make ([]int ,0,_aebd ._cfadc );for _ddcb :=0;_ddcb < _aebd ._aaga ;_ddcb ++{if !_aebd .emptyCompositeRow (_ddcb ){_daccc =append (_daccc ,_ddcb );
-};};for _adee :=0;_adee < _aebd ._cfadc ;_adee ++{if !_aebd .emptyCompositeColumn (_adee ){_abcaa =append (_abcaa ,_adee );};};if len (_daccc )==_aebd ._aaga &&len (_abcaa )==_aebd ._cfadc {return _aebd ;};_bgdb :=textTable {_cegab :_aebd ._cegab ,_cfadc :len (_abcaa ),_aaga :len (_daccc ),_eccda :make (map[uint64 ]*textPara ,len (_abcaa )*len (_daccc ))};
-if _ggegb {_bg .Log .Info ("\u0072\u0065\u0064\u0075ce\u003a\u0020\u0025\u0064\u0078\u0025\u0064\u0020\u002d\u003e\u0020\u0025\u0064\u0078%\u0064",_aebd ._cfadc ,_aebd ._aaga ,len (_abcaa ),len (_daccc ));_bg .Log .Info ("\u0072\u0065d\u0075\u0063\u0065d\u0043\u006f\u006c\u0073\u003a\u0020\u0025\u002b\u0076",_abcaa );
-_bg .Log .Info ("\u0072\u0065d\u0075\u0063\u0065d\u0052\u006f\u0077\u0073\u003a\u0020\u0025\u002b\u0076",_daccc );};for _aefa ,_eeaba :=range _daccc {for _gdgb ,_gdeea :=range _abcaa {_edeea ,_gfce :=_aebd .getComposite (_gdeea ,_eeaba );if _edeea ==nil {continue ;
-};if _ggegb {_fa .Printf ("\u0020 \u0025\u0032\u0064\u002c \u0025\u0032\u0064\u0020\u0028%\u0032d\u002c \u0025\u0032\u0064\u0029\u0020\u0025\u0071\n",_gdgb ,_aefa ,_gdeea ,_eeaba ,_fagdg (_edeea .merge ().text (),50));};_bgdb .putComposite (_gdgb ,_aefa ,_edeea ,_gfce );
-};};return &_bgdb ;};func _fffa (_fbec *_afa .PdfObjectString ,_gfb string ,_fafc *_ad .PdfFont ){_cgfd ,_bege :=_fafc .StringToCharcodeBytes (_gfb );if _bege !=0{_bg .Log .Debug ("\u0057\u0041\u0052\u004e\u003a\u0020\u0073\u006fm\u0065\u0020\u0072un\u0065\u0073\u0020\u0063\u006f\u0075l\u0064\u0020\u006e\u006f\u0074\u0020\u0062\u0065\u0020\u0065\u006e\u0063\u006f\u0064\u0065d\u002e\u000a\u0009\u0025\u0073\u0020\u002d\u003e \u0025\u0076",_gfb ,_cgfd );
-};_dbd :=_afa .MakeStringFromBytes (_cgfd );*_fbec =*_dbd ;};
+func (_ggeg *Editor) WriteToFile(outputPath string) error {
+	_dee, _cdfe := _ggeg._fba.ToWriter(nil)
+	if _cdfe != nil {
+		return _fa.Errorf("\u0066\u0061\u0069\u006c\u0065\u0064\u0020\u0074\u006f\u0020c\u006f\u006e\u0076\u0065\u0072\u0074\u0020t\u006f\u0020\u0077\u0072\u0069\u0074\u0065\u0072\u0020\u0025\u0076", _cdfe)
+	}
+	_dee.WriteToFile(outputPath)
+	return nil
+}
+
+func (_bdggg *textTable) emptyCompositeColumn(_ccegbe int) bool {
+	for _bdfb := 0; _bdfb < _bdggg._aaga; _bdfb++ {
+		if _eaae, _agdea := _bdggg._cafd[_fffbe(_ccegbe, _bdfb)]; _agdea {
+			if len(_eaae.paraList) > 0 {
+				return false
+			}
+		}
+	}
+	return true
+}
+
+func (_dcfd *shapesState) cubicTo(_aefgf, _dfba, _ecbf, _adfeb, _cdfb, _gdgeb float64) {
+	if _acge {
+		_bg.Log.Info("\u0063\u0075\u0062\u0069\u0063\u0054\u006f\u003a")
+	}
+	_dcfd.addPoint(_cdfb, _gdgeb)
+}
+
+func (_gfgg *textLine) text() string {
+	var _gafd []string
+	for _, _ggaa := range _gfgg._gbaa {
+		if _ggaa._efccdf {
+			_gafd = append(_gafd, "\u0020")
+		}
+		_gafd = append(_gafd, _ggaa._fgaa)
+	}
+	_fdba := _faf.Join(_gafd, "")
+	_cbdc := _afg([]rune(_fdba))
+	return _cbdc._cac
+}
+
+func _bead(_gcdba []TextMark, _fbfae *TextTable) []TextMark {
+	var _eefc []TextMark
+	for _, _eaadf := range _gcdba {
+		_eaadf._eace = true
+		_eaadf._ggdea = _fbfae
+		_eefc = append(_eefc, _eaadf)
+	}
+	return _eefc
+}
+
+func _ebcfa(_fcea map[float64]map[float64]gridTile) []float64 {
+	_bcdae := make([]float64, 0, len(_fcea))
+	_gdde := make(map[float64]struct{}, len(_fcea))
+	for _, _adbf := range _fcea {
+		for _fcfdd := range _adbf {
+			if _, _ddagg := _gdde[_fcfdd]; _ddagg {
+				continue
+			}
+			_bcdae = append(_bcdae, _fcfdd)
+			_gdde[_fcfdd] = struct{}{}
+		}
+	}
+	_eg.Float64s(_bcdae)
+	return _bcdae
+}
+
+type rulingList []*ruling
+
+const (
+	_bade  = true
+	_gefc  = true
+	_dbdb  = true
+	_ebgg  = false
+	_eecf  = true
+	_egdb  = true
+	_ffaa  = true
+	_bbfaf = true
+	_fccb  = false
+)
+
+func _agad(_bgcf _ad.PdfRectangle) *ruling {
+	return &ruling{_gafe: _dcfdg, _ecfb: _bgcf.Llx, _ggecg: _bgcf.Lly, _gebf: _bgcf.Ury}
+}
+
+func (_edgde *textObject) moveTextSetLeading(_gbfgf, _gda float64) {
+	_edgde._dggef._dgd = -_gda
+	_edgde.moveLP(_gbfgf, _gda)
+}
+
+func (_aebd *textTable) reduce() *textTable {
+	_daccc := make([]int, 0, _aebd._aaga)
+	_abcaa := make([]int, 0, _aebd._cfadc)
+	for _ddcb := 0; _ddcb < _aebd._aaga; _ddcb++ {
+		if !_aebd.emptyCompositeRow(_ddcb) {
+			_daccc = append(_daccc, _ddcb)
+		}
+	}
+	for _adee := 0; _adee < _aebd._cfadc; _adee++ {
+		if !_aebd.emptyCompositeColumn(_adee) {
+			_abcaa = append(_abcaa, _adee)
+		}
+	}
+	if len(_daccc) == _aebd._aaga && len(_abcaa) == _aebd._cfadc {
+		return _aebd
+	}
+	_bgdb := textTable{_cegab: _aebd._cegab, _cfadc: len(_abcaa), _aaga: len(_daccc), _eccda: make(map[uint64]*textPara, len(_abcaa)*len(_daccc))}
+	if _ggegb {
+		_bg.Log.Info("\u0072\u0065\u0064\u0075ce\u003a\u0020\u0025\u0064\u0078\u0025\u0064\u0020\u002d\u003e\u0020\u0025\u0064\u0078%\u0064", _aebd._cfadc, _aebd._aaga, len(_abcaa), len(_daccc))
+		_bg.Log.Info("\u0072\u0065d\u0075\u0063\u0065d\u0043\u006f\u006c\u0073\u003a\u0020\u0025\u002b\u0076", _abcaa)
+		_bg.Log.Info("\u0072\u0065d\u0075\u0063\u0065d\u0052\u006f\u0077\u0073\u003a\u0020\u0025\u002b\u0076", _daccc)
+	}
+	for _aefa, _eeaba := range _daccc {
+		for _gdgb, _gdeea := range _abcaa {
+			_edeea, _gfce := _aebd.getComposite(_gdeea, _eeaba)
+			if _edeea == nil {
+				continue
+			}
+			if _ggegb {
+				_fa.Printf("\u0020 \u0025\u0032\u0064\u002c \u0025\u0032\u0064\u0020\u0028%\u0032d\u002c \u0025\u0032\u0064\u0029\u0020\u0025\u0071\n", _gdgb, _aefa, _gdeea, _eeaba, _fagdg(_edeea.merge().text(), 50))
+			}
+			_bgdb.putComposite(_gdgb, _aefa, _edeea, _gfce)
+		}
+	}
+	return &_bgdb
+}
+
+func _fffa(_fbec *_afa.PdfObjectString, _gfb string, _fafc *_ad.PdfFont) {
+	_cgfd, _bege := _fafc.StringToCharcodeBytes(_gfb)
+	if _bege != 0 {
+		_bg.Log.Debug("\u0057\u0041\u0052\u004e\u003a\u0020\u0073\u006fm\u0065\u0020\u0072un\u0065\u0073\u0020\u0063\u006f\u0075l\u0064\u0020\u006e\u006f\u0074\u0020\u0062\u0065\u0020\u0065\u006e\u0063\u006f\u0064\u0065d\u002e\u000a\u0009\u0025\u0073\u0020\u002d\u003e \u0025\u0076", _gfb, _cgfd)
+	}
+	_dbd := _afa.MakeStringFromBytes(_cgfd)
+	*_fbec = *_dbd
+}
 
 // String returns a description of `tm`.
-func (_bcda *textMark )String ()string {return _fa .Sprintf ("\u0025\u002e\u0032f \u0066\u006f\u006e\u0074\u0073\u0069\u007a\u0065\u003d\u0025\u002e\u0032\u0066\u0020\u0022\u0025\u0073\u0022",_bcda .PdfRectangle ,_bcda ._caadf ,_bcda ._acfa );};func (_bdebg *wordBag )absorb (_gcaa *wordBag ){_aecf :=_gcaa .makeRemovals ();
-for _bbec ,_gbgaa :=range _gcaa ._fdeg {for _ ,_deaa :=range _gbgaa {_bdebg .pullWord (_deaa ,_bbec ,_aecf );};};_gcaa .applyRemovals (_aecf );};
+func (_bcda *textMark) String() string {
+	return _fa.Sprintf("\u0025\u002e\u0032f \u0066\u006f\u006e\u0074\u0073\u0069\u007a\u0065\u003d\u0025\u002e\u0032\u0066\u0020\u0022\u0025\u0073\u0022", _bcda.PdfRectangle, _bcda._caadf, _bcda._acfa)
+}
+
+func (_bdebg *wordBag) absorb(_gcaa *wordBag) {
+	_aecf := _gcaa.makeRemovals()
+	for _bbec, _gbgaa := range _gcaa._fdeg {
+		for _, _deaa := range _gbgaa {
+			_bdebg.pullWord(_deaa, _bbec, _aecf)
+		}
+	}
+	_gcaa.applyRemovals(_aecf)
+}
 
 // RenderMode specifies the text rendering mode (Tmode), which determines whether showing text shall cause
 // glyph outlines to be  stroked, filled, used as a clipping boundary, or some combination of the three.
 // Stroking, filling, and clipping shall have the same effects for a text object as they do for a path object
 // (see 8.5.3, "Path-Painting Operators" and 8.5.4, "Clipping Path Operators").
-type RenderMode int ;func (_dcda *textLine )pullWord (_adef *wordBag ,_cffe *textWord ,_bdbf int ){_dcda .appendWord (_cffe );_adef .removeWord (_cffe ,_bdbf );};func _daad (_edccc *wordBag ,_ecca int )*textLine {_accec :=_edccc .firstWord (_ecca );_eacgf :=textLine {PdfRectangle :_accec .PdfRectangle ,_fgfb :_accec ._bbebf ,_adaa :_accec ._fcgaa };
-_eacgf .pullWord (_edccc ,_accec ,_ecca );return &_eacgf ;};func (_dcgc *textPara )text ()string {_fdgfb :=new (_fg .Buffer );_dcgc .writeText (_fdgfb );return _fdgfb .String ();};func _beea (_eagf *list )[]*list {var _cged []*list ;for _ ,_gacd :=range _eagf ._cgfag {switch _gacd ._ebbb {case "\u004c\u0049":_cbaa :=_ccbag (_gacd );
-_gbcd :=_beea (_gacd );_fagd :=_cbda (_cbaa ,"\u0062\u0075\u006c\u006c\u0065\u0074",_gbcd );_daae :=_dbfff (_cbaa ,"");_fagd ._bdeac =_daae ;_cged =append (_cged ,_fagd );case "\u004c\u0042\u006fd\u0079":return _beea (_gacd );case "\u004c":_caacd :=_beea (_gacd );
-_cged =append (_cged ,_caacd ...);return _cged ;};};return _cged ;};func (_cdeb *textObject )setTextLeading (_fbb float64 ){if _cdeb ==nil {return ;};_cdeb ._dggef ._dgd =_fbb ;};const (_afb ="\u0045\u0052R\u004f\u0052\u003a\u0020\u0043\u0061\u006e\u0027\u0074\u0020\u0063\u006f\u006e\u0076\u0065\u0072\u0074\u0020\u0066\u006f\u006e\u0074\u0020\u006f\u0062\u006a\u0065\u0063\u0074\u002c\u0020\u0069\u006e\u0076\u0061\u006c\u0069\u0064\u0020\u0074\u0079\u0070\u0065";
-_gfg ="\u0045\u0052\u0052\u004f\u0052\u003a\u0020\u0043a\u006e\u0027\u0074 g\u0065\u0074\u0020\u0066\u006f\u006et\u0020\u0070\u0072\u006f\u0070\u0065\u0072\u0074\u0069\u0065\u0073\u002c\u0020\u0066\u006fn\u0074\u0020\u006e\u006f\u0074\u0020\u0066\u006fu\u006e\u0064";
-_fff ="\u0045\u0052\u0052O\u0052\u003a\u0020\u0043\u0061\u006e\u0027\u0074\u0020\u0067\u0065\u0074\u0020\u0066\u006f\u006e\u0074\u0020\u0073\u0074\u0072\u0065\u0061\u006d\u002c\u0020\u0069\u006e\u0076a\u006c\u0069\u0064\u0020\u0074\u0079\u0070\u0065";_eda ="E\u0052R\u004f\u0052\u003a\u0020\u004e\u006f\u0020\u0066o\u006e\u0074\u0020\u0066ou\u006e\u0064";
-);func _gfde (_edcgd float64 )int {var _aade int ;if _edcgd >=0{_aade =int (_edcgd /_bbbb );}else {_aade =int (_edcgd /_bbbb )-1;};return _aade ;};type rectRuling struct{_abbdf rulingKind ;_cbfc markKind ;_cb .Color ;_ad .PdfRectangle ;};func _ffda (_fcae []*wordBag )[]*wordBag {if len (_fcae )<=1{return _fcae ;
-};if _aggg {_bg .Log .Info ("\u006d\u0065\u0072\u0067\u0065\u0057\u006f\u0072\u0064B\u0061\u0067\u0073\u003a");};_eg .Slice (_fcae ,func (_bdc ,_agee int )bool {_ffae ,_gbcf :=_fcae [_bdc ],_fcae [_agee ];_beaf :=_ffae .Width ()*_ffae .Height ();_caee :=_gbcf .Width ()*_gbcf .Height ();
-if _beaf !=_caee {return _beaf > _caee ;};if _ffae .Height ()!=_gbcf .Height (){return _ffae .Height ()> _gbcf .Height ();};return _bdc < _agee ;});var _bfbbb []*wordBag ;_cacd :=make (intSet );for _dfgdf :=0;_dfgdf < len (_fcae );_dfgdf ++{if _cacd .has (_dfgdf ){continue ;
-};_fabg :=_fcae [_dfgdf ];for _dgdb :=_dfgdf +1;_dgdb < len (_fcae );_dgdb ++{if _cacd .has (_dfgdf ){continue ;};_debe :=_fcae [_dgdb ];_cedd :=_fabg .PdfRectangle ;_cedd .Llx -=_fabg ._eagga ;if _fbbf (_cedd ,_debe .PdfRectangle ){_fabg .absorb (_debe );
-_cacd .add (_dgdb );};};_bfbbb =append (_bfbbb ,_fabg );};if len (_fcae )!=len (_bfbbb )+len (_cacd ){_bg .Log .Error ("\u006d\u0065\u0072ge\u0057\u006f\u0072\u0064\u0042\u0061\u0067\u0073\u003a \u0025d\u2192%\u0064 \u0061\u0062\u0073\u006f\u0072\u0062\u0065\u0064\u003d\u0025\u0064",len (_fcae ),len (_bfbbb ),len (_cacd ));
-};return _bfbbb ;};func (_bfab paraList )sortReadingOrder (){_bg .Log .Trace ("\u0073\u006fr\u0074\u0052\u0065\u0061\u0064i\u006e\u0067\u004f\u0072\u0064e\u0072\u003a\u0020\u0070\u0061\u0072\u0061\u0073\u003d\u0025\u0064\u0020\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u0078\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d",len (_bfab ));
-if len (_bfab )<=1{return ;};_bfab .computeEBBoxes ();_eg .Slice (_bfab ,func (_cggdf ,_gbac int )bool {return _cecdc (_bfab [_cggdf ],_bfab [_gbac ])<=0});};func (_faee *textObject )reset (){_faee ._dfde =_cd .IdentityMatrix ();_faee ._feec =_cd .IdentityMatrix ();
-_faee ._fcbb =nil ;};func (_geabg *textTable )log (_dcaab string ){if !_ggegb {return ;};_bg .Log .Info ("~\u007e\u007e\u0020\u0025\u0073\u003a \u0025\u0064\u0020\u0078\u0020\u0025d\u0020\u0067\u0072\u0069\u0064\u003d\u0025t\u000a\u0020\u0020\u0020\u0020\u0020\u0020\u0025\u0036\u002e2\u0066",_dcaab ,_geabg ._cfadc ,_geabg ._aaga ,_geabg ._cegab ,_geabg .PdfRectangle );
-for _dabfbd :=0;_dabfbd < _geabg ._aaga ;_dabfbd ++{for _beac :=0;_beac < _geabg ._cfadc ;_beac ++{_bbfc :=_geabg .get (_beac ,_dabfbd );if _bbfc ==nil {continue ;};_fa .Printf ("%\u0034\u0064\u0020\u00252d\u003a \u0025\u0036\u002e\u0032\u0066 \u0025\u0071\u0020\u0025\u0064\u000a",_beac ,_dabfbd ,_bbfc .PdfRectangle ,_fagdg (_bbfc .text (),50),_a .RuneCountInString (_bbfc .text ()));
-};};};func (_acbba *shapesState )newSubPath (){_acbba .clearPath ();if _acge {_bg .Log .Info ("\u006e\u0065\u0077\u0053\u0075\u0062\u0050\u0061\u0074h\u003a\u0020\u0025\u0073",_acbba );};};func (_deca *textLine )toTextMarks (_fcgf *int )[]TextMark {var _fecd []TextMark ;
-for _ ,_ecge :=range _deca ._gbaa {if _ecge ._efccdf {_fecd =_cfdbba (_fecd ,_fcgf ,"\u0020");};_cgfad :=_ecge .toTextMarks (_fcgf );_fecd =append (_fecd ,_cgfad ...);};return _fecd ;};func _ffad (_cgaa _afa .PdfObject ,_aggec _cb .Color )(_cg .Image ,error ){_faddd ,_cbaege :=_afa .GetStream (_cgaa );
-if !_cbaege {return nil ,nil ;};_bbed ,_bbfac :=_ad .NewXObjectImageFromStream (_faddd );if _bbfac !=nil {return nil ,_bbfac ;};_ffgfg ,_bbfac :=_bbed .ToImage ();if _bbfac !=nil {return nil ,_bbfac ;};return _fedcc (_ffgfg ,_aggec ),nil ;};
+type RenderMode int
+
+func (_dcda *textLine) pullWord(_adef *wordBag, _cffe *textWord, _bdbf int) {
+	_dcda.appendWord(_cffe)
+	_adef.removeWord(_cffe, _bdbf)
+}
+
+func _daad(_edccc *wordBag, _ecca int) *textLine {
+	_accec := _edccc.firstWord(_ecca)
+	_eacgf := textLine{PdfRectangle: _accec.PdfRectangle, _fgfb: _accec._bbebf, _adaa: _accec._fcgaa}
+	_eacgf.pullWord(_edccc, _accec, _ecca)
+	return &_eacgf
+}
+
+func (_dcgc *textPara) text() string {
+	_fdgfb := new(_fg.Buffer)
+	_dcgc.writeText(_fdgfb)
+	return _fdgfb.String()
+}
+
+func _beea(_eagf *list) []*list {
+	var _cged []*list
+	for _, _gacd := range _eagf._cgfag {
+		switch _gacd._ebbb {
+		case "\u004c\u0049":
+			_cbaa := _ccbag(_gacd)
+			_gbcd := _beea(_gacd)
+			_fagd := _cbda(_cbaa, "\u0062\u0075\u006c\u006c\u0065\u0074", _gbcd)
+			_daae := _dbfff(_cbaa, "")
+			_fagd._bdeac = _daae
+			_cged = append(_cged, _fagd)
+		case "\u004c\u0042\u006fd\u0079":
+			return _beea(_gacd)
+		case "\u004c":
+			_caacd := _beea(_gacd)
+			_cged = append(_cged, _caacd...)
+			return _cged
+		}
+	}
+	return _cged
+}
+
+func (_cdeb *textObject) setTextLeading(_fbb float64) {
+	if _cdeb == nil {
+		return
+	}
+	_cdeb._dggef._dgd = _fbb
+}
+
+const (
+	_afb = "\u0045\u0052R\u004f\u0052\u003a\u0020\u0043\u0061\u006e\u0027\u0074\u0020\u0063\u006f\u006e\u0076\u0065\u0072\u0074\u0020\u0066\u006f\u006e\u0074\u0020\u006f\u0062\u006a\u0065\u0063\u0074\u002c\u0020\u0069\u006e\u0076\u0061\u006c\u0069\u0064\u0020\u0074\u0079\u0070\u0065"
+	_gfg = "\u0045\u0052\u0052\u004f\u0052\u003a\u0020\u0043a\u006e\u0027\u0074 g\u0065\u0074\u0020\u0066\u006f\u006et\u0020\u0070\u0072\u006f\u0070\u0065\u0072\u0074\u0069\u0065\u0073\u002c\u0020\u0066\u006fn\u0074\u0020\u006e\u006f\u0074\u0020\u0066\u006fu\u006e\u0064"
+	_fff = "\u0045\u0052\u0052O\u0052\u003a\u0020\u0043\u0061\u006e\u0027\u0074\u0020\u0067\u0065\u0074\u0020\u0066\u006f\u006e\u0074\u0020\u0073\u0074\u0072\u0065\u0061\u006d\u002c\u0020\u0069\u006e\u0076a\u006c\u0069\u0064\u0020\u0074\u0079\u0070\u0065"
+	_eda = "E\u0052R\u004f\u0052\u003a\u0020\u004e\u006f\u0020\u0066o\u006e\u0074\u0020\u0066ou\u006e\u0064"
+)
+
+func _gfde(_edcgd float64) int {
+	var _aade int
+	if _edcgd >= 0 {
+		_aade = int(_edcgd / _bbbb)
+	} else {
+		_aade = int(_edcgd/_bbbb) - 1
+	}
+	return _aade
+}
+
+type rectRuling struct {
+	_abbdf rulingKind
+	_cbfc  markKind
+	_cb.Color
+	_ad.PdfRectangle
+}
+
+func _ffda(_fcae []*wordBag) []*wordBag {
+	if len(_fcae) <= 1 {
+		return _fcae
+	}
+	if _aggg {
+		_bg.Log.Info("\u006d\u0065\u0072\u0067\u0065\u0057\u006f\u0072\u0064B\u0061\u0067\u0073\u003a")
+	}
+	_eg.Slice(_fcae, func(_bdc, _agee int) bool {
+		_ffae, _gbcf := _fcae[_bdc], _fcae[_agee]
+		_beaf := _ffae.Width() * _ffae.Height()
+		_caee := _gbcf.Width() * _gbcf.Height()
+		if _beaf != _caee {
+			return _beaf > _caee
+		}
+		if _ffae.Height() != _gbcf.Height() {
+			return _ffae.Height() > _gbcf.Height()
+		}
+		return _bdc < _agee
+	})
+	var _bfbbb []*wordBag
+	_cacd := make(intSet)
+	for _dfgdf := 0; _dfgdf < len(_fcae); _dfgdf++ {
+		if _cacd.has(_dfgdf) {
+			continue
+		}
+		_fabg := _fcae[_dfgdf]
+		for _dgdb := _dfgdf + 1; _dgdb < len(_fcae); _dgdb++ {
+			if _cacd.has(_dfgdf) {
+				continue
+			}
+			_debe := _fcae[_dgdb]
+			_cedd := _fabg.PdfRectangle
+			_cedd.Llx -= _fabg._eagga
+			if _fbbf(_cedd, _debe.PdfRectangle) {
+				_fabg.absorb(_debe)
+				_cacd.add(_dgdb)
+			}
+		}
+		_bfbbb = append(_bfbbb, _fabg)
+	}
+	if len(_fcae) != len(_bfbbb)+len(_cacd) {
+		_bg.Log.Error("\u006d\u0065\u0072ge\u0057\u006f\u0072\u0064\u0042\u0061\u0067\u0073\u003a \u0025d\u2192%\u0064 \u0061\u0062\u0073\u006f\u0072\u0062\u0065\u0064\u003d\u0025\u0064", len(_fcae), len(_bfbbb), len(_cacd))
+	}
+	return _bfbbb
+}
+
+func (_bfab paraList) sortReadingOrder() {
+	_bg.Log.Trace("\u0073\u006fr\u0074\u0052\u0065\u0061\u0064i\u006e\u0067\u004f\u0072\u0064e\u0072\u003a\u0020\u0070\u0061\u0072\u0061\u0073\u003d\u0025\u0064\u0020\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u0078\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d", len(_bfab))
+	if len(_bfab) <= 1 {
+		return
+	}
+	_bfab.computeEBBoxes()
+	_eg.Slice(_bfab, func(_cggdf, _gbac int) bool { return _cecdc(_bfab[_cggdf], _bfab[_gbac]) <= 0 })
+}
+
+func (_faee *textObject) reset() {
+	_faee._dfde = _cd.IdentityMatrix()
+	_faee._feec = _cd.IdentityMatrix()
+	_faee._fcbb = nil
+}
+
+func (_geabg *textTable) log(_dcaab string) {
+	if !_ggegb {
+		return
+	}
+	_bg.Log.Info("~\u007e\u007e\u0020\u0025\u0073\u003a \u0025\u0064\u0020\u0078\u0020\u0025d\u0020\u0067\u0072\u0069\u0064\u003d\u0025t\u000a\u0020\u0020\u0020\u0020\u0020\u0020\u0025\u0036\u002e2\u0066", _dcaab, _geabg._cfadc, _geabg._aaga, _geabg._cegab, _geabg.PdfRectangle)
+	for _dabfbd := 0; _dabfbd < _geabg._aaga; _dabfbd++ {
+		for _beac := 0; _beac < _geabg._cfadc; _beac++ {
+			_bbfc := _geabg.get(_beac, _dabfbd)
+			if _bbfc == nil {
+				continue
+			}
+			_fa.Printf("%\u0034\u0064\u0020\u00252d\u003a \u0025\u0036\u002e\u0032\u0066 \u0025\u0071\u0020\u0025\u0064\u000a", _beac, _dabfbd, _bbfc.PdfRectangle, _fagdg(_bbfc.text(), 50), _a.RuneCountInString(_bbfc.text()))
+		}
+	}
+}
+
+func (_acbba *shapesState) newSubPath() {
+	_acbba.clearPath()
+	if _acge {
+		_bg.Log.Info("\u006e\u0065\u0077\u0053\u0075\u0062\u0050\u0061\u0074h\u003a\u0020\u0025\u0073", _acbba)
+	}
+}
+
+func (_deca *textLine) toTextMarks(_fcgf *int) []TextMark {
+	var _fecd []TextMark
+	for _, _ecge := range _deca._gbaa {
+		if _ecge._efccdf {
+			_fecd = _cfdbba(_fecd, _fcgf, "\u0020")
+		}
+		_cgfad := _ecge.toTextMarks(_fcgf)
+		_fecd = append(_fecd, _cgfad...)
+	}
+	return _fecd
+}
+
+func _ffad(_cgaa _afa.PdfObject, _aggec _cb.Color) (_cg.Image, error) {
+	_faddd, _cbaege := _afa.GetStream(_cgaa)
+	if !_cbaege {
+		return nil, nil
+	}
+	_bbed, _bbfac := _ad.NewXObjectImageFromStream(_faddd)
+	if _bbfac != nil {
+		return nil, _bbfac
+	}
+	_ffgfg, _bbfac := _bbed.ToImage()
+	if _bbfac != nil {
+		return nil, _bbfac
+	}
+	return _fedcc(_ffgfg, _aggec), nil
+}
 
 // Match defines the structure for each match, including pattern, indexes, and locations.
-type Match struct{Pattern string ;Indexes [][]int ;Locations []Box ;};
+type Match struct {
+	Pattern   string
+	Indexes   [][]int
+	Locations []Box
+}
 
 // ToText returns the page text as a single string.
 // Deprecated: This function is deprecated and will be removed in a future major version. Please use
 // Text() instead.
-func (_facc PageText )ToText ()string {return _facc .Text ()};
+func (_facc PageText) ToText() string { return _facc.Text() }
 
 // String returns a description of `v`.
-func (_eagge *ruling )String ()string {if _eagge ._gafe ==_gbgfg {return "\u004e\u004f\u0054\u0020\u0052\u0055\u004c\u0049\u004e\u0047";};_ffgb ,_ggccd :="\u0078","\u0079";if _eagge ._gafe ==_cafa {_ffgb ,_ggccd ="\u0079","\u0078";};_cgdc :="";if _eagge ._bdbgf !=0.0{_cgdc =_fa .Sprintf (" \u0077\u0069\u0064\u0074\u0068\u003d\u0025\u002e\u0032\u0066",_eagge ._bdbgf );
-};return _fa .Sprintf ("\u0025\u00310\u0073\u0020\u0025\u0073\u003d\u0025\u0036\u002e\u0032\u0066\u0020\u0025\u0073\u003d\u0025\u0036\u002e\u0032\u0066\u0020\u002d\u0020\u0025\u0036\u002e\u0032\u0066\u0020\u0028\u0025\u0036\u002e\u0032\u0066\u0029\u0020\u0025\u0073\u0020\u0025\u0076\u0025\u0073",_eagge ._gafe ,_ffgb ,_eagge ._ecfb ,_ggccd ,_eagge ._ggecg ,_eagge ._gebf ,_eagge ._gebf -_eagge ._ggecg ,_eagge ._abddg ,_eagge .Color ,_cgdc );
-};func (_acgb paraList )log (_efdgd string ){if !_ebbaf {return ;};_bg .Log .Info ("%\u0038\u0073\u003a\u0020\u0025\u0064 \u0070\u0061\u0072\u0061\u0073\u0020=\u003d\u003d\u003d\u003d\u003d\u003d\u002d-\u002d\u002d\u002d\u002d\u002d\u003d\u003d\u003d\u003d\u003d=\u003d",_efdgd ,len (_acgb ));
-for _adbb ,_ggca :=range _acgb {if _ggca ==nil {continue ;};_cbef :=_ggca .text ();_bcgc :="\u0020\u0020";if _ggca ._fbbfg !=nil {_bcgc =_fa .Sprintf ("\u005b%\u0064\u0078\u0025\u0064\u005d",_ggca ._fbbfg ._cfadc ,_ggca ._fbbfg ._aaga );};_fa .Printf ("\u0025\u0034\u0064\u003a\u0020\u0025\u0036\u002e\u0032\u0066\u0020\u0025s\u0020\u0025\u0071\u000a",_adbb ,_ggca .PdfRectangle ,_bcgc ,_fagdg (_cbef ,50));
-};};func (_ece *subpath )add (_acdfc ..._cd .Point ){_ece ._bfgb =append (_ece ._bfgb ,_acdfc ...)};type textLine struct{_ad .PdfRectangle ;_adaa float64 ;_gbaa []*textWord ;_fgfb float64 ;};func (_ecae *textPara )taken ()bool {return _ecae ==nil ||_ecae ._bdfe };
-func _dfaec (_defe string ,_edbd []rulingList ){_bg .Log .Info ("\u0024\u0024 \u0025\u0064\u0020g\u0072\u0069\u0064\u0073\u0020\u002d\u0020\u0025\u0073",len (_edbd ),_defe );for _gfba ,_efga :=range _edbd {_fa .Printf ("\u0025\u0034\u0064\u003a\u0020\u0025\u0073\u000a",_gfba ,_efga .String ());
-};};func _cecdc (_gefbb ,_eagd bounded )float64 {_eafc :=_cbff (_gefbb ,_eagd );if !_edec (_eafc ){return _eafc ;};return _cedab (_gefbb ,_eagd );};var _ccffa string ="\u005e\u005b\u0061\u002d\u007a\u0041\u002dZ\u005d\u0028\u005c)\u007c\u005c\u002e)\u007c\u005e[\u005c\u0064\u005d\u002b\u0028\u005c)\u007c\\.\u0029\u007c\u005e\u005c\u0028\u005b\u0061\u002d\u007a\u0041\u002d\u005a\u005d\u005c\u0029\u007c\u005e\u005c\u0028\u005b\u005c\u0064\u005d\u002b\u005c\u0029";
-func (_abfc *textObject )moveText (_ebdc ,_gcbe float64 ){_abfc .moveLP (_ebdc ,_gcbe )};func (_aeffe rulingList )secMinMax ()(float64 ,float64 ){_dfce ,_begf :=_aeffe [0]._ggecg ,_aeffe [0]._gebf ;for _ ,_dedaf :=range _aeffe [1:]{if _dedaf ._ggecg < _dfce {_dfce =_dedaf ._ggecg ;
-};if _dedaf ._gebf > _begf {_begf =_dedaf ._gebf ;};};return _dfce ,_begf ;};func _ebc (_ag []string ,_fd int ,_efa string )int {_efab :=_fd ;for ;_efab < len (_ag );_efab ++{if _ag [_efab ]!=_efa {return _efab ;};};return _efab ;};func (_dfbfg *textPara )depth ()float64 {if _dfbfg ._gddfg {return -1.0;
-};if len (_dfbfg ._feea )> 0{return _dfbfg ._feea [0]._adaa ;};return _dfbfg ._fbbfg .depth ();};func (_fcba paraList )addNeighbours (){_fagcg :=func (_gacge []int ,_eggfe *textPara )([]*textPara ,[]*textPara ){_daabd :=make ([]*textPara ,0,len (_gacge )-1);
-_gbgb :=make ([]*textPara ,0,len (_gacge )-1);for _ ,_agbf :=range _gacge {_gfbfe :=_fcba [_agbf ];if _gfbfe .Urx <=_eggfe .Llx {_daabd =append (_daabd ,_gfbfe );}else if _gfbfe .Llx >=_eggfe .Urx {_gbgb =append (_gbgb ,_gfbfe );};};return _daabd ,_gbgb ;
-};_aaeb :=func (_bgdbd []int ,_dgaed *textPara )([]*textPara ,[]*textPara ){_fadc :=make ([]*textPara ,0,len (_bgdbd )-1);_bggdd :=make ([]*textPara ,0,len (_bgdbd )-1);for _ ,_feceb :=range _bgdbd {_dced :=_fcba [_feceb ];if _dced .Ury <=_dgaed .Lly {_bggdd =append (_bggdd ,_dced );
-}else if _dced .Lly >=_dgaed .Ury {_fadc =append (_fadc ,_dced );};};return _fadc ,_bggdd ;};_bagc :=_fcba .yNeighbours (_eddbgd );for _ ,_ddecc :=range _fcba {_eabe :=_bagc [_ddecc ];if len (_eabe )==0{continue ;};_fbagc ,_effd :=_fagcg (_eabe ,_ddecc );
-if len (_fbagc )==0&&len (_effd )==0{continue ;};if len (_fbagc )> 0{_dgfde :=_fbagc [0];for _ ,_gbgfd :=range _fbagc [1:]{if _gbgfd .Urx >=_dgfde .Urx {_dgfde =_gbgfd ;};};for _ ,_ecaac :=range _fbagc {if _ecaac !=_dgfde &&_ecaac .Urx > _dgfde .Llx {_dgfde =nil ;
-break ;};};if _dgfde !=nil &&_fgee (_ddecc .PdfRectangle ,_dgfde .PdfRectangle ){_ddecc ._aagb =_dgfde ;};};if len (_effd )> 0{_geacd :=_effd [0];for _ ,_adbbb :=range _effd [1:]{if _adbbb .Llx <=_geacd .Llx {_geacd =_adbbb ;};};for _ ,_eaadfa :=range _effd {if _eaadfa !=_geacd &&_eaadfa .Llx < _geacd .Urx {_geacd =nil ;
-break ;};};if _geacd !=nil &&_fgee (_ddecc .PdfRectangle ,_geacd .PdfRectangle ){_ddecc ._badad =_geacd ;};};};_bagc =_fcba .xNeighbours (_ffg );for _ ,_gaacd :=range _fcba {_eeac :=_bagc [_gaacd ];if len (_eeac )==0{continue ;};_dgggf ,_adbad :=_aaeb (_eeac ,_gaacd );
-if len (_dgggf )==0&&len (_adbad )==0{continue ;};if len (_adbad )> 0{_egede :=_adbad [0];for _ ,_fffdg :=range _adbad [1:]{if _fffdg .Ury >=_egede .Ury {_egede =_fffdg ;};};for _ ,_aecff :=range _adbad {if _aecff !=_egede &&_aecff .Ury > _egede .Lly {_egede =nil ;
-break ;};};if _egede !=nil &&_cfcef (_gaacd .PdfRectangle ,_egede .PdfRectangle ){_gaacd ._gdae =_egede ;};};if len (_dgggf )> 0{_cfbcc :=_dgggf [0];for _ ,_degae :=range _dgggf [1:]{if _degae .Lly <=_cfbcc .Lly {_cfbcc =_degae ;};};for _ ,_bbdg :=range _dgggf {if _bbdg !=_cfbcc &&_bbdg .Lly < _cfbcc .Ury {_cfbcc =nil ;
-break ;};};if _cfbcc !=nil &&_cfcef (_gaacd .PdfRectangle ,_cfbcc .PdfRectangle ){_gaacd ._decad =_cfbcc ;};};};for _ ,_bgaaf :=range _fcba {if _bgaaf ._aagb !=nil &&_bgaaf ._aagb ._badad !=_bgaaf {_bgaaf ._aagb =nil ;};if _bgaaf ._decad !=nil &&_bgaaf ._decad ._gdae !=_bgaaf {_bgaaf ._decad =nil ;
-};if _bgaaf ._badad !=nil &&_bgaaf ._badad ._aagb !=_bgaaf {_bgaaf ._badad =nil ;};if _bgaaf ._gdae !=nil &&_bgaaf ._gdae ._decad !=_bgaaf {_bgaaf ._gdae =nil ;};};};type paraList []*textPara ;
+func (_eagge *ruling) String() string {
+	if _eagge._gafe == _gbgfg {
+		return "\u004e\u004f\u0054\u0020\u0052\u0055\u004c\u0049\u004e\u0047"
+	}
+	_ffgb, _ggccd := "\u0078", "\u0079"
+	if _eagge._gafe == _cafa {
+		_ffgb, _ggccd = "\u0079", "\u0078"
+	}
+	_cgdc := ""
+	if _eagge._bdbgf != 0.0 {
+		_cgdc = _fa.Sprintf(" \u0077\u0069\u0064\u0074\u0068\u003d\u0025\u002e\u0032\u0066", _eagge._bdbgf)
+	}
+	return _fa.Sprintf("\u0025\u00310\u0073\u0020\u0025\u0073\u003d\u0025\u0036\u002e\u0032\u0066\u0020\u0025\u0073\u003d\u0025\u0036\u002e\u0032\u0066\u0020\u002d\u0020\u0025\u0036\u002e\u0032\u0066\u0020\u0028\u0025\u0036\u002e\u0032\u0066\u0029\u0020\u0025\u0073\u0020\u0025\u0076\u0025\u0073", _eagge._gafe, _ffgb, _eagge._ecfb, _ggccd, _eagge._ggecg, _eagge._gebf, _eagge._gebf-_eagge._ggecg, _eagge._abddg, _eagge.Color, _cgdc)
+}
+
+func (_acgb paraList) log(_efdgd string) {
+	if !_ebbaf {
+		return
+	}
+	_bg.Log.Info("%\u0038\u0073\u003a\u0020\u0025\u0064 \u0070\u0061\u0072\u0061\u0073\u0020=\u003d\u003d\u003d\u003d\u003d\u003d\u002d-\u002d\u002d\u002d\u002d\u002d\u003d\u003d\u003d\u003d\u003d=\u003d", _efdgd, len(_acgb))
+	for _adbb, _ggca := range _acgb {
+		if _ggca == nil {
+			continue
+		}
+		_cbef := _ggca.text()
+		_bcgc := "\u0020\u0020"
+		if _ggca._fbbfg != nil {
+			_bcgc = _fa.Sprintf("\u005b%\u0064\u0078\u0025\u0064\u005d", _ggca._fbbfg._cfadc, _ggca._fbbfg._aaga)
+		}
+		_fa.Printf("\u0025\u0034\u0064\u003a\u0020\u0025\u0036\u002e\u0032\u0066\u0020\u0025s\u0020\u0025\u0071\u000a", _adbb, _ggca.PdfRectangle, _bcgc, _fagdg(_cbef, 50))
+	}
+}
+
+func (_ece *subpath) add(_acdfc ..._cd.Point) { _ece._bfgb = append(_ece._bfgb, _acdfc...) }
+
+type textLine struct {
+	_ad.PdfRectangle
+	_adaa float64
+	_gbaa []*textWord
+	_fgfb float64
+}
+
+func (_ecae *textPara) taken() bool { return _ecae == nil || _ecae._bdfe }
+
+func _dfaec(_defe string, _edbd []rulingList) {
+	_bg.Log.Info("\u0024\u0024 \u0025\u0064\u0020g\u0072\u0069\u0064\u0073\u0020\u002d\u0020\u0025\u0073", len(_edbd), _defe)
+	for _gfba, _efga := range _edbd {
+		_fa.Printf("\u0025\u0034\u0064\u003a\u0020\u0025\u0073\u000a", _gfba, _efga.String())
+	}
+}
+
+func _cecdc(_gefbb, _eagd bounded) float64 {
+	_eafc := _cbff(_gefbb, _eagd)
+	if !_edec(_eafc) {
+		return _eafc
+	}
+	return _cedab(_gefbb, _eagd)
+}
+
+var _ccffa string = "\u005e\u005b\u0061\u002d\u007a\u0041\u002dZ\u005d\u0028\u005c)\u007c\u005c\u002e)\u007c\u005e[\u005c\u0064\u005d\u002b\u0028\u005c)\u007c\\.\u0029\u007c\u005e\u005c\u0028\u005b\u0061\u002d\u007a\u0041\u002d\u005a\u005d\u005c\u0029\u007c\u005e\u005c\u0028\u005b\u005c\u0064\u005d\u002b\u005c\u0029"
+
+func (_abfc *textObject) moveText(_ebdc, _gcbe float64) { _abfc.moveLP(_ebdc, _gcbe) }
+
+func (_aeffe rulingList) secMinMax() (float64, float64) {
+	_dfce, _begf := _aeffe[0]._ggecg, _aeffe[0]._gebf
+	for _, _dedaf := range _aeffe[1:] {
+		if _dedaf._ggecg < _dfce {
+			_dfce = _dedaf._ggecg
+		}
+		if _dedaf._gebf > _begf {
+			_begf = _dedaf._gebf
+		}
+	}
+	return _dfce, _begf
+}
+
+func _ebc(_ag []string, _fd int, _efa string) int {
+	_efab := _fd
+	for ; _efab < len(_ag); _efab++ {
+		if _ag[_efab] != _efa {
+			return _efab
+		}
+	}
+	return _efab
+}
+
+func (_dfbfg *textPara) depth() float64 {
+	if _dfbfg._gddfg {
+		return -1.0
+	}
+	if len(_dfbfg._feea) > 0 {
+		return _dfbfg._feea[0]._adaa
+	}
+	return _dfbfg._fbbfg.depth()
+}
+
+func (_fcba paraList) addNeighbours() {
+	_fagcg := func(_gacge []int, _eggfe *textPara) ([]*textPara, []*textPara) {
+		_daabd := make([]*textPara, 0, len(_gacge)-1)
+		_gbgb := make([]*textPara, 0, len(_gacge)-1)
+		for _, _agbf := range _gacge {
+			_gfbfe := _fcba[_agbf]
+			if _gfbfe.Urx <= _eggfe.Llx {
+				_daabd = append(_daabd, _gfbfe)
+			} else if _gfbfe.Llx >= _eggfe.Urx {
+				_gbgb = append(_gbgb, _gfbfe)
+			}
+		}
+		return _daabd, _gbgb
+	}
+	_aaeb := func(_bgdbd []int, _dgaed *textPara) ([]*textPara, []*textPara) {
+		_fadc := make([]*textPara, 0, len(_bgdbd)-1)
+		_bggdd := make([]*textPara, 0, len(_bgdbd)-1)
+		for _, _feceb := range _bgdbd {
+			_dced := _fcba[_feceb]
+			if _dced.Ury <= _dgaed.Lly {
+				_bggdd = append(_bggdd, _dced)
+			} else if _dced.Lly >= _dgaed.Ury {
+				_fadc = append(_fadc, _dced)
+			}
+		}
+		return _fadc, _bggdd
+	}
+	_bagc := _fcba.yNeighbours(_eddbgd)
+	for _, _ddecc := range _fcba {
+		_eabe := _bagc[_ddecc]
+		if len(_eabe) == 0 {
+			continue
+		}
+		_fbagc, _effd := _fagcg(_eabe, _ddecc)
+		if len(_fbagc) == 0 && len(_effd) == 0 {
+			continue
+		}
+		if len(_fbagc) > 0 {
+			_dgfde := _fbagc[0]
+			for _, _gbgfd := range _fbagc[1:] {
+				if _gbgfd.Urx >= _dgfde.Urx {
+					_dgfde = _gbgfd
+				}
+			}
+			for _, _ecaac := range _fbagc {
+				if _ecaac != _dgfde && _ecaac.Urx > _dgfde.Llx {
+					_dgfde = nil
+					break
+				}
+			}
+			if _dgfde != nil && _fgee(_ddecc.PdfRectangle, _dgfde.PdfRectangle) {
+				_ddecc._aagb = _dgfde
+			}
+		}
+		if len(_effd) > 0 {
+			_geacd := _effd[0]
+			for _, _adbbb := range _effd[1:] {
+				if _adbbb.Llx <= _geacd.Llx {
+					_geacd = _adbbb
+				}
+			}
+			for _, _eaadfa := range _effd {
+				if _eaadfa != _geacd && _eaadfa.Llx < _geacd.Urx {
+					_geacd = nil
+					break
+				}
+			}
+			if _geacd != nil && _fgee(_ddecc.PdfRectangle, _geacd.PdfRectangle) {
+				_ddecc._badad = _geacd
+			}
+		}
+	}
+	_bagc = _fcba.xNeighbours(_ffg)
+	for _, _gaacd := range _fcba {
+		_eeac := _bagc[_gaacd]
+		if len(_eeac) == 0 {
+			continue
+		}
+		_dgggf, _adbad := _aaeb(_eeac, _gaacd)
+		if len(_dgggf) == 0 && len(_adbad) == 0 {
+			continue
+		}
+		if len(_adbad) > 0 {
+			_egede := _adbad[0]
+			for _, _fffdg := range _adbad[1:] {
+				if _fffdg.Ury >= _egede.Ury {
+					_egede = _fffdg
+				}
+			}
+			for _, _aecff := range _adbad {
+				if _aecff != _egede && _aecff.Ury > _egede.Lly {
+					_egede = nil
+					break
+				}
+			}
+			if _egede != nil && _cfcef(_gaacd.PdfRectangle, _egede.PdfRectangle) {
+				_gaacd._gdae = _egede
+			}
+		}
+		if len(_dgggf) > 0 {
+			_cfbcc := _dgggf[0]
+			for _, _degae := range _dgggf[1:] {
+				if _degae.Lly <= _cfbcc.Lly {
+					_cfbcc = _degae
+				}
+			}
+			for _, _bbdg := range _dgggf {
+				if _bbdg != _cfbcc && _bbdg.Lly < _cfbcc.Ury {
+					_cfbcc = nil
+					break
+				}
+			}
+			if _cfbcc != nil && _cfcef(_gaacd.PdfRectangle, _cfbcc.PdfRectangle) {
+				_gaacd._decad = _cfbcc
+			}
+		}
+	}
+	for _, _bgaaf := range _fcba {
+		if _bgaaf._aagb != nil && _bgaaf._aagb._badad != _bgaaf {
+			_bgaaf._aagb = nil
+		}
+		if _bgaaf._decad != nil && _bgaaf._decad._gdae != _bgaaf {
+			_bgaaf._decad = nil
+		}
+		if _bgaaf._badad != nil && _bgaaf._badad._aagb != _bgaaf {
+			_bgaaf._badad = nil
+		}
+		if _bgaaf._gdae != nil && _bgaaf._gdae._decad != _bgaaf {
+			_bgaaf._gdae = nil
+		}
+	}
+}
+
+type paraList []*textPara
 
 // String returns a human readable description of `s`.
-func (_adfd intSet )String ()string {var _ebfd []int ;for _acdeb :=range _adfd {if _adfd .has (_acdeb ){_ebfd =append (_ebfd ,_acdeb );};};_eg .Ints (_ebfd );return _fa .Sprintf ("\u0025\u002b\u0076",_ebfd );};type bounded interface{bbox ()_ad .PdfRectangle };
-func (_bcba *shapesState )stroke (_bcbg *[]pathSection ){_daeg :=pathSection {_fdgf :_bcba ._fec ,Color :_bcba ._affd .getStrokeColor ()};*_bcbg =append (*_bcbg ,_daeg );if _feda {_fa .Printf ("\u0020 \u0020\u0020S\u0054\u0052\u004fK\u0045\u003a\u0020\u0025\u0064\u0020\u0073t\u0072\u006f\u006b\u0065\u0073\u0020s\u0073\u003d\u0025\u0073\u0020\u0063\u006f\u006c\u006f\u0072\u003d%\u002b\u0076\u0020\u0025\u0036\u002e\u0032\u0066\u000a",len (*_bcbg ),_bcba ,_bcba ._affd .getStrokeColor (),_daeg .bbox ());
-if _aeff {for _abbb ,_bgbd :=range _bcba ._fec {_fa .Printf ("\u0025\u0038\u0064\u003a\u0020\u0025\u0073\u000a",_abbb ,_bgbd );if _abbb ==10{break ;};};};};};func (_fgbcg *textTable )compositeRowCorridors ()map[int ][]float64 {_badbe :=make (map[int ][]float64 ,_fgbcg ._aaga );
-if _ggegb {_bg .Log .Info ("c\u006f\u006d\u0070\u006f\u0073\u0069t\u0065\u0052\u006f\u0077\u0043\u006f\u0072\u0072\u0069d\u006f\u0072\u0073:\u0020h\u003d\u0025\u0064",_fgbcg ._aaga );};for _ebdef :=1;_ebdef < _fgbcg ._aaga ;_ebdef ++{var _bccge []compositeCell ;
-for _edag :=0;_edag < _fgbcg ._cfadc ;_edag ++{if _cbge ,_gcdgc :=_fgbcg ._cafd [_fffbe (_edag ,_ebdef )];_gcdgc {_bccge =append (_bccge ,_cbge );};};if len (_bccge )==0{continue ;};_baabb :=_ebdad (_bccge );_badbe [_ebdef ]=_baabb ;if _ggegb {_fa .Printf ("\u0020\u0020\u0020\u0025\u0032\u0064\u003a\u0020\u00256\u002e\u0032\u0066\u000a",_ebdef ,_baabb );
-};};return _badbe ;};type list struct{_aage []*textLine ;_ebbb string ;_cgfag []*list ;_bdeac string ;};func (_cfdg *wordBag )scanBand (_gga string ,_aea *wordBag ,_geddd func (_bbcga *wordBag ,_bgaff *textWord )bool ,_cfce ,_ecea ,_cfgb float64 ,_eeab ,_gcbg bool )int {_fbdb :=_aea ._eagga ;
-var _fcfe map[int ]map[*textWord ]struct{};if !_eeab {_fcfe =_cfdg .makeRemovals ();};_fgca :=_acdag *_fbdb ;_ebgf :=0;for _ ,_bfdc :=range _cfdg .depthBand (_cfce -_fgca ,_ecea +_fgca ){if len (_cfdg ._fdeg [_bfdc ])==0{continue ;};for _ ,_ggae :=range _cfdg ._fdeg [_bfdc ]{if !(_cfce -_fgca <=_ggae ._fcgaa &&_ggae ._fcgaa <=_ecea +_fgca ){continue ;
-};if !_geddd (_aea ,_ggae ){continue ;};_ggcd :=2.0*_c .Abs (_ggae ._bbebf -_aea ._eagga )/(_ggae ._bbebf +_aea ._eagga );_accf :=_c .Max (_ggae ._bbebf /_aea ._eagga ,_aea ._eagga /_ggae ._bbebf );_fbdf :=_c .Min (_ggcd ,_accf );if _cfgb > 0&&_fbdf > _cfgb {continue ;
-};if _aea .blocked (_ggae ){continue ;};if !_eeab {_aea .pullWord (_ggae ,_bfdc ,_fcfe );};_ebgf ++;if !_gcbg {if _ggae ._fcgaa < _cfce {_cfce =_ggae ._fcgaa ;};if _ggae ._fcgaa > _ecea {_ecea =_ggae ._fcgaa ;};};if _eeab {break ;};};};if !_eeab {_cfdg .applyRemovals (_fcfe );
-};return _ebgf ;};func (_bagg lineRuling )yMean ()float64 {return 0.5*(_bagg ._gfdac .Y +_bagg ._bfbed .Y )};type event struct{_ggcee float64 ;_ebbd bool ;_dffg int ;};func _aebed (_gfbdb ,_fcbe ,_beab ,_fgcfc *textPara )*textTable {_ddbcc :=&textTable {_cfadc :2,_aaga :2,_eccda :make (map[uint64 ]*textPara ,4)};
-_ddbcc .put (0,0,_gfbdb );_ddbcc .put (1,0,_fcbe );_ddbcc .put (0,1,_beab );_ddbcc .put (1,1,_fgcfc );return _ddbcc ;};func (_cdaaf paraList )applyTables (_gaaff []*textTable )paraList {var _bbbg paraList ;for _ ,_afbfe :=range _gaaff {_bbbg =append (_bbbg ,_afbfe .newTablePara ());
-};for _ ,_cceb :=range _cdaaf {if _cceb ._bdfe {continue ;};_bbbg =append (_bbbg ,_cceb );};return _bbbg ;};func _ebeg (_ceeb *paraList )map[int ][]*textLine {_ccac :=map[int ][]*textLine {};for _ ,_cgba :=range *_ceeb {for _ ,_acdff :=range _cgba ._feea {if !_abcbd (_acdff ){_bg .Log .Debug ("g\u0072\u006f\u0075p\u004c\u0069\u006e\u0065\u0073\u003a\u0020\u0054\u0068\u0065\u0020\u0074\u0065\u0078\u0074\u0020\u006c\u0069\u006e\u0065\u0020\u0063\u006f\u006e\u0074a\u0069\u006e\u0073 \u006d\u006f\u0072\u0065\u0020\u0074\u0068\u0061\u006e\u0020\u006f\u006e\u0065 \u006d\u0063\u0069\u0064 \u006e\u0075\u006d\u0062e\u0072\u002e\u0020\u0049\u0074\u0020\u0073\u0068\u006f\u0075\u006c\u0064\u0020\u0062\u0065\u0020\u0073p\u006c\u0069\u0074\u002e");
-continue ;};_fgdba :=_acdff ._gbaa [0]._ddfc [0]._daaf ;_ccac [_fgdba ]=append (_ccac [_fgdba ],_acdff );};if _cgba ._fbbfg !=nil {_ffb :=_cgba ._fbbfg ._eccda ;for _ ,_ccca :=range _ffb {for _ ,_faeab :=range _ccca ._feea {if !_abcbd (_faeab ){_bg .Log .Debug ("g\u0072\u006f\u0075p\u004c\u0069\u006e\u0065\u0073\u003a\u0020\u0054\u0068\u0065\u0020\u0074\u0065\u0078\u0074\u0020\u006c\u0069\u006e\u0065\u0020\u0063\u006f\u006e\u0074a\u0069\u006e\u0073 \u006d\u006f\u0072\u0065\u0020\u0074\u0068\u0061\u006e\u0020\u006f\u006e\u0065 \u006d\u0063\u0069\u0064 \u006e\u0075\u006d\u0062e\u0072\u002e\u0020\u0049\u0074\u0020\u0073\u0068\u006f\u0075\u006c\u0064\u0020\u0062\u0065\u0020\u0073p\u006c\u0069\u0074\u002e");
-continue ;};_geea :=_faeab ._gbaa [0]._ddfc [0]._daaf ;_ccac [_geea ]=append (_ccac [_geea ],_faeab );};};};};return _ccac ;};func (_afdg paraList )list ()[]*list {var _ebdca []*textLine ;var _ddgbe []*textLine ;for _ ,_bgddb :=range _afdg {_gdeb :=_bgddb .getListLines ();
-_ebdca =append (_ebdca ,_gdeb ...);_ddgbe =append (_ddgbe ,_bgddb ._feea ...);};_bcdef :=_bgag (_ebdca );_ebggb :=_edad (_ddgbe ,_bcdef );return _ebggb ;};func (_gaac *wordBag )getDepthIdx (_beded float64 )int {_dccb :=_gaac .depthIndexes ();_ccdgd :=_gfde (_beded );
-if _ccdgd < _dccb [0]{return _dccb [0];};if _ccdgd > _dccb [len (_dccb )-1]{return _dccb [len (_dccb )-1];};return _ccdgd ;};func (_fcab gridTile )complete ()bool {return _fcab .numBorders ()==4};func _geee (_ebadg *wordBag ,_cbfd *textWord ,_beff float64 )bool {return _cbfd .Llx < _ebadg .Urx +_beff &&_ebadg .Llx -_beff < _cbfd .Urx ;
-};func (_dceea *textTable )putComposite (_gfca ,_baade int ,_cdfdg paraList ,_afebfg _ad .PdfRectangle ){if len (_cdfdg )==0{_bg .Log .Error ("\u0074\u0065xt\u0054\u0061\u0062l\u0065\u0029\u0020\u0070utC\u006fmp\u006f\u0073\u0069\u0074\u0065\u003a\u0020em\u0070\u0074\u0079\u0020\u0070\u0061\u0072a\u0073");
-return ;};_facca :=compositeCell {PdfRectangle :_afebfg ,paraList :_cdfdg };if _ggegb {_fa .Printf ("\u0020\u0020\u0020\u0020\u0020\u0020\u0020\u0020\u0070\u0075\u0074\u0043\u006f\u006d\u0070o\u0073i\u0074\u0065\u0028\u0025\u0064\u002c\u0025\u0064\u0029\u003c\u002d\u0025\u0073\u000a",_gfca ,_baade ,_facca .String ());
-};_facca .updateBBox ();_dceea ._cafd [_fffbe (_gfca ,_baade )]=_facca ;};func _ccdg (_fdfc _ad .PdfRectangle )textState {return textState {_deeee :100,_caad :RenderModeFill ,_eccb :_fdfc };};func (_cefca paraList )yNeighbours (_aebgf float64 )map[*textPara ][]int {_eedee :=make ([]event ,2*len (_cefca ));
-if _aebgf ==0{for _aacd ,_afeea :=range _cefca {_eedee [2*_aacd ]=event {_afeea .Lly ,true ,_aacd };_eedee [2*_aacd +1]=event {_afeea .Ury ,false ,_aacd };};}else {for _dedg ,_feba :=range _cefca {_eedee [2*_dedg ]=event {_feba .Lly -_aebgf *_feba .fontsize (),true ,_dedg };
-_eedee [2*_dedg +1]=event {_feba .Ury +_aebgf *_feba .fontsize (),false ,_dedg };};};return _cefca .eventNeighbours (_eedee );};func _beged (_dfbad []rulingList )(rulingList ,rulingList ){var _adgf rulingList ;for _ ,_affe :=range _dfbad {_adgf =append (_adgf ,_affe ...);
-};return _adgf .vertsHorzs ();};func (_bgcg *shapesState )devicePoint (_gfdg ,_ggef float64 )_cd .Point {_fdfec :=_bgcg ._dcfcb .Mult (_bgcg ._fggg );_gfdg ,_ggef =_fdfec .Transform (_gfdg ,_ggef );return _cd .NewPoint (_gfdg ,_ggef );};func (_gdgdf rulingList )log (_gfbb string ){if !_feda {return ;
-};_bg .Log .Info ("\u0023\u0023\u0023\u0020\u0025\u0031\u0030\u0073\u003a\u0020\u0076\u0065c\u0073\u003d\u0025\u0073",_gfbb ,_gdgdf .String ());for _bfcba ,_agaad :=range _gdgdf {_fa .Printf ("\u0025\u0034\u0064\u003a\u0020\u0025\u0073\u000a",_bfcba ,_agaad .String ());
-};};func _gdag (_bgcd ,_ddfeg _cd .Point )bool {_ecafb :=_c .Abs (_bgcd .X -_ddfeg .X );_gced :=_c .Abs (_bgcd .Y -_ddfeg .Y );return _eedad (_gced ,_ecafb );};func (_bcde *PageText )getParagraphs ()paraList {var _bdgaa rulingList ;if _ffaa {_bgbc :=_gfgb (_bcde ._addcd );
-_bdgaa =append (_bdgaa ,_bgbc ...);};if _bbfaf {_egge :=_cfae (_bcde ._ddfd );_bdgaa =append (_bdgaa ,_egge ...);};_bdgaa ,_ddgf :=_bdgaa .toTilings ();var _ace paraList ;_efgd :=len (_bcde ._baaa );for _afee :=0;_afee < 360&&_efgd > 0;_afee +=90{_dgdd :=make ([]*textMark ,0,len (_bcde ._baaa )-_efgd );
-for _ ,_bga :=range _bcde ._baaa {if _bga ._cbgf ==_afee {_dgdd =append (_dgdd ,_bga );};};if len (_dgdd )> 0{_cdgd :=_gbcge (_dgdd ,_bcde ._gfag ,_bdgaa ,_ddgf ,_bcde ._acaf ._eedf ==ExtractionModeLayoutNoBreaks );_ace =append (_ace ,_cdgd ...);_efgd -=len (_dgdd );
-};};return _ace ;};func _fgdd (_fgcf _ad .PdfRectangle ,_eaad bounded )float64 {return _fgcf .Ury -_eaad .bbox ().Lly };func (_debf rulingList )removeDuplicates ()rulingList {if len (_debf )==0{return nil ;};_debf .sort ();_edeae :=rulingList {_debf [0]};
-for _ ,_deabe :=range _debf [1:]{if _deabe .equals (_edeae [len (_edeae )-1]){continue ;};_edeae =append (_edeae ,_deabe );};return _edeae ;};
+func (_adfd intSet) String() string {
+	var _ebfd []int
+	for _acdeb := range _adfd {
+		if _adfd.has(_acdeb) {
+			_ebfd = append(_ebfd, _acdeb)
+		}
+	}
+	_eg.Ints(_ebfd)
+	return _fa.Sprintf("\u0025\u002b\u0076", _ebfd)
+}
+
+type bounded interface{ bbox() _ad.PdfRectangle }
+
+func (_bcba *shapesState) stroke(_bcbg *[]pathSection) {
+	_daeg := pathSection{_fdgf: _bcba._fec, Color: _bcba._affd.getStrokeColor()}
+	*_bcbg = append(*_bcbg, _daeg)
+	if _feda {
+		_fa.Printf("\u0020 \u0020\u0020S\u0054\u0052\u004fK\u0045\u003a\u0020\u0025\u0064\u0020\u0073t\u0072\u006f\u006b\u0065\u0073\u0020s\u0073\u003d\u0025\u0073\u0020\u0063\u006f\u006c\u006f\u0072\u003d%\u002b\u0076\u0020\u0025\u0036\u002e\u0032\u0066\u000a", len(*_bcbg), _bcba, _bcba._affd.getStrokeColor(), _daeg.bbox())
+		if _aeff {
+			for _abbb, _bgbd := range _bcba._fec {
+				_fa.Printf("\u0025\u0038\u0064\u003a\u0020\u0025\u0073\u000a", _abbb, _bgbd)
+				if _abbb == 10 {
+					break
+				}
+			}
+		}
+	}
+}
+
+func (_fgbcg *textTable) compositeRowCorridors() map[int][]float64 {
+	_badbe := make(map[int][]float64, _fgbcg._aaga)
+	if _ggegb {
+		_bg.Log.Info("c\u006f\u006d\u0070\u006f\u0073\u0069t\u0065\u0052\u006f\u0077\u0043\u006f\u0072\u0072\u0069d\u006f\u0072\u0073:\u0020h\u003d\u0025\u0064", _fgbcg._aaga)
+	}
+	for _ebdef := 1; _ebdef < _fgbcg._aaga; _ebdef++ {
+		var _bccge []compositeCell
+		for _edag := 0; _edag < _fgbcg._cfadc; _edag++ {
+			if _cbge, _gcdgc := _fgbcg._cafd[_fffbe(_edag, _ebdef)]; _gcdgc {
+				_bccge = append(_bccge, _cbge)
+			}
+		}
+		if len(_bccge) == 0 {
+			continue
+		}
+		_baabb := _ebdad(_bccge)
+		_badbe[_ebdef] = _baabb
+		if _ggegb {
+			_fa.Printf("\u0020\u0020\u0020\u0025\u0032\u0064\u003a\u0020\u00256\u002e\u0032\u0066\u000a", _ebdef, _baabb)
+		}
+	}
+	return _badbe
+}
+
+type list struct {
+	_aage  []*textLine
+	_ebbb  string
+	_cgfag []*list
+	_bdeac string
+}
+
+func (_cfdg *wordBag) scanBand(_gga string, _aea *wordBag, _geddd func(_bbcga *wordBag, _bgaff *textWord) bool, _cfce, _ecea, _cfgb float64, _eeab, _gcbg bool) int {
+	_fbdb := _aea._eagga
+	var _fcfe map[int]map[*textWord]struct{}
+	if !_eeab {
+		_fcfe = _cfdg.makeRemovals()
+	}
+	_fgca := _acdag * _fbdb
+	_ebgf := 0
+	for _, _bfdc := range _cfdg.depthBand(_cfce-_fgca, _ecea+_fgca) {
+		if len(_cfdg._fdeg[_bfdc]) == 0 {
+			continue
+		}
+		for _, _ggae := range _cfdg._fdeg[_bfdc] {
+			if !(_cfce-_fgca <= _ggae._fcgaa && _ggae._fcgaa <= _ecea+_fgca) {
+				continue
+			}
+			if !_geddd(_aea, _ggae) {
+				continue
+			}
+			_ggcd := 2.0 * _c.Abs(_ggae._bbebf-_aea._eagga) / (_ggae._bbebf + _aea._eagga)
+			_accf := _c.Max(_ggae._bbebf/_aea._eagga, _aea._eagga/_ggae._bbebf)
+			_fbdf := _c.Min(_ggcd, _accf)
+			if _cfgb > 0 && _fbdf > _cfgb {
+				continue
+			}
+			if _aea.blocked(_ggae) {
+				continue
+			}
+			if !_eeab {
+				_aea.pullWord(_ggae, _bfdc, _fcfe)
+			}
+			_ebgf++
+			if !_gcbg {
+				if _ggae._fcgaa < _cfce {
+					_cfce = _ggae._fcgaa
+				}
+				if _ggae._fcgaa > _ecea {
+					_ecea = _ggae._fcgaa
+				}
+			}
+			if _eeab {
+				break
+			}
+		}
+	}
+	if !_eeab {
+		_cfdg.applyRemovals(_fcfe)
+	}
+	return _ebgf
+}
+
+func (_bagg lineRuling) yMean() float64 { return 0.5 * (_bagg._gfdac.Y + _bagg._bfbed.Y) }
+
+type event struct {
+	_ggcee float64
+	_ebbd  bool
+	_dffg  int
+}
+
+func _aebed(_gfbdb, _fcbe, _beab, _fgcfc *textPara) *textTable {
+	_ddbcc := &textTable{_cfadc: 2, _aaga: 2, _eccda: make(map[uint64]*textPara, 4)}
+	_ddbcc.put(0, 0, _gfbdb)
+	_ddbcc.put(1, 0, _fcbe)
+	_ddbcc.put(0, 1, _beab)
+	_ddbcc.put(1, 1, _fgcfc)
+	return _ddbcc
+}
+
+func (_cdaaf paraList) applyTables(_gaaff []*textTable) paraList {
+	var _bbbg paraList
+	for _, _afbfe := range _gaaff {
+		_bbbg = append(_bbbg, _afbfe.newTablePara())
+	}
+	for _, _cceb := range _cdaaf {
+		if _cceb._bdfe {
+			continue
+		}
+		_bbbg = append(_bbbg, _cceb)
+	}
+	return _bbbg
+}
+
+func _ebeg(_ceeb *paraList) map[int][]*textLine {
+	_ccac := map[int][]*textLine{}
+	for _, _cgba := range *_ceeb {
+		for _, _acdff := range _cgba._feea {
+			if !_abcbd(_acdff) {
+				_bg.Log.Debug("g\u0072\u006f\u0075p\u004c\u0069\u006e\u0065\u0073\u003a\u0020\u0054\u0068\u0065\u0020\u0074\u0065\u0078\u0074\u0020\u006c\u0069\u006e\u0065\u0020\u0063\u006f\u006e\u0074a\u0069\u006e\u0073 \u006d\u006f\u0072\u0065\u0020\u0074\u0068\u0061\u006e\u0020\u006f\u006e\u0065 \u006d\u0063\u0069\u0064 \u006e\u0075\u006d\u0062e\u0072\u002e\u0020\u0049\u0074\u0020\u0073\u0068\u006f\u0075\u006c\u0064\u0020\u0062\u0065\u0020\u0073p\u006c\u0069\u0074\u002e")
+				continue
+			}
+			_fgdba := _acdff._gbaa[0]._ddfc[0]._daaf
+			_ccac[_fgdba] = append(_ccac[_fgdba], _acdff)
+		}
+		if _cgba._fbbfg != nil {
+			_ffb := _cgba._fbbfg._eccda
+			for _, _ccca := range _ffb {
+				for _, _faeab := range _ccca._feea {
+					if !_abcbd(_faeab) {
+						_bg.Log.Debug("g\u0072\u006f\u0075p\u004c\u0069\u006e\u0065\u0073\u003a\u0020\u0054\u0068\u0065\u0020\u0074\u0065\u0078\u0074\u0020\u006c\u0069\u006e\u0065\u0020\u0063\u006f\u006e\u0074a\u0069\u006e\u0073 \u006d\u006f\u0072\u0065\u0020\u0074\u0068\u0061\u006e\u0020\u006f\u006e\u0065 \u006d\u0063\u0069\u0064 \u006e\u0075\u006d\u0062e\u0072\u002e\u0020\u0049\u0074\u0020\u0073\u0068\u006f\u0075\u006c\u0064\u0020\u0062\u0065\u0020\u0073p\u006c\u0069\u0074\u002e")
+						continue
+					}
+					_geea := _faeab._gbaa[0]._ddfc[0]._daaf
+					_ccac[_geea] = append(_ccac[_geea], _faeab)
+				}
+			}
+		}
+	}
+	return _ccac
+}
+
+func (_afdg paraList) list() []*list {
+	var _ebdca []*textLine
+	var _ddgbe []*textLine
+	for _, _bgddb := range _afdg {
+		_gdeb := _bgddb.getListLines()
+		_ebdca = append(_ebdca, _gdeb...)
+		_ddgbe = append(_ddgbe, _bgddb._feea...)
+	}
+	_bcdef := _bgag(_ebdca)
+	_ebggb := _edad(_ddgbe, _bcdef)
+	return _ebggb
+}
+
+func (_gaac *wordBag) getDepthIdx(_beded float64) int {
+	_dccb := _gaac.depthIndexes()
+	_ccdgd := _gfde(_beded)
+	if _ccdgd < _dccb[0] {
+		return _dccb[0]
+	}
+	if _ccdgd > _dccb[len(_dccb)-1] {
+		return _dccb[len(_dccb)-1]
+	}
+	return _ccdgd
+}
+
+func (_fcab gridTile) complete() bool { return _fcab.numBorders() == 4 }
+
+func _geee(_ebadg *wordBag, _cbfd *textWord, _beff float64) bool {
+	return _cbfd.Llx < _ebadg.Urx+_beff && _ebadg.Llx-_beff < _cbfd.Urx
+}
+
+func (_dceea *textTable) putComposite(_gfca, _baade int, _cdfdg paraList, _afebfg _ad.PdfRectangle) {
+	if len(_cdfdg) == 0 {
+		_bg.Log.Error("\u0074\u0065xt\u0054\u0061\u0062l\u0065\u0029\u0020\u0070utC\u006fmp\u006f\u0073\u0069\u0074\u0065\u003a\u0020em\u0070\u0074\u0079\u0020\u0070\u0061\u0072a\u0073")
+		return
+	}
+	_facca := compositeCell{PdfRectangle: _afebfg, paraList: _cdfdg}
+	if _ggegb {
+		_fa.Printf("\u0020\u0020\u0020\u0020\u0020\u0020\u0020\u0020\u0070\u0075\u0074\u0043\u006f\u006d\u0070o\u0073i\u0074\u0065\u0028\u0025\u0064\u002c\u0025\u0064\u0029\u003c\u002d\u0025\u0073\u000a", _gfca, _baade, _facca.String())
+	}
+	_facca.updateBBox()
+	_dceea._cafd[_fffbe(_gfca, _baade)] = _facca
+}
+
+func _ccdg(_fdfc _ad.PdfRectangle) textState {
+	return textState{_deeee: 100, _caad: RenderModeFill, _eccb: _fdfc}
+}
+
+func (_cefca paraList) yNeighbours(_aebgf float64) map[*textPara][]int {
+	_eedee := make([]event, 2*len(_cefca))
+	if _aebgf == 0 {
+		for _aacd, _afeea := range _cefca {
+			_eedee[2*_aacd] = event{_afeea.Lly, true, _aacd}
+			_eedee[2*_aacd+1] = event{_afeea.Ury, false, _aacd}
+		}
+	} else {
+		for _dedg, _feba := range _cefca {
+			_eedee[2*_dedg] = event{_feba.Lly - _aebgf*_feba.fontsize(), true, _dedg}
+			_eedee[2*_dedg+1] = event{_feba.Ury + _aebgf*_feba.fontsize(), false, _dedg}
+		}
+	}
+	return _cefca.eventNeighbours(_eedee)
+}
+
+func _beged(_dfbad []rulingList) (rulingList, rulingList) {
+	var _adgf rulingList
+	for _, _affe := range _dfbad {
+		_adgf = append(_adgf, _affe...)
+	}
+	return _adgf.vertsHorzs()
+}
+
+func (_bgcg *shapesState) devicePoint(_gfdg, _ggef float64) _cd.Point {
+	_fdfec := _bgcg._dcfcb.Mult(_bgcg._fggg)
+	_gfdg, _ggef = _fdfec.Transform(_gfdg, _ggef)
+	return _cd.NewPoint(_gfdg, _ggef)
+}
+
+func (_gdgdf rulingList) log(_gfbb string) {
+	if !_feda {
+		return
+	}
+	_bg.Log.Info("\u0023\u0023\u0023\u0020\u0025\u0031\u0030\u0073\u003a\u0020\u0076\u0065c\u0073\u003d\u0025\u0073", _gfbb, _gdgdf.String())
+	for _bfcba, _agaad := range _gdgdf {
+		_fa.Printf("\u0025\u0034\u0064\u003a\u0020\u0025\u0073\u000a", _bfcba, _agaad.String())
+	}
+}
+
+func _gdag(_bgcd, _ddfeg _cd.Point) bool {
+	_ecafb := _c.Abs(_bgcd.X - _ddfeg.X)
+	_gced := _c.Abs(_bgcd.Y - _ddfeg.Y)
+	return _eedad(_gced, _ecafb)
+}
+
+func (_bcde *PageText) getParagraphs() paraList {
+	var _bdgaa rulingList
+	if _ffaa {
+		_bgbc := _gfgb(_bcde._addcd)
+		_bdgaa = append(_bdgaa, _bgbc...)
+	}
+	if _bbfaf {
+		_egge := _cfae(_bcde._ddfd)
+		_bdgaa = append(_bdgaa, _egge...)
+	}
+	_bdgaa, _ddgf := _bdgaa.toTilings()
+	var _ace paraList
+	_efgd := len(_bcde._baaa)
+	for _afee := 0; _afee < 360 && _efgd > 0; _afee += 90 {
+		_dgdd := make([]*textMark, 0, len(_bcde._baaa)-_efgd)
+		for _, _bga := range _bcde._baaa {
+			if _bga._cbgf == _afee {
+				_dgdd = append(_dgdd, _bga)
+			}
+		}
+		if len(_dgdd) > 0 {
+			_cdgd := _gbcge(_dgdd, _bcde._gfag, _bdgaa, _ddgf, _bcde._acaf._eedf == ExtractionModeLayoutNoBreaks)
+			_ace = append(_ace, _cdgd...)
+			_efgd -= len(_dgdd)
+		}
+	}
+	return _ace
+}
+
+func _fgdd(_fgcf _ad.PdfRectangle, _eaad bounded) float64 { return _fgcf.Ury - _eaad.bbox().Lly }
+
+func (_debf rulingList) removeDuplicates() rulingList {
+	if len(_debf) == 0 {
+		return nil
+	}
+	_debf.sort()
+	_edeae := rulingList{_debf[0]}
+	for _, _deabe := range _debf[1:] {
+		if _deabe.equals(_edeae[len(_edeae)-1]) {
+			continue
+		}
+		_edeae = append(_edeae, _deabe)
+	}
+	return _edeae
+}
 
 // Marks returns the TextMark collection for a page. It represents all the text on the page.
-func (_bda PageText )Marks ()*TextMarkArray {return &TextMarkArray {_fde :_bda ._abcd }};var _cacfc string ="\u0028\u003f\u0069\u0029\u005e\u0028\u004d\u007b\u0030\u002c\u0033\u007d\u0029\u0028\u0043\u0028?\u003a\u0044\u007cM\u0029\u007c\u0044\u003f\u0043{\u0030\u002c\u0033\u007d\u0029\u0028\u0058\u0028\u003f\u003a\u004c\u007c\u0043\u0029\u007cL\u003f\u0058\u007b\u0030\u002c\u0033}\u0029\u0028\u0049\u0028\u003f\u003a\u0056\u007c\u0058\u0029\u007c\u0056\u003f\u0049\u007b\u0030\u002c\u0033\u007d\u0029\u0028\u005c\u0029\u007c\u005c\u002e\u0029\u007c\u005e\u005c\u0028\u0028\u004d\u007b\u0030\u002c\u0033\u007d\u0029\u0028\u0043\u0028\u003f\u003aD\u007cM\u0029\u007c\u0044\u003f\u0043\u007b\u0030\u002c\u0033\u007d\u0029\u0028\u0058\u0028?\u003a\u004c\u007c\u0043\u0029\u007c\u004c?\u0058\u007b0\u002c\u0033\u007d\u0029(\u0049\u0028\u003f\u003a\u0056|\u0058\u0029\u007c\u0056\u003f\u0049\u007b\u0030\u002c\u0033\u007d\u0029\u005c\u0029";
-func _bdfc (_ebde byte )bool {for _ ,_abde :=range _gcgc {if []byte (_abde )[0]==_ebde {return true ;};};return false ;};const (_egeb markKind =iota ;_ffcacd ;_egecd ;_accc ;);func (_cabfg rulingList )snapToGroups ()rulingList {_agade ,_dfdc :=_cabfg .vertsHorzs ();
-if len (_agade )> 0{_agade =_agade .snapToGroupsDirection ();};if len (_dfdc )> 0{_dfdc =_dfdc .snapToGroupsDirection ();};_eebcc :=append (_agade ,_dfdc ...);_eebcc .log ("\u0073\u006e\u0061p\u0054\u006f\u0047\u0072\u006f\u0075\u0070\u0073");return _eebcc ;
-};func (_dccc *shapesState )moveTo (_eacg ,_eefb float64 ){_dccc ._eaba =true ;_dccc ._aaba =_dccc .devicePoint (_eacg ,_eefb );if _acge {_bg .Log .Info ("\u006d\u006fv\u0065\u0054\u006f\u003a\u0020\u0025\u002e\u0032\u0066\u002c\u0025\u002e\u0032\u0066\u0020\u0064\u0065\u0076\u0069\u0063\u0065\u003d%.\u0032\u0066",_eacg ,_eefb ,_dccc ._aaba );
-};};
+func (_bda PageText) Marks() *TextMarkArray { return &TextMarkArray{_fde: _bda._abcd} }
+
+var _cacfc string = "\u0028\u003f\u0069\u0029\u005e\u0028\u004d\u007b\u0030\u002c\u0033\u007d\u0029\u0028\u0043\u0028?\u003a\u0044\u007cM\u0029\u007c\u0044\u003f\u0043{\u0030\u002c\u0033\u007d\u0029\u0028\u0058\u0028\u003f\u003a\u004c\u007c\u0043\u0029\u007cL\u003f\u0058\u007b\u0030\u002c\u0033}\u0029\u0028\u0049\u0028\u003f\u003a\u0056\u007c\u0058\u0029\u007c\u0056\u003f\u0049\u007b\u0030\u002c\u0033\u007d\u0029\u0028\u005c\u0029\u007c\u005c\u002e\u0029\u007c\u005e\u005c\u0028\u0028\u004d\u007b\u0030\u002c\u0033\u007d\u0029\u0028\u0043\u0028\u003f\u003aD\u007cM\u0029\u007c\u0044\u003f\u0043\u007b\u0030\u002c\u0033\u007d\u0029\u0028\u0058\u0028?\u003a\u004c\u007c\u0043\u0029\u007c\u004c?\u0058\u007b0\u002c\u0033\u007d\u0029(\u0049\u0028\u003f\u003a\u0056|\u0058\u0029\u007c\u0056\u003f\u0049\u007b\u0030\u002c\u0033\u007d\u0029\u005c\u0029"
+
+func _bdfc(_ebde byte) bool {
+	for _, _abde := range _gcgc {
+		if []byte(_abde)[0] == _ebde {
+			return true
+		}
+	}
+	return false
+}
+
+const (
+	_egeb markKind = iota
+	_ffcacd
+	_egecd
+	_accc
+)
+
+func (_cabfg rulingList) snapToGroups() rulingList {
+	_agade, _dfdc := _cabfg.vertsHorzs()
+	if len(_agade) > 0 {
+		_agade = _agade.snapToGroupsDirection()
+	}
+	if len(_dfdc) > 0 {
+		_dfdc = _dfdc.snapToGroupsDirection()
+	}
+	_eebcc := append(_agade, _dfdc...)
+	_eebcc.log("\u0073\u006e\u0061p\u0054\u006f\u0047\u0072\u006f\u0075\u0070\u0073")
+	return _eebcc
+}
+
+func (_dccc *shapesState) moveTo(_eacg, _eefb float64) {
+	_dccc._eaba = true
+	_dccc._aaba = _dccc.devicePoint(_eacg, _eefb)
+	if _acge {
+		_bg.Log.Info("\u006d\u006fv\u0065\u0054\u006f\u003a\u0020\u0025\u002e\u0032\u0066\u002c\u0025\u002e\u0032\u0066\u0020\u0064\u0065\u0076\u0069\u0063\u0065\u003d%.\u0032\u0066", _eacg, _eefb, _dccc._aaba)
+	}
+}
 
 // String returns a string describing the current state of the textState stack.
-func (_dbfe *stateStack )String ()string {_fdfb :=[]string {_fa .Sprintf ("\u002d\u002d\u002d\u002d f\u006f\u006e\u0074\u0020\u0073\u0074\u0061\u0063\u006b\u003a\u0020\u0025\u0064",len (*_dbfe ))};for _ccdc ,_bafed :=range *_dbfe {_gcbf :="\u003c\u006e\u0069l\u003e";
-if _bafed !=nil {_gcbf =_bafed .String ();};_fdfb =append (_fdfb ,_fa .Sprintf ("\u0009\u0025\u0032\u0064\u003a\u0020\u0025\u0073",_ccdc ,_gcbf ));};return _faf .Join (_fdfb ,"\u000a");};func (_fgga *stateStack )pop ()*textState {if _fgga .empty (){return nil ;
-};_eged :=*(*_fgga )[len (*_fgga )-1];*_fgga =(*_fgga )[:len (*_fgga )-1];return &_eged ;};func (_cgfdg *textTable )get (_cdacd ,_bbfd int )*textPara {return _cgfdg ._eccda [_fffbe (_cdacd ,_bbfd )];};func _cdabd (_fdcf _ad .PdfRectangle )*ruling {return &ruling {_gafe :_dcfdg ,_ecfb :_fdcf .Urx ,_ggecg :_fdcf .Lly ,_gebf :_fdcf .Ury };
-};func (_gded *ruling )gridIntersecting (_beeea *ruling )bool {return _ffac (_gded ._ggecg ,_beeea ._ggecg )&&_ffac (_gded ._gebf ,_beeea ._gebf );};func (_fbea *textObject )getFillColor ()_cb .Color {return _dbegde (_fbea ._edcg .ColorspaceNonStroking ,_fbea ._edcg .ColorNonStroking );
-};var (_cad =_fb .New ("\u0074\u0079p\u0065\u0020\u0063h\u0065\u0063\u006b\u0020\u0065\u0072\u0072\u006f\u0072");_bf =_fb .New ("\u0072\u0061\u006e\u0067\u0065\u0020\u0063\u0068\u0065\u0063\u006b\u0020e\u0072\u0072\u006f\u0072"););func (_acfge rectRuling )asRuling ()(*ruling ,bool ){_fadb :=ruling {_gafe :_acfge ._abbdf ,Color :_acfge .Color ,_abddg :_egecd };
-switch _acfge ._abbdf {case _dcfdg :_fadb ._ecfb =0.5*(_acfge .Llx +_acfge .Urx );_fadb ._ggecg =_acfge .Lly ;_fadb ._gebf =_acfge .Ury ;_fgfaf ,_ccab :=_acfge .checkWidth (_acfge .Llx ,_acfge .Urx );if !_ccab {if _gdgd {_bg .Log .Error ("\u0072\u0065\u0063\u0074\u0052\u0075l\u0069\u006e\u0067\u002e\u0061\u0073\u0052\u0075\u006c\u0069\u006e\u0067\u003a\u0020\u0072\u0075\u006c\u0069\u006e\u0067V\u0065\u0072\u0074\u0020\u0021\u0063\u0068\u0065\u0063\u006b\u0057\u0069\u0064\u0074h\u0020v\u003d\u0025\u002b\u0076",_acfge );
-};return nil ,false ;};_fadb ._bdbgf =_fgfaf ;case _cafa :_fadb ._ecfb =0.5*(_acfge .Lly +_acfge .Ury );_fadb ._ggecg =_acfge .Llx ;_fadb ._gebf =_acfge .Urx ;_edgg ,_cecea :=_acfge .checkWidth (_acfge .Lly ,_acfge .Ury );if !_cecea {if _gdgd {_bg .Log .Error ("\u0072\u0065\u0063\u0074\u0052\u0075l\u0069\u006e\u0067\u002e\u0061\u0073\u0052\u0075\u006c\u0069\u006e\u0067\u003a\u0020\u0072\u0075\u006c\u0069\u006e\u0067H\u006f\u0072\u007a\u0020\u0021\u0063\u0068\u0065\u0063\u006b\u0057\u0069\u0064\u0074h\u0020v\u003d\u0025\u002b\u0076",_acfge );
-};return nil ,false ;};_fadb ._bdbgf =_edgg ;default:_bg .Log .Error ("\u0062\u0061\u0064\u0020pr\u0069\u006d\u0061\u0072\u0079\u0020\u006b\u0069\u006e\u0064\u003d\u0025\u0064",_acfge ._abbdf );return nil ,false ;};return &_fadb ,true ;};func (_dcd *textObject )renderText (_bbga _afa .PdfObject ,_dcfa []byte ,_gfab int ,_ebgc string )error {if _dcd ._fgad {_bg .Log .Debug ("\u0072\u0065\u006e\u0064\u0065r\u0054\u0065\u0078\u0074\u003a\u0020\u0049\u006e\u0076\u0061\u006c\u0069\u0064 \u0066\u006f\u006e\u0074\u002e\u0020\u004e\u006f\u0074\u0020\u0070\u0072\u006f\u0063\u0065\u0073\u0073\u0069\u006e\u0067\u002e");
-return nil ;};_fbaa :=_dcd .getCurrentFont ();_cbdb :=_fbaa .BytesToCharcodes (_dcfa );var (_dgef []string ;_fdae int ;_fea int ;);if _ebgc !=""{_dgef =[]string {_afa .MakeString (_ebgc ).Decoded ()};_fdae =1;}else {_dgef ,_fdae ,_fea =_fbaa .CharcodesToStrings (_cbdb ,"");
-if _fea > 0{_bg .Log .Debug ("\u0072\u0065nd\u0065\u0072\u0054e\u0078\u0074\u003a\u0020num\u0043ha\u0072\u0073\u003d\u0025\u0064\u0020\u006eum\u004d\u0069\u0073\u0073\u0065\u0073\u003d%\u0064",_fdae ,_fea );};};_dcd ._dggef ._fbef +=_fdae ;_dcd ._dggef ._edabg +=_fea ;
-_aadc :=_dcd ._dggef ;_cedc :=_aadc ._dba ;_fcec :=_aadc ._deeee /100.0;_cbaf :=_fgaf ;if _fbaa .Subtype ()=="\u0054\u0079\u0070e\u0033"{_cbaf =1;};_dgbe ,_edeed :=_fbaa .GetRuneMetrics (' ');if !_edeed {_dgbe ,_edeed =_fbaa .GetCharMetrics (32);};if !_edeed {_dgbe ,_ =_ad .DefaultFont ().GetRuneMetrics (' ');
-};_afgd :=_dgbe .Wx *_cbaf ;_bg .Log .Trace ("\u0073p\u0061\u0063e\u0057\u0069\u0064t\u0068\u003d\u0025\u002e\u0032\u0066\u0020t\u0065\u0078\u0074\u003d\u0025\u0071 \u0066\u006f\u006e\u0074\u003d\u0025\u0073\u0020\u0066\u006f\u006et\u0053\u0069\u007a\u0065\u003d\u0025\u002e\u0032\u0066",_afgd ,_dgef ,_fbaa ,_cedc );
-_bcgg :=_cd .NewMatrix (_cedc *_fcec ,0,0,_cedc ,0,_aadc ._cfec );if _afga {_bg .Log .Info ("\u0072\u0065\u006e\u0064\u0065\u0072T\u0065\u0078\u0074\u003a\u0020\u0025\u0064\u0020\u0063\u006f\u0064\u0065\u0073=\u0025\u002b\u0076\u0020\u0074\u0065\u0078t\u0073\u003d\u0025\u0071",len (_cbdb ),_cbdb ,_dgef );
-};_bg .Log .Trace ("\u0072\u0065\u006e\u0064\u0065\u0072T\u0065\u0078\u0074\u003a\u0020\u0025\u0064\u0020\u0063\u006f\u0064\u0065\u0073=\u0025\u002b\u0076\u0020\u0072\u0075\u006ee\u0073\u003d\u0025\u0071",len (_cbdb ),_cbdb ,len (_dgef ));_dcbf :=_dcd .getFillColor ();
-_abbg :=_dcd .getStrokeColor ();for _edgb ,_ebaba :=range _dgef {_dec :=[]rune (_ebaba );if len (_dec )==1&&_dec [0]=='\x00'{continue ;};_edea :=_cbdb [_edgb ];_febe :=_dcd ._edcg .CTM .Mult (_dcd ._dfde ).Mult (_bcgg );_aebg :=0.0;if len (_dec )==1&&_dec [0]==32{_aebg =_aadc ._ccda ;
-};_abff ,_cdfd :=_fbaa .GetCharMetrics (_edea );if !_cdfd {_bg .Log .Debug ("\u0045R\u0052\u004fR\u003a\u0020\u004e\u006f \u006d\u0065\u0074r\u0069\u0063\u0020\u0066\u006f\u0072\u0020\u0063\u006fde\u003d\u0025\u0064 \u0072\u003d0\u0078\u0025\u0030\u0034\u0078\u003d%\u002b\u0071 \u0025\u0073",_edea ,_dec ,_dec ,_fbaa );
-return _fa .Errorf ("\u006e\u006f\u0020\u0063\u0068\u0061\u0072\u0020\u006d\u0065\u0074\u0072\u0069\u0063\u0073:\u0020f\u006f\u006e\u0074\u003d\u0025\u0073\u0020\u0063\u006f\u0064\u0065\u003d\u0025\u0064",_fbaa .String (),_edea );};_ccf :=_cd .Point {X :_abff .Wx *_cbaf ,Y :_abff .Wy *_cbaf };
-_ebad :=_cd .Point {X :(_ccf .X *_cedc +_aebg )*_fcec };_caade :=_cd .Point {X :(_ccf .X *_cedc +_aadc ._daab +_aebg )*_fcec };if _afga {_bg .Log .Info ("\u0074\u0066\u0073\u003d\u0025\u002e\u0032\u0066\u0020\u0074\u0063\u003d\u0025\u002e\u0032f\u0020t\u0077\u003d\u0025\u002e\u0032\u0066\u0020\u0074\u0068\u003d\u0025\u002e\u0032\u0066",_cedc ,_aadc ._daab ,_aadc ._ccda ,_fcec );
-_bg .Log .Info ("\u0064x\u002c\u0064\u0079\u003d%\u002e\u0033\u0066\u0020\u00740\u003d%\u002e3\u0066\u0020\u0074\u003d\u0025\u002e\u0033f",_ccf ,_ebad ,_caade );};_agdc :=_egbf (_ebad );_efc :=_egbf (_caade );_bgc :=_dcd ._edcg .CTM .Mult (_dcd ._dfde ).Mult (_agdc );
-if _deea {_bg .Log .Info ("e\u006e\u0064\u003a\u000a\tC\u0054M\u003d\u0025\u0073\u000a\u0009 \u0074\u006d\u003d\u0025\u0073\u000a"+"\u0009\u0020t\u0064\u003d\u0025s\u0020\u0078\u006c\u0061\u0074\u003d\u0025\u0073\u000a"+"\u0009t\u0064\u0030\u003d\u0025s\u000a\u0009\u0020\u0020\u2192 \u0025s\u0020x\u006c\u0061\u0074\u003d\u0025\u0073",_dcd ._edcg .CTM ,_dcd ._dfde ,_efc ,_egbg (_dcd ._edcg .CTM .Mult (_dcd ._dfde ).Mult (_efc )),_agdc ,_bgc ,_egbg (_bgc ));
-};_cea ,_fgde :=_dcd .newTextMark (_g .ExpandLigatures (_dec ),_febe ,_egbg (_bgc ),_c .Abs (_afgd *_febe .ScalingFactorX ()),_fbaa ,_dcd ._dggef ._daab ,_dcbf ,_abbg ,_bbga ,_dgef ,_edgb ,_gfab );if !_fgde {_bg .Log .Debug ("\u0054\u0065\u0078\u0074\u0020\u006d\u0061\u0072\u006b\u0020\u006f\u0075\u0074\u0073\u0069d\u0065 \u0070\u0061\u0067\u0065\u002e\u0020\u0053\u006b\u0069\u0070\u0070\u0069\u006e\u0067");
-continue ;};if _fbaa ==nil {_bg .Log .Debug ("\u0045R\u0052O\u0052\u003a\u0020\u004e\u006f\u0020\u0066\u006f\u006e\u0074\u002e");}else if _fbaa .Encoder ()==nil {_bg .Log .Debug ("E\u0052\u0052\u004f\u0052\u003a\u0020N\u006f\u0020\u0065\u006e\u0063\u006f\u0064\u0069\u006eg\u002e\u0020\u0066o\u006et\u003d\u0025\u0073",_fbaa );
-}else {if _ccbe ,_bbcg :=_fbaa .Encoder ().CharcodeToRune (_edea );_bbcg {_cea ._fbdg =string (_ccbe );};};_bg .Log .Trace ("i\u003d\u0025\u0064\u0020\u0063\u006fd\u0065\u003d\u0025\u0064\u0020\u006d\u0061\u0072\u006b=\u0025\u0073\u0020t\u0072m\u003d\u0025\u0073",_edgb ,_edea ,_cea ,_febe );
-_dcd ._fcbb =append (_dcd ._fcbb ,&_cea );_dcd ._dfde .Concat (_efc );};return nil ;};func _dbegde (_dgggfc _ad .PdfColorspace ,_ggge _ad .PdfColor )_cb .Color {if _dgggfc ==nil ||_ggge ==nil {return _cb .Black ;};_gcfb ,_aeadb :=_dgggfc .ColorToRGB (_ggge );
-if _aeadb !=nil {_bg .Log .Debug ("\u0057\u0041\u0052\u004e\u003a\u0020\u0063\u006fu\u006c\u0064\u0020no\u0074\u0020\u0063\u006f\u006e\u0076e\u0072\u0074\u0020\u0063\u006f\u006c\u006f\u0072\u0020\u0025\u0076\u0020\u0028\u0025\u0076)\u0020\u0074\u006f\u0020\u0052\u0047\u0042\u003a \u0025\u0073",_ggge ,_dgggfc ,_aeadb );
-return _cb .Black ;};_babgd ,_dcddf :=_gcfb .(*_ad .PdfColorDeviceRGB );if !_dcddf {_bg .Log .Debug ("\u0057\u0041\u0052\u004e\u003a\u0020\u0063\u006f\u006e\u0076\u0065\u0072\u0074\u0065\u0064 \u0063\u006f\u006c\u006f\u0072\u0020\u0069\u0073\u0020\u006e\u006f\u0074\u0020i\u006e\u0020\u0074\u0068\u0065\u0020\u0052\u0047\u0042\u0020\u0063\u006flo\u0072\u0073\u0070\u0061\u0063\u0065\u003a\u0020\u0025\u0076",_gcfb );
-return _cb .Black ;};return _cb .NRGBA {R :uint8 (_babgd .R ()*255),G :uint8 (_babgd .G ()*255),B :uint8 (_babgd .B ()*255),A :uint8 (255)};};
+func (_dbfe *stateStack) String() string {
+	_fdfb := []string{_fa.Sprintf("\u002d\u002d\u002d\u002d f\u006f\u006e\u0074\u0020\u0073\u0074\u0061\u0063\u006b\u003a\u0020\u0025\u0064", len(*_dbfe))}
+	for _ccdc, _bafed := range *_dbfe {
+		_gcbf := "\u003c\u006e\u0069l\u003e"
+		if _bafed != nil {
+			_gcbf = _bafed.String()
+		}
+		_fdfb = append(_fdfb, _fa.Sprintf("\u0009\u0025\u0032\u0064\u003a\u0020\u0025\u0073", _ccdc, _gcbf))
+	}
+	return _faf.Join(_fdfb, "\u000a")
+}
+
+func (_fgga *stateStack) pop() *textState {
+	if _fgga.empty() {
+		return nil
+	}
+	_eged := *(*_fgga)[len(*_fgga)-1]
+	*_fgga = (*_fgga)[:len(*_fgga)-1]
+	return &_eged
+}
+
+func (_cgfdg *textTable) get(_cdacd, _bbfd int) *textPara {
+	return _cgfdg._eccda[_fffbe(_cdacd, _bbfd)]
+}
+
+func _cdabd(_fdcf _ad.PdfRectangle) *ruling {
+	return &ruling{_gafe: _dcfdg, _ecfb: _fdcf.Urx, _ggecg: _fdcf.Lly, _gebf: _fdcf.Ury}
+}
+
+func (_gded *ruling) gridIntersecting(_beeea *ruling) bool {
+	return _ffac(_gded._ggecg, _beeea._ggecg) && _ffac(_gded._gebf, _beeea._gebf)
+}
+
+func (_fbea *textObject) getFillColor() _cb.Color {
+	return _dbegde(_fbea._edcg.ColorspaceNonStroking, _fbea._edcg.ColorNonStroking)
+}
+
+var (
+	_cad = _fb.New("\u0074\u0079p\u0065\u0020\u0063h\u0065\u0063\u006b\u0020\u0065\u0072\u0072\u006f\u0072")
+	_bf  = _fb.New("\u0072\u0061\u006e\u0067\u0065\u0020\u0063\u0068\u0065\u0063\u006b\u0020e\u0072\u0072\u006f\u0072")
+)
+
+func (_acfge rectRuling) asRuling() (*ruling, bool) {
+	_fadb := ruling{_gafe: _acfge._abbdf, Color: _acfge.Color, _abddg: _egecd}
+	switch _acfge._abbdf {
+	case _dcfdg:
+		_fadb._ecfb = 0.5 * (_acfge.Llx + _acfge.Urx)
+		_fadb._ggecg = _acfge.Lly
+		_fadb._gebf = _acfge.Ury
+		_fgfaf, _ccab := _acfge.checkWidth(_acfge.Llx, _acfge.Urx)
+		if !_ccab {
+			if _gdgd {
+				_bg.Log.Error("\u0072\u0065\u0063\u0074\u0052\u0075l\u0069\u006e\u0067\u002e\u0061\u0073\u0052\u0075\u006c\u0069\u006e\u0067\u003a\u0020\u0072\u0075\u006c\u0069\u006e\u0067V\u0065\u0072\u0074\u0020\u0021\u0063\u0068\u0065\u0063\u006b\u0057\u0069\u0064\u0074h\u0020v\u003d\u0025\u002b\u0076", _acfge)
+			}
+			return nil, false
+		}
+		_fadb._bdbgf = _fgfaf
+	case _cafa:
+		_fadb._ecfb = 0.5 * (_acfge.Lly + _acfge.Ury)
+		_fadb._ggecg = _acfge.Llx
+		_fadb._gebf = _acfge.Urx
+		_edgg, _cecea := _acfge.checkWidth(_acfge.Lly, _acfge.Ury)
+		if !_cecea {
+			if _gdgd {
+				_bg.Log.Error("\u0072\u0065\u0063\u0074\u0052\u0075l\u0069\u006e\u0067\u002e\u0061\u0073\u0052\u0075\u006c\u0069\u006e\u0067\u003a\u0020\u0072\u0075\u006c\u0069\u006e\u0067H\u006f\u0072\u007a\u0020\u0021\u0063\u0068\u0065\u0063\u006b\u0057\u0069\u0064\u0074h\u0020v\u003d\u0025\u002b\u0076", _acfge)
+			}
+			return nil, false
+		}
+		_fadb._bdbgf = _edgg
+	default:
+		_bg.Log.Error("\u0062\u0061\u0064\u0020pr\u0069\u006d\u0061\u0072\u0079\u0020\u006b\u0069\u006e\u0064\u003d\u0025\u0064", _acfge._abbdf)
+		return nil, false
+	}
+	return &_fadb, true
+}
+
+func (_dcd *textObject) renderText(_bbga _afa.PdfObject, _dcfa []byte, _gfab int, _ebgc string) error {
+	if _dcd._fgad {
+		_bg.Log.Debug("\u0072\u0065\u006e\u0064\u0065r\u0054\u0065\u0078\u0074\u003a\u0020\u0049\u006e\u0076\u0061\u006c\u0069\u0064 \u0066\u006f\u006e\u0074\u002e\u0020\u004e\u006f\u0074\u0020\u0070\u0072\u006f\u0063\u0065\u0073\u0073\u0069\u006e\u0067\u002e")
+		return nil
+	}
+	_fbaa := _dcd.getCurrentFont()
+	_cbdb := _fbaa.BytesToCharcodes(_dcfa)
+	var (
+		_dgef []string
+		_fdae int
+		_fea  int
+	)
+	if _ebgc != "" {
+		_dgef = []string{_afa.MakeString(_ebgc).Decoded()}
+		_fdae = 1
+	} else {
+		_dgef, _fdae, _fea = _fbaa.CharcodesToStrings(_cbdb, "")
+		if _fea > 0 {
+			_bg.Log.Debug("\u0072\u0065nd\u0065\u0072\u0054e\u0078\u0074\u003a\u0020num\u0043ha\u0072\u0073\u003d\u0025\u0064\u0020\u006eum\u004d\u0069\u0073\u0073\u0065\u0073\u003d%\u0064", _fdae, _fea)
+		}
+	}
+	_dcd._dggef._fbef += _fdae
+	_dcd._dggef._edabg += _fea
+	_aadc := _dcd._dggef
+	_cedc := _aadc._dba
+	_fcec := _aadc._deeee / 100.0
+	_cbaf := _fgaf
+	if _fbaa.Subtype() == "\u0054\u0079\u0070e\u0033" {
+		_cbaf = 1
+	}
+	_dgbe, _edeed := _fbaa.GetRuneMetrics(' ')
+	if !_edeed {
+		_dgbe, _edeed = _fbaa.GetCharMetrics(32)
+	}
+	if !_edeed {
+		_dgbe, _ = _ad.DefaultFont().GetRuneMetrics(' ')
+	}
+	_afgd := _dgbe.Wx * _cbaf
+	_bg.Log.Trace("\u0073p\u0061\u0063e\u0057\u0069\u0064t\u0068\u003d\u0025\u002e\u0032\u0066\u0020t\u0065\u0078\u0074\u003d\u0025\u0071 \u0066\u006f\u006e\u0074\u003d\u0025\u0073\u0020\u0066\u006f\u006et\u0053\u0069\u007a\u0065\u003d\u0025\u002e\u0032\u0066", _afgd, _dgef, _fbaa, _cedc)
+	_bcgg := _cd.NewMatrix(_cedc*_fcec, 0, 0, _cedc, 0, _aadc._cfec)
+	if _afga {
+		_bg.Log.Info("\u0072\u0065\u006e\u0064\u0065\u0072T\u0065\u0078\u0074\u003a\u0020\u0025\u0064\u0020\u0063\u006f\u0064\u0065\u0073=\u0025\u002b\u0076\u0020\u0074\u0065\u0078t\u0073\u003d\u0025\u0071", len(_cbdb), _cbdb, _dgef)
+	}
+	_bg.Log.Trace("\u0072\u0065\u006e\u0064\u0065\u0072T\u0065\u0078\u0074\u003a\u0020\u0025\u0064\u0020\u0063\u006f\u0064\u0065\u0073=\u0025\u002b\u0076\u0020\u0072\u0075\u006ee\u0073\u003d\u0025\u0071", len(_cbdb), _cbdb, len(_dgef))
+	_dcbf := _dcd.getFillColor()
+	_abbg := _dcd.getStrokeColor()
+	for _edgb, _ebaba := range _dgef {
+		_dec := []rune(_ebaba)
+		if len(_dec) == 1 && _dec[0] == '\x00' {
+			continue
+		}
+		_edea := _cbdb[_edgb]
+		_febe := _dcd._edcg.CTM.Mult(_dcd._dfde).Mult(_bcgg)
+		_aebg := 0.0
+		if len(_dec) == 1 && _dec[0] == 32 {
+			_aebg = _aadc._ccda
+		}
+		_abff, _cdfd := _fbaa.GetCharMetrics(_edea)
+		if !_cdfd {
+			_bg.Log.Debug("\u0045R\u0052\u004fR\u003a\u0020\u004e\u006f \u006d\u0065\u0074r\u0069\u0063\u0020\u0066\u006f\u0072\u0020\u0063\u006fde\u003d\u0025\u0064 \u0072\u003d0\u0078\u0025\u0030\u0034\u0078\u003d%\u002b\u0071 \u0025\u0073", _edea, _dec, _dec, _fbaa)
+			return _fa.Errorf("\u006e\u006f\u0020\u0063\u0068\u0061\u0072\u0020\u006d\u0065\u0074\u0072\u0069\u0063\u0073:\u0020f\u006f\u006e\u0074\u003d\u0025\u0073\u0020\u0063\u006f\u0064\u0065\u003d\u0025\u0064", _fbaa.String(), _edea)
+		}
+		_ccf := _cd.Point{X: _abff.Wx * _cbaf, Y: _abff.Wy * _cbaf}
+		_ebad := _cd.Point{X: (_ccf.X*_cedc + _aebg) * _fcec}
+		_caade := _cd.Point{X: (_ccf.X*_cedc + _aadc._daab + _aebg) * _fcec}
+		if _afga {
+			_bg.Log.Info("\u0074\u0066\u0073\u003d\u0025\u002e\u0032\u0066\u0020\u0074\u0063\u003d\u0025\u002e\u0032f\u0020t\u0077\u003d\u0025\u002e\u0032\u0066\u0020\u0074\u0068\u003d\u0025\u002e\u0032\u0066", _cedc, _aadc._daab, _aadc._ccda, _fcec)
+			_bg.Log.Info("\u0064x\u002c\u0064\u0079\u003d%\u002e\u0033\u0066\u0020\u00740\u003d%\u002e3\u0066\u0020\u0074\u003d\u0025\u002e\u0033f", _ccf, _ebad, _caade)
+		}
+		_agdc := _egbf(_ebad)
+		_efc := _egbf(_caade)
+		_bgc := _dcd._edcg.CTM.Mult(_dcd._dfde).Mult(_agdc)
+		if _deea {
+			_bg.Log.Info("e\u006e\u0064\u003a\u000a\tC\u0054M\u003d\u0025\u0073\u000a\u0009 \u0074\u006d\u003d\u0025\u0073\u000a"+"\u0009\u0020t\u0064\u003d\u0025s\u0020\u0078\u006c\u0061\u0074\u003d\u0025\u0073\u000a"+"\u0009t\u0064\u0030\u003d\u0025s\u000a\u0009\u0020\u0020\u2192 \u0025s\u0020x\u006c\u0061\u0074\u003d\u0025\u0073", _dcd._edcg.CTM, _dcd._dfde, _efc, _egbg(_dcd._edcg.CTM.Mult(_dcd._dfde).Mult(_efc)), _agdc, _bgc, _egbg(_bgc))
+		}
+		_cea, _fgde := _dcd.newTextMark(_g.ExpandLigatures(_dec), _febe, _egbg(_bgc), _c.Abs(_afgd*_febe.ScalingFactorX()), _fbaa, _dcd._dggef._daab, _dcbf, _abbg, _bbga, _dgef, _edgb, _gfab)
+		if !_fgde {
+			_bg.Log.Debug("\u0054\u0065\u0078\u0074\u0020\u006d\u0061\u0072\u006b\u0020\u006f\u0075\u0074\u0073\u0069d\u0065 \u0070\u0061\u0067\u0065\u002e\u0020\u0053\u006b\u0069\u0070\u0070\u0069\u006e\u0067")
+			continue
+		}
+		if _fbaa == nil {
+			_bg.Log.Debug("\u0045R\u0052O\u0052\u003a\u0020\u004e\u006f\u0020\u0066\u006f\u006e\u0074\u002e")
+		} else if _fbaa.Encoder() == nil {
+			_bg.Log.Debug("E\u0052\u0052\u004f\u0052\u003a\u0020N\u006f\u0020\u0065\u006e\u0063\u006f\u0064\u0069\u006eg\u002e\u0020\u0066o\u006et\u003d\u0025\u0073", _fbaa)
+		} else {
+			if _ccbe, _bbcg := _fbaa.Encoder().CharcodeToRune(_edea); _bbcg {
+				_cea._fbdg = string(_ccbe)
+			}
+		}
+		_bg.Log.Trace("i\u003d\u0025\u0064\u0020\u0063\u006fd\u0065\u003d\u0025\u0064\u0020\u006d\u0061\u0072\u006b=\u0025\u0073\u0020t\u0072m\u003d\u0025\u0073", _edgb, _edea, _cea, _febe)
+		_dcd._fcbb = append(_dcd._fcbb, &_cea)
+		_dcd._dfde.Concat(_efc)
+	}
+	return nil
+}
+
+func _dbegde(_dgggfc _ad.PdfColorspace, _ggge _ad.PdfColor) _cb.Color {
+	if _dgggfc == nil || _ggge == nil {
+		return _cb.Black
+	}
+	_gcfb, _aeadb := _dgggfc.ColorToRGB(_ggge)
+	if _aeadb != nil {
+		_bg.Log.Debug("\u0057\u0041\u0052\u004e\u003a\u0020\u0063\u006fu\u006c\u0064\u0020no\u0074\u0020\u0063\u006f\u006e\u0076e\u0072\u0074\u0020\u0063\u006f\u006c\u006f\u0072\u0020\u0025\u0076\u0020\u0028\u0025\u0076)\u0020\u0074\u006f\u0020\u0052\u0047\u0042\u003a \u0025\u0073", _ggge, _dgggfc, _aeadb)
+		return _cb.Black
+	}
+	_babgd, _dcddf := _gcfb.(*_ad.PdfColorDeviceRGB)
+	if !_dcddf {
+		_bg.Log.Debug("\u0057\u0041\u0052\u004e\u003a\u0020\u0063\u006f\u006e\u0076\u0065\u0072\u0074\u0065\u0064 \u0063\u006f\u006c\u006f\u0072\u0020\u0069\u0073\u0020\u006e\u006f\u0074\u0020i\u006e\u0020\u0074\u0068\u0065\u0020\u0052\u0047\u0042\u0020\u0063\u006flo\u0072\u0073\u0070\u0061\u0063\u0065\u003a\u0020\u0025\u0076", _gcfb)
+		return _cb.Black
+	}
+	return _cb.NRGBA{R: uint8(_babgd.R() * 255), G: uint8(_babgd.G() * 255), B: uint8(_babgd.B() * 255), A: uint8(255)}
+}
 
 // ExtractionMode defines different types of extraction mode.
-type ExtractionMode int ;func (_ddd *imageExtractContext )extractContentStreamImages (_dgc string ,_dgf *_ad .PdfPageResources )error {_ccb :=_af .NewContentStreamParser (_dgc );_bdba ,_fgd :=_ccb .Parse ();if _fgd !=nil {return _fgd ;};if _ddd ._gcc ==nil {_ddd ._gcc =map[*_afa .PdfObjectStream ]*cachedImage {};
-};if _ddd ._dbe ==nil {_ddd ._dbe =&ImageExtractOptions {};};_gbae :=_af .NewContentStreamProcessor (*_bdba );_gbae .AddHandler (_af .HandlerConditionEnumAllOperands ,"",_ddd .processOperand );return _gbae .Process (_dgf );};type gridTiling struct{_ad .PdfRectangle ;
-_eced []float64 ;_bcgge []float64 ;_ggad map[float64 ]map[float64 ]gridTile ;};var _cadaa =_ca .MustCompile ("\u005e\u005c\u0073\u002a\u0028\u005c\u0064\u002b\u005c\u002e\u003f|\u005b\u0049\u0069\u0076\u005d\u002b\u0029\u005c\u0073\u002a\\\u0029\u003f\u0024");
-func _affce (_eaaf ,_bcgd _ad .PdfRectangle )bool {return _cfcef (_eaaf ,_bcgd )&&_fgee (_eaaf ,_bcgd )};func (_cgdbd gridTiling )log (_bageg string ){if !_cefd {return ;};_bg .Log .Info ("\u0074i\u006ci\u006e\u0067\u003a\u0020\u0025d\u0020\u0078 \u0025\u0064\u0020\u0025\u0071",len (_cgdbd ._eced ),len (_cgdbd ._bcgge ),_bageg );
-_fa .Printf ("\u0020\u0020\u0020l\u006c\u0078\u003d\u0025\u002e\u0032\u0066\u000a",_cgdbd ._eced );_fa .Printf ("\u0020\u0020\u0020l\u006c\u0079\u003d\u0025\u002e\u0032\u0066\u000a",_cgdbd ._bcgge );for _cgccf ,_bbgcgg :=range _cgdbd ._bcgge {_bdcg ,_eafag :=_cgdbd ._ggad [_bbgcgg ];
-if !_eafag {continue ;};_fa .Printf ("%\u0034\u0064\u003a\u0020\u0025\u0036\u002e\u0032\u0066\u000a",_cgccf ,_bbgcgg );for _aebbd ,_cfcd :=range _cgdbd ._eced {_dadc ,_babg :=_bdcg [_cfcd ];if !_babg {continue ;};_fa .Printf ("\u0025\u0038\u0064\u003a\u0020\u0025\u0073\u000a",_aebbd ,_dadc .String ());
-};};};func (_ccec *TextMarkArray )exists (_gcefd TextMark )bool {for _ ,_cebe :=range _ccec .Elements (){if _eb .DeepEqual (_gcefd .DirectObject ,_cebe .DirectObject )&&_eb .DeepEqual (_gcefd .BBox ,_cebe .BBox )&&_cebe .Text ==_gcefd .Text {return true ;
-};};return false ;};
+type ExtractionMode int
+
+func (_ddd *imageExtractContext) extractContentStreamImages(_dgc string, _dgf *_ad.PdfPageResources) error {
+	_ccb := _af.NewContentStreamParser(_dgc)
+	_bdba, _fgd := _ccb.Parse()
+	if _fgd != nil {
+		return _fgd
+	}
+	if _ddd._gcc == nil {
+		_ddd._gcc = map[*_afa.PdfObjectStream]*cachedImage{}
+	}
+	if _ddd._dbe == nil {
+		_ddd._dbe = &ImageExtractOptions{}
+	}
+	_gbae := _af.NewContentStreamProcessor(*_bdba)
+	_gbae.AddHandler(_af.HandlerConditionEnumAllOperands, "", _ddd.processOperand)
+	return _gbae.Process(_dgf)
+}
+
+type gridTiling struct {
+	_ad.PdfRectangle
+	_eced  []float64
+	_bcgge []float64
+	_ggad  map[float64]map[float64]gridTile
+}
+
+var _cadaa = _ca.MustCompile("\u005e\u005c\u0073\u002a\u0028\u005c\u0064\u002b\u005c\u002e\u003f|\u005b\u0049\u0069\u0076\u005d\u002b\u0029\u005c\u0073\u002a\\\u0029\u003f\u0024")
+
+func _affce(_eaaf, _bcgd _ad.PdfRectangle) bool {
+	return _cfcef(_eaaf, _bcgd) && _fgee(_eaaf, _bcgd)
+}
+
+func (_cgdbd gridTiling) log(_bageg string) {
+	if !_cefd {
+		return
+	}
+	_bg.Log.Info("\u0074i\u006ci\u006e\u0067\u003a\u0020\u0025d\u0020\u0078 \u0025\u0064\u0020\u0025\u0071", len(_cgdbd._eced), len(_cgdbd._bcgge), _bageg)
+	_fa.Printf("\u0020\u0020\u0020l\u006c\u0078\u003d\u0025\u002e\u0032\u0066\u000a", _cgdbd._eced)
+	_fa.Printf("\u0020\u0020\u0020l\u006c\u0079\u003d\u0025\u002e\u0032\u0066\u000a", _cgdbd._bcgge)
+	for _cgccf, _bbgcgg := range _cgdbd._bcgge {
+		_bdcg, _eafag := _cgdbd._ggad[_bbgcgg]
+		if !_eafag {
+			continue
+		}
+		_fa.Printf("%\u0034\u0064\u003a\u0020\u0025\u0036\u002e\u0032\u0066\u000a", _cgccf, _bbgcgg)
+		for _aebbd, _cfcd := range _cgdbd._eced {
+			_dadc, _babg := _bdcg[_cfcd]
+			if !_babg {
+				continue
+			}
+			_fa.Printf("\u0025\u0038\u0064\u003a\u0020\u0025\u0073\u000a", _aebbd, _dadc.String())
+		}
+	}
+}
+
+func (_ccec *TextMarkArray) exists(_gcefd TextMark) bool {
+	for _, _cebe := range _ccec.Elements() {
+		if _eb.DeepEqual(_gcefd.DirectObject, _cebe.DirectObject) && _eb.DeepEqual(_gcefd.BBox, _cebe.BBox) && _cebe.Text == _gcefd.Text {
+			return true
+		}
+	}
+	return false
+}
 
 // Options extractor options.
-type Options struct{
+type Options struct {
 
-// DisableDocumentTags specifies whether to use the document tags during list extraction.
-DisableDocumentTags bool ;
+	// DisableDocumentTags specifies whether to use the document tags during list extraction.
+	DisableDocumentTags bool
 
-// ApplyCropBox will extract page text based on page cropbox if set to `true`.
-ApplyCropBox bool ;
+	// ApplyCropBox will extract page text based on page cropbox if set to `true`.
+	ApplyCropBox bool
 
-// Text extraction mode, default is ExtractionModeLayout.
-ExtractionMode ExtractionMode ;
+	// Text extraction mode, default is ExtractionModeLayout.
+	ExtractionMode ExtractionMode
 
-// IncludeAnnotations specifies whether to include annotations in the extraction process, default value is `false`.
-IncludeAnnotations bool ;
+	// IncludeAnnotations specifies whether to include annotations in the extraction process, default value is `false`.
+	IncludeAnnotations bool
 
-// RelaxedMode specifies whether to use relaxed mode for processing the objects,
-// If enabled UniPDF will automatically try to fix invalid parameters length and value.
-// Default is `false`.
-RelaxedMode bool ;};func _facg (_cbgg []float64 ,_abbbg ,_cfbc float64 )[]float64 {_fgfbf ,_bfdff :=_abbbg ,_cfbc ;if _bfdff < _fgfbf {_fgfbf ,_bfdff =_bfdff ,_fgfbf ;};_gcccg :=make ([]float64 ,0,len (_cbgg )+2);_gcccg =append (_gcccg ,_abbbg );for _ ,_ecggg :=range _cbgg {if _ecggg <=_fgfbf {continue ;
-}else if _ecggg >=_bfdff {break ;};_gcccg =append (_gcccg ,_ecggg );};_gcccg =append (_gcccg ,_cfbc );return _gcccg ;};func (_gabf *imageExtractContext )processOperand (_egb *_af .ContentStreamOperation ,_bcfe _af .GraphicsState ,_egf *_ad .PdfPageResources )error {if _egb .Operand =="\u0042\u0049"&&len (_egb .Params )==1{_bbg ,_bgfd :=_egb .Params [0].(*_af .ContentStreamInlineImage );
-if !_bgfd {return nil ;};if _baf ,_bdd :=_afa .GetBoolVal (_bbg .ImageMask );_bdd {if _baf &&!_gabf ._dbe .IncludeInlineStencilMasks {return nil ;};};return _gabf .extractInlineImage (_bbg ,_bcfe ,_egf );}else if _egb .Operand =="\u0044\u006f"&&len (_egb .Params )==1{_gca ,_ged :=_afa .GetName (_egb .Params [0]);
-if !_ged {_bg .Log .Debug ("E\u0052\u0052\u004f\u0052\u003a\u0020\u0054\u0079\u0070\u0065");return _cad ;};_ ,_feb :=_egf .GetXObjectByName (*_gca );switch _feb {case _ad .XObjectTypeImage :return _gabf .extractXObjectImage (_gca ,_bcfe ,_egf );case _ad .XObjectTypeForm :return _gabf .extractFormImages (_gca ,_bcfe ,_egf );
-};}else if _gabf ._cfe &&(_egb .Operand =="\u0073\u0063\u006e"||_egb .Operand =="\u0053\u0043\u004e")&&len (_egb .Params )==1{_fagc ,_fgbe :=_afa .GetName (_egb .Params [0]);if !_fgbe {_bg .Log .Debug ("E\u0052\u0052\u004f\u0052\u003a\u0020\u0054\u0079\u0070\u0065");
-return _cad ;};_gaa ,_fgbe :=_egf .GetPatternByName (*_fagc );if !_fgbe {_bg .Log .Debug ("\u0045R\u0052\u004f\u0052\u003a\u0020\u0050\u0061\u0074\u0074\u0065\u0072n\u0020\u006e\u006f\u0074\u0020\u0066\u006f\u0075\u006e\u0064");return nil ;};if _gaa .IsTiling (){_edgd :=_gaa .GetAsTilingPattern ();
-_bfg ,_ffca :=_edgd .GetContentStream ();if _ffca !=nil {return _ffca ;};_ffca =_gabf .extractContentStreamImages (string (_bfg ),_edgd .Resources );if _ffca !=nil {return _ffca ;};};}else if (_egb .Operand =="\u0063\u0073"||_egb .Operand =="\u0043\u0053")&&len (_egb .Params )>=1{_gabf ._cfe =_egb .Params [0].String ()=="\u0050a\u0074\u0074\u0065\u0072\u006e";
-};return nil ;};func (_ddbfg intSet )add (_ccdfg int ){_ddbfg [_ccdfg ]=struct{}{}};func (_ffgc *textWord )toTextMarks (_egbde *int )[]TextMark {var _bdeef []TextMark ;for _ ,_acgeg :=range _ffgc ._ddfc {_bdeef =_bbgef (_bdeef ,_egbde ,_acgeg .ToTextMark ());
-};return _bdeef ;};type fontEntry struct{_cggf *_ad .PdfFont ;_bad int64 ;};func _ggec (_gbec string )string {_acac :=[]rune (_gbec );return string (_acac [:len (_acac )-1])};func _cgcb (_ddag *TextMarkArray )string {_dgcc :="";for _ ,_aeb :=range _ddag .Elements (){_dgcc +=_aeb .Text ;
-};return _dgcc ;};func (_bcffa paraList )findTableGrid (_fgafaf gridTiling )(*textTable ,map[*textPara ]struct{}){_fbeee :=len (_fgafaf ._eced );_fbff :=len (_fgafaf ._bcgge );_aege :=textTable {_cegab :true ,_cfadc :_fbeee ,_aaga :_fbff ,_eccda :make (map[uint64 ]*textPara ,_fbeee *_fbff ),_cafd :make (map[uint64 ]compositeCell ,_fbeee *_fbff )};
-_aege .PdfRectangle =_fgafaf .PdfRectangle ;_fdfcg :=make (map[*textPara ]struct{});_fbeb :=int ((1.0-_ddbg )*float64 (_fbeee *_fbff ));_ccdgg :=0;if _cefd {_bg .Log .Info ("\u0066\u0069\u006e\u0064Ta\u0062\u006c\u0065\u0047\u0072\u0069\u0064\u003a\u0020\u0025\u0064\u0020\u0078\u0020%\u0064",_fbeee ,_fbff );
-};for _geec ,_dcdcg :=range _fgafaf ._bcgge {_gdbdf ,_bedeg :=_fgafaf ._ggad [_dcdcg ];if !_bedeg {continue ;};for _dagd ,_babb :=range _fgafaf ._eced {_cacff ,_fdec :=_gdbdf [_babb ];if !_fdec {continue ;};_eeba :=_bcffa .inTile (_cacff );if len (_eeba )==0{_ccdgg ++;
-if _ccdgg > _fbeb {if _cefd {_bg .Log .Info ("\u0021\u006e\u0075m\u0045\u006d\u0070\u0074\u0079\u003d\u0025\u0064",_ccdgg );};return nil ,nil ;};}else {_aege .putComposite (_dagd ,_geec ,_eeba ,_cacff .PdfRectangle );for _ ,_faed :=range _eeba {_fdfcg [_faed ]=struct{}{};
-};};};};_dbdbb :=0;for _fggf :=0;_fggf < _fbeee ;_fggf ++{_bgcde :=_aege .get (_fggf ,0);if _bgcde ==nil ||!_bgcde ._gddfg {_dbdbb ++;};};if _dbdbb ==0{if _cefd {_bg .Log .Info ("\u0021\u006e\u0075m\u0048\u0065\u0061\u0064\u0065\u0072\u003d\u0030");};return nil ,nil ;
-};_gecb :=_aege .reduceTiling (_fgafaf ,_ccff );_gecb =_gecb .subdivide ();return _gecb ,_fdfcg ;};func (_abgef *ruling )intersects (_ccef *ruling )bool {_aabga :=(_abgef ._gafe ==_dcfdg &&_ccef ._gafe ==_cafa )||(_ccef ._gafe ==_dcfdg &&_abgef ._gafe ==_cafa );
-_fcgd :=func (_fbfe ,_abfb *ruling )bool {return _fbfe ._ggecg -_edcb <=_abfb ._ecfb &&_abfb ._ecfb <=_fbfe ._gebf +_edcb ;};_ffbgd :=_fcgd (_abgef ,_ccef );_bddag :=_fcgd (_ccef ,_abgef );if _feda {_fa .Printf ("\u0020\u0020\u0020\u0020\u0069\u006e\u0074\u0065\u0072\u0073\u0065\u0063\u0074\u0073\u003a\u0020\u0020\u006fr\u0074\u0068\u006f\u0067\u006f\u006e\u0061l\u003d\u0025\u0074\u0020\u006f\u0031\u003d\u0025\u0074\u0020\u006f2\u003d\u0025\u0074\u0020\u2192\u0020\u0025\u0074\u000a"+"\u0020\u0020\u0020 \u0020\u0020\u0020\u0076\u003d\u0025\u0073\u000a"+" \u0020\u0020\u0020\u0020\u0020\u0077\u003d\u0025\u0073\u000a",_aabga ,_ffbgd ,_bddag ,_aabga &&_ffbgd &&_bddag ,_abgef ,_ccef );
-};return _aabga &&_ffbgd &&_bddag ;};
+	// RelaxedMode specifies whether to use relaxed mode for processing the objects,
+	// If enabled UniPDF will automatically try to fix invalid parameters length and value.
+	// Default is `false`.
+	RelaxedMode bool
+}
+
+func _facg(_cbgg []float64, _abbbg, _cfbc float64) []float64 {
+	_fgfbf, _bfdff := _abbbg, _cfbc
+	if _bfdff < _fgfbf {
+		_fgfbf, _bfdff = _bfdff, _fgfbf
+	}
+	_gcccg := make([]float64, 0, len(_cbgg)+2)
+	_gcccg = append(_gcccg, _abbbg)
+	for _, _ecggg := range _cbgg {
+		if _ecggg <= _fgfbf {
+			continue
+		} else if _ecggg >= _bfdff {
+			break
+		}
+		_gcccg = append(_gcccg, _ecggg)
+	}
+	_gcccg = append(_gcccg, _cfbc)
+	return _gcccg
+}
+
+func (_gabf *imageExtractContext) processOperand(_egb *_af.ContentStreamOperation, _bcfe _af.GraphicsState, _egf *_ad.PdfPageResources) error {
+	if _egb.Operand == "\u0042\u0049" && len(_egb.Params) == 1 {
+		_bbg, _bgfd := _egb.Params[0].(*_af.ContentStreamInlineImage)
+		if !_bgfd {
+			return nil
+		}
+		if _baf, _bdd := _afa.GetBoolVal(_bbg.ImageMask); _bdd {
+			if _baf && !_gabf._dbe.IncludeInlineStencilMasks {
+				return nil
+			}
+		}
+		return _gabf.extractInlineImage(_bbg, _bcfe, _egf)
+	} else if _egb.Operand == "\u0044\u006f" && len(_egb.Params) == 1 {
+		_gca, _ged := _afa.GetName(_egb.Params[0])
+		if !_ged {
+			_bg.Log.Debug("E\u0052\u0052\u004f\u0052\u003a\u0020\u0054\u0079\u0070\u0065")
+			return _cad
+		}
+		_, _feb := _egf.GetXObjectByName(*_gca)
+		switch _feb {
+		case _ad.XObjectTypeImage:
+			return _gabf.extractXObjectImage(_gca, _bcfe, _egf)
+		case _ad.XObjectTypeForm:
+			return _gabf.extractFormImages(_gca, _bcfe, _egf)
+		}
+	} else if _gabf._cfe && (_egb.Operand == "\u0073\u0063\u006e" || _egb.Operand == "\u0053\u0043\u004e") && len(_egb.Params) == 1 {
+		_fagc, _fgbe := _afa.GetName(_egb.Params[0])
+		if !_fgbe {
+			_bg.Log.Debug("E\u0052\u0052\u004f\u0052\u003a\u0020\u0054\u0079\u0070\u0065")
+			return _cad
+		}
+		_gaa, _fgbe := _egf.GetPatternByName(*_fagc)
+		if !_fgbe {
+			_bg.Log.Debug("\u0045R\u0052\u004f\u0052\u003a\u0020\u0050\u0061\u0074\u0074\u0065\u0072n\u0020\u006e\u006f\u0074\u0020\u0066\u006f\u0075\u006e\u0064")
+			return nil
+		}
+		if _gaa.IsTiling() {
+			_edgd := _gaa.GetAsTilingPattern()
+			_bfg, _ffca := _edgd.GetContentStream()
+			if _ffca != nil {
+				return _ffca
+			}
+			_ffca = _gabf.extractContentStreamImages(string(_bfg), _edgd.Resources)
+			if _ffca != nil {
+				return _ffca
+			}
+		}
+	} else if (_egb.Operand == "\u0063\u0073" || _egb.Operand == "\u0043\u0053") && len(_egb.Params) >= 1 {
+		_gabf._cfe = _egb.Params[0].String() == "\u0050a\u0074\u0074\u0065\u0072\u006e"
+	}
+	return nil
+}
+
+func (_ddbfg intSet) add(_ccdfg int) { _ddbfg[_ccdfg] = struct{}{} }
+
+func (_ffgc *textWord) toTextMarks(_egbde *int) []TextMark {
+	var _bdeef []TextMark
+	for _, _acgeg := range _ffgc._ddfc {
+		_bdeef = _bbgef(_bdeef, _egbde, _acgeg.ToTextMark())
+	}
+	return _bdeef
+}
+
+type fontEntry struct {
+	_cggf *_ad.PdfFont
+	_bad  int64
+}
+
+func _ggec(_gbec string) string { _acac := []rune(_gbec); return string(_acac[:len(_acac)-1]) }
+
+func _cgcb(_ddag *TextMarkArray) string {
+	_dgcc := ""
+	for _, _aeb := range _ddag.Elements() {
+		_dgcc += _aeb.Text
+	}
+	return _dgcc
+}
+
+func (_bcffa paraList) findTableGrid(_fgafaf gridTiling) (*textTable, map[*textPara]struct{}) {
+	_fbeee := len(_fgafaf._eced)
+	_fbff := len(_fgafaf._bcgge)
+	_aege := textTable{_cegab: true, _cfadc: _fbeee, _aaga: _fbff, _eccda: make(map[uint64]*textPara, _fbeee*_fbff), _cafd: make(map[uint64]compositeCell, _fbeee*_fbff)}
+	_aege.PdfRectangle = _fgafaf.PdfRectangle
+	_fdfcg := make(map[*textPara]struct{})
+	_fbeb := int((1.0 - _ddbg) * float64(_fbeee*_fbff))
+	_ccdgg := 0
+	if _cefd {
+		_bg.Log.Info("\u0066\u0069\u006e\u0064Ta\u0062\u006c\u0065\u0047\u0072\u0069\u0064\u003a\u0020\u0025\u0064\u0020\u0078\u0020%\u0064", _fbeee, _fbff)
+	}
+	for _geec, _dcdcg := range _fgafaf._bcgge {
+		_gdbdf, _bedeg := _fgafaf._ggad[_dcdcg]
+		if !_bedeg {
+			continue
+		}
+		for _dagd, _babb := range _fgafaf._eced {
+			_cacff, _fdec := _gdbdf[_babb]
+			if !_fdec {
+				continue
+			}
+			_eeba := _bcffa.inTile(_cacff)
+			if len(_eeba) == 0 {
+				_ccdgg++
+				if _ccdgg > _fbeb {
+					if _cefd {
+						_bg.Log.Info("\u0021\u006e\u0075m\u0045\u006d\u0070\u0074\u0079\u003d\u0025\u0064", _ccdgg)
+					}
+					return nil, nil
+				}
+			} else {
+				_aege.putComposite(_dagd, _geec, _eeba, _cacff.PdfRectangle)
+				for _, _faed := range _eeba {
+					_fdfcg[_faed] = struct{}{}
+				}
+			}
+		}
+	}
+	_dbdbb := 0
+	for _fggf := 0; _fggf < _fbeee; _fggf++ {
+		_bgcde := _aege.get(_fggf, 0)
+		if _bgcde == nil || !_bgcde._gddfg {
+			_dbdbb++
+		}
+	}
+	if _dbdbb == 0 {
+		if _cefd {
+			_bg.Log.Info("\u0021\u006e\u0075m\u0048\u0065\u0061\u0064\u0065\u0072\u003d\u0030")
+		}
+		return nil, nil
+	}
+	_gecb := _aege.reduceTiling(_fgafaf, _ccff)
+	_gecb = _gecb.subdivide()
+	return _gecb, _fdfcg
+}
+
+func (_abgef *ruling) intersects(_ccef *ruling) bool {
+	_aabga := (_abgef._gafe == _dcfdg && _ccef._gafe == _cafa) || (_ccef._gafe == _dcfdg && _abgef._gafe == _cafa)
+	_fcgd := func(_fbfe, _abfb *ruling) bool {
+		return _fbfe._ggecg-_edcb <= _abfb._ecfb && _abfb._ecfb <= _fbfe._gebf+_edcb
+	}
+	_ffbgd := _fcgd(_abgef, _ccef)
+	_bddag := _fcgd(_ccef, _abgef)
+	if _feda {
+		_fa.Printf("\u0020\u0020\u0020\u0020\u0069\u006e\u0074\u0065\u0072\u0073\u0065\u0063\u0074\u0073\u003a\u0020\u0020\u006fr\u0074\u0068\u006f\u0067\u006f\u006e\u0061l\u003d\u0025\u0074\u0020\u006f\u0031\u003d\u0025\u0074\u0020\u006f2\u003d\u0025\u0074\u0020\u2192\u0020\u0025\u0074\u000a"+"\u0020\u0020\u0020 \u0020\u0020\u0020\u0076\u003d\u0025\u0073\u000a"+" \u0020\u0020\u0020\u0020\u0020\u0077\u003d\u0025\u0073\u000a", _aabga, _ffbgd, _bddag, _aabga && _ffbgd && _bddag, _abgef, _ccef)
+	}
+	return _aabga && _ffbgd && _bddag
+}
 
 // String returns a string describing `ma`.
-func (_bacd TextMarkArray )String ()string {_gcde :=len (_bacd ._fde );if _gcde ==0{return "\u0045\u004d\u0050T\u0059";};_ggdae :=_bacd ._fde [0];_fbbc :=_bacd ._fde [_gcde -1];return _fa .Sprintf ("\u007b\u0054\u0045\u0058\u0054\u004d\u0041\u0052K\u0041\u0052\u0052AY\u003a\u0020\u0025\u0064\u0020\u0065l\u0065\u006d\u0065\u006e\u0074\u0073\u000a\u0009\u0066\u0069\u0072\u0073\u0074\u003d\u0025s\u000a\u0009\u0020\u006c\u0061\u0073\u0074\u003d%\u0073\u007d",_gcde ,_ggdae ,_fbbc );
-};func _dagb (_cfdfd *textLine )float64 {return _cfdfd ._gbaa [0].Llx };func _ccce (_acbed *wordBag ,_cdaa *textWord ,_eacgb float64 )bool {return _acbed .Urx <=_cdaa .Llx &&_cdaa .Llx < _acbed .Urx +_eacgb ;};func (_aead *textLine )appendWord (_cdbeg *textWord ){_aead ._gbaa =append (_aead ._gbaa ,_cdbeg );
-_aead .PdfRectangle =_faea (_aead .PdfRectangle ,_cdbeg .PdfRectangle );if _cdbeg ._bbebf > _aead ._fgfb {_aead ._fgfb =_cdbeg ._bbebf ;};if _cdbeg ._fcgaa > _aead ._adaa {_aead ._adaa =_cdbeg ._fcgaa ;};};func _gedde (_cefcd map[int ][]float64 ){if len (_cefcd )<=1{return ;
-};_bggba :=_ceddf (_cefcd );if _ggegb {_bg .Log .Info ("\u0066i\u0078C\u0065\u006c\u006c\u0073\u003a \u006b\u0065y\u0073\u003d\u0025\u002b\u0076",_bggba );};var _geabb ,_fbeff int ;for _geabb ,_fbeff =range _bggba {if _cefcd [_fbeff ]!=nil {break ;};};
-for _agcfg ,_bbfga :=range _bggba [_geabb :]{_afff :=_cefcd [_bbfga ];if _afff ==nil {continue ;};if _ggegb {_fa .Printf ("\u0025\u0034\u0064\u003a\u0020\u006b\u0030\u003d\u0025\u0064\u0020\u006b1\u003d\u0025\u0064\u000a",_geabb +_agcfg ,_fbeff ,_bbfga );
-};_abcff :=_cefcd [_bbfga ];if _abcff [len (_abcff )-1]> _afff [0]{_abcff [len (_abcff )-1]=_afff [0];_cefcd [_fbeff ]=_abcff ;};_fbeff =_bbfga ;};};func _dfbfba (_cagc ,_aebbe _cg .Image )_cg .Image {_eageg ,_bbbd :=_aebbe .Bounds ().Size (),_cagc .Bounds ().Size ();
-_cfecge ,_aeeg :=_eageg .X ,_eageg .Y ;if _bbbd .X > _cfecge {_cfecge =_bbbd .X ;};if _bbbd .Y > _aeeg {_aeeg =_bbbd .Y ;};_cccaa :=_cg .Rect (0,0,_cfecge ,_aeeg );if _eageg .X !=_cfecge ||_eageg .Y !=_aeeg {_ffcg :=_cg .NewRGBA (_cccaa );_e .BiLinear .Scale (_ffcg ,_cccaa ,_cagc ,_aebbe .Bounds (),_e .Over ,nil );
-_aebbe =_ffcg ;};if _bbbd .X !=_cfecge ||_bbbd .Y !=_aeeg {_dagc :=_cg .NewRGBA (_cccaa );_e .BiLinear .Scale (_dagc ,_cccaa ,_cagc ,_cagc .Bounds (),_e .Over ,nil );_cagc =_dagc ;};_gede :=_cg .NewRGBA (_cccaa );_e .DrawMask (_gede ,_cccaa ,_cagc ,_cg .Point {},_aebbe ,_cg .Point {},_e .Over );
-return _gede ;};func (_aafb pathSection )bbox ()_ad .PdfRectangle {_eagg :=_aafb ._fdgf [0]._bfgb [0];_ddec :=_ad .PdfRectangle {Llx :_eagg .X ,Urx :_eagg .X ,Lly :_eagg .Y ,Ury :_eagg .Y };_dcdf :=func (_gaea _cd .Point ){if _gaea .X < _ddec .Llx {_ddec .Llx =_gaea .X ;
-}else if _gaea .X > _ddec .Urx {_ddec .Urx =_gaea .X ;};if _gaea .Y < _ddec .Lly {_ddec .Lly =_gaea .Y ;}else if _gaea .Y > _ddec .Ury {_ddec .Ury =_gaea .Y ;};};for _ ,_aee :=range _aafb ._fdgf [0]._bfgb [1:]{_dcdf (_aee );};for _ ,_dbfg :=range _aafb ._fdgf [1:]{for _ ,_ccgf :=range _dbfg ._bfgb {_dcdf (_ccgf );
-};};return _ddec ;};func (_abadf *wordBag )removeDuplicates (){if _aggf {_bg .Log .Info ("r\u0065m\u006f\u0076\u0065\u0044\u0075\u0070\u006c\u0069c\u0061\u0074\u0065\u0073: \u0025\u0071",_abadf .text ());};for _ ,_gbfd :=range _abadf .depthIndexes (){if len (_abadf ._fdeg [_gbfd ])==0{continue ;
-};_ecgfb :=_abadf ._fdeg [_gbfd ][0];_cffc :=_edae *_ecgfb ._bbebf ;_gfbfa :=_ecgfb ._fcgaa ;for _ ,_abfg :=range _abadf .depthBand (_gfbfa ,_gfbfa +_cffc ){_gbdb :=map[*textWord ]struct{}{};_fafg :=_abadf ._fdeg [_abfg ];for _ ,_agbd :=range _fafg {if _ ,_afcaf :=_gbdb [_agbd ];
-_afcaf {continue ;};for _ ,_beee :=range _fafg {if _ ,_dfeg :=_gbdb [_beee ];_dfeg {continue ;};if _beee !=_agbd &&_beee ._fgaa ==_agbd ._fgaa &&_c .Abs (_beee .Llx -_agbd .Llx )< _cffc &&_c .Abs (_beee .Urx -_agbd .Urx )< _cffc &&_c .Abs (_beee .Lly -_agbd .Lly )< _cffc &&_c .Abs (_beee .Ury -_agbd .Ury )< _cffc {_gbdb [_beee ]=struct{}{};
-};};};if len (_gbdb )> 0{_cdfc :=0;for _ ,_cgae :=range _fafg {if _ ,_affb :=_gbdb [_cgae ];!_affb {_fafg [_cdfc ]=_cgae ;_cdfc ++;};};_abadf ._fdeg [_abfg ]=_fafg [:len (_fafg )-len (_gbdb )];if len (_abadf ._fdeg [_abfg ])==0{delete (_abadf ._fdeg ,_abfg );
-};};};};};func _aaea (_febdb *textWord ,_ceac float64 ,_dabf ,_abbd rulingList )*wordBag {_dabfa :=_gfde (_febdb ._fcgaa );_dfcg :=[]*textWord {_febdb };_fgcc :=wordBag {_fdeg :map[int ][]*textWord {_dabfa :_dfcg },PdfRectangle :_febdb .PdfRectangle ,_eagga :_febdb ._bbebf ,_gdca :_ceac ,_fegfc :_dabf ,_fbee :_abbd };
-return &_fgcc ;};func (_dbbeg *textTable )logComposite (_afcfe string ){if !_ggegb {return ;};_bg .Log .Info ("\u007e~\u007eP\u0061\u0072\u0061\u0020\u0025d\u0020\u0078 \u0025\u0064\u0020\u0025\u0073",_dbbeg ._cfadc ,_dbbeg ._aaga ,_afcfe );_fa .Printf ("\u0025\u0035\u0073 \u007c","");
-for _cddc :=0;_cddc < _dbbeg ._cfadc ;_cddc ++{_fa .Printf ("\u0025\u0033\u0064 \u007c",_cddc );};_fa .Println ("");_fa .Printf ("\u0025\u0035\u0073 \u002b","");for _cdfa :=0;_cdfa < _dbbeg ._cfadc ;_cdfa ++{_fa .Printf ("\u0025\u0033\u0073 \u002b","\u002d\u002d\u002d");
-};_fa .Println ("");for _dbbc :=0;_dbbc < _dbbeg ._aaga ;_dbbc ++{_fa .Printf ("\u0025\u0035\u0064 \u007c",_dbbc );for _adfb :=0;_adfb < _dbbeg ._cfadc ;_adfb ++{_ebada ,_ :=_dbbeg ._cafd [_fffbe (_adfb ,_dbbc )].parasBBox ();_fa .Printf ("\u0025\u0033\u0064 \u007c",len (_ebada ));
-};_fa .Println ("");};_bg .Log .Info ("\u007e~\u007eT\u0065\u0078\u0074\u0020\u0025d\u0020\u0078 \u0025\u0064\u0020\u0025\u0073",_dbbeg ._cfadc ,_dbbeg ._aaga ,_afcfe );_fa .Printf ("\u0025\u0035\u0073 \u007c","");for _ccbgd :=0;_ccbgd < _dbbeg ._cfadc ;
-_ccbgd ++{_fa .Printf ("\u0025\u0031\u0032\u0064\u0020\u007c",_ccbgd );};_fa .Println ("");_fa .Printf ("\u0025\u0035\u0073 \u002b","");for _accca :=0;_accca < _dbbeg ._cfadc ;_accca ++{_fa .Print ("\u002d\u002d\u002d\u002d\u002d\u002d\u002d\u002d\u002d-\u002d\u002d\u002d\u002b");
-};_fa .Println ("");for _acaaf :=0;_acaaf < _dbbeg ._aaga ;_acaaf ++{_fa .Printf ("\u0025\u0035\u0064 \u007c",_acaaf );for _dgbc :=0;_dgbc < _dbbeg ._cfadc ;_dgbc ++{_aabd ,_ :=_dbbeg ._cafd [_fffbe (_dgbc ,_acaaf )].parasBBox ();_eagb :="";_cade :=_aabd .merge ();
-if _cade !=nil {_eagb =_cade .text ();};_eagb =_fa .Sprintf ("\u0025\u0071",_fagdg (_eagb ,12));_eagb =_eagb [1:len (_eagb )-1];_fa .Printf ("\u0025\u0031\u0032\u0073\u0020\u007c",_eagb );};_fa .Println ("");};};func (_bfbeg rulingList )sort (){_eg .Slice (_bfbeg ,_bfbeg .comp )};
-func (_dcfg rulingList )primMinMax ()(float64 ,float64 ){_feagg ,_gbeea :=_dcfg [0]._ecfb ,_dcfg [0]._ecfb ;for _ ,_dbbf :=range _dcfg [1:]{if _dbbf ._ecfb < _feagg {_feagg =_dbbf ._ecfb ;}else if _dbbf ._ecfb > _gbeea {_gbeea =_dbbf ._ecfb ;};};return _feagg ,_gbeea ;
-};type textPara struct{_ad .PdfRectangle ;_cbfdb _ad .PdfRectangle ;_feea []*textLine ;_fbbfg *textTable ;_bdfe bool ;_gddfg bool ;_aagb *textPara ;_badad *textPara ;_decad *textPara ;_gdae *textPara ;_fgfc []list ;};func (_edba *shapesState )establishSubpath ()*subpath {_cbcb ,_dafdb :=_edba .lastpointEstablished ();
-if !_dafdb {_edba ._fec =append (_edba ._fec ,_ffde (_cbcb ));};if len (_edba ._fec )==0{return nil ;};_edba ._eaba =false ;return _edba ._fec [len (_edba ._fec )-1];};var _dcba *_ca .Regexp =_ca .MustCompile (_cacfc +"\u007c"+_ccffa );type cachedImage struct{_bab *_ad .Image ;
-_ebaa _ad .PdfColorspace ;};
+func (_bacd TextMarkArray) String() string {
+	_gcde := len(_bacd._fde)
+	if _gcde == 0 {
+		return "\u0045\u004d\u0050T\u0059"
+	}
+	_ggdae := _bacd._fde[0]
+	_fbbc := _bacd._fde[_gcde-1]
+	return _fa.Sprintf("\u007b\u0054\u0045\u0058\u0054\u004d\u0041\u0052K\u0041\u0052\u0052AY\u003a\u0020\u0025\u0064\u0020\u0065l\u0065\u006d\u0065\u006e\u0074\u0073\u000a\u0009\u0066\u0069\u0072\u0073\u0074\u003d\u0025s\u000a\u0009\u0020\u006c\u0061\u0073\u0074\u003d%\u0073\u007d", _gcde, _ggdae, _fbbc)
+}
+
+func _dagb(_cfdfd *textLine) float64 { return _cfdfd._gbaa[0].Llx }
+
+func _ccce(_acbed *wordBag, _cdaa *textWord, _eacgb float64) bool {
+	return _acbed.Urx <= _cdaa.Llx && _cdaa.Llx < _acbed.Urx+_eacgb
+}
+
+func (_aead *textLine) appendWord(_cdbeg *textWord) {
+	_aead._gbaa = append(_aead._gbaa, _cdbeg)
+	_aead.PdfRectangle = _faea(_aead.PdfRectangle, _cdbeg.PdfRectangle)
+	if _cdbeg._bbebf > _aead._fgfb {
+		_aead._fgfb = _cdbeg._bbebf
+	}
+	if _cdbeg._fcgaa > _aead._adaa {
+		_aead._adaa = _cdbeg._fcgaa
+	}
+}
+
+func _gedde(_cefcd map[int][]float64) {
+	if len(_cefcd) <= 1 {
+		return
+	}
+	_bggba := _ceddf(_cefcd)
+	if _ggegb {
+		_bg.Log.Info("\u0066i\u0078C\u0065\u006c\u006c\u0073\u003a \u006b\u0065y\u0073\u003d\u0025\u002b\u0076", _bggba)
+	}
+	var _geabb, _fbeff int
+	for _geabb, _fbeff = range _bggba {
+		if _cefcd[_fbeff] != nil {
+			break
+		}
+	}
+	for _agcfg, _bbfga := range _bggba[_geabb:] {
+		_afff := _cefcd[_bbfga]
+		if _afff == nil {
+			continue
+		}
+		if _ggegb {
+			_fa.Printf("\u0025\u0034\u0064\u003a\u0020\u006b\u0030\u003d\u0025\u0064\u0020\u006b1\u003d\u0025\u0064\u000a", _geabb+_agcfg, _fbeff, _bbfga)
+		}
+		_abcff := _cefcd[_bbfga]
+		if _abcff[len(_abcff)-1] > _afff[0] {
+			_abcff[len(_abcff)-1] = _afff[0]
+			_cefcd[_fbeff] = _abcff
+		}
+		_fbeff = _bbfga
+	}
+}
+
+func _dfbfba(_cagc, _aebbe _cg.Image) _cg.Image {
+	_eageg, _bbbd := _aebbe.Bounds().Size(), _cagc.Bounds().Size()
+	_cfecge, _aeeg := _eageg.X, _eageg.Y
+	if _bbbd.X > _cfecge {
+		_cfecge = _bbbd.X
+	}
+	if _bbbd.Y > _aeeg {
+		_aeeg = _bbbd.Y
+	}
+	_cccaa := _cg.Rect(0, 0, _cfecge, _aeeg)
+	if _eageg.X != _cfecge || _eageg.Y != _aeeg {
+		_ffcg := _cg.NewRGBA(_cccaa)
+		_e.BiLinear.Scale(_ffcg, _cccaa, _cagc, _aebbe.Bounds(), _e.Over, nil)
+		_aebbe = _ffcg
+	}
+	if _bbbd.X != _cfecge || _bbbd.Y != _aeeg {
+		_dagc := _cg.NewRGBA(_cccaa)
+		_e.BiLinear.Scale(_dagc, _cccaa, _cagc, _cagc.Bounds(), _e.Over, nil)
+		_cagc = _dagc
+	}
+	_gede := _cg.NewRGBA(_cccaa)
+	_e.DrawMask(_gede, _cccaa, _cagc, _cg.Point{}, _aebbe, _cg.Point{}, _e.Over)
+	return _gede
+}
+
+func (_aafb pathSection) bbox() _ad.PdfRectangle {
+	_eagg := _aafb._fdgf[0]._bfgb[0]
+	_ddec := _ad.PdfRectangle{Llx: _eagg.X, Urx: _eagg.X, Lly: _eagg.Y, Ury: _eagg.Y}
+	_dcdf := func(_gaea _cd.Point) {
+		if _gaea.X < _ddec.Llx {
+			_ddec.Llx = _gaea.X
+		} else if _gaea.X > _ddec.Urx {
+			_ddec.Urx = _gaea.X
+		}
+		if _gaea.Y < _ddec.Lly {
+			_ddec.Lly = _gaea.Y
+		} else if _gaea.Y > _ddec.Ury {
+			_ddec.Ury = _gaea.Y
+		}
+	}
+	for _, _aee := range _aafb._fdgf[0]._bfgb[1:] {
+		_dcdf(_aee)
+	}
+	for _, _dbfg := range _aafb._fdgf[1:] {
+		for _, _ccgf := range _dbfg._bfgb {
+			_dcdf(_ccgf)
+		}
+	}
+	return _ddec
+}
+
+func (_abadf *wordBag) removeDuplicates() {
+	if _aggf {
+		_bg.Log.Info("r\u0065m\u006f\u0076\u0065\u0044\u0075\u0070\u006c\u0069c\u0061\u0074\u0065\u0073: \u0025\u0071", _abadf.text())
+	}
+	for _, _gbfd := range _abadf.depthIndexes() {
+		if len(_abadf._fdeg[_gbfd]) == 0 {
+			continue
+		}
+		_ecgfb := _abadf._fdeg[_gbfd][0]
+		_cffc := _edae * _ecgfb._bbebf
+		_gfbfa := _ecgfb._fcgaa
+		for _, _abfg := range _abadf.depthBand(_gfbfa, _gfbfa+_cffc) {
+			_gbdb := map[*textWord]struct{}{}
+			_fafg := _abadf._fdeg[_abfg]
+			for _, _agbd := range _fafg {
+				if _, _afcaf := _gbdb[_agbd]; _afcaf {
+					continue
+				}
+				for _, _beee := range _fafg {
+					if _, _dfeg := _gbdb[_beee]; _dfeg {
+						continue
+					}
+					if _beee != _agbd && _beee._fgaa == _agbd._fgaa && _c.Abs(_beee.Llx-_agbd.Llx) < _cffc && _c.Abs(_beee.Urx-_agbd.Urx) < _cffc && _c.Abs(_beee.Lly-_agbd.Lly) < _cffc && _c.Abs(_beee.Ury-_agbd.Ury) < _cffc {
+						_gbdb[_beee] = struct{}{}
+					}
+				}
+			}
+			if len(_gbdb) > 0 {
+				_cdfc := 0
+				for _, _cgae := range _fafg {
+					if _, _affb := _gbdb[_cgae]; !_affb {
+						_fafg[_cdfc] = _cgae
+						_cdfc++
+					}
+				}
+				_abadf._fdeg[_abfg] = _fafg[:len(_fafg)-len(_gbdb)]
+				if len(_abadf._fdeg[_abfg]) == 0 {
+					delete(_abadf._fdeg, _abfg)
+				}
+			}
+		}
+	}
+}
+
+func _aaea(_febdb *textWord, _ceac float64, _dabf, _abbd rulingList) *wordBag {
+	_dabfa := _gfde(_febdb._fcgaa)
+	_dfcg := []*textWord{_febdb}
+	_fgcc := wordBag{_fdeg: map[int][]*textWord{_dabfa: _dfcg}, PdfRectangle: _febdb.PdfRectangle, _eagga: _febdb._bbebf, _gdca: _ceac, _fegfc: _dabf, _fbee: _abbd}
+	return &_fgcc
+}
+
+func (_dbbeg *textTable) logComposite(_afcfe string) {
+	if !_ggegb {
+		return
+	}
+	_bg.Log.Info("\u007e~\u007eP\u0061\u0072\u0061\u0020\u0025d\u0020\u0078 \u0025\u0064\u0020\u0025\u0073", _dbbeg._cfadc, _dbbeg._aaga, _afcfe)
+	_fa.Printf("\u0025\u0035\u0073 \u007c", "")
+	for _cddc := 0; _cddc < _dbbeg._cfadc; _cddc++ {
+		_fa.Printf("\u0025\u0033\u0064 \u007c", _cddc)
+	}
+	_fa.Println("")
+	_fa.Printf("\u0025\u0035\u0073 \u002b", "")
+	for _cdfa := 0; _cdfa < _dbbeg._cfadc; _cdfa++ {
+		_fa.Printf("\u0025\u0033\u0073 \u002b", "\u002d\u002d\u002d")
+	}
+	_fa.Println("")
+	for _dbbc := 0; _dbbc < _dbbeg._aaga; _dbbc++ {
+		_fa.Printf("\u0025\u0035\u0064 \u007c", _dbbc)
+		for _adfb := 0; _adfb < _dbbeg._cfadc; _adfb++ {
+			_ebada, _ := _dbbeg._cafd[_fffbe(_adfb, _dbbc)].parasBBox()
+			_fa.Printf("\u0025\u0033\u0064 \u007c", len(_ebada))
+		}
+		_fa.Println("")
+	}
+	_bg.Log.Info("\u007e~\u007eT\u0065\u0078\u0074\u0020\u0025d\u0020\u0078 \u0025\u0064\u0020\u0025\u0073", _dbbeg._cfadc, _dbbeg._aaga, _afcfe)
+	_fa.Printf("\u0025\u0035\u0073 \u007c", "")
+	for _ccbgd := 0; _ccbgd < _dbbeg._cfadc; _ccbgd++ {
+		_fa.Printf("\u0025\u0031\u0032\u0064\u0020\u007c", _ccbgd)
+	}
+	_fa.Println("")
+	_fa.Printf("\u0025\u0035\u0073 \u002b", "")
+	for _accca := 0; _accca < _dbbeg._cfadc; _accca++ {
+		_fa.Print("\u002d\u002d\u002d\u002d\u002d\u002d\u002d\u002d\u002d-\u002d\u002d\u002d\u002b")
+	}
+	_fa.Println("")
+	for _acaaf := 0; _acaaf < _dbbeg._aaga; _acaaf++ {
+		_fa.Printf("\u0025\u0035\u0064 \u007c", _acaaf)
+		for _dgbc := 0; _dgbc < _dbbeg._cfadc; _dgbc++ {
+			_aabd, _ := _dbbeg._cafd[_fffbe(_dgbc, _acaaf)].parasBBox()
+			_eagb := ""
+			_cade := _aabd.merge()
+			if _cade != nil {
+				_eagb = _cade.text()
+			}
+			_eagb = _fa.Sprintf("\u0025\u0071", _fagdg(_eagb, 12))
+			_eagb = _eagb[1 : len(_eagb)-1]
+			_fa.Printf("\u0025\u0031\u0032\u0073\u0020\u007c", _eagb)
+		}
+		_fa.Println("")
+	}
+}
+
+func (_bfbeg rulingList) sort() { _eg.Slice(_bfbeg, _bfbeg.comp) }
+
+func (_dcfg rulingList) primMinMax() (float64, float64) {
+	_feagg, _gbeea := _dcfg[0]._ecfb, _dcfg[0]._ecfb
+	for _, _dbbf := range _dcfg[1:] {
+		if _dbbf._ecfb < _feagg {
+			_feagg = _dbbf._ecfb
+		} else if _dbbf._ecfb > _gbeea {
+			_gbeea = _dbbf._ecfb
+		}
+	}
+	return _feagg, _gbeea
+}
+
+type textPara struct {
+	_ad.PdfRectangle
+	_cbfdb _ad.PdfRectangle
+	_feea  []*textLine
+	_fbbfg *textTable
+	_bdfe  bool
+	_gddfg bool
+	_aagb  *textPara
+	_badad *textPara
+	_decad *textPara
+	_gdae  *textPara
+	_fgfc  []list
+}
+
+func (_edba *shapesState) establishSubpath() *subpath {
+	_cbcb, _dafdb := _edba.lastpointEstablished()
+	if !_dafdb {
+		_edba._fec = append(_edba._fec, _ffde(_cbcb))
+	}
+	if len(_edba._fec) == 0 {
+		return nil
+	}
+	_edba._eaba = false
+	return _edba._fec[len(_edba._fec)-1]
+}
+
+var _dcba *_ca.Regexp = _ca.MustCompile(_cacfc + "\u007c" + _ccffa)
+
+type cachedImage struct {
+	_bab  *_ad.Image
+	_ebaa _ad.PdfColorspace
+}
 
 // ExtractFonts returns all font information from the page extractor, including
 // font name, font type, the raw data of the embedded font file (if embedded), font descriptor and more.
@@ -731,202 +5266,1537 @@ _ebaa _ad .PdfColorspace ;};
 // The entries from `previousPageFonts` are added to the returned result unless already included in the page, i.e. no duplicate entries.
 //
 // NOTE: If previousPageFonts is nil, all fonts from the page will be returned. Use it when building up a full list of fonts for a document or page range.
-func (_gee *Extractor )ExtractFonts (previousPageFonts *PageFonts )(*PageFonts ,error ){_cc :=PageFonts {};_eeb :=_cc .extractPageResourcesToFont (_gee ._gab );if _eeb !=nil {return nil ,_eeb ;};if previousPageFonts !=nil {for _ ,_eba :=range previousPageFonts .Fonts {if !_eae (_cc .Fonts ,_eba .FontName ){_cc .Fonts =append (_cc .Fonts ,_eba );
-};};};return &PageFonts {Fonts :_cc .Fonts },nil ;};func _ae (_gf string ,_ga bool ,_cag bool )BidiText {_be :="\u006c\u0074\u0072";if _cag {_be ="\u0074\u0074\u0062";}else if !_ga {_be ="\u0072\u0074\u006c";};return BidiText {_cac :_gf ,_fc :_be };};func _eefg (_fgdb string ,_eac string )([][]int ,error ){_ade ,_gbce :=_ca .Compile (_fgdb );
-if _gbce !=nil {return nil ,_fa .Errorf ("\u0065\u0072\u0072\u006f\u0072\u0020c\u006f\u006d\u0070\u0069\u006c\u0069\u006e\u0067\u0020\u0072\u0065\u0067\u0065x\u0020\u0070\u0061\u0074\u0074\u0065\u0072n\u003a\u0020\u0025\u0077",_gbce );};_fdga :=_ade .FindAllStringIndex (_eac ,-1);
-return _fdga ,nil ;};func (_ebefa intSet )del (_egbfa int ){delete (_ebefa ,_egbfa )};func (_aadba rulingList )vertsHorzs ()(rulingList ,rulingList ){var _cbbg ,_abeg rulingList ;for _ ,_dbfgb :=range _aadba {switch _dbfgb ._gafe {case _dcfdg :_cbbg =append (_cbbg ,_dbfgb );
-case _cafa :_abeg =append (_abeg ,_dbfgb );};};return _cbbg ,_abeg ;};func (_bage *wordBag )firstWord (_deba int )*textWord {return _bage ._fdeg [_deba ][0]};func (_fgafa rulingList )augmentGrid ()(rulingList ,rulingList ){_eafaa ,_fcede :=_fgafa .vertsHorzs ();
-if len (_eafaa )==0||len (_fcede )==0{return _eafaa ,_fcede ;};_adcd ,_gdaa :=_eafaa ,_fcede ;_cbgda :=_eafaa .bbox ();_dabeb :=_fcede .bbox ();if _feda {_bg .Log .Info ("\u0061u\u0067\u006d\u0065\u006e\u0074\u0047\u0072\u0069\u0064\u003a\u0020b\u0062\u006f\u0078\u0056\u003d\u0025\u0036\u002e\u0032\u0066",_cbgda );
-_bg .Log .Info ("\u0061u\u0067\u006d\u0065\u006e\u0074\u0047\u0072\u0069\u0064\u003a\u0020b\u0062\u006f\u0078\u0048\u003d\u0025\u0036\u002e\u0032\u0066",_dabeb );};var _ggabb ,_cbgff ,_eacga ,_aggfb *ruling ;if _dabeb .Llx < _cbgda .Llx -_edcb {_ggabb =&ruling {_abddg :_accc ,_gafe :_dcfdg ,_ecfb :_dabeb .Llx ,_ggecg :_cbgda .Lly ,_gebf :_cbgda .Ury };
-_eafaa =append (rulingList {_ggabb },_eafaa ...);};if _dabeb .Urx > _cbgda .Urx +_edcb {_cbgff =&ruling {_abddg :_accc ,_gafe :_dcfdg ,_ecfb :_dabeb .Urx ,_ggecg :_cbgda .Lly ,_gebf :_cbgda .Ury };_eafaa =append (_eafaa ,_cbgff );};if _cbgda .Lly < _dabeb .Lly -_edcb {_eacga =&ruling {_abddg :_accc ,_gafe :_cafa ,_ecfb :_cbgda .Lly ,_ggecg :_dabeb .Llx ,_gebf :_dabeb .Urx };
-_fcede =append (rulingList {_eacga },_fcede ...);};if _cbgda .Ury > _dabeb .Ury +_edcb {_aggfb =&ruling {_abddg :_accc ,_gafe :_cafa ,_ecfb :_cbgda .Ury ,_ggecg :_dabeb .Llx ,_gebf :_dabeb .Urx };_fcede =append (_fcede ,_aggfb );};if len (_eafaa )+len (_fcede )==len (_fgafa ){return _adcd ,_gdaa ;
-};_caeef :=append (_eafaa ,_fcede ...);_fgafa .log ("u\u006e\u0061\u0075\u0067\u006d\u0065\u006e\u0074\u0065\u0064");_caeef .log ("\u0061u\u0067\u006d\u0065\u006e\u0074\u0065d");return _eafaa ,_fcede ;};func _ceae (_aedc []_afa .PdfObject )(_adadf ,_dafc float64 ,_fcbeg error ){if len (_aedc )!=2{return 0,0,_fa .Errorf ("\u0069\u006e\u0076\u0061l\u0069\u0064\u0020\u006e\u0075\u006d\u0062\u0065\u0072\u0020o\u0066 \u0070\u0061\u0072\u0061\u006d\u0073\u003a \u0025\u0064",len (_aedc ));
-};_cdgdd ,_fcbeg :=_afa .GetNumbersAsFloat (_aedc );if _fcbeg !=nil {return 0,0,_fcbeg ;};return _cdgdd [0],_cdgdd [1],nil ;};func _dbfff (_adgbc []*textLine ,_bdaa string )string {var _bbgc _faf .Builder ;_cgce :=0.0;for _gcdec ,_cfdfe :=range _adgbc {_bgaa :=_cfdfe .text ();
-_aefe :=_cfdfe ._adaa ;if _gcdec < len (_adgbc )-1{_cgce =_adgbc [_gcdec +1]._adaa ;}else {_cgce =0.0;};_bbgc .WriteString (_bdaa );_bbgc .WriteString (_bgaa );if _cgce !=_aefe {_bbgc .WriteString ("\u000a");}else {_bbgc .WriteString ("\u0020");};};return _bbgc .String ();
-};const _fbca =10;
+func (_gee *Extractor) ExtractFonts(previousPageFonts *PageFonts) (*PageFonts, error) {
+	_cc := PageFonts{}
+	_eeb := _cc.extractPageResourcesToFont(_gee._gab)
+	if _eeb != nil {
+		return nil, _eeb
+	}
+	if previousPageFonts != nil {
+		for _, _eba := range previousPageFonts.Fonts {
+			if !_eae(_cc.Fonts, _eba.FontName) {
+				_cc.Fonts = append(_cc.Fonts, _eba)
+			}
+		}
+	}
+	return &PageFonts{Fonts: _cc.Fonts}, nil
+}
+
+func _ae(_gf string, _ga bool, _cag bool) BidiText {
+	_be := "\u006c\u0074\u0072"
+	if _cag {
+		_be = "\u0074\u0074\u0062"
+	} else if !_ga {
+		_be = "\u0072\u0074\u006c"
+	}
+	return BidiText{_cac: _gf, _fc: _be}
+}
+
+func _eefg(_fgdb string, _eac string) ([][]int, error) {
+	_ade, _gbce := _ca.Compile(_fgdb)
+	if _gbce != nil {
+		return nil, _fa.Errorf("\u0065\u0072\u0072\u006f\u0072\u0020c\u006f\u006d\u0070\u0069\u006c\u0069\u006e\u0067\u0020\u0072\u0065\u0067\u0065x\u0020\u0070\u0061\u0074\u0074\u0065\u0072n\u003a\u0020\u0025\u0077", _gbce)
+	}
+	_fdga := _ade.FindAllStringIndex(_eac, -1)
+	return _fdga, nil
+}
+
+func (_ebefa intSet) del(_egbfa int) { delete(_ebefa, _egbfa) }
+
+func (_aadba rulingList) vertsHorzs() (rulingList, rulingList) {
+	var _cbbg, _abeg rulingList
+	for _, _dbfgb := range _aadba {
+		switch _dbfgb._gafe {
+		case _dcfdg:
+			_cbbg = append(_cbbg, _dbfgb)
+		case _cafa:
+			_abeg = append(_abeg, _dbfgb)
+		}
+	}
+	return _cbbg, _abeg
+}
+
+func (_bage *wordBag) firstWord(_deba int) *textWord { return _bage._fdeg[_deba][0] }
+
+func (_fgafa rulingList) augmentGrid() (rulingList, rulingList) {
+	_eafaa, _fcede := _fgafa.vertsHorzs()
+	if len(_eafaa) == 0 || len(_fcede) == 0 {
+		return _eafaa, _fcede
+	}
+	_adcd, _gdaa := _eafaa, _fcede
+	_cbgda := _eafaa.bbox()
+	_dabeb := _fcede.bbox()
+	if _feda {
+		_bg.Log.Info("\u0061u\u0067\u006d\u0065\u006e\u0074\u0047\u0072\u0069\u0064\u003a\u0020b\u0062\u006f\u0078\u0056\u003d\u0025\u0036\u002e\u0032\u0066", _cbgda)
+		_bg.Log.Info("\u0061u\u0067\u006d\u0065\u006e\u0074\u0047\u0072\u0069\u0064\u003a\u0020b\u0062\u006f\u0078\u0048\u003d\u0025\u0036\u002e\u0032\u0066", _dabeb)
+	}
+	var _ggabb, _cbgff, _eacga, _aggfb *ruling
+	if _dabeb.Llx < _cbgda.Llx-_edcb {
+		_ggabb = &ruling{_abddg: _accc, _gafe: _dcfdg, _ecfb: _dabeb.Llx, _ggecg: _cbgda.Lly, _gebf: _cbgda.Ury}
+		_eafaa = append(rulingList{_ggabb}, _eafaa...)
+	}
+	if _dabeb.Urx > _cbgda.Urx+_edcb {
+		_cbgff = &ruling{_abddg: _accc, _gafe: _dcfdg, _ecfb: _dabeb.Urx, _ggecg: _cbgda.Lly, _gebf: _cbgda.Ury}
+		_eafaa = append(_eafaa, _cbgff)
+	}
+	if _cbgda.Lly < _dabeb.Lly-_edcb {
+		_eacga = &ruling{_abddg: _accc, _gafe: _cafa, _ecfb: _cbgda.Lly, _ggecg: _dabeb.Llx, _gebf: _dabeb.Urx}
+		_fcede = append(rulingList{_eacga}, _fcede...)
+	}
+	if _cbgda.Ury > _dabeb.Ury+_edcb {
+		_aggfb = &ruling{_abddg: _accc, _gafe: _cafa, _ecfb: _cbgda.Ury, _ggecg: _dabeb.Llx, _gebf: _dabeb.Urx}
+		_fcede = append(_fcede, _aggfb)
+	}
+	if len(_eafaa)+len(_fcede) == len(_fgafa) {
+		return _adcd, _gdaa
+	}
+	_caeef := append(_eafaa, _fcede...)
+	_fgafa.log("u\u006e\u0061\u0075\u0067\u006d\u0065\u006e\u0074\u0065\u0064")
+	_caeef.log("\u0061u\u0067\u006d\u0065\u006e\u0074\u0065d")
+	return _eafaa, _fcede
+}
+
+func _ceae(_aedc []_afa.PdfObject) (_adadf, _dafc float64, _fcbeg error) {
+	if len(_aedc) != 2 {
+		return 0, 0, _fa.Errorf("\u0069\u006e\u0076\u0061l\u0069\u0064\u0020\u006e\u0075\u006d\u0062\u0065\u0072\u0020o\u0066 \u0070\u0061\u0072\u0061\u006d\u0073\u003a \u0025\u0064", len(_aedc))
+	}
+	_cdgdd, _fcbeg := _afa.GetNumbersAsFloat(_aedc)
+	if _fcbeg != nil {
+		return 0, 0, _fcbeg
+	}
+	return _cdgdd[0], _cdgdd[1], nil
+}
+
+func _dbfff(_adgbc []*textLine, _bdaa string) string {
+	var _bbgc _faf.Builder
+	_cgce := 0.0
+	for _gcdec, _cfdfe := range _adgbc {
+		_bgaa := _cfdfe.text()
+		_aefe := _cfdfe._adaa
+		if _gcdec < len(_adgbc)-1 {
+			_cgce = _adgbc[_gcdec+1]._adaa
+		} else {
+			_cgce = 0.0
+		}
+		_bbgc.WriteString(_bdaa)
+		_bbgc.WriteString(_bgaa)
+		if _cgce != _aefe {
+			_bbgc.WriteString("\u000a")
+		} else {
+			_bbgc.WriteString("\u0020")
+		}
+	}
+	return _bbgc.String()
+}
+
+const _fbca = 10
 
 // ExtractPageImages returns the image contents of the page extractor, including data
 // and position, size information for each image.
 // A set of options to control page image extraction can be passed in. The options
 // parameter can be nil for the default options. By default, inline stencil masks
 // are not extracted.
-func (_ebec *Extractor )ExtractPageImages (options *ImageExtractOptions )(*PageImages ,error ){_dcf :=&imageExtractContext {_dbe :options };_cbc :=_dcf .extractContentStreamImages (_ebec ._cgc ,_ebec ._gab );if _cbc !=nil {return nil ,_cbc ;};return &PageImages {Images :_dcf ._fdc },nil ;
-};func (_ecgbf rulingList )toGrids ()[]rulingList {if _feda {_bg .Log .Info ("t\u006f\u0047\u0072\u0069\u0064\u0073\u003a\u0020\u0025\u0073",_ecgbf );};_addge :=_ecgbf .intersections ();if _feda {_bg .Log .Info ("\u0074\u006f\u0047r\u0069\u0064\u0073\u003a \u0076\u0065\u0063\u0073\u003d\u0025\u0064 \u0069\u006e\u0074\u0065\u0072\u0073\u0065\u0063\u0074\u0073\u003d\u0025\u0064\u0020",len (_ecgbf ),len (_addge ));
-for _ ,_debb :=range _eeaef (_addge ){_fa .Printf ("\u00254\u0064\u003a\u0020\u0025\u002b\u0076\n",_debb ,_addge [_debb ]);};};_dabda :=make (map[int ]intSet ,len (_ecgbf ));for _cbaag :=range _ecgbf {_ccegg :=_ecgbf .connections (_addge ,_cbaag );if len (_ccegg )> 0{_dabda [_cbaag ]=_ccegg ;
-};};if _feda {_bg .Log .Info ("t\u006fG\u0072\u0069\u0064\u0073\u003a\u0020\u0063\u006fn\u006e\u0065\u0063\u0074s=\u0025\u0064",len (_dabda ));for _ ,_baddf :=range _eeaef (_dabda ){_fa .Printf ("\u00254\u0064\u003a\u0020\u0025\u002b\u0076\n",_baddf ,_dabda [_baddf ]);
-};};_eecd :=_aacc (len (_ecgbf ),func (_dbfgf ,_gdbaf int )bool {_ebccd ,_fbage :=len (_dabda [_dbfgf ]),len (_dabda [_gdbaf ]);if _ebccd !=_fbage {return _ebccd > _fbage ;};return _ecgbf .comp (_dbfgf ,_gdbaf );});if _feda {_bg .Log .Info ("t\u006fG\u0072\u0069\u0064\u0073\u003a\u0020\u006f\u0072d\u0065\u0072\u0069\u006eg=\u0025\u0076",_eecd );
-};_bbgefb :=[][]int {{_eecd [0]}};_dgebg :for _ ,_aebcd :=range _eecd [1:]{for _fdfdd ,_fcge :=range _bbgefb {for _ ,_fgef :=range _fcge {if _dabda [_fgef ].has (_aebcd ){_bbgefb [_fdfdd ]=append (_fcge ,_aebcd );continue _dgebg ;};};};_bbgefb =append (_bbgefb ,[]int {_aebcd });
-};if _feda {_bg .Log .Info ("\u0074o\u0047r\u0069\u0064\u0073\u003a\u0020i\u0067\u0072i\u0064\u0073\u003d\u0025\u0076",_bbgefb );};_eg .SliceStable (_bbgefb ,func (_dfdb ,_egafe int )bool {return len (_bbgefb [_dfdb ])> len (_bbgefb [_egafe ])});for _ ,_aagf :=range _bbgefb {_eg .Slice (_aagf ,func (_ccbb ,_efac int )bool {return _ecgbf .comp (_aagf [_ccbb ],_aagf [_efac ])});
-};_bfece :=make ([]rulingList ,len (_bbgefb ));for _cffee ,_cfbg :=range _bbgefb {_caaca :=make (rulingList ,len (_cfbg ));for _dcbg ,_gbfe :=range _cfbg {_caaca [_dcbg ]=_ecgbf [_gbfe ];};_bfece [_cffee ]=_caaca ;};if _feda {_bg .Log .Info ("\u0074o\u0047r\u0069\u0064\u0073\u003a\u0020g\u0072\u0069d\u0073\u003d\u0025\u002b\u0076",_bfece );
-};var _bgfc []rulingList ;for _ ,_bgcec :=range _bfece {if _gafa ,_gdbcb :=_bgcec .isActualGrid ();_gdbcb {_bgcec =_gafa ;_bgcec =_bgcec .snapToGroups ();_bgfc =append (_bgfc ,_bgcec );};};if _feda {_dfaec ("t\u006fG\u0072\u0069\u0064\u0073\u003a\u0020\u0061\u0063t\u0075\u0061\u006c\u0047ri\u0064\u0073",_bgfc );
-_bg .Log .Info ("\u0074\u006f\u0047\u0072\u0069\u0064\u0073\u003a\u0020\u0067\u0072\u0069\u0064\u0073\u003d%\u0064 \u0061\u0063\u0074\u0075\u0061\u006c\u0047\u0072\u0069\u0064\u0073\u003d\u0025\u0064",len (_bfece ),len (_bgfc ));};return _bgfc ;};func _cdceb (_acec *list ,_bgafa *_faf .Builder ,_ffcc *string ){_egcee :=_caafd (_acec ,_ffcc );
-_bgafa .WriteString (_egcee );for _ ,_ddfdc :=range _acec ._cgfag {_bddg :=*_ffcc +"\u0020\u0020\u0020";_cdceb (_ddfdc ,_bgafa ,&_bddg );};};func _cfae (_fgedf []pathSection )rulingList {_edabd (_fgedf );if _feda {_bg .Log .Info ("\u006da\u006b\u0065\u0046\u0069l\u006c\u0052\u0075\u006c\u0069n\u0067s\u003a \u0025\u0064\u0020\u0066\u0069\u006c\u006cs",len (_fgedf ));
-};var _bcdaf rulingList ;for _ ,_caacb :=range _fgedf {for _ ,_eacab :=range _caacb ._fdgf {if !_eacab .isQuadrilateral (){if _feda {_bg .Log .Error ("!\u0069s\u0051\u0075\u0061\u0064\u0072\u0069\u006c\u0061t\u0065\u0072\u0061\u006c: \u0025\u0073",_eacab );
-};continue ;};if _gcfcb ,_efgcg :=_eacab .makeRectRuling (_caacb .Color );_efgcg {_bcdaf =append (_bcdaf ,_gcfcb );}else {if _gdgd {_bg .Log .Error ("\u0021\u006d\u0061\u006beR\u0065\u0063\u0074\u0052\u0075\u006c\u0069\u006e\u0067\u003a\u0020\u0025\u0073",_eacab );
-};};};};if _feda {_bg .Log .Info ("\u006d\u0061\u006b\u0065Fi\u006c\u006c\u0052\u0075\u006c\u0069\u006e\u0067\u0073\u003a\u0020\u0025\u0073",_bcdaf .String ());};return _bcdaf ;};func (_cgccc rulingList )merge ()*ruling {_cggde :=_cgccc [0]._ecfb ;_ggce :=_cgccc [0]._ggecg ;
-_bgcdb :=_cgccc [0]._gebf ;for _ ,_ffcagf :=range _cgccc [1:]{_cggde +=_ffcagf ._ecfb ;if _ffcagf ._ggecg < _ggce {_ggce =_ffcagf ._ggecg ;};if _ffcagf ._gebf > _bgcdb {_bgcdb =_ffcagf ._gebf ;};};_bbggf :=&ruling {_gafe :_cgccc [0]._gafe ,_abddg :_cgccc [0]._abddg ,Color :_cgccc [0].Color ,_ecfb :_cggde /float64 (len (_cgccc )),_ggecg :_ggce ,_gebf :_bgcdb };
-if _abcba {_bg .Log .Info ("\u006de\u0072g\u0065\u003a\u0020\u0025\u0032d\u0020\u0076e\u0063\u0073\u0020\u0025\u0073",len (_cgccc ),_bbggf );for _edfgf ,_egcgb :=range _cgccc {_fa .Printf ("\u0025\u0034\u0064\u003a\u0020\u0025\u0073\u000a",_edfgf ,_egcgb );
-};};return _bbggf ;};
+func (_ebec *Extractor) ExtractPageImages(options *ImageExtractOptions) (*PageImages, error) {
+	_dcf := &imageExtractContext{_dbe: options}
+	_cbc := _dcf.extractContentStreamImages(_ebec._cgc, _ebec._gab)
+	if _cbc != nil {
+		return nil, _cbc
+	}
+	return &PageImages{Images: _dcf._fdc}, nil
+}
+
+func (_ecgbf rulingList) toGrids() []rulingList {
+	if _feda {
+		_bg.Log.Info("t\u006f\u0047\u0072\u0069\u0064\u0073\u003a\u0020\u0025\u0073", _ecgbf)
+	}
+	_addge := _ecgbf.intersections()
+	if _feda {
+		_bg.Log.Info("\u0074\u006f\u0047r\u0069\u0064\u0073\u003a \u0076\u0065\u0063\u0073\u003d\u0025\u0064 \u0069\u006e\u0074\u0065\u0072\u0073\u0065\u0063\u0074\u0073\u003d\u0025\u0064\u0020", len(_ecgbf), len(_addge))
+		for _, _debb := range _eeaef(_addge) {
+			_fa.Printf("\u00254\u0064\u003a\u0020\u0025\u002b\u0076\n", _debb, _addge[_debb])
+		}
+	}
+	_dabda := make(map[int]intSet, len(_ecgbf))
+	for _cbaag := range _ecgbf {
+		_ccegg := _ecgbf.connections(_addge, _cbaag)
+		if len(_ccegg) > 0 {
+			_dabda[_cbaag] = _ccegg
+		}
+	}
+	if _feda {
+		_bg.Log.Info("t\u006fG\u0072\u0069\u0064\u0073\u003a\u0020\u0063\u006fn\u006e\u0065\u0063\u0074s=\u0025\u0064", len(_dabda))
+		for _, _baddf := range _eeaef(_dabda) {
+			_fa.Printf("\u00254\u0064\u003a\u0020\u0025\u002b\u0076\n", _baddf, _dabda[_baddf])
+		}
+	}
+	_eecd := _aacc(len(_ecgbf), func(_dbfgf, _gdbaf int) bool {
+		_ebccd, _fbage := len(_dabda[_dbfgf]), len(_dabda[_gdbaf])
+		if _ebccd != _fbage {
+			return _ebccd > _fbage
+		}
+		return _ecgbf.comp(_dbfgf, _gdbaf)
+	})
+	if _feda {
+		_bg.Log.Info("t\u006fG\u0072\u0069\u0064\u0073\u003a\u0020\u006f\u0072d\u0065\u0072\u0069\u006eg=\u0025\u0076", _eecd)
+	}
+	_bbgefb := [][]int{{_eecd[0]}}
+_dgebg:
+	for _, _aebcd := range _eecd[1:] {
+		for _fdfdd, _fcge := range _bbgefb {
+			for _, _fgef := range _fcge {
+				if _dabda[_fgef].has(_aebcd) {
+					_bbgefb[_fdfdd] = append(_fcge, _aebcd)
+					continue _dgebg
+				}
+			}
+		}
+		_bbgefb = append(_bbgefb, []int{_aebcd})
+	}
+	if _feda {
+		_bg.Log.Info("\u0074o\u0047r\u0069\u0064\u0073\u003a\u0020i\u0067\u0072i\u0064\u0073\u003d\u0025\u0076", _bbgefb)
+	}
+	_eg.SliceStable(_bbgefb, func(_dfdb, _egafe int) bool { return len(_bbgefb[_dfdb]) > len(_bbgefb[_egafe]) })
+	for _, _aagf := range _bbgefb {
+		_eg.Slice(_aagf, func(_ccbb, _efac int) bool { return _ecgbf.comp(_aagf[_ccbb], _aagf[_efac]) })
+	}
+	_bfece := make([]rulingList, len(_bbgefb))
+	for _cffee, _cfbg := range _bbgefb {
+		_caaca := make(rulingList, len(_cfbg))
+		for _dcbg, _gbfe := range _cfbg {
+			_caaca[_dcbg] = _ecgbf[_gbfe]
+		}
+		_bfece[_cffee] = _caaca
+	}
+	if _feda {
+		_bg.Log.Info("\u0074o\u0047r\u0069\u0064\u0073\u003a\u0020g\u0072\u0069d\u0073\u003d\u0025\u002b\u0076", _bfece)
+	}
+	var _bgfc []rulingList
+	for _, _bgcec := range _bfece {
+		if _gafa, _gdbcb := _bgcec.isActualGrid(); _gdbcb {
+			_bgcec = _gafa
+			_bgcec = _bgcec.snapToGroups()
+			_bgfc = append(_bgfc, _bgcec)
+		}
+	}
+	if _feda {
+		_dfaec("t\u006fG\u0072\u0069\u0064\u0073\u003a\u0020\u0061\u0063t\u0075\u0061\u006c\u0047ri\u0064\u0073", _bgfc)
+		_bg.Log.Info("\u0074\u006f\u0047\u0072\u0069\u0064\u0073\u003a\u0020\u0067\u0072\u0069\u0064\u0073\u003d%\u0064 \u0061\u0063\u0074\u0075\u0061\u006c\u0047\u0072\u0069\u0064\u0073\u003d\u0025\u0064", len(_bfece), len(_bgfc))
+	}
+	return _bgfc
+}
+
+func _cdceb(_acec *list, _bgafa *_faf.Builder, _ffcc *string) {
+	_egcee := _caafd(_acec, _ffcc)
+	_bgafa.WriteString(_egcee)
+	for _, _ddfdc := range _acec._cgfag {
+		_bddg := *_ffcc + "\u0020\u0020\u0020"
+		_cdceb(_ddfdc, _bgafa, &_bddg)
+	}
+}
+
+func _cfae(_fgedf []pathSection) rulingList {
+	_edabd(_fgedf)
+	if _feda {
+		_bg.Log.Info("\u006da\u006b\u0065\u0046\u0069l\u006c\u0052\u0075\u006c\u0069n\u0067s\u003a \u0025\u0064\u0020\u0066\u0069\u006c\u006cs", len(_fgedf))
+	}
+	var _bcdaf rulingList
+	for _, _caacb := range _fgedf {
+		for _, _eacab := range _caacb._fdgf {
+			if !_eacab.isQuadrilateral() {
+				if _feda {
+					_bg.Log.Error("!\u0069s\u0051\u0075\u0061\u0064\u0072\u0069\u006c\u0061t\u0065\u0072\u0061\u006c: \u0025\u0073", _eacab)
+				}
+				continue
+			}
+			if _gcfcb, _efgcg := _eacab.makeRectRuling(_caacb.Color); _efgcg {
+				_bcdaf = append(_bcdaf, _gcfcb)
+			} else {
+				if _gdgd {
+					_bg.Log.Error("\u0021\u006d\u0061\u006beR\u0065\u0063\u0074\u0052\u0075\u006c\u0069\u006e\u0067\u003a\u0020\u0025\u0073", _eacab)
+				}
+			}
+		}
+	}
+	if _feda {
+		_bg.Log.Info("\u006d\u0061\u006b\u0065Fi\u006c\u006c\u0052\u0075\u006c\u0069\u006e\u0067\u0073\u003a\u0020\u0025\u0073", _bcdaf.String())
+	}
+	return _bcdaf
+}
+
+func (_cgccc rulingList) merge() *ruling {
+	_cggde := _cgccc[0]._ecfb
+	_ggce := _cgccc[0]._ggecg
+	_bgcdb := _cgccc[0]._gebf
+	for _, _ffcagf := range _cgccc[1:] {
+		_cggde += _ffcagf._ecfb
+		if _ffcagf._ggecg < _ggce {
+			_ggce = _ffcagf._ggecg
+		}
+		if _ffcagf._gebf > _bgcdb {
+			_bgcdb = _ffcagf._gebf
+		}
+	}
+	_bbggf := &ruling{_gafe: _cgccc[0]._gafe, _abddg: _cgccc[0]._abddg, Color: _cgccc[0].Color, _ecfb: _cggde / float64(len(_cgccc)), _ggecg: _ggce, _gebf: _bgcdb}
+	if _abcba {
+		_bg.Log.Info("\u006de\u0072g\u0065\u003a\u0020\u0025\u0032d\u0020\u0076e\u0063\u0073\u0020\u0025\u0073", len(_cgccc), _bbggf)
+		for _edfgf, _egcgb := range _cgccc {
+			_fa.Printf("\u0025\u0034\u0064\u003a\u0020\u0025\u0073\u000a", _edfgf, _egcgb)
+		}
+	}
+	return _bbggf
+}
 
 // String returns a description of `k`.
-func (_bdbac markKind )String ()string {_fada ,_ccgb :=_caab [_bdbac ];if !_ccgb {return _fa .Sprintf ("\u004e\u006f\u0074\u0020\u0061\u0020\u006d\u0061\u0072k\u003a\u0020\u0025\u0064",_bdbac );};return _fada ;};func _feaga (_fdbf _afa .PdfObject ,_dece _cb .Color )(_cg .Image ,error ){_cfcc ,_befed :=_afa .GetStream (_fdbf );
-if !_befed {return nil ,nil ;};_eaagc ,_gadff :=_ad .NewXObjectImageFromStream (_cfcc );if _gadff !=nil {return nil ,_gadff ;};_acfaf ,_gadff :=_eaagc .ToImage ();if _gadff !=nil {return nil ,_gadff ;};return _fgggd (_acfaf ,_dece ),nil ;};func (_deee *textObject )setTextMatrix (_bcb []float64 ){if len (_bcb )!=6{_bg .Log .Debug ("\u0045\u0052\u0052OR\u003a\u0020\u006c\u0065\u006e\u0028\u0066\u0029\u0020\u0021\u003d\u0020\u0036\u0020\u0028\u0025\u0064\u0029",len (_bcb ));
-return ;};_dfc ,_cgfa ,_ffdd ,_bbgg ,_cdfeb ,_bfbb :=_bcb [0],_bcb [1],_bcb [2],_bcb [3],_bcb [4],_bcb [5];_deee ._dfde =_cd .NewMatrix (_dfc ,_cgfa ,_ffdd ,_bbgg ,_cdfeb ,_bfbb );_deee ._feec =_deee ._dfde ;};func (_cccc paraList )findTables (_cagbf []gridTiling )[]*textTable {_cccc .addNeighbours ();
-_eg .Slice (_cccc ,func (_fgcb ,_cfcae int )bool {return _cggc (_cccc [_fgcb ],_cccc [_cfcae ])< 0});var _efbc []*textTable ;if _eecf {_bdbec :=_cccc .findGridTables (_cagbf );_efbc =append (_efbc ,_bdbec ...);};if _egdb {_afdf :=_cccc .findTextTables ();
-_efbc =append (_efbc ,_afdf ...);};return _efbc ;};func (_bcgcc *subpath )makeRectRuling (_adeb _cb .Color )(*ruling ,bool ){if _gdgd {_bg .Log .Info ("\u006d\u0061\u006beR\u0065\u0063\u0074\u0052\u0075\u006c\u0069\u006e\u0067\u003a\u0020\u0070\u0061\u0074\u0068\u003d\u0025\u0076",_bcgcc );
-};_gfdbf :=_bcgcc ._bfgb [:4];_fdag :=make (map[int ]rulingKind ,len (_gfdbf ));for _fdefbb ,_fbbg :=range _gfdbf {_cbcc :=_bcgcc ._bfgb [(_fdefbb +1)%4];_fdag [_fdefbb ]=_cdga (_fbbg ,_cbcc );if _gdgd {_fa .Printf ("\u0025\u0034\u0064: \u0025\u0073\u0020\u003d\u0020\u0025\u0036\u002e\u0032\u0066\u0020\u002d\u0020\u0025\u0036\u002e\u0032\u0066",_fdefbb ,_fdag [_fdefbb ],_fbbg ,_cbcc );
-};};if _gdgd {_fa .Printf ("\u0020\u0020\u0020\u006b\u0069\u006e\u0064\u0073\u003d\u0025\u002b\u0076\u000a",_fdag );};var _agabc ,_dggb []int ;for _abae ,_aeae :=range _fdag {switch _aeae {case _cafa :_dggb =append (_dggb ,_abae );case _dcfdg :_agabc =append (_agabc ,_abae );
-};};if _gdgd {_fa .Printf ("\u0020\u0020 \u0068\u006f\u0072z\u0073\u003d\u0025\u0064\u0020\u0025\u002b\u0076\u000a",len (_dggb ),_dggb );_fa .Printf ("\u0020\u0020 \u0076\u0065\u0072t\u0073\u003d\u0025\u0064\u0020\u0025\u002b\u0076\u000a",len (_agabc ),_agabc );
-};_dcbc :=(len (_dggb )==2&&len (_agabc )==2)||(len (_dggb )==2&&len (_agabc )==0&&_gdag (_gfdbf [_dggb [0]],_gfdbf [_dggb [1]]))||(len (_agabc )==2&&len (_dggb )==0&&_cdgae (_gfdbf [_agabc [0]],_gfdbf [_agabc [1]]));if _gdgd {_fa .Printf (" \u0020\u0020\u0068\u006f\u0072\u007as\u003d\u0025\u0064\u0020\u0076\u0065\u0072\u0074\u0073=\u0025\u0064\u0020o\u006b=\u0025\u0074\u000a",len (_dggb ),len (_agabc ),_dcbc );
-};if !_dcbc {if _gdgd {_bg .Log .Error ("\u0021!\u006d\u0061\u006b\u0065R\u0065\u0063\u0074\u0052\u0075l\u0069n\u0067:\u0020\u0070\u0061\u0074\u0068\u003d\u0025v",_bcgcc );_fa .Printf (" \u0020\u0020\u0068\u006f\u0072\u007as\u003d\u0025\u0064\u0020\u0076\u0065\u0072\u0074\u0073=\u0025\u0064\u0020o\u006b=\u0025\u0074\u000a",len (_dggb ),len (_agabc ),_dcbc );
-};return &ruling {},false ;};if len (_agabc )==0{for _ecefe ,_dcegg :=range _fdag {if _dcegg !=_cafa {_agabc =append (_agabc ,_ecefe );};};};if len (_dggb )==0{for _fade ,_eebfb :=range _fdag {if _eebfb !=_dcfdg {_dggb =append (_dggb ,_fade );};};};if _gdgd {_bg .Log .Info ("\u006da\u006b\u0065R\u0065\u0063\u0074\u0052u\u006c\u0069\u006eg\u003a\u0020\u0068\u006f\u0072\u007a\u0073\u003d\u0025d \u0076\u0065\u0072t\u0073\u003d%\u0064\u0020\u0070\u006f\u0069\u006et\u0073\u003d%\u0064\u000a"+"\u0009\u0020\u0068o\u0072\u007a\u0073\u003d\u0025\u002b\u0076\u000a"+"\u0009\u0020\u0076e\u0072\u0074\u0073\u003d\u0025\u002b\u0076\u000a"+"\t\u0070\u006f\u0069\u006e\u0074\u0073\u003d\u0025\u002b\u0076",len (_dggb ),len (_agabc ),len (_gfdbf ),_dggb ,_agabc ,_gfdbf );
-};var _edfb ,_dfeca ,_gbdg ,_beeg _cd .Point ;if _gfdbf [_dggb [0]].Y > _gfdbf [_dggb [1]].Y {_gbdg ,_beeg =_gfdbf [_dggb [0]],_gfdbf [_dggb [1]];}else {_gbdg ,_beeg =_gfdbf [_dggb [1]],_gfdbf [_dggb [0]];};if _gfdbf [_agabc [0]].X > _gfdbf [_agabc [1]].X {_edfb ,_dfeca =_gfdbf [_agabc [0]],_gfdbf [_agabc [1]];
-}else {_edfb ,_dfeca =_gfdbf [_agabc [1]],_gfdbf [_agabc [0]];};_bceec :=_ad .PdfRectangle {Llx :_edfb .X ,Urx :_dfeca .X ,Lly :_beeg .Y ,Ury :_gbdg .Y };if _bceec .Llx > _bceec .Urx {_bceec .Llx ,_bceec .Urx =_bceec .Urx ,_bceec .Llx ;};if _bceec .Lly > _bceec .Ury {_bceec .Lly ,_bceec .Ury =_bceec .Ury ,_bceec .Lly ;
-};_aebfd :=rectRuling {PdfRectangle :_bceec ,_abbdf :_ggeb (_bceec ),Color :_adeb };if _aebfd ._abbdf ==_gbgfg {if _gdgd {_bg .Log .Error ("\u006da\u006b\u0065\u0052\u0065\u0063\u0074\u0052\u0075\u006c\u0069\u006eg\u003a\u0020\u006b\u0069\u006e\u0064\u003d\u006e\u0069\u006c");
-};return nil ,false ;};_dgae ,_dfaef :=_aebfd .asRuling ();if !_dfaef {if _gdgd {_bg .Log .Error ("\u006da\u006b\u0065\u0052\u0065c\u0074\u0052\u0075\u006c\u0069n\u0067:\u0020!\u0069\u0073\u0052\u0075\u006c\u0069\u006eg");};return nil ,false ;};if _feda {_fa .Printf ("\u0020\u0020\u0020\u0072\u003d\u0025\u0073\u000a",_dgae .String ());
-};return _dgae ,true ;};var _caab =map[markKind ]string {_ffcacd :"\u0073\u0074\u0072\u006f\u006b\u0065",_egecd :"\u0066\u0069\u006c\u006c",_accc :"\u0061u\u0067\u006d\u0065\u006e\u0074"};func _bfag (_dbcb map[float64 ][]*textLine )[]float64 {_abcfe :=[]float64 {};
-for _fcce :=range _dbcb {_abcfe =append (_abcfe ,_fcce );};_eg .Float64s (_abcfe );return _abcfe ;};func (_bgfaa *textMark )bbox ()_ad .PdfRectangle {return _bgfaa .PdfRectangle };func (_gcdfb rulingList )bbox ()_ad .PdfRectangle {var _gefd _ad .PdfRectangle ;
-if len (_gcdfb )==0{_bg .Log .Error ("r\u0075\u006c\u0069\u006e\u0067\u004ci\u0073\u0074\u002e\u0062\u0062\u006f\u0078\u003a\u0020n\u006f\u0020\u0072u\u006ci\u006e\u0067\u0073");return _ad .PdfRectangle {};};if _gcdfb [0]._gafe ==_cafa {_gefd .Llx ,_gefd .Urx =_gcdfb .secMinMax ();
-_gefd .Lly ,_gefd .Ury =_gcdfb .primMinMax ();}else {_gefd .Llx ,_gefd .Urx =_gcdfb .primMinMax ();_gefd .Lly ,_gefd .Ury =_gcdfb .secMinMax ();};return _gefd ;};
+func (_bdbac markKind) String() string {
+	_fada, _ccgb := _caab[_bdbac]
+	if !_ccgb {
+		return _fa.Sprintf("\u004e\u006f\u0074\u0020\u0061\u0020\u006d\u0061\u0072k\u003a\u0020\u0025\u0064", _bdbac)
+	}
+	return _fada
+}
+
+func _feaga(_fdbf _afa.PdfObject, _dece _cb.Color) (_cg.Image, error) {
+	_cfcc, _befed := _afa.GetStream(_fdbf)
+	if !_befed {
+		return nil, nil
+	}
+	_eaagc, _gadff := _ad.NewXObjectImageFromStream(_cfcc)
+	if _gadff != nil {
+		return nil, _gadff
+	}
+	_acfaf, _gadff := _eaagc.ToImage()
+	if _gadff != nil {
+		return nil, _gadff
+	}
+	return _fgggd(_acfaf, _dece), nil
+}
+
+func (_deee *textObject) setTextMatrix(_bcb []float64) {
+	if len(_bcb) != 6 {
+		_bg.Log.Debug("\u0045\u0052\u0052OR\u003a\u0020\u006c\u0065\u006e\u0028\u0066\u0029\u0020\u0021\u003d\u0020\u0036\u0020\u0028\u0025\u0064\u0029", len(_bcb))
+		return
+	}
+	_dfc, _cgfa, _ffdd, _bbgg, _cdfeb, _bfbb := _bcb[0], _bcb[1], _bcb[2], _bcb[3], _bcb[4], _bcb[5]
+	_deee._dfde = _cd.NewMatrix(_dfc, _cgfa, _ffdd, _bbgg, _cdfeb, _bfbb)
+	_deee._feec = _deee._dfde
+}
+
+func (_cccc paraList) findTables(_cagbf []gridTiling) []*textTable {
+	_cccc.addNeighbours()
+	_eg.Slice(_cccc, func(_fgcb, _cfcae int) bool { return _cggc(_cccc[_fgcb], _cccc[_cfcae]) < 0 })
+	var _efbc []*textTable
+	if _eecf {
+		_bdbec := _cccc.findGridTables(_cagbf)
+		_efbc = append(_efbc, _bdbec...)
+	}
+	if _egdb {
+		_afdf := _cccc.findTextTables()
+		_efbc = append(_efbc, _afdf...)
+	}
+	return _efbc
+}
+
+func (_bcgcc *subpath) makeRectRuling(_adeb _cb.Color) (*ruling, bool) {
+	if _gdgd {
+		_bg.Log.Info("\u006d\u0061\u006beR\u0065\u0063\u0074\u0052\u0075\u006c\u0069\u006e\u0067\u003a\u0020\u0070\u0061\u0074\u0068\u003d\u0025\u0076", _bcgcc)
+	}
+	_gfdbf := _bcgcc._bfgb[:4]
+	_fdag := make(map[int]rulingKind, len(_gfdbf))
+	for _fdefbb, _fbbg := range _gfdbf {
+		_cbcc := _bcgcc._bfgb[(_fdefbb+1)%4]
+		_fdag[_fdefbb] = _cdga(_fbbg, _cbcc)
+		if _gdgd {
+			_fa.Printf("\u0025\u0034\u0064: \u0025\u0073\u0020\u003d\u0020\u0025\u0036\u002e\u0032\u0066\u0020\u002d\u0020\u0025\u0036\u002e\u0032\u0066", _fdefbb, _fdag[_fdefbb], _fbbg, _cbcc)
+		}
+	}
+	if _gdgd {
+		_fa.Printf("\u0020\u0020\u0020\u006b\u0069\u006e\u0064\u0073\u003d\u0025\u002b\u0076\u000a", _fdag)
+	}
+	var _agabc, _dggb []int
+	for _abae, _aeae := range _fdag {
+		switch _aeae {
+		case _cafa:
+			_dggb = append(_dggb, _abae)
+		case _dcfdg:
+			_agabc = append(_agabc, _abae)
+		}
+	}
+	if _gdgd {
+		_fa.Printf("\u0020\u0020 \u0068\u006f\u0072z\u0073\u003d\u0025\u0064\u0020\u0025\u002b\u0076\u000a", len(_dggb), _dggb)
+		_fa.Printf("\u0020\u0020 \u0076\u0065\u0072t\u0073\u003d\u0025\u0064\u0020\u0025\u002b\u0076\u000a", len(_agabc), _agabc)
+	}
+	_dcbc := (len(_dggb) == 2 && len(_agabc) == 2) || (len(_dggb) == 2 && len(_agabc) == 0 && _gdag(_gfdbf[_dggb[0]], _gfdbf[_dggb[1]])) || (len(_agabc) == 2 && len(_dggb) == 0 && _cdgae(_gfdbf[_agabc[0]], _gfdbf[_agabc[1]]))
+	if _gdgd {
+		_fa.Printf(" \u0020\u0020\u0068\u006f\u0072\u007as\u003d\u0025\u0064\u0020\u0076\u0065\u0072\u0074\u0073=\u0025\u0064\u0020o\u006b=\u0025\u0074\u000a", len(_dggb), len(_agabc), _dcbc)
+	}
+	if !_dcbc {
+		if _gdgd {
+			_bg.Log.Error("\u0021!\u006d\u0061\u006b\u0065R\u0065\u0063\u0074\u0052\u0075l\u0069n\u0067:\u0020\u0070\u0061\u0074\u0068\u003d\u0025v", _bcgcc)
+			_fa.Printf(" \u0020\u0020\u0068\u006f\u0072\u007as\u003d\u0025\u0064\u0020\u0076\u0065\u0072\u0074\u0073=\u0025\u0064\u0020o\u006b=\u0025\u0074\u000a", len(_dggb), len(_agabc), _dcbc)
+		}
+		return &ruling{}, false
+	}
+	if len(_agabc) == 0 {
+		for _ecefe, _dcegg := range _fdag {
+			if _dcegg != _cafa {
+				_agabc = append(_agabc, _ecefe)
+			}
+		}
+	}
+	if len(_dggb) == 0 {
+		for _fade, _eebfb := range _fdag {
+			if _eebfb != _dcfdg {
+				_dggb = append(_dggb, _fade)
+			}
+		}
+	}
+	if _gdgd {
+		_bg.Log.Info("\u006da\u006b\u0065R\u0065\u0063\u0074\u0052u\u006c\u0069\u006eg\u003a\u0020\u0068\u006f\u0072\u007a\u0073\u003d\u0025d \u0076\u0065\u0072t\u0073\u003d%\u0064\u0020\u0070\u006f\u0069\u006et\u0073\u003d%\u0064\u000a"+"\u0009\u0020\u0068o\u0072\u007a\u0073\u003d\u0025\u002b\u0076\u000a"+"\u0009\u0020\u0076e\u0072\u0074\u0073\u003d\u0025\u002b\u0076\u000a"+"\t\u0070\u006f\u0069\u006e\u0074\u0073\u003d\u0025\u002b\u0076", len(_dggb), len(_agabc), len(_gfdbf), _dggb, _agabc, _gfdbf)
+	}
+	var _edfb, _dfeca, _gbdg, _beeg _cd.Point
+	if _gfdbf[_dggb[0]].Y > _gfdbf[_dggb[1]].Y {
+		_gbdg, _beeg = _gfdbf[_dggb[0]], _gfdbf[_dggb[1]]
+	} else {
+		_gbdg, _beeg = _gfdbf[_dggb[1]], _gfdbf[_dggb[0]]
+	}
+	if _gfdbf[_agabc[0]].X > _gfdbf[_agabc[1]].X {
+		_edfb, _dfeca = _gfdbf[_agabc[0]], _gfdbf[_agabc[1]]
+	} else {
+		_edfb, _dfeca = _gfdbf[_agabc[1]], _gfdbf[_agabc[0]]
+	}
+	_bceec := _ad.PdfRectangle{Llx: _edfb.X, Urx: _dfeca.X, Lly: _beeg.Y, Ury: _gbdg.Y}
+	if _bceec.Llx > _bceec.Urx {
+		_bceec.Llx, _bceec.Urx = _bceec.Urx, _bceec.Llx
+	}
+	if _bceec.Lly > _bceec.Ury {
+		_bceec.Lly, _bceec.Ury = _bceec.Ury, _bceec.Lly
+	}
+	_aebfd := rectRuling{PdfRectangle: _bceec, _abbdf: _ggeb(_bceec), Color: _adeb}
+	if _aebfd._abbdf == _gbgfg {
+		if _gdgd {
+			_bg.Log.Error("\u006da\u006b\u0065\u0052\u0065\u0063\u0074\u0052\u0075\u006c\u0069\u006eg\u003a\u0020\u006b\u0069\u006e\u0064\u003d\u006e\u0069\u006c")
+		}
+		return nil, false
+	}
+	_dgae, _dfaef := _aebfd.asRuling()
+	if !_dfaef {
+		if _gdgd {
+			_bg.Log.Error("\u006da\u006b\u0065\u0052\u0065c\u0074\u0052\u0075\u006c\u0069n\u0067:\u0020!\u0069\u0073\u0052\u0075\u006c\u0069\u006eg")
+		}
+		return nil, false
+	}
+	if _feda {
+		_fa.Printf("\u0020\u0020\u0020\u0072\u003d\u0025\u0073\u000a", _dgae.String())
+	}
+	return _dgae, true
+}
+
+var _caab = map[markKind]string{_ffcacd: "\u0073\u0074\u0072\u006f\u006b\u0065", _egecd: "\u0066\u0069\u006c\u006c", _accc: "\u0061u\u0067\u006d\u0065\u006e\u0074"}
+
+func _bfag(_dbcb map[float64][]*textLine) []float64 {
+	_abcfe := []float64{}
+	for _fcce := range _dbcb {
+		_abcfe = append(_abcfe, _fcce)
+	}
+	_eg.Float64s(_abcfe)
+	return _abcfe
+}
+
+func (_bgfaa *textMark) bbox() _ad.PdfRectangle { return _bgfaa.PdfRectangle }
+
+func (_gcdfb rulingList) bbox() _ad.PdfRectangle {
+	var _gefd _ad.PdfRectangle
+	if len(_gcdfb) == 0 {
+		_bg.Log.Error("r\u0075\u006c\u0069\u006e\u0067\u004ci\u0073\u0074\u002e\u0062\u0062\u006f\u0078\u003a\u0020n\u006f\u0020\u0072u\u006ci\u006e\u0067\u0073")
+		return _ad.PdfRectangle{}
+	}
+	if _gcdfb[0]._gafe == _cafa {
+		_gefd.Llx, _gefd.Urx = _gcdfb.secMinMax()
+		_gefd.Lly, _gefd.Ury = _gcdfb.primMinMax()
+	} else {
+		_gefd.Llx, _gefd.Urx = _gcdfb.primMinMax()
+		_gefd.Lly, _gefd.Ury = _gcdfb.secMinMax()
+	}
+	return _gefd
+}
 
 // BidiText represents a bidi text organized in its visual order
 // with base direction of the text.
-type BidiText struct{_cac string ;_fc string ;};func _caafd (_caec *list ,_egaf *string )string {_gaeb :=_faf .Split (_caec ._bdeac ,"\u000a");_acdaa :=&_faf .Builder {};for _ ,_bdfa :=range _gaeb {if _bdfa !=""{_acdaa .WriteString (*_egaf );_acdaa .WriteString (_bdfa );
-_acdaa .WriteString ("\u000a");};};return _acdaa .String ();};func _beda (_ecdb _ad .PdfRectangle ,_eebc ,_bacc ,_effc ,_dgec *ruling )gridTile {_dcgd :=_ecdb .Llx ;_gabbg :=_ecdb .Urx ;_bfegc :=_ecdb .Lly ;_dfee :=_ecdb .Ury ;return gridTile {PdfRectangle :_ecdb ,_dgaae :_eebc !=nil &&_eebc .encloses (_bfegc ,_dfee ),_ebecd :_bacc !=nil &&_bacc .encloses (_bfegc ,_dfee ),_cegae :_effc !=nil &&_effc .encloses (_dcgd ,_gabbg ),_eece :_dgec !=nil &&_dgec .encloses (_dcgd ,_gabbg )};
-};func (_dbdc rulingList )intersections ()map[int ]intSet {var _dgdda ,_cddad []int ;for _babaa ,_cgdg :=range _dbdc {switch _cgdg ._gafe {case _dcfdg :_dgdda =append (_dgdda ,_babaa );case _cafa :_cddad =append (_cddad ,_babaa );};};if len (_dgdda )< _adgg +1||len (_cddad )< _eabb +1{return nil ;
-};if len (_dgdda )+len (_cddad )> _bdgd {_bg .Log .Debug ("\u0069\u006e\u0074\u0065\u0072\u0073e\u0063\u0074\u0069\u006f\u006e\u0073\u003a\u0020\u0054\u004f\u004f\u0020\u004d\u0041\u004e\u0059\u0020\u0072\u0075\u006ci\u006e\u0067\u0073\u0020\u0076\u0065\u0063\u0073\u003d\u0025\u0064\u0020\u003d\u0020%\u0064 \u0078\u0020\u0025\u0064",len (_dbdc ),len (_dgdda ),len (_cddad ));
-return nil ;};_eeeaf :=make (map[int ]intSet ,len (_dgdda )+len (_cddad ));for _ ,_gbaea :=range _dgdda {for _ ,_bbba :=range _cddad {if _dbdc [_gbaea ].intersects (_dbdc [_bbba ]){if _ ,_feecd :=_eeeaf [_gbaea ];!_feecd {_eeeaf [_gbaea ]=make (intSet );
-};if _ ,_dcffd :=_eeeaf [_bbba ];!_dcffd {_eeeaf [_bbba ]=make (intSet );};_eeeaf [_gbaea ].add (_bbba );_eeeaf [_bbba ].add (_gbaea );};};};return _eeeaf ;};func (_ddba *wordBag )makeRemovals ()map[int ]map[*textWord ]struct{}{_fdef :=make (map[int ]map[*textWord ]struct{},len (_ddba ._fdeg ));
-for _dfcff :=range _ddba ._fdeg {_fdef [_dfcff ]=make (map[*textWord ]struct{});};return _fdef ;};func (_gdbg rulingList )blocks (_dgad ,_bcfeg *ruling )bool {if _dgad ._ggecg > _bcfeg ._gebf ||_bcfeg ._ggecg > _dgad ._gebf {return false ;};_gefbf :=_c .Max (_dgad ._ggecg ,_bcfeg ._ggecg );
-_ccbg :=_c .Min (_dgad ._gebf ,_bcfeg ._gebf );if _dgad ._ecfb > _bcfeg ._ecfb {_dgad ,_bcfeg =_bcfeg ,_dgad ;};for _ ,_ebcd :=range _gdbg {if _dgad ._ecfb <=_ebcd ._ecfb +_ddgfe &&_ebcd ._ecfb <=_bcfeg ._ecfb +_ddgfe &&_ebcd ._ggecg <=_ccbg &&_gefbf <=_ebcd ._gebf {return true ;
-};};return false ;};func _gbcge (_faca []*textMark ,_eeag _ad .PdfRectangle ,_beba rulingList ,_acbbd []gridTiling ,_bbbe bool )paraList {_bg .Log .Trace ("\u006d\u0061\u006b\u0065\u0054\u0065\u0078\u0074\u0050\u0061\u0067\u0065\u003a \u0025\u0064\u0020\u0065\u006c\u0065m\u0065\u006e\u0074\u0073\u0020\u0070\u0061\u0067\u0065\u0053\u0069\u007a\u0065=\u0025\u002e\u0032\u0066",len (_faca ),_eeag );
-if len (_faca )==0{return nil ;};_bcdb :=_fgcfa (_faca ,_eeag ,false );if len (_bcdb )==0{return nil ;};_beba .log ("\u006d\u0061\u006be\u0054\u0065\u0078\u0074\u0050\u0061\u0067\u0065");_ffcdg ,_aeab :=_beba .vertsHorzs ();_ffaab :=_begb (_bcdb ,_eeag .Ury ,_ffcdg ,_aeab );
-_gfdb :=_adba (_ffaab ,_eeag .Ury ,_ffcdg ,_aeab ,_bbbe );_gfdb =_ffda (_gfdb );_fbdfa :=make (paraList ,0,len (_gfdb ));for _ ,_bdebgb :=range _gfdb {_egdcf :=_bdebgb .arrangeText (_bbbe );if _egdcf !=nil {_fbdfa =append (_fbdfa ,_egdcf );};};if len (_fbdfa )>=_fdacb {_fbdfa =_fbdfa .extractTables (_acbbd );
-};_fbdfa .sortReadingOrder ();_fbdfa .sortTopoOrder ();_fbdfa .log ("\u0073\u006f\u0072te\u0064\u0020\u0069\u006e\u0020\u0072\u0065\u0061\u0064\u0069\u006e\u0067\u0020\u006f\u0072\u0064\u0065\u0072");return _fbdfa ;};func (_gdff *wordBag )removeWord (_gefb *textWord ,_gdgeg int ){_cfag :=_gdff ._fdeg [_gdgeg ];
-_cfag =_fbabb (_cfag ,_gefb );if len (_cfag )==0{delete (_gdff ._fdeg ,_gdgeg );}else {_gdff ._fdeg [_gdgeg ]=_cfag ;};};func _fbabb (_gagde []*textWord ,_fggaa *textWord )[]*textWord {for _abac ,_gadad :=range _gagde {if _gadad ==_fggaa {return _edgdf (_gagde ,_abac );
-};};_bg .Log .Error ("\u0072\u0065\u006d\u006f\u0076e\u0057\u006f\u0072\u0064\u003a\u0020\u0077\u006f\u0072\u0064\u0073\u0020\u0064o\u0065\u0073\u006e\u0027\u0074\u0020\u0063\u006f\u006e\u0074\u0061\u0069\u006e\u0020\u0077\u006f\u0072\u0064\u003d\u0025\u0073",_fggaa );
-return nil ;};func _ccbag (_cfecg *list )[]*textLine {for _ ,_gaae :=range _cfecg ._cgfag {switch _gaae ._ebbb {case "\u004c\u0042\u006fd\u0079":if len (_gaae ._aage )!=0{return _gaae ._aage ;};return _ccbag (_gaae );case "\u0053\u0070\u0061\u006e":return _gaae ._aage ;
-case "I\u006e\u006c\u0069\u006e\u0065\u0053\u0068\u0061\u0070\u0065":return _gaae ._aage ;};};return nil ;};func _gcgf (_dcef ,_daee *textPara )bool {if _dcef ._gddfg ||_daee ._gddfg {return true ;};return _edec (_dcef .depth ()-_daee .depth ());};func (_eeafg compositeCell )hasLines (_agaef []*textLine )bool {for _bfec ,_gbee :=range _agaef {_ecgb :=_affce (_eeafg .PdfRectangle ,_gbee .PdfRectangle );
-if _ggegb {_fa .Printf ("\u0020\u0020\u0020\u0020\u0020\u0020\u005e\u005e\u005e\u0069\u006e\u0074\u0065\u0072\u0073e\u0063t\u0073\u003d\u0025\u0074\u0020\u0025\u0064\u0020\u006f\u0066\u0020\u0025\u0064\u000a",_ecgb ,_bfec ,len (_agaef ));_fa .Printf ("\u0020\u0020\u0020\u0020  \u005e\u005e\u005e\u0063\u006f\u006d\u0070\u006f\u0073\u0069\u0074\u0065\u003d\u0025s\u000a",_eeafg );
-_fa .Printf ("\u0020 \u0020 \u0020\u0020\u0020\u006c\u0069\u006e\u0065\u003d\u0025\u0073\u000a",_gbee );};if _ecgb {return true ;};};return false ;};func _egef (_gfecd []*textLine ){_eg .Slice (_gfecd ,func (_faab ,_agggc int )bool {_bdfag ,_gbda :=_gfecd [_faab ],_gfecd [_agggc ];
-return _bdfag ._adaa < _gbda ._adaa ;});};func _geef (_edaff map[int ][]float64 )string {_feaa :=_ceddf (_edaff );_ggac :=make ([]string ,len (_edaff ));for _gedbg ,_defgd :=range _feaa {_ggac [_gedbg ]=_fa .Sprintf ("\u0025\u0064\u003a\u0020\u0025\u002e\u0032\u0066",_defgd ,_edaff [_defgd ]);
-};return _fa .Sprintf ("\u007b\u0025\u0073\u007d",_faf .Join (_ggac ,"\u002c\u0020"));};func (_befd rulingList )splitSec ()[]rulingList {_eg .Slice (_befd ,func (_cbfac ,_efgdg int )bool {_dgbfc ,_eeccb :=_befd [_cbfac ],_befd [_efgdg ];if _dgbfc ._ggecg !=_eeccb ._ggecg {return _dgbfc ._ggecg < _eeccb ._ggecg ;
-};return _dgbfc ._gebf < _eeccb ._gebf ;});_ccgea :=make (map[*ruling ]struct{},len (_befd ));_fegab :=func (_eeaga *ruling )rulingList {_eabg :=rulingList {_eeaga };_ccgea [_eeaga ]=struct{}{};for _ ,_gaab :=range _befd {if _ ,_eacfe :=_ccgea [_gaab ];
-_eacfe {continue ;};for _ ,_cdabg :=range _eabg {if _gaab .alignsSec (_cdabg ){_eabg =append (_eabg ,_gaab );_ccgea [_gaab ]=struct{}{};break ;};};};return _eabg ;};_fabcb :=[]rulingList {_fegab (_befd [0])};for _ ,_bccf :=range _befd [1:]{if _ ,_dcaf :=_ccgea [_bccf ];
-_dcaf {continue ;};_fabcb =append (_fabcb ,_fegab (_bccf ));};return _fabcb ;};func (_dgggd paraList )inTile (_aabf gridTile )paraList {var _dcae paraList ;for _ ,_fdcddf :=range _dgggd {if _aabf .contains (_fdcddf .PdfRectangle ){_dcae =append (_dcae ,_fdcddf );
-};};if _ggegb {_fa .Printf ("\u0020 \u0020\u0069\u006e\u0054i\u006c\u0065\u003a\u0020\u0020%\u0073 \u0069n\u0073\u0069\u0064\u0065\u003d\u0025\u0064\n",_aabf ,len (_dcae ));for _beaca ,_agea :=range _dcae {_fa .Printf ("\u0025\u0034\u0064\u003a\u0020\u0025\u0073\u000a",_beaca ,_agea );
-};_fa .Println ("");};return _dcae ;};func (_agab *textObject )showTextAdjusted (_affc *_afa .PdfObjectArray ,_bedd int ,_caggg string )error {_edcc :=false ;for _ ,_edaf :=range _affc .Elements (){switch _edaf .(type ){case *_afa .PdfObjectFloat ,*_afa .PdfObjectInteger :_cdg ,_fgae :=_afa .GetNumberAsFloat (_edaf );
-if _fgae !=nil {_bg .Log .Debug ("\u0045\u0052\u0052\u004fR\u003a\u0020\u0073\u0068\u006f\u0077\u0054\u0065\u0078t\u0041\u0064\u006a\u0075\u0073\u0074\u0065\u0064\u002e\u0020\u0042\u0061\u0064\u0020\u006e\u0075\u006d\u0065r\u0069\u0063\u0061\u006c\u0020a\u0072\u0067\u002e\u0020\u006f\u003d\u0025\u0073\u0020\u0061\u0072\u0067\u0073\u003d\u0025\u002b\u0076",_edaf ,_affc );
-return _fgae ;};_dfab ,_acfbb :=-_cdg *0.001*_agab ._dggef ._dba ,0.0;if _edcc {_acfbb ,_dfab =_dfab ,_acfbb ;};_cdfg :=_egbf (_cd .Point {X :_dfab ,Y :_acfbb });_agab ._dfde .Concat (_cdfg );case *_afa .PdfObjectString :_bbc :=_afa .TraceToDirectObject (_edaf );
-_efdg ,_affg :=_afa .GetStringBytes (_bbc );if !_affg {_bg .Log .Trace ("s\u0068\u006f\u0077\u0054\u0065\u0078\u0074\u0041\u0064j\u0075\u0073\u0074\u0065\u0064\u003a\u0020Ba\u0064\u0020\u0073\u0074r\u0069\u006e\u0067\u0020\u0061\u0072\u0067\u002e\u0020o=\u0025\u0073 \u0061\u0072\u0067\u0073\u003d\u0025\u002b\u0076",_edaf ,_affc );
-return _afa .ErrTypeError ;};_agab .renderText (_bbc ,_efdg ,_bedd ,_caggg );default:_bg .Log .Debug ("\u0045\u0052\u0052\u004f\u0052\u003a\u0020\u0073\u0068\u006f\u0077\u0054\u0065\u0078\u0074A\u0064\u006a\u0075\u0073\u0074\u0065\u0064\u002e\u0020\u0055\u006e\u0065\u0078p\u0065\u0063\u0074\u0065\u0064\u0020\u0074\u0079\u0070\u0065\u0020\u0028%T\u0029\u0020\u0061\u0072\u0067\u0073\u003d\u0025\u002b\u0076",_edaf ,_affc );
-return _afa .ErrTypeError ;};};return nil ;};func _dcbbd (_dfgce map[float64 ]map[float64 ]gridTile )[]float64 {_fecge :=make ([]float64 ,0,len (_dfgce ));for _bffab :=range _dfgce {_fecge =append (_fecge ,_bffab );};_eg .Float64s (_fecge );_baebf :=len (_fecge );
-for _fegag :=0;_fegag < _baebf /2;_fegag ++{_fecge [_fegag ],_fecge [_baebf -1-_fegag ]=_fecge [_baebf -1-_fegag ],_fecge [_fegag ];};return _fecge ;};func _eeaef (_afdcg map[int ]intSet )[]int {_cdaca :=make ([]int ,0,len (_afdcg ));for _fbcd :=range _afdcg {_cdaca =append (_cdaca ,_fbcd );
-};_eg .Ints (_cdaca );return _cdaca ;};
+type BidiText struct {
+	_cac string
+	_fc  string
+}
+
+func _caafd(_caec *list, _egaf *string) string {
+	_gaeb := _faf.Split(_caec._bdeac, "\u000a")
+	_acdaa := &_faf.Builder{}
+	for _, _bdfa := range _gaeb {
+		if _bdfa != "" {
+			_acdaa.WriteString(*_egaf)
+			_acdaa.WriteString(_bdfa)
+			_acdaa.WriteString("\u000a")
+		}
+	}
+	return _acdaa.String()
+}
+
+func _beda(_ecdb _ad.PdfRectangle, _eebc, _bacc, _effc, _dgec *ruling) gridTile {
+	_dcgd := _ecdb.Llx
+	_gabbg := _ecdb.Urx
+	_bfegc := _ecdb.Lly
+	_dfee := _ecdb.Ury
+	return gridTile{PdfRectangle: _ecdb, _dgaae: _eebc != nil && _eebc.encloses(_bfegc, _dfee), _ebecd: _bacc != nil && _bacc.encloses(_bfegc, _dfee), _cegae: _effc != nil && _effc.encloses(_dcgd, _gabbg), _eece: _dgec != nil && _dgec.encloses(_dcgd, _gabbg)}
+}
+
+func (_dbdc rulingList) intersections() map[int]intSet {
+	var _dgdda, _cddad []int
+	for _babaa, _cgdg := range _dbdc {
+		switch _cgdg._gafe {
+		case _dcfdg:
+			_dgdda = append(_dgdda, _babaa)
+		case _cafa:
+			_cddad = append(_cddad, _babaa)
+		}
+	}
+	if len(_dgdda) < _adgg+1 || len(_cddad) < _eabb+1 {
+		return nil
+	}
+	if len(_dgdda)+len(_cddad) > _bdgd {
+		_bg.Log.Debug("\u0069\u006e\u0074\u0065\u0072\u0073e\u0063\u0074\u0069\u006f\u006e\u0073\u003a\u0020\u0054\u004f\u004f\u0020\u004d\u0041\u004e\u0059\u0020\u0072\u0075\u006ci\u006e\u0067\u0073\u0020\u0076\u0065\u0063\u0073\u003d\u0025\u0064\u0020\u003d\u0020%\u0064 \u0078\u0020\u0025\u0064", len(_dbdc), len(_dgdda), len(_cddad))
+		return nil
+	}
+	_eeeaf := make(map[int]intSet, len(_dgdda)+len(_cddad))
+	for _, _gbaea := range _dgdda {
+		for _, _bbba := range _cddad {
+			if _dbdc[_gbaea].intersects(_dbdc[_bbba]) {
+				if _, _feecd := _eeeaf[_gbaea]; !_feecd {
+					_eeeaf[_gbaea] = make(intSet)
+				}
+				if _, _dcffd := _eeeaf[_bbba]; !_dcffd {
+					_eeeaf[_bbba] = make(intSet)
+				}
+				_eeeaf[_gbaea].add(_bbba)
+				_eeeaf[_bbba].add(_gbaea)
+			}
+		}
+	}
+	return _eeeaf
+}
+
+func (_ddba *wordBag) makeRemovals() map[int]map[*textWord]struct{} {
+	_fdef := make(map[int]map[*textWord]struct{}, len(_ddba._fdeg))
+	for _dfcff := range _ddba._fdeg {
+		_fdef[_dfcff] = make(map[*textWord]struct{})
+	}
+	return _fdef
+}
+
+func (_gdbg rulingList) blocks(_dgad, _bcfeg *ruling) bool {
+	if _dgad._ggecg > _bcfeg._gebf || _bcfeg._ggecg > _dgad._gebf {
+		return false
+	}
+	_gefbf := _c.Max(_dgad._ggecg, _bcfeg._ggecg)
+	_ccbg := _c.Min(_dgad._gebf, _bcfeg._gebf)
+	if _dgad._ecfb > _bcfeg._ecfb {
+		_dgad, _bcfeg = _bcfeg, _dgad
+	}
+	for _, _ebcd := range _gdbg {
+		if _dgad._ecfb <= _ebcd._ecfb+_ddgfe && _ebcd._ecfb <= _bcfeg._ecfb+_ddgfe && _ebcd._ggecg <= _ccbg && _gefbf <= _ebcd._gebf {
+			return true
+		}
+	}
+	return false
+}
+
+func _gbcge(_faca []*textMark, _eeag _ad.PdfRectangle, _beba rulingList, _acbbd []gridTiling, _bbbe bool) paraList {
+	_bg.Log.Trace("\u006d\u0061\u006b\u0065\u0054\u0065\u0078\u0074\u0050\u0061\u0067\u0065\u003a \u0025\u0064\u0020\u0065\u006c\u0065m\u0065\u006e\u0074\u0073\u0020\u0070\u0061\u0067\u0065\u0053\u0069\u007a\u0065=\u0025\u002e\u0032\u0066", len(_faca), _eeag)
+	if len(_faca) == 0 {
+		return nil
+	}
+	_bcdb := _fgcfa(_faca, _eeag, false)
+	if len(_bcdb) == 0 {
+		return nil
+	}
+	_beba.log("\u006d\u0061\u006be\u0054\u0065\u0078\u0074\u0050\u0061\u0067\u0065")
+	_ffcdg, _aeab := _beba.vertsHorzs()
+	_ffaab := _begb(_bcdb, _eeag.Ury, _ffcdg, _aeab)
+	_gfdb := _adba(_ffaab, _eeag.Ury, _ffcdg, _aeab, _bbbe)
+	_gfdb = _ffda(_gfdb)
+	_fbdfa := make(paraList, 0, len(_gfdb))
+	for _, _bdebgb := range _gfdb {
+		_egdcf := _bdebgb.arrangeText(_bbbe)
+		if _egdcf != nil {
+			_fbdfa = append(_fbdfa, _egdcf)
+		}
+	}
+	if len(_fbdfa) >= _fdacb {
+		_fbdfa = _fbdfa.extractTables(_acbbd)
+	}
+	_fbdfa.sortReadingOrder()
+	_fbdfa.sortTopoOrder()
+	_fbdfa.log("\u0073\u006f\u0072te\u0064\u0020\u0069\u006e\u0020\u0072\u0065\u0061\u0064\u0069\u006e\u0067\u0020\u006f\u0072\u0064\u0065\u0072")
+	return _fbdfa
+}
+
+func (_gdff *wordBag) removeWord(_gefb *textWord, _gdgeg int) {
+	_cfag := _gdff._fdeg[_gdgeg]
+	_cfag = _fbabb(_cfag, _gefb)
+	if len(_cfag) == 0 {
+		delete(_gdff._fdeg, _gdgeg)
+	} else {
+		_gdff._fdeg[_gdgeg] = _cfag
+	}
+}
+
+func _fbabb(_gagde []*textWord, _fggaa *textWord) []*textWord {
+	for _abac, _gadad := range _gagde {
+		if _gadad == _fggaa {
+			return _edgdf(_gagde, _abac)
+		}
+	}
+	_bg.Log.Error("\u0072\u0065\u006d\u006f\u0076e\u0057\u006f\u0072\u0064\u003a\u0020\u0077\u006f\u0072\u0064\u0073\u0020\u0064o\u0065\u0073\u006e\u0027\u0074\u0020\u0063\u006f\u006e\u0074\u0061\u0069\u006e\u0020\u0077\u006f\u0072\u0064\u003d\u0025\u0073", _fggaa)
+	return nil
+}
+
+func _ccbag(_cfecg *list) []*textLine {
+	for _, _gaae := range _cfecg._cgfag {
+		switch _gaae._ebbb {
+		case "\u004c\u0042\u006fd\u0079":
+			if len(_gaae._aage) != 0 {
+				return _gaae._aage
+			}
+			return _ccbag(_gaae)
+		case "\u0053\u0070\u0061\u006e":
+			return _gaae._aage
+		case "I\u006e\u006c\u0069\u006e\u0065\u0053\u0068\u0061\u0070\u0065":
+			return _gaae._aage
+		}
+	}
+	return nil
+}
+
+func _gcgf(_dcef, _daee *textPara) bool {
+	if _dcef._gddfg || _daee._gddfg {
+		return true
+	}
+	return _edec(_dcef.depth() - _daee.depth())
+}
+
+func (_eeafg compositeCell) hasLines(_agaef []*textLine) bool {
+	for _bfec, _gbee := range _agaef {
+		_ecgb := _affce(_eeafg.PdfRectangle, _gbee.PdfRectangle)
+		if _ggegb {
+			_fa.Printf("\u0020\u0020\u0020\u0020\u0020\u0020\u005e\u005e\u005e\u0069\u006e\u0074\u0065\u0072\u0073e\u0063t\u0073\u003d\u0025\u0074\u0020\u0025\u0064\u0020\u006f\u0066\u0020\u0025\u0064\u000a", _ecgb, _bfec, len(_agaef))
+			_fa.Printf("\u0020\u0020\u0020\u0020  \u005e\u005e\u005e\u0063\u006f\u006d\u0070\u006f\u0073\u0069\u0074\u0065\u003d\u0025s\u000a", _eeafg)
+			_fa.Printf("\u0020 \u0020 \u0020\u0020\u0020\u006c\u0069\u006e\u0065\u003d\u0025\u0073\u000a", _gbee)
+		}
+		if _ecgb {
+			return true
+		}
+	}
+	return false
+}
+
+func _egef(_gfecd []*textLine) {
+	_eg.Slice(_gfecd, func(_faab, _agggc int) bool {
+		_bdfag, _gbda := _gfecd[_faab], _gfecd[_agggc]
+		return _bdfag._adaa < _gbda._adaa
+	})
+}
+
+func _geef(_edaff map[int][]float64) string {
+	_feaa := _ceddf(_edaff)
+	_ggac := make([]string, len(_edaff))
+	for _gedbg, _defgd := range _feaa {
+		_ggac[_gedbg] = _fa.Sprintf("\u0025\u0064\u003a\u0020\u0025\u002e\u0032\u0066", _defgd, _edaff[_defgd])
+	}
+	return _fa.Sprintf("\u007b\u0025\u0073\u007d", _faf.Join(_ggac, "\u002c\u0020"))
+}
+
+func (_befd rulingList) splitSec() []rulingList {
+	_eg.Slice(_befd, func(_cbfac, _efgdg int) bool {
+		_dgbfc, _eeccb := _befd[_cbfac], _befd[_efgdg]
+		if _dgbfc._ggecg != _eeccb._ggecg {
+			return _dgbfc._ggecg < _eeccb._ggecg
+		}
+		return _dgbfc._gebf < _eeccb._gebf
+	})
+	_ccgea := make(map[*ruling]struct{}, len(_befd))
+	_fegab := func(_eeaga *ruling) rulingList {
+		_eabg := rulingList{_eeaga}
+		_ccgea[_eeaga] = struct{}{}
+		for _, _gaab := range _befd {
+			if _, _eacfe := _ccgea[_gaab]; _eacfe {
+				continue
+			}
+			for _, _cdabg := range _eabg {
+				if _gaab.alignsSec(_cdabg) {
+					_eabg = append(_eabg, _gaab)
+					_ccgea[_gaab] = struct{}{}
+					break
+				}
+			}
+		}
+		return _eabg
+	}
+	_fabcb := []rulingList{_fegab(_befd[0])}
+	for _, _bccf := range _befd[1:] {
+		if _, _dcaf := _ccgea[_bccf]; _dcaf {
+			continue
+		}
+		_fabcb = append(_fabcb, _fegab(_bccf))
+	}
+	return _fabcb
+}
+
+func (_dgggd paraList) inTile(_aabf gridTile) paraList {
+	var _dcae paraList
+	for _, _fdcddf := range _dgggd {
+		if _aabf.contains(_fdcddf.PdfRectangle) {
+			_dcae = append(_dcae, _fdcddf)
+		}
+	}
+	if _ggegb {
+		_fa.Printf("\u0020 \u0020\u0069\u006e\u0054i\u006c\u0065\u003a\u0020\u0020%\u0073 \u0069n\u0073\u0069\u0064\u0065\u003d\u0025\u0064\n", _aabf, len(_dcae))
+		for _beaca, _agea := range _dcae {
+			_fa.Printf("\u0025\u0034\u0064\u003a\u0020\u0025\u0073\u000a", _beaca, _agea)
+		}
+		_fa.Println("")
+	}
+	return _dcae
+}
+
+func (_agab *textObject) showTextAdjusted(_affc *_afa.PdfObjectArray, _bedd int, _caggg string) error {
+	_edcc := false
+	for _, _edaf := range _affc.Elements() {
+		switch _edaf.(type) {
+		case *_afa.PdfObjectFloat, *_afa.PdfObjectInteger:
+			_cdg, _fgae := _afa.GetNumberAsFloat(_edaf)
+			if _fgae != nil {
+				_bg.Log.Debug("\u0045\u0052\u0052\u004fR\u003a\u0020\u0073\u0068\u006f\u0077\u0054\u0065\u0078t\u0041\u0064\u006a\u0075\u0073\u0074\u0065\u0064\u002e\u0020\u0042\u0061\u0064\u0020\u006e\u0075\u006d\u0065r\u0069\u0063\u0061\u006c\u0020a\u0072\u0067\u002e\u0020\u006f\u003d\u0025\u0073\u0020\u0061\u0072\u0067\u0073\u003d\u0025\u002b\u0076", _edaf, _affc)
+				return _fgae
+			}
+			_dfab, _acfbb := -_cdg*0.001*_agab._dggef._dba, 0.0
+			if _edcc {
+				_acfbb, _dfab = _dfab, _acfbb
+			}
+			_cdfg := _egbf(_cd.Point{X: _dfab, Y: _acfbb})
+			_agab._dfde.Concat(_cdfg)
+		case *_afa.PdfObjectString:
+			_bbc := _afa.TraceToDirectObject(_edaf)
+			_efdg, _affg := _afa.GetStringBytes(_bbc)
+			if !_affg {
+				_bg.Log.Trace("s\u0068\u006f\u0077\u0054\u0065\u0078\u0074\u0041\u0064j\u0075\u0073\u0074\u0065\u0064\u003a\u0020Ba\u0064\u0020\u0073\u0074r\u0069\u006e\u0067\u0020\u0061\u0072\u0067\u002e\u0020o=\u0025\u0073 \u0061\u0072\u0067\u0073\u003d\u0025\u002b\u0076", _edaf, _affc)
+				return _afa.ErrTypeError
+			}
+			_agab.renderText(_bbc, _efdg, _bedd, _caggg)
+		default:
+			_bg.Log.Debug("\u0045\u0052\u0052\u004f\u0052\u003a\u0020\u0073\u0068\u006f\u0077\u0054\u0065\u0078\u0074A\u0064\u006a\u0075\u0073\u0074\u0065\u0064\u002e\u0020\u0055\u006e\u0065\u0078p\u0065\u0063\u0074\u0065\u0064\u0020\u0074\u0079\u0070\u0065\u0020\u0028%T\u0029\u0020\u0061\u0072\u0067\u0073\u003d\u0025\u002b\u0076", _edaf, _affc)
+			return _afa.ErrTypeError
+		}
+	}
+	return nil
+}
+
+func _dcbbd(_dfgce map[float64]map[float64]gridTile) []float64 {
+	_fecge := make([]float64, 0, len(_dfgce))
+	for _bffab := range _dfgce {
+		_fecge = append(_fecge, _bffab)
+	}
+	_eg.Float64s(_fecge)
+	_baebf := len(_fecge)
+	for _fegag := 0; _fegag < _baebf/2; _fegag++ {
+		_fecge[_fegag], _fecge[_baebf-1-_fegag] = _fecge[_baebf-1-_fegag], _fecge[_fegag]
+	}
+	return _fecge
+}
+
+func _eeaef(_afdcg map[int]intSet) []int {
+	_cdaca := make([]int, 0, len(_afdcg))
+	for _fbcd := range _afdcg {
+		_cdaca = append(_cdaca, _fbcd)
+	}
+	_eg.Ints(_cdaca)
+	return _cdaca
+}
 
 // Tables returns the tables extracted from the page.
-func (_acfe PageText )Tables ()[]TextTable {if _ggegb {_bg .Log .Info ("\u0054\u0061\u0062\u006c\u0065\u0073\u003a\u0020\u0025\u0064",len (_acfe ._abcf ));};return _acfe ._abcf ;};type textObject struct{_bgbb *Extractor ;_dfece *_ad .PdfPageResources ;
-_edcg _af .GraphicsState ;_dggef *textState ;_ddaa *stateStack ;_dfde _cd .Matrix ;_feec _cd .Matrix ;_fcbb []*textMark ;_fgad bool ;};
+func (_acfe PageText) Tables() []TextTable {
+	if _ggegb {
+		_bg.Log.Info("\u0054\u0061\u0062\u006c\u0065\u0073\u003a\u0020\u0025\u0064", len(_acfe._abcf))
+	}
+	return _acfe._abcf
+}
+
+type textObject struct {
+	_bgbb  *Extractor
+	_dfece *_ad.PdfPageResources
+	_edcg  _af.GraphicsState
+	_dggef *textState
+	_ddaa  *stateStack
+	_dfde  _cd.Matrix
+	_feec  _cd.Matrix
+	_fcbb  []*textMark
+	_fgad  bool
+}
 
 // Text returns the extracted page text.
-func (_bbde PageText )Text ()string {return _bbde ._dfcf };type stateStack []*textState ;func (_cfcb *textTable )reduceTiling (_bfae gridTiling ,_fgbeg float64 )*textTable {_begdg :=make ([]int ,0,_cfcb ._aaga );_ggfca :=make ([]int ,0,_cfcb ._cfadc );
-_gaada :=_bfae ._eced ;_adefc :=_bfae ._bcgge ;for _bfebf :=0;_bfebf < _cfcb ._aaga ;_bfebf ++{_eabd :=_bfebf > 0&&_c .Abs (_adefc [_bfebf -1]-_adefc [_bfebf ])< _fgbeg &&_cfcb .emptyCompositeRow (_bfebf );if !_eabd {_begdg =append (_begdg ,_bfebf );};
-};for _agbba :=0;_agbba < _cfcb ._cfadc ;_agbba ++{_ebbbc :=_agbba < _cfcb ._cfadc -1&&_c .Abs (_gaada [_agbba +1]-_gaada [_agbba ])< _fgbeg &&_cfcb .emptyCompositeColumn (_agbba );if !_ebbbc {_ggfca =append (_ggfca ,_agbba );};};if len (_begdg )==_cfcb ._aaga &&len (_ggfca )==_cfcb ._cfadc {return _cfcb ;
-};_dbae :=textTable {_cegab :_cfcb ._cegab ,_cfadc :len (_ggfca ),_aaga :len (_begdg ),_cafd :make (map[uint64 ]compositeCell ,len (_ggfca )*len (_begdg ))};if _ggegb {_bg .Log .Info ("\u0072\u0065\u0064\u0075c\u0065\u0054\u0069\u006c\u0069\u006e\u0067\u003a\u0020\u0025d\u0078%\u0064\u0020\u002d\u003e\u0020\u0025\u0064x\u0025\u0064",_cfcb ._cfadc ,_cfcb ._aaga ,len (_ggfca ),len (_begdg ));
-_bg .Log .Info ("\u0072\u0065d\u0075\u0063\u0065d\u0043\u006f\u006c\u0073\u003a\u0020\u0025\u002b\u0076",_ggfca );_bg .Log .Info ("\u0072\u0065d\u0075\u0063\u0065d\u0052\u006f\u0077\u0073\u003a\u0020\u0025\u002b\u0076",_begdg );};for _badc ,_fdefg :=range _begdg {for _adbg ,_fgba :=range _ggfca {_ebbbcd ,_afgb :=_cfcb .getComposite (_fgba ,_fdefg );
-if len (_ebbbcd )==0{continue ;};if _ggegb {_fa .Printf ("\u0020 \u0025\u0032\u0064\u002c \u0025\u0032\u0064\u0020\u0028%\u0032d\u002c \u0025\u0032\u0064\u0029\u0020\u0025\u0071\n",_adbg ,_badc ,_fgba ,_fdefg ,_fagdg (_ebbbcd .merge ().text (),50));};_dbae .putComposite (_adbg ,_badc ,_ebbbcd ,_afgb );
-};};return &_dbae ;};func _bccd (_edeb []*textLine )[]*textLine {_gcab :=[]*textLine {};for _ ,_bdge :=range _edeb {_ecef :=_bdge .text ();_cfdaf :=_dcba .Find ([]byte (_ecef ));if _cfdaf !=nil {_gcab =append (_gcab ,_bdge );};};return _gcab ;};type subpath struct{_bfgb []_cd .Point ;
-_bgfa bool ;};func (_afebf *wordBag )blocked (_bgef *textWord )bool {if _bgef .Urx < _afebf .Llx {_fbfd :=_cdabd (_bgef .PdfRectangle );_aebf :=_agad (_afebf .PdfRectangle );if _afebf ._fegfc .blocks (_fbfd ,_aebf ){if _dgcca {_bg .Log .Info ("\u0062\u006c\u006f\u0063ke\u0064\u0020\u2190\u0078\u003a\u0020\u0025\u0073\u0020\u0025\u0073",_bgef ,_afebf );
-};return true ;};}else if _afebf .Urx < _bgef .Llx {_gffb :=_cdabd (_afebf .PdfRectangle );_efddd :=_agad (_bgef .PdfRectangle );if _afebf ._fegfc .blocks (_gffb ,_efddd ){if _dgcca {_bg .Log .Info ("b\u006co\u0063\u006b\u0065\u0064\u0020\u0078\u2192\u0020:\u0020\u0025\u0073\u0020%s",_bgef ,_afebf );
-};return true ;};};if _bgef .Ury < _afebf .Lly {_agfd :=_bggg (_bgef .PdfRectangle );_caefb :=_bbcb (_afebf .PdfRectangle );if _afebf ._fbee .blocks (_agfd ,_caefb ){if _dgcca {_bg .Log .Info ("\u0062\u006c\u006f\u0063ke\u0064\u0020\u2190\u0079\u003a\u0020\u0025\u0073\u0020\u0025\u0073",_bgef ,_afebf );
-};return true ;};}else if _afebf .Ury < _bgef .Lly {_fgag :=_bggg (_afebf .PdfRectangle );_fgbd :=_bbcb (_bgef .PdfRectangle );if _afebf ._fbee .blocks (_fgag ,_fgbd ){if _dgcca {_bg .Log .Info ("b\u006co\u0063\u006b\u0065\u0064\u0020\u0079\u2192\u0020:\u0020\u0025\u0073\u0020%s",_bgef ,_afebf );
-};return true ;};};return false ;};func _edad (_ddfda []*textLine ,_dcfcc map[float64 ][]*textLine )[]*list {_bdab :=_bfag (_dcfcc );_ggbd :=[]*list {};if len (_bdab )==0{return _ggbd ;};_adfc :=_bdab [0];_gccc :=1;_fdcdd :=_dcfcc [_adfc ];for _becg ,_eaec :=range _fdcdd {var _dgga float64 ;
-_ccceg :=[]*list {};_dcbd :=_eaec ._adaa ;_gfbd :=-1.0;if _becg < len (_fdcdd )-1{_gfbd =_fdcdd [_becg +1]._adaa ;};if _gccc < len (_bdab ){_ccceg =_cbadf (_ddfda ,_dcfcc ,_bdab ,_gccc ,_dcbd ,_gfbd );};_dgga =_gfbd ;if len (_ccceg )> 0{_eafec :=_ccceg [0];
-if len (_eafec ._aage )> 0{_dgga =_eafec ._aage [0]._adaa ;};};_ecab :=[]*textLine {_eaec };_fdcc :=_daaca (_eaec ,_ddfda ,_dcbd ,_dgga );_ecab =append (_ecab ,_fdcc ...);_gddc :=_cbda (_ecab ,"\u0062\u0075\u006c\u006c\u0065\u0074",_ccceg );_gddc ._bdeac =_dbfff (_ecab ,"");
-_ggbd =append (_ggbd ,_gddc );};return _ggbd ;};func (_beefb rulingList )sortStrict (){_eg .Slice (_beefb ,func (_gabd ,_dbdd int )bool {_fcbcf ,_cded :=_beefb [_gabd ],_beefb [_dbdd ];_ffgfa ,_gdfg :=_fcbcf ._gafe ,_cded ._gafe ;if _ffgfa !=_gdfg {return _ffgfa > _gdfg ;
-};_fcda ,_gcdfbg :=_fcbcf ._ecfb ,_cded ._ecfb ;if !_edec (_fcda -_gcdfbg ){return _fcda < _gcdfbg ;};_fcda ,_gcdfbg =_fcbcf ._ggecg ,_cded ._ggecg ;if _fcda !=_gcdfbg {return _fcda < _gcdfbg ;};return _fcbcf ._gebf < _cded ._gebf ;});};func _ecdc (_bcabf string )bool {for _ ,_geddc :=range _bcabf {if !_bd .IsSpace (_geddc ){return false ;
-};};return true ;};func _eecfb (_fcfb []TextMark ,_bgdce *int )[]TextMark {_badf :=_fcfb [len (_fcfb )-1];_gdee :=[]rune (_badf .Text );if len (_gdee )==1{_fcfb =_fcfb [:len (_fcfb )-1];_cgeb :=_fcfb [len (_fcfb )-1];*_bgdce =_cgeb .Offset +len (_cgeb .Text );
-}else {_bbcff :=_ggec (_badf .Text );*_bgdce +=len (_bbcff )-len (_badf .Text );_badf .Text =_bbcff ;};return _fcfb ;};type textWord struct{_ad .PdfRectangle ;_fcgaa float64 ;_fgaa string ;_ddfc []*textMark ;_bbebf float64 ;_efccdf bool ;};func _ffde (_ebdg _cd .Point )*subpath {return &subpath {_bfgb :[]_cd .Point {_ebdg }}};
-func _gefdg (_gggc []*textMark ,_ecfde _ad .PdfRectangle )*textWord {_gcfgd :=_gggc [0].PdfRectangle ;_deccc :=_gggc [0]._caadf ;for _ ,_cabg :=range _gggc [1:]{_gcfgd =_faea (_gcfgd ,_cabg .PdfRectangle );if _cabg ._caadf > _deccc {_deccc =_cabg ._caadf ;
-};};return &textWord {PdfRectangle :_gcfgd ,_ddfc :_gggc ,_fcgaa :_ecfde .Ury -_gcfgd .Lly ,_bbebf :_deccc };};
+func (_bbde PageText) Text() string { return _bbde._dfcf }
+
+type stateStack []*textState
+
+func (_cfcb *textTable) reduceTiling(_bfae gridTiling, _fgbeg float64) *textTable {
+	_begdg := make([]int, 0, _cfcb._aaga)
+	_ggfca := make([]int, 0, _cfcb._cfadc)
+	_gaada := _bfae._eced
+	_adefc := _bfae._bcgge
+	for _bfebf := 0; _bfebf < _cfcb._aaga; _bfebf++ {
+		_eabd := _bfebf > 0 && _c.Abs(_adefc[_bfebf-1]-_adefc[_bfebf]) < _fgbeg && _cfcb.emptyCompositeRow(_bfebf)
+		if !_eabd {
+			_begdg = append(_begdg, _bfebf)
+		}
+	}
+	for _agbba := 0; _agbba < _cfcb._cfadc; _agbba++ {
+		_ebbbc := _agbba < _cfcb._cfadc-1 && _c.Abs(_gaada[_agbba+1]-_gaada[_agbba]) < _fgbeg && _cfcb.emptyCompositeColumn(_agbba)
+		if !_ebbbc {
+			_ggfca = append(_ggfca, _agbba)
+		}
+	}
+	if len(_begdg) == _cfcb._aaga && len(_ggfca) == _cfcb._cfadc {
+		return _cfcb
+	}
+	_dbae := textTable{_cegab: _cfcb._cegab, _cfadc: len(_ggfca), _aaga: len(_begdg), _cafd: make(map[uint64]compositeCell, len(_ggfca)*len(_begdg))}
+	if _ggegb {
+		_bg.Log.Info("\u0072\u0065\u0064\u0075c\u0065\u0054\u0069\u006c\u0069\u006e\u0067\u003a\u0020\u0025d\u0078%\u0064\u0020\u002d\u003e\u0020\u0025\u0064x\u0025\u0064", _cfcb._cfadc, _cfcb._aaga, len(_ggfca), len(_begdg))
+		_bg.Log.Info("\u0072\u0065d\u0075\u0063\u0065d\u0043\u006f\u006c\u0073\u003a\u0020\u0025\u002b\u0076", _ggfca)
+		_bg.Log.Info("\u0072\u0065d\u0075\u0063\u0065d\u0052\u006f\u0077\u0073\u003a\u0020\u0025\u002b\u0076", _begdg)
+	}
+	for _badc, _fdefg := range _begdg {
+		for _adbg, _fgba := range _ggfca {
+			_ebbbcd, _afgb := _cfcb.getComposite(_fgba, _fdefg)
+			if len(_ebbbcd) == 0 {
+				continue
+			}
+			if _ggegb {
+				_fa.Printf("\u0020 \u0025\u0032\u0064\u002c \u0025\u0032\u0064\u0020\u0028%\u0032d\u002c \u0025\u0032\u0064\u0029\u0020\u0025\u0071\n", _adbg, _badc, _fgba, _fdefg, _fagdg(_ebbbcd.merge().text(), 50))
+			}
+			_dbae.putComposite(_adbg, _badc, _ebbbcd, _afgb)
+		}
+	}
+	return &_dbae
+}
+
+func _bccd(_edeb []*textLine) []*textLine {
+	_gcab := []*textLine{}
+	for _, _bdge := range _edeb {
+		_ecef := _bdge.text()
+		_cfdaf := _dcba.Find([]byte(_ecef))
+		if _cfdaf != nil {
+			_gcab = append(_gcab, _bdge)
+		}
+	}
+	return _gcab
+}
+
+type subpath struct {
+	_bfgb []_cd.Point
+	_bgfa bool
+}
+
+func (_afebf *wordBag) blocked(_bgef *textWord) bool {
+	if _bgef.Urx < _afebf.Llx {
+		_fbfd := _cdabd(_bgef.PdfRectangle)
+		_aebf := _agad(_afebf.PdfRectangle)
+		if _afebf._fegfc.blocks(_fbfd, _aebf) {
+			if _dgcca {
+				_bg.Log.Info("\u0062\u006c\u006f\u0063ke\u0064\u0020\u2190\u0078\u003a\u0020\u0025\u0073\u0020\u0025\u0073", _bgef, _afebf)
+			}
+			return true
+		}
+	} else if _afebf.Urx < _bgef.Llx {
+		_gffb := _cdabd(_afebf.PdfRectangle)
+		_efddd := _agad(_bgef.PdfRectangle)
+		if _afebf._fegfc.blocks(_gffb, _efddd) {
+			if _dgcca {
+				_bg.Log.Info("b\u006co\u0063\u006b\u0065\u0064\u0020\u0078\u2192\u0020:\u0020\u0025\u0073\u0020%s", _bgef, _afebf)
+			}
+			return true
+		}
+	}
+	if _bgef.Ury < _afebf.Lly {
+		_agfd := _bggg(_bgef.PdfRectangle)
+		_caefb := _bbcb(_afebf.PdfRectangle)
+		if _afebf._fbee.blocks(_agfd, _caefb) {
+			if _dgcca {
+				_bg.Log.Info("\u0062\u006c\u006f\u0063ke\u0064\u0020\u2190\u0079\u003a\u0020\u0025\u0073\u0020\u0025\u0073", _bgef, _afebf)
+			}
+			return true
+		}
+	} else if _afebf.Ury < _bgef.Lly {
+		_fgag := _bggg(_afebf.PdfRectangle)
+		_fgbd := _bbcb(_bgef.PdfRectangle)
+		if _afebf._fbee.blocks(_fgag, _fgbd) {
+			if _dgcca {
+				_bg.Log.Info("b\u006co\u0063\u006b\u0065\u0064\u0020\u0079\u2192\u0020:\u0020\u0025\u0073\u0020%s", _bgef, _afebf)
+			}
+			return true
+		}
+	}
+	return false
+}
+
+func _edad(_ddfda []*textLine, _dcfcc map[float64][]*textLine) []*list {
+	_bdab := _bfag(_dcfcc)
+	_ggbd := []*list{}
+	if len(_bdab) == 0 {
+		return _ggbd
+	}
+	_adfc := _bdab[0]
+	_gccc := 1
+	_fdcdd := _dcfcc[_adfc]
+	for _becg, _eaec := range _fdcdd {
+		var _dgga float64
+		_ccceg := []*list{}
+		_dcbd := _eaec._adaa
+		_gfbd := -1.0
+		if _becg < len(_fdcdd)-1 {
+			_gfbd = _fdcdd[_becg+1]._adaa
+		}
+		if _gccc < len(_bdab) {
+			_ccceg = _cbadf(_ddfda, _dcfcc, _bdab, _gccc, _dcbd, _gfbd)
+		}
+		_dgga = _gfbd
+		if len(_ccceg) > 0 {
+			_eafec := _ccceg[0]
+			if len(_eafec._aage) > 0 {
+				_dgga = _eafec._aage[0]._adaa
+			}
+		}
+		_ecab := []*textLine{_eaec}
+		_fdcc := _daaca(_eaec, _ddfda, _dcbd, _dgga)
+		_ecab = append(_ecab, _fdcc...)
+		_gddc := _cbda(_ecab, "\u0062\u0075\u006c\u006c\u0065\u0074", _ccceg)
+		_gddc._bdeac = _dbfff(_ecab, "")
+		_ggbd = append(_ggbd, _gddc)
+	}
+	return _ggbd
+}
+
+func (_beefb rulingList) sortStrict() {
+	_eg.Slice(_beefb, func(_gabd, _dbdd int) bool {
+		_fcbcf, _cded := _beefb[_gabd], _beefb[_dbdd]
+		_ffgfa, _gdfg := _fcbcf._gafe, _cded._gafe
+		if _ffgfa != _gdfg {
+			return _ffgfa > _gdfg
+		}
+		_fcda, _gcdfbg := _fcbcf._ecfb, _cded._ecfb
+		if !_edec(_fcda - _gcdfbg) {
+			return _fcda < _gcdfbg
+		}
+		_fcda, _gcdfbg = _fcbcf._ggecg, _cded._ggecg
+		if _fcda != _gcdfbg {
+			return _fcda < _gcdfbg
+		}
+		return _fcbcf._gebf < _cded._gebf
+	})
+}
+
+func _ecdc(_bcabf string) bool {
+	for _, _geddc := range _bcabf {
+		if !_bd.IsSpace(_geddc) {
+			return false
+		}
+	}
+	return true
+}
+
+func _eecfb(_fcfb []TextMark, _bgdce *int) []TextMark {
+	_badf := _fcfb[len(_fcfb)-1]
+	_gdee := []rune(_badf.Text)
+	if len(_gdee) == 1 {
+		_fcfb = _fcfb[:len(_fcfb)-1]
+		_cgeb := _fcfb[len(_fcfb)-1]
+		*_bgdce = _cgeb.Offset + len(_cgeb.Text)
+	} else {
+		_bbcff := _ggec(_badf.Text)
+		*_bgdce += len(_bbcff) - len(_badf.Text)
+		_badf.Text = _bbcff
+	}
+	return _fcfb
+}
+
+type textWord struct {
+	_ad.PdfRectangle
+	_fcgaa  float64
+	_fgaa   string
+	_ddfc   []*textMark
+	_bbebf  float64
+	_efccdf bool
+}
+
+func _ffde(_ebdg _cd.Point) *subpath { return &subpath{_bfgb: []_cd.Point{_ebdg}} }
+
+func _gefdg(_gggc []*textMark, _ecfde _ad.PdfRectangle) *textWord {
+	_gcfgd := _gggc[0].PdfRectangle
+	_deccc := _gggc[0]._caadf
+	for _, _cabg := range _gggc[1:] {
+		_gcfgd = _faea(_gcfgd, _cabg.PdfRectangle)
+		if _cabg._caadf > _deccc {
+			_deccc = _cabg._caadf
+		}
+	}
+	return &textWord{PdfRectangle: _gcfgd, _ddfc: _gggc, _fcgaa: _ecfde.Ury - _gcfgd.Lly, _bbebf: _deccc}
+}
 
 // String returns a description of `t`.
-func (_cgefe *textTable )String ()string {return _fa .Sprintf ("\u0025\u0064\u0020\u0078\u0020\u0025\u0064\u0020\u0025\u0074",_cgefe ._cfadc ,_cgefe ._aaga ,_cgefe ._cegab );};func (_befa *textTable )newTablePara ()*textPara {_eacc :=_befa .computeBbox ();
-_edgbaa :=&textPara {PdfRectangle :_eacc ,_cbfdb :_eacc ,_fbbfg :_befa };if _ggegb {_bg .Log .Info ("\u006e\u0065w\u0054\u0061\u0062l\u0065\u0050\u0061\u0072\u0061\u003a\u0020\u0025\u0073",_edgbaa );};return _edgbaa ;};func (_eddfe *shapesState )clearPath (){_eddfe ._fec =nil ;
-_eddfe ._eaba =false ;if _acge {_bg .Log .Info ("\u0043\u004c\u0045A\u0052\u003a\u0020\u0073\u0073\u003d\u0025\u0073",_eddfe );};};func (_gbaef paraList )llyOrdering ()[]int {_dfabe :=make ([]int ,len (_gbaef ));for _dgag :=range _gbaef {_dfabe [_dgag ]=_dgag ;
-};_eg .SliceStable (_dfabe ,func (_gcbea ,_cafe int )bool {_dgee ,_eccba :=_dfabe [_gcbea ],_dfabe [_cafe ];return _gbaef [_dgee ].Lly < _gbaef [_eccba ].Lly ;});return _dfabe ;};
+func (_cgefe *textTable) String() string {
+	return _fa.Sprintf("\u0025\u0064\u0020\u0078\u0020\u0025\u0064\u0020\u0025\u0074", _cgefe._cfadc, _cgefe._aaga, _cgefe._cegab)
+}
+
+func (_befa *textTable) newTablePara() *textPara {
+	_eacc := _befa.computeBbox()
+	_edgbaa := &textPara{PdfRectangle: _eacc, _cbfdb: _eacc, _fbbfg: _befa}
+	if _ggegb {
+		_bg.Log.Info("\u006e\u0065w\u0054\u0061\u0062l\u0065\u0050\u0061\u0072\u0061\u003a\u0020\u0025\u0073", _edgbaa)
+	}
+	return _edgbaa
+}
+
+func (_eddfe *shapesState) clearPath() {
+	_eddfe._fec = nil
+	_eddfe._eaba = false
+	if _acge {
+		_bg.Log.Info("\u0043\u004c\u0045A\u0052\u003a\u0020\u0073\u0073\u003d\u0025\u0073", _eddfe)
+	}
+}
+
+func (_gbaef paraList) llyOrdering() []int {
+	_dfabe := make([]int, len(_gbaef))
+	for _dgag := range _gbaef {
+		_dfabe[_dgag] = _dgag
+	}
+	_eg.SliceStable(_dfabe, func(_gcbea, _cafe int) bool {
+		_dgee, _eccba := _dfabe[_gcbea], _dfabe[_cafe]
+		return _gbaef[_dgee].Lly < _gbaef[_eccba].Lly
+	})
+	return _dfabe
+}
 
 // ImageExtractOptions contains options for controlling image extraction from
 // PDF pages.
-type ImageExtractOptions struct{IncludeInlineStencilMasks bool ;};
+type ImageExtractOptions struct{ IncludeInlineStencilMasks bool }
 
 // TableInfo gets table information of the textmark `tm`.
-func (_gdge *TextMark )TableInfo ()(*TextTable ,[][]int ){if !_gdge ._eace {return nil ,nil ;};_ffdg :=_gdge ._ggdea ;_eggb :=_ffdg .getCellInfo (*_gdge );return _ffdg ,_eggb ;};func (_agae paraList )writeText (_gcfc _ef .Writer ){for _cfebc ,_dbef :=range _agae {if _dbef ._gddfg {continue ;
-};_dbef .writeText (_gcfc );if _cfebc !=len (_agae )-1{if _gcgf (_dbef ,_agae [_cfebc +1]){_gcfc .Write ([]byte ("\u0020"));}else {_gcfc .Write ([]byte ("\u000a"));_gcfc .Write ([]byte ("\u000a"));};};};_gcfc .Write ([]byte ("\u000a"));_gcfc .Write ([]byte ("\u000a"));
-};var _gccbe =map[rulingKind ]string {_gbgfg :"\u006e\u006f\u006e\u0065",_cafa :"\u0068\u006f\u0072\u0069\u007a\u006f\u006e\u0074\u0061\u006c",_dcfdg :"\u0076\u0065\u0072\u0074\u0069\u0063\u0061\u006c"};
+func (_gdge *TextMark) TableInfo() (*TextTable, [][]int) {
+	if !_gdge._eace {
+		return nil, nil
+	}
+	_ffdg := _gdge._ggdea
+	_eggb := _ffdg.getCellInfo(*_gdge)
+	return _ffdg, _eggb
+}
+
+func (_agae paraList) writeText(_gcfc _ef.Writer) {
+	for _cfebc, _dbef := range _agae {
+		if _dbef._gddfg {
+			continue
+		}
+		_dbef.writeText(_gcfc)
+		if _cfebc != len(_agae)-1 {
+			if _gcgf(_dbef, _agae[_cfebc+1]) {
+				_gcfc.Write([]byte("\u0020"))
+			} else {
+				_gcfc.Write([]byte("\u000a"))
+				_gcfc.Write([]byte("\u000a"))
+			}
+		}
+	}
+	_gcfc.Write([]byte("\u000a"))
+	_gcfc.Write([]byte("\u000a"))
+}
+
+var _gccbe = map[rulingKind]string{_gbgfg: "\u006e\u006f\u006e\u0065", _cafa: "\u0068\u006f\u0072\u0069\u007a\u006f\u006e\u0074\u0061\u006c", _dcfdg: "\u0076\u0065\u0072\u0074\u0069\u0063\u0061\u006c"}
 
 // ToTextMark returns the public view of `tm`.
-func (_bfbg *textMark )ToTextMark ()TextMark {return TextMark {Text :_bfbg ._acfa ,Original :_bfbg ._fbdg ,BBox :_bfbg ._bdee ,Font :_bfbg ._beeb ,FontSize :_bfbg ._caadf ,FillColor :_bfbg ._ceba ,StrokeColor :_bfbg ._ebede ,Orientation :_bfbg ._cbgf ,DirectObject :_bfbg ._bcag ,ObjString :_bfbg ._gbag ,Tw :_bfbg .Tw ,Th :_bfbg .Th ,Tc :_bfbg ._cffbg ,Index :_bfbg ._ccga };
-};func (_gddca *textTable )growTable (){_cefg :=func (_cfbf paraList ){_gddca ._aaga ++;for _egfeb :=0;_egfeb < _gddca ._cfadc ;_egfeb ++{_afcd :=_cfbf [_egfeb ];_gddca .put (_egfeb ,_gddca ._aaga -1,_afcd );};};_ebgb :=func (_dgcbb paraList ){_gddca ._cfadc ++;
-for _fdfae :=0;_fdfae < _gddca ._aaga ;_fdfae ++{_gbfec :=_dgcbb [_fdfae ];_gddca .put (_gddca ._cfadc -1,_fdfae ,_gbfec );};};if _gbef {_gddca .log ("\u0067r\u006f\u0077\u0054\u0061\u0062\u006ce");};for _bbgcgd :=0;;_bbgcgd ++{_dbdcb :=false ;_fagg :=_gddca .getDown ();
-_gdaaf :=_gddca .getRight ();if _gbef {_fa .Printf ("\u0025\u0034\u0064\u003a\u0020\u0025\u0073\u000a",_bbgcgd ,_gddca );_fa .Printf ("\u0020\u0020 \u0020\u0020\u0020 \u0020\u0064\u006f\u0077\u006e\u003d\u0025\u0073\u000a",_fagg );_fa .Printf ("\u0020\u0020 \u0020\u0020\u0020 \u0072\u0069\u0067\u0068\u0074\u003d\u0025\u0073\u000a",_gdaaf );
-};if _fagg !=nil &&_gdaaf !=nil {_afcf :=_fagg [len (_fagg )-1];if !_afcf .taken ()&&_afcf ==_gdaaf [len (_gdaaf )-1]{_cefg (_fagg );if _gdaaf =_gddca .getRight ();_gdaaf !=nil {_ebgb (_gdaaf );_gddca .put (_gddca ._cfadc -1,_gddca ._aaga -1,_afcf );};
-_dbdcb =true ;};};if !_dbdcb &&_fagg !=nil {_cefg (_fagg );_dbdcb =true ;};if !_dbdcb &&_gdaaf !=nil {_ebgb (_gdaaf );_dbdcb =true ;};if !_dbdcb {break ;};};};func (_gdfgf paraList )extractTables (_cdaae []gridTiling )paraList {if _ggegb {_bg .Log .Debug ("\u0065\u0078\u0074r\u0061\u0063\u0074\u0054\u0061\u0062\u006c\u0065\u0073\u003d\u0025\u0064\u0020\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u0078\u003d\u003d\u003d\u003d=\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d",len (_gdfgf ));
-};if len (_gdfgf )< _fdacb {return _gdfgf ;};_aeada :=_gdfgf .findTables (_cdaae );if _ggegb {_bg .Log .Info ("c\u006f\u006d\u0062\u0069\u006e\u0065d\u0020\u0074\u0061\u0062\u006c\u0065s\u0020\u0025\u0064\u0020\u003d\u003d\u003d=\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d=\u003d",len (_aeada ));
-for _decf ,_egbb :=range _aeada {_egbb .log (_fa .Sprintf ("c\u006f\u006d\u0062\u0069\u006e\u0065\u0064\u0020\u0025\u0064",_decf ));};};return _gdfgf .applyTables (_aeada );};func _gdcb (_bada float64 ,_aeaa int )int {if _aeaa ==0{_aeaa =1;};_adggd :=float64 (_aeaa );
-return int (_c .Round (_bada /_adggd )*_adggd );};func (_adgba *textTable )getDown ()paraList {_gdebc :=make (paraList ,_adgba ._cfadc );for _cdag :=0;_cdag < _adgba ._cfadc ;_cdag ++{_gfgda :=_adgba .get (_cdag ,_adgba ._aaga -1)._gdae ;if _gfgda .taken (){return nil ;
-};_gdebc [_cdag ]=_gfgda ;};for _beeae :=0;_beeae < _adgba ._cfadc -1;_beeae ++{if _gdebc [_beeae ]._badad !=_gdebc [_beeae +1]{return nil ;};};return _gdebc ;};func (_gebe *shapesState )lastpointEstablished ()(_cd .Point ,bool ){if _gebe ._eaba {return _gebe ._aaba ,false ;
-};_efgeg :=len (_gebe ._fec );if _efgeg > 0&&_gebe ._fec [_efgeg -1]._bgfa {return _gebe ._fec [_efgeg -1].last (),false ;};return _cd .Point {},true ;};func _aeebf (_ffea []*_ad .KValue ,_bceef map[int ][]*textLine ,_gfgea _afa .PdfObject )[]*list {_agge :=[]*list {};
-for _ ,_ecad :=range _ffea {_gece :=_ecad .GetKDict ();_cdbga :=_gece .GetChildren ();_gac :=[]*textLine {};_acgd :=[]*list {};_bbggb :=_gece .S .(*_afa .PdfObjectName ).String ();_baebd :=_cdbga [0];_bfdd :=_baebd .GetMCID ();if len (_cdbga )==1&&_bfdd !=nil &&*_bfdd !=-1{if _gece .Pg ==_gfgea {_gac =_bceef [*_bfdd ];
-};}else {_acgd =_aeebf (_cdbga ,_bceef ,_gfgea );};_bbee :=_cbda (_gac ,_bbggb ,_acgd );_agge =append (_agge ,_bbee );};return _agge ;};func _adba (_caf *wordBag ,_beaea float64 ,_dcdd ,_dfbbc rulingList ,_dcbff bool )[]*wordBag {var _geddb []*wordBag ;
-for _ ,_egdg :=range _caf .depthIndexes (){_fbeg :=false ;for !_caf .empty (_egdg ){_facde :=_caf .firstReadingIndex (_egdg );_gccb :=_caf .firstWord (_facde );_cdgc :=_aaea (_gccb ,_beaea ,_dcdd ,_dfbbc );_caf .removeWord (_gccb ,_facde );if _aebc {_bg .Log .Info ("\u0066\u0069\u0072\u0073\u0074\u0057\u006f\u0072\u0064\u0020\u005e\u005e^\u005e\u0020\u0025\u0073",_gccb .String ());
-};for _gagd :=true ;_gagd ;_gagd =_fbeg {_fbeg =false ;_adag :=_cbcd *_cdgc ._eagga ;_ebaeg :=_dgfc *_cdgc ._eagga ;if _dcbff {_ebaeg =_c .MaxFloat64 ;};_aadb :=_ebed *_cdgc ._eagga ;if _aebc {_bg .Log .Info ("\u0070a\u0072a\u0057\u006f\u0072\u0064\u0073\u0020\u0064\u0065\u0070\u0074\u0068 \u0025\u002e\u0032\u0066 \u002d\u0020\u0025\u002e\u0032f\u0020\u006d\u0061\u0078\u0049\u006e\u0074\u0072\u0061\u0044\u0065\u0070\u0074\u0068\u0047\u0061\u0070\u003d\u0025\u002e\u0032\u0066\u0020\u006d\u0061\u0078\u0049\u006e\u0074\u0072\u0061R\u0065\u0061\u0064\u0069\u006e\u0067\u0047\u0061p\u003d\u0025\u002e\u0032\u0066",_cdgc .minDepth (),_cdgc .maxDepth (),_aadb ,_ebaeg );
-};if _caf .scanBand ("\u0076\u0065\u0072\u0074\u0069\u0063\u0061\u006c",_cdgc ,_aabb (_geee ,0),_cdgc .minDepth ()-_aadb ,_cdgc .maxDepth ()+_aadb ,_ccdd ,false ,false )> 0{_fbeg =true ;};if _caf .scanBand ("\u0068\u006f\u0072\u0069\u007a\u006f\u006e\u0074\u0061\u006c",_cdgc ,_aabb (_geee ,_ebaeg ),_cdgc .minDepth (),_cdgc .maxDepth (),_gdged ,false ,false )> 0{_fbeg =true ;
-};if _fbeg {continue ;};_afge :=_caf .scanBand ("",_cdgc ,_aabb (_ccce ,_adag ),_cdgc .minDepth (),_cdgc .maxDepth (),_fbeca ,true ,false );if _afge > 0{_gcdb :=(_cdgc .maxDepth ()-_cdgc .minDepth ())/_cdgc ._eagga ;if (_afge > 1&&float64 (_afge )> 0.3*_gcdb )||_afge <=10{if _caf .scanBand ("\u006f\u0074\u0068e\u0072",_cdgc ,_aabb (_ccce ,_adag ),_cdgc .minDepth (),_cdgc .maxDepth (),_fbeca ,false ,true )> 0{_fbeg =true ;
-};};};};_geddb =append (_geddb ,_cdgc );};};return _geddb ;};type textState struct{_daab float64 ;_ccda float64 ;_deeee float64 ;_dgd float64 ;_dba float64 ;_caad RenderMode ;_cfec float64 ;_gdd *_ad .PdfFont ;_eccb _ad .PdfRectangle ;_fbef int ;_edabg int ;
-};
+func (_bfbg *textMark) ToTextMark() TextMark {
+	return TextMark{Text: _bfbg._acfa, Original: _bfbg._fbdg, BBox: _bfbg._bdee, Font: _bfbg._beeb, FontSize: _bfbg._caadf, FillColor: _bfbg._ceba, StrokeColor: _bfbg._ebede, Orientation: _bfbg._cbgf, DirectObject: _bfbg._bcag, ObjString: _bfbg._gbag, Tw: _bfbg.Tw, Th: _bfbg.Th, Tc: _bfbg._cffbg, Index: _bfbg._ccga}
+}
+
+func (_gddca *textTable) growTable() {
+	_cefg := func(_cfbf paraList) {
+		_gddca._aaga++
+		for _egfeb := 0; _egfeb < _gddca._cfadc; _egfeb++ {
+			_afcd := _cfbf[_egfeb]
+			_gddca.put(_egfeb, _gddca._aaga-1, _afcd)
+		}
+	}
+	_ebgb := func(_dgcbb paraList) {
+		_gddca._cfadc++
+		for _fdfae := 0; _fdfae < _gddca._aaga; _fdfae++ {
+			_gbfec := _dgcbb[_fdfae]
+			_gddca.put(_gddca._cfadc-1, _fdfae, _gbfec)
+		}
+	}
+	if _gbef {
+		_gddca.log("\u0067r\u006f\u0077\u0054\u0061\u0062\u006ce")
+	}
+	for _bbgcgd := 0; ; _bbgcgd++ {
+		_dbdcb := false
+		_fagg := _gddca.getDown()
+		_gdaaf := _gddca.getRight()
+		if _gbef {
+			_fa.Printf("\u0025\u0034\u0064\u003a\u0020\u0025\u0073\u000a", _bbgcgd, _gddca)
+			_fa.Printf("\u0020\u0020 \u0020\u0020\u0020 \u0020\u0064\u006f\u0077\u006e\u003d\u0025\u0073\u000a", _fagg)
+			_fa.Printf("\u0020\u0020 \u0020\u0020\u0020 \u0072\u0069\u0067\u0068\u0074\u003d\u0025\u0073\u000a", _gdaaf)
+		}
+		if _fagg != nil && _gdaaf != nil {
+			_afcf := _fagg[len(_fagg)-1]
+			if !_afcf.taken() && _afcf == _gdaaf[len(_gdaaf)-1] {
+				_cefg(_fagg)
+				if _gdaaf = _gddca.getRight(); _gdaaf != nil {
+					_ebgb(_gdaaf)
+					_gddca.put(_gddca._cfadc-1, _gddca._aaga-1, _afcf)
+				}
+				_dbdcb = true
+			}
+		}
+		if !_dbdcb && _fagg != nil {
+			_cefg(_fagg)
+			_dbdcb = true
+		}
+		if !_dbdcb && _gdaaf != nil {
+			_ebgb(_gdaaf)
+			_dbdcb = true
+		}
+		if !_dbdcb {
+			break
+		}
+	}
+}
+
+func (_gdfgf paraList) extractTables(_cdaae []gridTiling) paraList {
+	if _ggegb {
+		_bg.Log.Debug("\u0065\u0078\u0074r\u0061\u0063\u0074\u0054\u0061\u0062\u006c\u0065\u0073\u003d\u0025\u0064\u0020\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u0078\u003d\u003d\u003d\u003d=\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d", len(_gdfgf))
+	}
+	if len(_gdfgf) < _fdacb {
+		return _gdfgf
+	}
+	_aeada := _gdfgf.findTables(_cdaae)
+	if _ggegb {
+		_bg.Log.Info("c\u006f\u006d\u0062\u0069\u006e\u0065d\u0020\u0074\u0061\u0062\u006c\u0065s\u0020\u0025\u0064\u0020\u003d\u003d\u003d=\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d=\u003d", len(_aeada))
+		for _decf, _egbb := range _aeada {
+			_egbb.log(_fa.Sprintf("c\u006f\u006d\u0062\u0069\u006e\u0065\u0064\u0020\u0025\u0064", _decf))
+		}
+	}
+	return _gdfgf.applyTables(_aeada)
+}
+
+func _gdcb(_bada float64, _aeaa int) int {
+	if _aeaa == 0 {
+		_aeaa = 1
+	}
+	_adggd := float64(_aeaa)
+	return int(_c.Round(_bada/_adggd) * _adggd)
+}
+
+func (_adgba *textTable) getDown() paraList {
+	_gdebc := make(paraList, _adgba._cfadc)
+	for _cdag := 0; _cdag < _adgba._cfadc; _cdag++ {
+		_gfgda := _adgba.get(_cdag, _adgba._aaga-1)._gdae
+		if _gfgda.taken() {
+			return nil
+		}
+		_gdebc[_cdag] = _gfgda
+	}
+	for _beeae := 0; _beeae < _adgba._cfadc-1; _beeae++ {
+		if _gdebc[_beeae]._badad != _gdebc[_beeae+1] {
+			return nil
+		}
+	}
+	return _gdebc
+}
+
+func (_gebe *shapesState) lastpointEstablished() (_cd.Point, bool) {
+	if _gebe._eaba {
+		return _gebe._aaba, false
+	}
+	_efgeg := len(_gebe._fec)
+	if _efgeg > 0 && _gebe._fec[_efgeg-1]._bgfa {
+		return _gebe._fec[_efgeg-1].last(), false
+	}
+	return _cd.Point{}, true
+}
+
+func _aeebf(_ffea []*_ad.KValue, _bceef map[int][]*textLine, _gfgea _afa.PdfObject) []*list {
+	_agge := []*list{}
+	for _, _ecad := range _ffea {
+		_gece := _ecad.GetKDict()
+		_cdbga := _gece.GetChildren()
+		_gac := []*textLine{}
+		_acgd := []*list{}
+		_bbggb := _gece.S.(*_afa.PdfObjectName).String()
+		_baebd := _cdbga[0]
+		_bfdd := _baebd.GetMCID()
+		if len(_cdbga) == 1 && _bfdd != nil && *_bfdd != -1 {
+			if _gece.Pg == _gfgea {
+				_gac = _bceef[*_bfdd]
+			}
+		} else {
+			_acgd = _aeebf(_cdbga, _bceef, _gfgea)
+		}
+		_bbee := _cbda(_gac, _bbggb, _acgd)
+		_agge = append(_agge, _bbee)
+	}
+	return _agge
+}
+
+func _adba(_caf *wordBag, _beaea float64, _dcdd, _dfbbc rulingList, _dcbff bool) []*wordBag {
+	var _geddb []*wordBag
+	for _, _egdg := range _caf.depthIndexes() {
+		_fbeg := false
+		for !_caf.empty(_egdg) {
+			_facde := _caf.firstReadingIndex(_egdg)
+			_gccb := _caf.firstWord(_facde)
+			_cdgc := _aaea(_gccb, _beaea, _dcdd, _dfbbc)
+			_caf.removeWord(_gccb, _facde)
+			if _aebc {
+				_bg.Log.Info("\u0066\u0069\u0072\u0073\u0074\u0057\u006f\u0072\u0064\u0020\u005e\u005e^\u005e\u0020\u0025\u0073", _gccb.String())
+			}
+			for _gagd := true; _gagd; _gagd = _fbeg {
+				_fbeg = false
+				_adag := _cbcd * _cdgc._eagga
+				_ebaeg := _dgfc * _cdgc._eagga
+				if _dcbff {
+					_ebaeg = _c.MaxFloat64
+				}
+				_aadb := _ebed * _cdgc._eagga
+				if _aebc {
+					_bg.Log.Info("\u0070a\u0072a\u0057\u006f\u0072\u0064\u0073\u0020\u0064\u0065\u0070\u0074\u0068 \u0025\u002e\u0032\u0066 \u002d\u0020\u0025\u002e\u0032f\u0020\u006d\u0061\u0078\u0049\u006e\u0074\u0072\u0061\u0044\u0065\u0070\u0074\u0068\u0047\u0061\u0070\u003d\u0025\u002e\u0032\u0066\u0020\u006d\u0061\u0078\u0049\u006e\u0074\u0072\u0061R\u0065\u0061\u0064\u0069\u006e\u0067\u0047\u0061p\u003d\u0025\u002e\u0032\u0066", _cdgc.minDepth(), _cdgc.maxDepth(), _aadb, _ebaeg)
+				}
+				if _caf.scanBand("\u0076\u0065\u0072\u0074\u0069\u0063\u0061\u006c", _cdgc, _aabb(_geee, 0), _cdgc.minDepth()-_aadb, _cdgc.maxDepth()+_aadb, _ccdd, false, false) > 0 {
+					_fbeg = true
+				}
+				if _caf.scanBand("\u0068\u006f\u0072\u0069\u007a\u006f\u006e\u0074\u0061\u006c", _cdgc, _aabb(_geee, _ebaeg), _cdgc.minDepth(), _cdgc.maxDepth(), _gdged, false, false) > 0 {
+					_fbeg = true
+				}
+				if _fbeg {
+					continue
+				}
+				_afge := _caf.scanBand("", _cdgc, _aabb(_ccce, _adag), _cdgc.minDepth(), _cdgc.maxDepth(), _fbeca, true, false)
+				if _afge > 0 {
+					_gcdb := (_cdgc.maxDepth() - _cdgc.minDepth()) / _cdgc._eagga
+					if (_afge > 1 && float64(_afge) > 0.3*_gcdb) || _afge <= 10 {
+						if _caf.scanBand("\u006f\u0074\u0068e\u0072", _cdgc, _aabb(_ccce, _adag), _cdgc.minDepth(), _cdgc.maxDepth(), _fbeca, false, true) > 0 {
+							_fbeg = true
+						}
+					}
+				}
+			}
+			_geddb = append(_geddb, _cdgc)
+		}
+	}
+	return _geddb
+}
+
+type textState struct {
+	_daab  float64
+	_ccda  float64
+	_deeee float64
+	_dgd   float64
+	_dba   float64
+	_caad  RenderMode
+	_cfec  float64
+	_gdd   *_ad.PdfFont
+	_eccb  _ad.PdfRectangle
+	_fbef  int
+	_edabg int
+}
 
 // New returns an Extractor instance for extracting content from the input PDF page.
-func New (page *_ad .PdfPage )(*Extractor ,error ){return NewWithOptions (page ,nil )};
+func New(page *_ad.PdfPage) (*Extractor, error) { return NewWithOptions(page, nil) }
 
 // String returns a description of `b`.
-func (_cacfa *wordBag )String ()string {var _ecbb []string ;for _ ,_bbfa :=range _cacfa .depthIndexes (){_dfbgf :=_cacfa ._fdeg [_bbfa ];for _ ,_bggf :=range _dfbgf {_ecbb =append (_ecbb ,_bggf ._fgaa );};};return _fa .Sprintf ("\u0025.\u0032\u0066\u0020\u0066\u006f\u006e\u0074\u0073\u0069\u007a\u0065=\u0025\u002e\u0032\u0066\u0020\u0025\u0064\u0020\u0025\u0071",_cacfa .PdfRectangle ,_cacfa ._eagga ,len (_ecbb ),_ecbb );
-};func _agdf (_cgbc int ,_dbabb map[int ][]float64 )([]int ,int ){_fffb :=make ([]int ,_cgbc );_gbadbd :=0;for _fdaeb :=0;_fdaeb < _cgbc ;_fdaeb ++{_fffb [_fdaeb ]=_gbadbd ;_gbadbd +=len (_dbabb [_fdaeb ])+1;};return _fffb ,_gbadbd ;};func _ggeb (_dgcec _ad .PdfRectangle )rulingKind {_bced :=_dgcec .Width ();
-_ebgaa :=_dgcec .Height ();if _bced > _ebgaa {if _bced >=_cfda {return _cafa ;};}else {if _ebgaa >=_cfda {return _dcfdg ;};};return _gbgfg ;};func (_geeb *shapesState )quadraticTo (_fbdc ,_fdbg ,_dbac ,_eggf float64 ){if _acge {_bg .Log .Info ("\u0071\u0075\u0061d\u0072\u0061\u0074\u0069\u0063\u0054\u006f\u003a");
-};_geeb .addPoint (_dbac ,_eggf );};func _eedad (_gcbc ,_acbf float64 )bool {return _gcbc /_c .Max (_fbcg ,_acbf )< _efba };type textTable struct{_ad .PdfRectangle ;_cfadc ,_aaga int ;_cegab bool ;_eccda map[uint64 ]*textPara ;_cafd map[uint64 ]compositeCell ;
-};func (_gbg *TextMarkArray )getTextMarkAtOffset (_eeae int )*TextMark {for _ ,_eeaf :=range _gbg ._fde {if _eeaf .Offset ==_eeae {return &_eeaf ;};};return nil ;};func _edabd (_fcgda []pathSection ){if _aebca < 0.0{return ;};if _feda {_bg .Log .Info ("\u0067\u0072\u0061\u006e\u0075\u006c\u0061\u0072\u0069\u007a\u0065\u003a\u0020\u0025\u0064 \u0073u\u0062\u0070\u0061\u0074\u0068\u0020\u0073\u0065\u0063\u0074\u0069\u006f\u006e\u0073",len (_fcgda ));
-};for _ceceag ,_dcegc :=range _fcgda {for _aaac ,_ccbga :=range _dcegc ._fdgf {for _fcefd ,_eacd :=range _ccbga ._bfgb {_ccbga ._bfgb [_fcefd ]=_cd .Point {X :_egbe (_eacd .X ),Y :_egbe (_eacd .Y )};if _feda {_gbfca :=_ccbga ._bfgb [_fcefd ];if !_gbcfg (_eacd ,_gbfca ){_bgbgd :=_cd .Point {X :_gbfca .X -_eacd .X ,Y :_gbfca .Y -_eacd .Y };
-_fa .Printf ("\u0025\u0034d \u002d\u0020\u00254\u0064\u0020\u002d\u0020%4d\u003a %\u002e\u0032\u0066\u0020\u2192\u0020\u0025.2\u0066\u0020\u0028\u0025\u0067\u0029\u000a",_ceceag ,_aaac ,_fcefd ,_eacd ,_gbfca ,_bgbgd );};};};};};};func (_dbaf *textObject )getCurrentFont ()*_ad .PdfFont {_fgafd :=_dbaf ._dggef ._gdd ;
-if _fgafd ==nil {_bg .Log .Debug ("\u0045\u0052\u0052\u004f\u0052\u003a\u0020\u004e\u006f\u0020\u0066\u006f\u006e\u0074\u0020\u0064\u0065\u0066\u0069\u006e\u0065\u0064\u002e\u0020U\u0073\u0069\u006e\u0067\u0020d\u0065\u0066a\u0075\u006c\u0074\u002e");return _ad .DefaultFont ();
-};return _fgafd ;};
+func (_cacfa *wordBag) String() string {
+	var _ecbb []string
+	for _, _bbfa := range _cacfa.depthIndexes() {
+		_dfbgf := _cacfa._fdeg[_bbfa]
+		for _, _bggf := range _dfbgf {
+			_ecbb = append(_ecbb, _bggf._fgaa)
+		}
+	}
+	return _fa.Sprintf("\u0025.\u0032\u0066\u0020\u0066\u006f\u006e\u0074\u0073\u0069\u007a\u0065=\u0025\u002e\u0032\u0066\u0020\u0025\u0064\u0020\u0025\u0071", _cacfa.PdfRectangle, _cacfa._eagga, len(_ecbb), _ecbb)
+}
+
+func _agdf(_cgbc int, _dbabb map[int][]float64) ([]int, int) {
+	_fffb := make([]int, _cgbc)
+	_gbadbd := 0
+	for _fdaeb := 0; _fdaeb < _cgbc; _fdaeb++ {
+		_fffb[_fdaeb] = _gbadbd
+		_gbadbd += len(_dbabb[_fdaeb]) + 1
+	}
+	return _fffb, _gbadbd
+}
+
+func _ggeb(_dgcec _ad.PdfRectangle) rulingKind {
+	_bced := _dgcec.Width()
+	_ebgaa := _dgcec.Height()
+	if _bced > _ebgaa {
+		if _bced >= _cfda {
+			return _cafa
+		}
+	} else {
+		if _ebgaa >= _cfda {
+			return _dcfdg
+		}
+	}
+	return _gbgfg
+}
+
+func (_geeb *shapesState) quadraticTo(_fbdc, _fdbg, _dbac, _eggf float64) {
+	if _acge {
+		_bg.Log.Info("\u0071\u0075\u0061d\u0072\u0061\u0074\u0069\u0063\u0054\u006f\u003a")
+	}
+	_geeb.addPoint(_dbac, _eggf)
+}
+
+func _eedad(_gcbc, _acbf float64) bool { return _gcbc/_c.Max(_fbcg, _acbf) < _efba }
+
+type textTable struct {
+	_ad.PdfRectangle
+	_cfadc, _aaga int
+	_cegab        bool
+	_eccda        map[uint64]*textPara
+	_cafd         map[uint64]compositeCell
+}
+
+func (_gbg *TextMarkArray) getTextMarkAtOffset(_eeae int) *TextMark {
+	for _, _eeaf := range _gbg._fde {
+		if _eeaf.Offset == _eeae {
+			return &_eeaf
+		}
+	}
+	return nil
+}
+
+func _edabd(_fcgda []pathSection) {
+	if _aebca < 0.0 {
+		return
+	}
+	if _feda {
+		_bg.Log.Info("\u0067\u0072\u0061\u006e\u0075\u006c\u0061\u0072\u0069\u007a\u0065\u003a\u0020\u0025\u0064 \u0073u\u0062\u0070\u0061\u0074\u0068\u0020\u0073\u0065\u0063\u0074\u0069\u006f\u006e\u0073", len(_fcgda))
+	}
+	for _ceceag, _dcegc := range _fcgda {
+		for _aaac, _ccbga := range _dcegc._fdgf {
+			for _fcefd, _eacd := range _ccbga._bfgb {
+				_ccbga._bfgb[_fcefd] = _cd.Point{X: _egbe(_eacd.X), Y: _egbe(_eacd.Y)}
+				if _feda {
+					_gbfca := _ccbga._bfgb[_fcefd]
+					if !_gbcfg(_eacd, _gbfca) {
+						_bgbgd := _cd.Point{X: _gbfca.X - _eacd.X, Y: _gbfca.Y - _eacd.Y}
+						_fa.Printf("\u0025\u0034d \u002d\u0020\u00254\u0064\u0020\u002d\u0020%4d\u003a %\u002e\u0032\u0066\u0020\u2192\u0020\u0025.2\u0066\u0020\u0028\u0025\u0067\u0029\u000a", _ceceag, _aaac, _fcefd, _eacd, _gbfca, _bgbgd)
+					}
+				}
+			}
+		}
+	}
+}
+
+func (_dbaf *textObject) getCurrentFont() *_ad.PdfFont {
+	_fgafd := _dbaf._dggef._gdd
+	if _fgafd == nil {
+		_bg.Log.Debug("\u0045\u0052\u0052\u004f\u0052\u003a\u0020\u004e\u006f\u0020\u0066\u006f\u006e\u0074\u0020\u0064\u0065\u0066\u0069\u006e\u0065\u0064\u002e\u0020U\u0073\u0069\u006e\u0067\u0020d\u0065\u0066a\u0075\u006c\u0074\u002e")
+		return _ad.DefaultFont()
+	}
+	return _fgafd
+}
 
 // String returns a description of `w`.
-func (_daadf *textWord )String ()string {return _fa .Sprintf ("\u0025\u002e2\u0066\u0020\u0025\u0036\u002e\u0032\u0066\u0020\u0066\u006f\u006e\u0074\u0073\u0069\u007a\u0065\u003d\u0025\u002e\u0032\u0066\u0020\"%\u0073\u0022",_daadf ._fcgaa ,_daadf .PdfRectangle ,_daadf ._bbebf ,_daadf ._fgaa );
-};func _bbgff (_gdeaa map[float64 ]gridTile )[]float64 {_ebff :=make ([]float64 ,0,len (_gdeaa ));for _dbde :=range _gdeaa {_ebff =append (_ebff ,_dbde );};_eg .Float64s (_ebff );return _ebff ;};var _cbb =[]string {"\u0041\u004e","\u0041\u004e","\u0041\u004e","\u0041\u004e","\u0041\u004e","\u0041\u004e","\u004f\u004e","\u004f\u004e","\u0041\u004c","\u0045\u0054","\u0045\u0054","\u0041\u004c","\u0043\u0053","\u0041\u004c","\u004f\u004e","\u004f\u004e","\u004e\u0053\u004d","\u004e\u0053\u004d","\u004e\u0053\u004d","\u004e\u0053\u004d","\u004e\u0053\u004d","\u004e\u0053\u004d","\u004e\u0053\u004d","\u004e\u0053\u004d","\u004e\u0053\u004d","\u004e\u0053\u004d","\u004e\u0053\u004d","\u0041\u004c","\u0041\u004c","","\u0041\u004c","\u0041\u004c","\u0041\u004c","\u0041\u004c","\u0041\u004c","\u0041\u004c","\u0041\u004c","\u0041\u004c","\u0041\u004c","\u0041\u004c","\u0041\u004c","\u0041\u004c","\u0041\u004c","\u0041\u004c","\u0041\u004c","\u0041\u004c","\u0041\u004c","\u0041\u004c","\u0041\u004c","\u0041\u004c","\u0041\u004c","\u0041\u004c","\u0041\u004c","\u0041\u004c","\u0041\u004c","\u0041\u004c","\u0041\u004c","\u0041\u004c","\u0041\u004c","\u0041\u004c","\u0041\u004c","\u0041\u004c","\u0041\u004c","\u0041\u004c","\u0041\u004c","\u0041\u004c","\u0041\u004c","\u0041\u004c","\u0041\u004c","\u0041\u004c","\u0041\u004c","\u0041\u004c","\u0041\u004c","\u0041\u004c","\u0041\u004c","\u004e\u0053\u004d","\u004e\u0053\u004d","\u004e\u0053\u004d","\u004e\u0053\u004d","\u004e\u0053\u004d","\u004e\u0053\u004d","\u004e\u0053\u004d","\u004e\u0053\u004d","\u004e\u0053\u004d","\u004e\u0053\u004d","\u004e\u0053\u004d","\u004e\u0053\u004d","\u004e\u0053\u004d","\u004e\u0053\u004d","\u004e\u0053\u004d","\u004e\u0053\u004d","\u004e\u0053\u004d","\u004e\u0053\u004d","\u004e\u0053\u004d","\u004e\u0053\u004d","\u004e\u0053\u004d","\u0041\u004e","\u0041\u004e","\u0041\u004e","\u0041\u004e","\u0041\u004e","\u0041\u004e","\u0041\u004e","\u0041\u004e","\u0041\u004e","\u0041\u004e","\u0045\u0054","\u0041\u004e","\u0041\u004e","\u0041\u004c","\u0041\u004c","\u0041\u004c","\u004e\u0053\u004d","\u0041\u004c","\u0041\u004c","\u0041\u004c","\u0041\u004c","\u0041\u004c","\u0041\u004c","\u0041\u004c","\u0041\u004c","\u0041\u004c","\u0041\u004c","\u0041\u004c","\u0041\u004c","\u0041\u004c","\u0041\u004c","\u0041\u004c","\u0041\u004c","\u0041\u004c","\u0041\u004c","\u0041\u004c","\u0041\u004c","\u0041\u004c","\u0041\u004c","\u0041\u004c","\u0041\u004c","\u0041\u004c","\u0041\u004c","\u0041\u004c","\u0041\u004c","\u0041\u004c","\u0041\u004c","\u0041\u004c","\u0041\u004c","\u0041\u004c","\u0041\u004c","\u0041\u004c","\u0041\u004c","\u0041\u004c","\u0041\u004c","\u0041\u004c","\u0041\u004c","\u0041\u004c","\u0041\u004c","\u0041\u004c","\u0041\u004c","\u0041\u004c","\u0041\u004c","\u0041\u004c","\u0041\u004c","\u0041\u004c","\u0041\u004c","\u0041\u004c","\u0041\u004c","\u0041\u004c","\u0041\u004c","\u0041\u004c","\u0041\u004c","\u0041\u004c","\u0041\u004c","\u0041\u004c","\u0041\u004c","\u0041\u004c","\u0041\u004c","\u0041\u004c","\u0041\u004c","\u0041\u004c","\u0041\u004c","\u0041\u004c","\u0041\u004c","\u0041\u004c","\u0041\u004c","\u0041\u004c","\u0041\u004c","\u0041\u004c","\u0041\u004c","\u0041\u004c","\u0041\u004c","\u0041\u004c","\u0041\u004c","\u0041\u004c","\u0041\u004c","\u0041\u004c","\u0041\u004c","\u0041\u004c","\u0041\u004c","\u0041\u004c","\u0041\u004c","\u0041\u004c","\u0041\u004c","\u0041\u004c","\u0041\u004c","\u0041\u004c","\u0041\u004c","\u0041\u004c","\u0041\u004c","\u0041\u004c","\u0041\u004c","\u0041\u004c","\u0041\u004c","\u0041\u004c","\u0041\u004c","\u0041\u004c","\u004e\u0053\u004d","\u004e\u0053\u004d","\u004e\u0053\u004d","\u004e\u0053\u004d","\u004e\u0053\u004d","\u004e\u0053\u004d","\u004e\u0053\u004d","\u0041\u004e","\u004f\u004e","\u004e\u0053\u004d","\u004e\u0053\u004d","\u004e\u0053\u004d","\u004e\u0053\u004d","\u004e\u0053\u004d","\u004e\u0053\u004d","\u0041\u004c","\u0041\u004c","\u004e\u0053\u004d","\u004e\u0053\u004d","\u004f\u004e","\u004e\u0053\u004d","\u004e\u0053\u004d","\u004e\u0053\u004d","\u004e\u0053\u004d","\u0041\u004c","\u0041\u004c","\u0045\u004e","\u0045\u004e","\u0045\u004e","\u0045\u004e","\u0045\u004e","\u0045\u004e","\u0045\u004e","\u0045\u004e","\u0045\u004e","\u0045\u004e","\u0041\u004c","\u0041\u004c","\u0041\u004c","\u0041\u004c","\u0041\u004c","\u0041\u004c"};
-const (RenderModeStroke RenderMode =1<<iota ;RenderModeFill ;RenderModeClip ;);func _fgggd (_beffd *_ad .Image ,_dbfb _cb .Color )_cg .Image {_bedf ,_badg :=int (_beffd .Width ),int (_beffd .Height );_aageb :=_cg .NewRGBA (_cg .Rect (0,0,_bedf ,_badg ));
-for _ggdf :=0;_ggdf < _badg ;_ggdf ++{for _edcga :=0;_edcga < _bedf ;_edcga ++{_cfge ,_ebdf :=_beffd .ColorAt (_edcga ,_ggdf );if _ebdf !=nil {_bg .Log .Debug ("\u0057\u0041\u0052\u004e\u003a\u0020\u0063o\u0075\u006c\u0064\u0020\u006e\u006f\u0074\u0020\u0072\u0065\u0074\u0072\u0069\u0065v\u0065 \u0069\u006d\u0061\u0067\u0065\u0020m\u0061\u0073\u006b\u0020\u0076\u0061\u006cu\u0065\u0020\u0061\u0074\u0020\u0028\u0025\u0064\u002c\u0020\u0025\u0064\u0029\u002e\u0020\u004f\u0075\u0074\u0070\u0075\u0074\u0020\u006da\u0079\u0020\u0062\u0065\u0020\u0069\u006e\u0063\u006f\u0072\u0072\u0065\u0063t\u002e",_edcga ,_ggdf );
-continue ;};_agfag ,_afbef ,_eaag ,_ :=_cfge .RGBA ();var _ebbcf _cb .Color ;if _agfag +_afbef +_eaag ==0{_ebbcf =_cb .Transparent ;}else {_ebbcf =_dbfb ;};_aageb .Set (_edcga ,_ggdf ,_ebbcf );};};return _aageb ;};
+func (_daadf *textWord) String() string {
+	return _fa.Sprintf("\u0025\u002e2\u0066\u0020\u0025\u0036\u002e\u0032\u0066\u0020\u0066\u006f\u006e\u0074\u0073\u0069\u007a\u0065\u003d\u0025\u002e\u0032\u0066\u0020\"%\u0073\u0022", _daadf._fcgaa, _daadf.PdfRectangle, _daadf._bbebf, _daadf._fgaa)
+}
+
+func _bbgff(_gdeaa map[float64]gridTile) []float64 {
+	_ebff := make([]float64, 0, len(_gdeaa))
+	for _dbde := range _gdeaa {
+		_ebff = append(_ebff, _dbde)
+	}
+	_eg.Float64s(_ebff)
+	return _ebff
+}
+
+var _cbb = []string{"\u0041\u004e", "\u0041\u004e", "\u0041\u004e", "\u0041\u004e", "\u0041\u004e", "\u0041\u004e", "\u004f\u004e", "\u004f\u004e", "\u0041\u004c", "\u0045\u0054", "\u0045\u0054", "\u0041\u004c", "\u0043\u0053", "\u0041\u004c", "\u004f\u004e", "\u004f\u004e", "\u004e\u0053\u004d", "\u004e\u0053\u004d", "\u004e\u0053\u004d", "\u004e\u0053\u004d", "\u004e\u0053\u004d", "\u004e\u0053\u004d", "\u004e\u0053\u004d", "\u004e\u0053\u004d", "\u004e\u0053\u004d", "\u004e\u0053\u004d", "\u004e\u0053\u004d", "\u0041\u004c", "\u0041\u004c", "", "\u0041\u004c", "\u0041\u004c", "\u0041\u004c", "\u0041\u004c", "\u0041\u004c", "\u0041\u004c", "\u0041\u004c", "\u0041\u004c", "\u0041\u004c", "\u0041\u004c", "\u0041\u004c", "\u0041\u004c", "\u0041\u004c", "\u0041\u004c", "\u0041\u004c", "\u0041\u004c", "\u0041\u004c", "\u0041\u004c", "\u0041\u004c", "\u0041\u004c", "\u0041\u004c", "\u0041\u004c", "\u0041\u004c", "\u0041\u004c", "\u0041\u004c", "\u0041\u004c", "\u0041\u004c", "\u0041\u004c", "\u0041\u004c", "\u0041\u004c", "\u0041\u004c", "\u0041\u004c", "\u0041\u004c", "\u0041\u004c", "\u0041\u004c", "\u0041\u004c", "\u0041\u004c", "\u0041\u004c", "\u0041\u004c", "\u0041\u004c", "\u0041\u004c", "\u0041\u004c", "\u0041\u004c", "\u0041\u004c", "\u0041\u004c", "\u004e\u0053\u004d", "\u004e\u0053\u004d", "\u004e\u0053\u004d", "\u004e\u0053\u004d", "\u004e\u0053\u004d", "\u004e\u0053\u004d", "\u004e\u0053\u004d", "\u004e\u0053\u004d", "\u004e\u0053\u004d", "\u004e\u0053\u004d", "\u004e\u0053\u004d", "\u004e\u0053\u004d", "\u004e\u0053\u004d", "\u004e\u0053\u004d", "\u004e\u0053\u004d", "\u004e\u0053\u004d", "\u004e\u0053\u004d", "\u004e\u0053\u004d", "\u004e\u0053\u004d", "\u004e\u0053\u004d", "\u004e\u0053\u004d", "\u0041\u004e", "\u0041\u004e", "\u0041\u004e", "\u0041\u004e", "\u0041\u004e", "\u0041\u004e", "\u0041\u004e", "\u0041\u004e", "\u0041\u004e", "\u0041\u004e", "\u0045\u0054", "\u0041\u004e", "\u0041\u004e", "\u0041\u004c", "\u0041\u004c", "\u0041\u004c", "\u004e\u0053\u004d", "\u0041\u004c", "\u0041\u004c", "\u0041\u004c", "\u0041\u004c", "\u0041\u004c", "\u0041\u004c", "\u0041\u004c", "\u0041\u004c", "\u0041\u004c", "\u0041\u004c", "\u0041\u004c", "\u0041\u004c", "\u0041\u004c", "\u0041\u004c", "\u0041\u004c", "\u0041\u004c", "\u0041\u004c", "\u0041\u004c", "\u0041\u004c", "\u0041\u004c", "\u0041\u004c", "\u0041\u004c", "\u0041\u004c", "\u0041\u004c", "\u0041\u004c", "\u0041\u004c", "\u0041\u004c", "\u0041\u004c", "\u0041\u004c", "\u0041\u004c", "\u0041\u004c", "\u0041\u004c", "\u0041\u004c", "\u0041\u004c", "\u0041\u004c", "\u0041\u004c", "\u0041\u004c", "\u0041\u004c", "\u0041\u004c", "\u0041\u004c", "\u0041\u004c", "\u0041\u004c", "\u0041\u004c", "\u0041\u004c", "\u0041\u004c", "\u0041\u004c", "\u0041\u004c", "\u0041\u004c", "\u0041\u004c", "\u0041\u004c", "\u0041\u004c", "\u0041\u004c", "\u0041\u004c", "\u0041\u004c", "\u0041\u004c", "\u0041\u004c", "\u0041\u004c", "\u0041\u004c", "\u0041\u004c", "\u0041\u004c", "\u0041\u004c", "\u0041\u004c", "\u0041\u004c", "\u0041\u004c", "\u0041\u004c", "\u0041\u004c", "\u0041\u004c", "\u0041\u004c", "\u0041\u004c", "\u0041\u004c", "\u0041\u004c", "\u0041\u004c", "\u0041\u004c", "\u0041\u004c", "\u0041\u004c", "\u0041\u004c", "\u0041\u004c", "\u0041\u004c", "\u0041\u004c", "\u0041\u004c", "\u0041\u004c", "\u0041\u004c", "\u0041\u004c", "\u0041\u004c", "\u0041\u004c", "\u0041\u004c", "\u0041\u004c", "\u0041\u004c", "\u0041\u004c", "\u0041\u004c", "\u0041\u004c", "\u0041\u004c", "\u0041\u004c", "\u0041\u004c", "\u0041\u004c", "\u0041\u004c", "\u0041\u004c", "\u0041\u004c", "\u0041\u004c", "\u0041\u004c", "\u0041\u004c", "\u004e\u0053\u004d", "\u004e\u0053\u004d", "\u004e\u0053\u004d", "\u004e\u0053\u004d", "\u004e\u0053\u004d", "\u004e\u0053\u004d", "\u004e\u0053\u004d", "\u0041\u004e", "\u004f\u004e", "\u004e\u0053\u004d", "\u004e\u0053\u004d", "\u004e\u0053\u004d", "\u004e\u0053\u004d", "\u004e\u0053\u004d", "\u004e\u0053\u004d", "\u0041\u004c", "\u0041\u004c", "\u004e\u0053\u004d", "\u004e\u0053\u004d", "\u004f\u004e", "\u004e\u0053\u004d", "\u004e\u0053\u004d", "\u004e\u0053\u004d", "\u004e\u0053\u004d", "\u0041\u004c", "\u0041\u004c", "\u0045\u004e", "\u0045\u004e", "\u0045\u004e", "\u0045\u004e", "\u0045\u004e", "\u0045\u004e", "\u0045\u004e", "\u0045\u004e", "\u0045\u004e", "\u0045\u004e", "\u0041\u004c", "\u0041\u004c", "\u0041\u004c", "\u0041\u004c", "\u0041\u004c", "\u0041\u004c"}
+
+const (
+	RenderModeStroke RenderMode = 1 << iota
+	RenderModeFill
+	RenderModeClip
+)
+
+func _fgggd(_beffd *_ad.Image, _dbfb _cb.Color) _cg.Image {
+	_bedf, _badg := int(_beffd.Width), int(_beffd.Height)
+	_aageb := _cg.NewRGBA(_cg.Rect(0, 0, _bedf, _badg))
+	for _ggdf := 0; _ggdf < _badg; _ggdf++ {
+		for _edcga := 0; _edcga < _bedf; _edcga++ {
+			_cfge, _ebdf := _beffd.ColorAt(_edcga, _ggdf)
+			if _ebdf != nil {
+				_bg.Log.Debug("\u0057\u0041\u0052\u004e\u003a\u0020\u0063o\u0075\u006c\u0064\u0020\u006e\u006f\u0074\u0020\u0072\u0065\u0074\u0072\u0069\u0065v\u0065 \u0069\u006d\u0061\u0067\u0065\u0020m\u0061\u0073\u006b\u0020\u0076\u0061\u006cu\u0065\u0020\u0061\u0074\u0020\u0028\u0025\u0064\u002c\u0020\u0025\u0064\u0029\u002e\u0020\u004f\u0075\u0074\u0070\u0075\u0074\u0020\u006da\u0079\u0020\u0062\u0065\u0020\u0069\u006e\u0063\u006f\u0072\u0072\u0065\u0063t\u002e", _edcga, _ggdf)
+				continue
+			}
+			_agfag, _afbef, _eaag, _ := _cfge.RGBA()
+			var _ebbcf _cb.Color
+			if _agfag+_afbef+_eaag == 0 {
+				_ebbcf = _cb.Transparent
+			} else {
+				_ebbcf = _dbfb
+			}
+			_aageb.Set(_edcga, _ggdf, _ebbcf)
+		}
+	}
+	return _aageb
+}
 
 // String returns a string describing `pt`.
-func (_edafb PageText )String ()string {_eca :=_fa .Sprintf ("P\u0061\u0067\u0065\u0054ex\u0074:\u0020\u0025\u0064\u0020\u0065l\u0065\u006d\u0065\u006e\u0074\u0073",len (_edafb ._baaa ));_ecce :=[]string {"\u002d"+_eca };for _ ,_dbbad :=range _edafb ._baaa {_ecce =append (_ecce ,_dbbad .String ());
-};_ecce =append (_ecce ,"\u002b"+_eca );return _faf .Join (_ecce ,"\u000a");};func _dcee (_efaba ,_agdg float64 )string {_fbce :=!_edec (_efaba -_agdg );if _fbce {return "\u000a";};return "\u0020";};
+func (_edafb PageText) String() string {
+	_eca := _fa.Sprintf("P\u0061\u0067\u0065\u0054ex\u0074:\u0020\u0025\u0064\u0020\u0065l\u0065\u006d\u0065\u006e\u0074\u0073", len(_edafb._baaa))
+	_ecce := []string{"\u002d" + _eca}
+	for _, _dbbad := range _edafb._baaa {
+		_ecce = append(_ecce, _dbbad.String())
+	}
+	_ecce = append(_ecce, "\u002b"+_eca)
+	return _faf.Join(_ecce, "\u000a")
+}
+
+func _dcee(_efaba, _agdg float64) string {
+	_fbce := !_edec(_efaba - _agdg)
+	if _fbce {
+		return "\u000a"
+	}
+	return "\u0020"
+}
 
 // BBox returns the smallest axis-aligned rectangle that encloses all the TextMarks in `ma`.
-func (_cecd *TextMarkArray )BBox ()(_ad .PdfRectangle ,bool ){var _afcc _ad .PdfRectangle ;_ebbc :=false ;for _ ,_bdbg :=range _cecd ._fde {if _bdbg .Meta ||_ecdc (_bdbg .Text ){continue ;};if _ebbc {_afcc =_faea (_afcc ,_bdbg .BBox );}else {_afcc =_bdbg .BBox ;
-_ebbc =true ;};};return _afcc ,_ebbc ;};func (_bfddd paraList )readBefore (_cgfe []int ,_eecc ,_bcfg int )bool {_egedg ,_abdd :=_bfddd [_eecc ],_bfddd [_bcfg ];if _febc (_egedg ,_abdd )&&_egedg .Lly > _abdd .Lly {return true ;};if !(_egedg ._cbfdb .Urx < _abdd ._cbfdb .Llx ){return false ;
-};_bbdb ,_ecgf :=_egedg .Lly ,_abdd .Lly ;if _bbdb > _ecgf {_ecgf ,_bbdb =_bbdb ,_ecgf ;};_eefbb :=_c .Max (_egedg ._cbfdb .Llx ,_abdd ._cbfdb .Llx );_acaae :=_c .Min (_egedg ._cbfdb .Urx ,_abdd ._cbfdb .Urx );_fecb :=_bfddd .llyRange (_cgfe ,_bbdb ,_ecgf );
-for _ ,_fedc :=range _fecb {if _fedc ==_eecc ||_fedc ==_bcfg {continue ;};_bgdc :=_bfddd [_fedc ];if _bgdc ._cbfdb .Llx <=_acaae &&_eefbb <=_bgdc ._cbfdb .Urx {return false ;};};return true ;};func (_efgaa *subpath )isQuadrilateral ()bool {if len (_efgaa ._bfgb )< 4||len (_efgaa ._bfgb )> 5{return false ;
-};if len (_efgaa ._bfgb )==5{_ffbag :=_efgaa ._bfgb [0];_acdc :=_efgaa ._bfgb [4];if _ffbag .X !=_acdc .X ||_ffbag .Y !=_acdc .Y {return false ;};};return true ;};func (_agba paraList )findGridTables (_agged []gridTiling )[]*textTable {if _ggegb {_bg .Log .Info ("\u0066i\u006e\u0064\u0047\u0072\u0069\u0064\u0054\u0061\u0062\u006c\u0065s\u003a\u0020\u0025\u0064\u0020\u0070\u0061\u0072\u0061\u0073",len (_agba ));
-for _cedg ,_ceebd :=range _agba {_fa .Printf ("\u0025\u0034\u0064\u003a\u0020\u0025\u0073\u000a",_cedg ,_ceebd );};};var _dgeec []*textTable ;for _feffa ,_bdcd :=range _agged {_edadg ,_gafad :=_agba .findTableGrid (_bdcd );if _edadg !=nil {_edadg .log (_fa .Sprintf ("\u0066\u0069\u006e\u0064Ta\u0062\u006c\u0065\u0057\u0069\u0074\u0068\u0047\u0072\u0069\u0064\u0073\u003a\u0020%\u0064",_feffa ));
-_dgeec =append (_dgeec ,_edadg );_edadg .markCells ();};for _baggd :=range _gafad {_baggd ._bdfe =true ;};};if _ggegb {_bg .Log .Info ("\u0066i\u006e\u0064\u0047\u0072i\u0064\u0054\u0061\u0062\u006ce\u0073:\u0020%\u0064\u0020\u0074\u0061\u0062\u006c\u0065s",len (_dgeec ));
-};return _dgeec ;};
+func (_cecd *TextMarkArray) BBox() (_ad.PdfRectangle, bool) {
+	var _afcc _ad.PdfRectangle
+	_ebbc := false
+	for _, _bdbg := range _cecd._fde {
+		if _bdbg.Meta || _ecdc(_bdbg.Text) {
+			continue
+		}
+		if _ebbc {
+			_afcc = _faea(_afcc, _bdbg.BBox)
+		} else {
+			_afcc = _bdbg.BBox
+			_ebbc = true
+		}
+	}
+	return _afcc, _ebbc
+}
+
+func (_bfddd paraList) readBefore(_cgfe []int, _eecc, _bcfg int) bool {
+	_egedg, _abdd := _bfddd[_eecc], _bfddd[_bcfg]
+	if _febc(_egedg, _abdd) && _egedg.Lly > _abdd.Lly {
+		return true
+	}
+	if !(_egedg._cbfdb.Urx < _abdd._cbfdb.Llx) {
+		return false
+	}
+	_bbdb, _ecgf := _egedg.Lly, _abdd.Lly
+	if _bbdb > _ecgf {
+		_ecgf, _bbdb = _bbdb, _ecgf
+	}
+	_eefbb := _c.Max(_egedg._cbfdb.Llx, _abdd._cbfdb.Llx)
+	_acaae := _c.Min(_egedg._cbfdb.Urx, _abdd._cbfdb.Urx)
+	_fecb := _bfddd.llyRange(_cgfe, _bbdb, _ecgf)
+	for _, _fedc := range _fecb {
+		if _fedc == _eecc || _fedc == _bcfg {
+			continue
+		}
+		_bgdc := _bfddd[_fedc]
+		if _bgdc._cbfdb.Llx <= _acaae && _eefbb <= _bgdc._cbfdb.Urx {
+			return false
+		}
+	}
+	return true
+}
+
+func (_efgaa *subpath) isQuadrilateral() bool {
+	if len(_efgaa._bfgb) < 4 || len(_efgaa._bfgb) > 5 {
+		return false
+	}
+	if len(_efgaa._bfgb) == 5 {
+		_ffbag := _efgaa._bfgb[0]
+		_acdc := _efgaa._bfgb[4]
+		if _ffbag.X != _acdc.X || _ffbag.Y != _acdc.Y {
+			return false
+		}
+	}
+	return true
+}
+
+func (_agba paraList) findGridTables(_agged []gridTiling) []*textTable {
+	if _ggegb {
+		_bg.Log.Info("\u0066i\u006e\u0064\u0047\u0072\u0069\u0064\u0054\u0061\u0062\u006c\u0065s\u003a\u0020\u0025\u0064\u0020\u0070\u0061\u0072\u0061\u0073", len(_agba))
+		for _cedg, _ceebd := range _agba {
+			_fa.Printf("\u0025\u0034\u0064\u003a\u0020\u0025\u0073\u000a", _cedg, _ceebd)
+		}
+	}
+	var _dgeec []*textTable
+	for _feffa, _bdcd := range _agged {
+		_edadg, _gafad := _agba.findTableGrid(_bdcd)
+		if _edadg != nil {
+			_edadg.log(_fa.Sprintf("\u0066\u0069\u006e\u0064Ta\u0062\u006c\u0065\u0057\u0069\u0074\u0068\u0047\u0072\u0069\u0064\u0073\u003a\u0020%\u0064", _feffa))
+			_dgeec = append(_dgeec, _edadg)
+			_edadg.markCells()
+		}
+		for _baggd := range _gafad {
+			_baggd._bdfe = true
+		}
+	}
+	if _ggegb {
+		_bg.Log.Info("\u0066i\u006e\u0064\u0047\u0072i\u0064\u0054\u0061\u0062\u006ce\u0073:\u0020%\u0064\u0020\u0074\u0061\u0062\u006c\u0065s", len(_dgeec))
+	}
+	return _dgeec
+}
 
 // String returns a string describing `tm`.
-func (_afaffb TextMark )String ()string {_eafb :=_afaffb .BBox ;var _egff string ;if _afaffb .Font !=nil {_egff =_afaffb .Font .String ();if len (_egff )> 50{_egff =_egff [:50]+"\u002e\u002e\u002e";};};var _eegg string ;if _afaffb .Meta {_eegg ="\u0020\u002a\u004d\u002a";
-};return _fa .Sprintf ("\u007b\u0054\u0065\u0078t\u004d\u0061\u0072\u006b\u003a\u0020\u0025\u0064\u0020%\u0071\u003d\u0025\u0030\u0032\u0078\u0020\u0028\u0025\u0036\u002e\u0032\u0066\u002c\u0020\u0025\u0036\u002e2\u0066\u0029\u0020\u0028\u00256\u002e\u0032\u0066\u002c\u0020\u0025\u0036\u002e\u0032\u0066\u0029\u0020\u0025\u0073\u0025\u0073\u007d",_afaffb .Offset ,_afaffb .Text ,[]rune (_afaffb .Text ),_eafb .Llx ,_eafb .Lly ,_eafb .Urx ,_eafb .Ury ,_egff ,_eegg );
-};func _fedcc (_ggdaa *_ad .Image ,_eedae _cb .Color )_cg .Image {_gffd ,_efaaa :=int (_ggdaa .Width ),int (_ggdaa .Height );_cbffa :=_cg .NewRGBA (_cg .Rect (0,0,_gffd ,_efaaa ));for _ceeg :=0;_ceeg < _efaaa ;_ceeg ++{for _adffe :=0;_adffe < _gffd ;_adffe ++{_eaaa ,_accfd :=_ggdaa .ColorAt (_adffe ,_ceeg );
-if _accfd !=nil {_bg .Log .Debug ("\u0057\u0041\u0052\u004e\u003a\u0020\u0063o\u0075\u006c\u0064\u0020\u006e\u006f\u0074\u0020\u0072\u0065\u0074\u0072\u0069\u0065v\u0065 \u0069\u006d\u0061\u0067\u0065\u0020m\u0061\u0073\u006b\u0020\u0076\u0061\u006cu\u0065\u0020\u0061\u0074\u0020\u0028\u0025\u0064\u002c\u0020\u0025\u0064\u0029\u002e\u0020\u004f\u0075\u0074\u0070\u0075\u0074\u0020\u006da\u0079\u0020\u0062\u0065\u0020\u0069\u006e\u0063\u006f\u0072\u0072\u0065\u0063t\u002e",_adffe ,_ceeg );
-continue ;};_efagb ,_becb ,_agadc ,_ :=_eaaa .RGBA ();var _bgdg _cb .Color ;if _efagb +_becb +_agadc ==0{_bgdg =_eedae ;}else {_bgdg =_cb .Transparent ;};_cbffa .Set (_adffe ,_ceeg ,_bgdg );};};return _cbffa ;};
+func (_afaffb TextMark) String() string {
+	_eafb := _afaffb.BBox
+	var _egff string
+	if _afaffb.Font != nil {
+		_egff = _afaffb.Font.String()
+		if len(_egff) > 50 {
+			_egff = _egff[:50] + "\u002e\u002e\u002e"
+		}
+	}
+	var _eegg string
+	if _afaffb.Meta {
+		_eegg = "\u0020\u002a\u004d\u002a"
+	}
+	return _fa.Sprintf("\u007b\u0054\u0065\u0078t\u004d\u0061\u0072\u006b\u003a\u0020\u0025\u0064\u0020%\u0071\u003d\u0025\u0030\u0032\u0078\u0020\u0028\u0025\u0036\u002e\u0032\u0066\u002c\u0020\u0025\u0036\u002e2\u0066\u0029\u0020\u0028\u00256\u002e\u0032\u0066\u002c\u0020\u0025\u0036\u002e\u0032\u0066\u0029\u0020\u0025\u0073\u0025\u0073\u007d", _afaffb.Offset, _afaffb.Text, []rune(_afaffb.Text), _eafb.Llx, _eafb.Lly, _eafb.Urx, _eafb.Ury, _egff, _eegg)
+}
+
+func _fedcc(_ggdaa *_ad.Image, _eedae _cb.Color) _cg.Image {
+	_gffd, _efaaa := int(_ggdaa.Width), int(_ggdaa.Height)
+	_cbffa := _cg.NewRGBA(_cg.Rect(0, 0, _gffd, _efaaa))
+	for _ceeg := 0; _ceeg < _efaaa; _ceeg++ {
+		for _adffe := 0; _adffe < _gffd; _adffe++ {
+			_eaaa, _accfd := _ggdaa.ColorAt(_adffe, _ceeg)
+			if _accfd != nil {
+				_bg.Log.Debug("\u0057\u0041\u0052\u004e\u003a\u0020\u0063o\u0075\u006c\u0064\u0020\u006e\u006f\u0074\u0020\u0072\u0065\u0074\u0072\u0069\u0065v\u0065 \u0069\u006d\u0061\u0067\u0065\u0020m\u0061\u0073\u006b\u0020\u0076\u0061\u006cu\u0065\u0020\u0061\u0074\u0020\u0028\u0025\u0064\u002c\u0020\u0025\u0064\u0029\u002e\u0020\u004f\u0075\u0074\u0070\u0075\u0074\u0020\u006da\u0079\u0020\u0062\u0065\u0020\u0069\u006e\u0063\u006f\u0072\u0072\u0065\u0063t\u002e", _adffe, _ceeg)
+				continue
+			}
+			_efagb, _becb, _agadc, _ := _eaaa.RGBA()
+			var _bgdg _cb.Color
+			if _efagb+_becb+_agadc == 0 {
+				_bgdg = _eedae
+			} else {
+				_bgdg = _cb.Transparent
+			}
+			_cbffa.Set(_adffe, _ceeg, _bgdg)
+		}
+	}
+	return _cbffa
+}
 
 // TextMark represents extracted text on a page with information regarding both textual content,
 // formatting (font and size) and positioning.
@@ -949,143 +6819,735 @@ continue ;};_efagb ,_becb ,_agadc ,_ :=_eaaa .RGBA ();var _bgdg _cb .Color ;if _
 //	 // handle errors
 //	 bbox, ok := spanMarks.BBox()
 //	 // handle errors
-type TextMark struct{
+type TextMark struct {
 
-// Text is the extracted text.
-Text string ;
+	// Text is the extracted text.
+	Text string
 
-// Original is the text in the PDF. It has not been decoded like `Text`.
-Original string ;
+	// Original is the text in the PDF. It has not been decoded like `Text`.
+	Original string
 
-// BBox is the bounding box of the text.
-BBox _ad .PdfRectangle ;
+	// BBox is the bounding box of the text.
+	BBox _ad.PdfRectangle
 
-// Font is the font the text was drawn with.
-Font *_ad .PdfFont ;
+	// Font is the font the text was drawn with.
+	Font *_ad.PdfFont
 
-// FontSize is the font size the text was drawn with.
-FontSize float64 ;
+	// FontSize is the font size the text was drawn with.
+	FontSize float64
 
-// Offset is the offset of the start of TextMark.Text in the extracted text. If you do this
-//   text, textMarks := pageText.Text(), pageText.Marks()
-//   marks := textMarks.Elements()
-// then marks[i].Offset is the offset of marks[i].Text in text.
-Offset int ;
+	// Offset is the offset of the start of TextMark.Text in the extracted text. If you do this
+	//   text, textMarks := pageText.Text(), pageText.Marks()
+	//   marks := textMarks.Elements()
+	// then marks[i].Offset is the offset of marks[i].Text in text.
+	Offset int
 
-// Meta is set true for spaces and line breaks that we insert in the extracted text. We insert
-// spaces (line breaks) when we see characters that are over a threshold horizontal (vertical)
-//  distance  apart. See wordJoiner (lineJoiner) in PageText.computeViews().
-Meta bool ;
+	// Meta is set true for spaces and line breaks that we insert in the extracted text. We insert
+	// spaces (line breaks) when we see characters that are over a threshold horizontal (vertical)
+	//  distance  apart. See wordJoiner (lineJoiner) in PageText.computeViews().
+	Meta bool
 
-// FillColor is the fill color of the text.
-// The color is nil for spaces and line breaks (i.e. the Meta field is true).
-FillColor _cb .Color ;
+	// FillColor is the fill color of the text.
+	// The color is nil for spaces and line breaks (i.e. the Meta field is true).
+	FillColor _cb.Color
 
-// StrokeColor is the stroke color of the text.
-// The color is nil for spaces and line breaks (i.e. the Meta field is true).
-StrokeColor _cb .Color ;
+	// StrokeColor is the stroke color of the text.
+	// The color is nil for spaces and line breaks (i.e. the Meta field is true).
+	StrokeColor _cb.Color
 
-// Orientation is the text orientation
-Orientation int ;
+	// Orientation is the text orientation
+	Orientation int
 
-// DirectObject is the underlying PdfObject (Text Object) that represents the visible texts. This is introduced to get
-// a simple access to the TextObject in case editing or replacment of some text is needed. E.g during redaction.
-DirectObject _afa .PdfObject ;
+	// DirectObject is the underlying PdfObject (Text Object) that represents the visible texts. This is introduced to get
+	// a simple access to the TextObject in case editing or replacment of some text is needed. E.g during redaction.
+	DirectObject _afa.PdfObject
 
-// ObjString is a decoded string operand of a text-showing operator. It has the same value as `Text` attribute except
-// when many glyphs are represented with the same Text Object that contains multiple length string operand in which case
-// ObjString spans more than one character string that falls in different TextMark objects.
-ObjString []string ;Tw float64 ;Th float64 ;Tc float64 ;Index int ;_eace bool ;_ggdea *TextTable ;};
+	// ObjString is a decoded string operand of a text-showing operator. It has the same value as `Text` attribute except
+	// when many glyphs are represented with the same Text Object that contains multiple length string operand in which case
+	// ObjString spans more than one character string that falls in different TextMark objects.
+	ObjString []string
+	Tw        float64
+	Th        float64
+	Tc        float64
+	Index     int
+	_eace     bool
+	_ggdea    *TextTable
+}
 
 // String returns a human readable description of `ss`.
-func (_eaff *shapesState )String ()string {return _fa .Sprintf ("\u007b\u0025\u0064\u0020su\u0062\u0070\u0061\u0074\u0068\u0073\u0020\u0066\u0072\u0065\u0073\u0068\u003d\u0025t\u007d",len (_eaff ._fec ),_eaff ._eaba );};func (_abcbg paraList )eventNeighbours (_daaae []event )map[*textPara ][]int {_eg .Slice (_daaae ,func (_gaacdd ,_bebb int )bool {_cbbe ,_ddbb :=_daaae [_gaacdd ],_daaae [_bebb ];
-_efffe ,_ffbb :=_cbbe ._ggcee ,_ddbb ._ggcee ;if _efffe !=_ffbb {return _efffe < _ffbb ;};if _cbbe ._ebbd !=_ddbb ._ebbd {return _cbbe ._ebbd ;};return _gaacdd < _bebb ;});_bdbfe :=make (map[int ]intSet );_edbga :=make (intSet );for _ ,_defeg :=range _daaae {if _defeg ._ebbd {_bdbfe [_defeg ._dffg ]=make (intSet );
-for _fadca :=range _edbga {if _fadca !=_defeg ._dffg {_bdbfe [_defeg ._dffg ].add (_fadca );_bdbfe [_fadca ].add (_defeg ._dffg );};};_edbga .add (_defeg ._dffg );}else {_edbga .del (_defeg ._dffg );};};_egfg :=map[*textPara ][]int {};for _bddgf ,_eedab :=range _bdbfe {_cabdd :=_abcbg [_bddgf ];
-if len (_eedab )==0{_egfg [_cabdd ]=nil ;continue ;};_fdaga :=make ([]int ,len (_eedab ));_baeg :=0;for _ead :=range _eedab {_fdaga [_baeg ]=_ead ;_baeg ++;};_egfg [_cabdd ]=_fdaga ;};return _egfg ;};func (_bfaf *textMark )inDiacriticArea (_afbe *textMark )bool {_cegc :=_bfaf .Llx -_afbe .Llx ;
-_deae :=_bfaf .Urx -_afbe .Urx ;_gbca :=_bfaf .Lly -_afbe .Lly ;return _c .Abs (_cegc +_deae )< _bfaf .Width ()*_fbdbe &&_c .Abs (_gbca )< _bfaf .Height ()*_fbdbe ;};func _egbg (_fage _cd .Matrix )_cd .Point {_abcb ,_dabg :=_fage .Translation ();return _cd .Point {X :_abcb ,Y :_dabg };
-};func _bbcb (_gcdcd _ad .PdfRectangle )*ruling {return &ruling {_gafe :_cafa ,_ecfb :_gcdcd .Lly ,_ggecg :_gcdcd .Llx ,_gebf :_gcdcd .Urx };};func _bggb (_daf *Extractor ,_eddf *_ad .PdfPageResources ,_cedag _af .GraphicsState ,_egac *textState ,_agaf *stateStack )*textObject {return &textObject {_bgbb :_daf ,_dfece :_eddf ,_edcg :_cedag ,_ddaa :_agaf ,_dggef :_egac ,_dfde :_cd .IdentityMatrix (),_feec :_cd .IdentityMatrix ()};
-};func _cabef (_bgefa ,_dbcg int )int {if _bgefa < _dbcg {return _bgefa ;};return _dbcg ;};
+func (_eaff *shapesState) String() string {
+	return _fa.Sprintf("\u007b\u0025\u0064\u0020su\u0062\u0070\u0061\u0074\u0068\u0073\u0020\u0066\u0072\u0065\u0073\u0068\u003d\u0025t\u007d", len(_eaff._fec), _eaff._eaba)
+}
+
+func (_abcbg paraList) eventNeighbours(_daaae []event) map[*textPara][]int {
+	_eg.Slice(_daaae, func(_gaacdd, _bebb int) bool {
+		_cbbe, _ddbb := _daaae[_gaacdd], _daaae[_bebb]
+		_efffe, _ffbb := _cbbe._ggcee, _ddbb._ggcee
+		if _efffe != _ffbb {
+			return _efffe < _ffbb
+		}
+		if _cbbe._ebbd != _ddbb._ebbd {
+			return _cbbe._ebbd
+		}
+		return _gaacdd < _bebb
+	})
+	_bdbfe := make(map[int]intSet)
+	_edbga := make(intSet)
+	for _, _defeg := range _daaae {
+		if _defeg._ebbd {
+			_bdbfe[_defeg._dffg] = make(intSet)
+			for _fadca := range _edbga {
+				if _fadca != _defeg._dffg {
+					_bdbfe[_defeg._dffg].add(_fadca)
+					_bdbfe[_fadca].add(_defeg._dffg)
+				}
+			}
+			_edbga.add(_defeg._dffg)
+		} else {
+			_edbga.del(_defeg._dffg)
+		}
+	}
+	_egfg := map[*textPara][]int{}
+	for _bddgf, _eedab := range _bdbfe {
+		_cabdd := _abcbg[_bddgf]
+		if len(_eedab) == 0 {
+			_egfg[_cabdd] = nil
+			continue
+		}
+		_fdaga := make([]int, len(_eedab))
+		_baeg := 0
+		for _ead := range _eedab {
+			_fdaga[_baeg] = _ead
+			_baeg++
+		}
+		_egfg[_cabdd] = _fdaga
+	}
+	return _egfg
+}
+
+func (_bfaf *textMark) inDiacriticArea(_afbe *textMark) bool {
+	_cegc := _bfaf.Llx - _afbe.Llx
+	_deae := _bfaf.Urx - _afbe.Urx
+	_gbca := _bfaf.Lly - _afbe.Lly
+	return _c.Abs(_cegc+_deae) < _bfaf.Width()*_fbdbe && _c.Abs(_gbca) < _bfaf.Height()*_fbdbe
+}
+
+func _egbg(_fage _cd.Matrix) _cd.Point {
+	_abcb, _dabg := _fage.Translation()
+	return _cd.Point{X: _abcb, Y: _dabg}
+}
+
+func _bbcb(_gcdcd _ad.PdfRectangle) *ruling {
+	return &ruling{_gafe: _cafa, _ecfb: _gcdcd.Lly, _ggecg: _gcdcd.Llx, _gebf: _gcdcd.Urx}
+}
+
+func _bggb(_daf *Extractor, _eddf *_ad.PdfPageResources, _cedag _af.GraphicsState, _egac *textState, _agaf *stateStack) *textObject {
+	return &textObject{_bgbb: _daf, _dfece: _eddf, _edcg: _cedag, _ddaa: _agaf, _dggef: _egac, _dfde: _cd.IdentityMatrix(), _feec: _cd.IdentityMatrix()}
+}
+
+func _cabef(_bgefa, _dbcg int) int {
+	if _bgefa < _dbcg {
+		return _bgefa
+	}
+	return _dbcg
+}
 
 // String returns a description of `l`.
-func (_cacdc *textLine )String ()string {return _fa .Sprintf ("\u0025\u002e2\u0066\u0020\u0025\u0036\u002e\u0032\u0066\u0020\u0066\u006f\u006e\u0074\u0073\u0069\u007a\u0065\u003d\u0025\u002e\u0032\u0066\u0020\"%\u0073\u0022",_cacdc ._adaa ,_cacdc .PdfRectangle ,_cacdc ._fgfb ,_cacdc .text ());
-};func (_ecfd *ruling )alignsSec (_egafed *ruling )bool {const _begd =_ddgfe +1.0;return _ecfd ._ggecg -_begd <=_egafed ._gebf &&_egafed ._ggecg -_begd <=_ecfd ._gebf ;};func _febc (_bdda ,_cbed *textPara )bool {return _cfcef (_bdda ._cbfdb ,_cbed ._cbfdb )};
-func _fffbe (_gdgdb ,_bbdcb int )uint64 {return uint64 (_gdgdb )*0x1000000+uint64 (_bbdcb )};func _edec (_gbebc float64 )bool {return _c .Abs (_gbebc )< _bff };func (_ecdg *textLine )markWordBoundaries (){_ddad :=_gcdc *_ecdg ._fgfb ;for _ffdac ,_bfef :=range _ecdg ._gbaa [1:]{if _baca (_bfef ,_ecdg ._gbaa [_ffdac ])>=_ddad {_bfef ._efccdf =true ;
-};};};type pathSection struct{_fdgf []*subpath ;_cb .Color ;};func _egbf (_aace _cd .Point )_cd .Matrix {return _cd .TranslationMatrix (_aace .X ,_aace .Y )};func _fecfd (_ecfdb ,_abgc int )int {if _ecfdb > _abgc {return _ecfdb ;};return _abgc ;};type rulingKind int ;
-func _fgcfa (_dgabb []*textMark ,_cbadg _ad .PdfRectangle ,_dbegd bool )[]*textWord {var _egde []*textWord ;var _efgcf *textWord ;if _ggcc {_bg .Log .Info ("\u006d\u0061\u006beT\u0065\u0078\u0074\u0057\u006f\u0072\u0064\u0073\u003a\u0020\u0025\u0064\u0020\u006d\u0061\u0072\u006b\u0073",len (_dgabb ));
-};_dcaeb :=func (){if _efgcf !=nil {_edbf :=_efgcf .computeText ();if !_ecdc (_edbf ){_efgcf ._fgaa =_edbf ;_egde =append (_egde ,_efgcf );if _ggcc {_bg .Log .Info ("\u0061\u0064\u0064Ne\u0077\u0057\u006f\u0072\u0064\u003a\u0020\u0025\u0064\u003a\u0020\u0077\u006f\u0072\u0064\u003d\u0025\u0073",len (_egde )-1,_efgcf .String ());
-for _decadb ,_gdbgf :=range _efgcf ._ddfc {_fa .Printf ("\u0025\u0034\u0064\u003a\u0020\u0025\u0073\u000a",_decadb ,_gdbgf .String ());};};};_efgcf =nil ;};};for _ ,_dgdag :=range _dgabb {if _dbdb &&_efgcf !=nil &&len (_efgcf ._ddfc )> 0{_dagedc :=_efgcf ._ddfc [len (_efgcf ._ddfc )-1];
-_ddcf ,_eagdf :=_efdaf (_dgdag ._acfa );_bcge ,_fgafbe :=_efdaf (_dagedc ._acfa );if _eagdf &&!_fgafbe &&_dagedc .inDiacriticArea (_dgdag ){_efgcf .addDiacritic (_ddcf );continue ;};if _fgafbe &&!_eagdf &&_dgdag .inDiacriticArea (_dagedc ){_efgcf ._ddfc =_efgcf ._ddfc [:len (_efgcf ._ddfc )-1];
-_efgcf .appendMark (_dgdag ,_cbadg );_efgcf .addDiacritic (_bcge );continue ;};};_fecfe :=_ecdc (_dgdag ._acfa );if _fecfe {_dcaeb ();continue ;};if _efgcf ==nil &&!_fecfe {_efgcf =_gefdg ([]*textMark {_dgdag },_cbadg );continue ;};_cbccd :=_efgcf ._bbebf ;
-_cbaab :=_c .Abs (_fgdd (_cbadg ,_dgdag )-_efgcf ._fcgaa )/_cbccd ;_ggbc :=_baca (_dgdag ,_efgcf )/_cbccd ;_eedgb :=_efgcf .Width ()+_dgdag .Width ();if _dbegd &&_dgdag ._eefe .Angle ()!=0.0{_eaffa :=_c .Abs (_eedgb *_c .Tan (_dgdag ._eefe .Angle ())/_cbccd );
-if _cbaab > _eaffa {_cbaab -=_eaffa ;}else {_cbaab =0.0;};};if _ggbc >=_egdcb ||!(-_degc <=_ggbc &&_cbaab <=_dfdd ){_dcaeb ();_efgcf =_gefdg ([]*textMark {_dgdag },_cbadg );continue ;};_efgcf .appendMark (_dgdag ,_cbadg );};_dcaeb ();return _egde ;};const _fgaf =1.0/1000.0;
-func _eae (_afe []Font ,_aa string )bool {for _ ,_gcdg :=range _afe {if _gcdg .FontName ==_aa {return true ;};};return false ;};func _dbba (_ded *TextMarkArray )[]*TextMarkArray {_geaf :=_ded .Elements ();_ebca :=len (_geaf );var _bccc _afa .PdfObject ;
-_ebce :=[]*TextMarkArray {};_dcfc :=&TextMarkArray {};_efda :=-1;for _bba ,_fgbea :=range _geaf {_aac :=_fgbea .DirectObject ;_efda =_fgbea .Index ;if _aac ==nil {_gaaf :=_adfe (_ded ,_bba );if _bccc !=nil {if _gaaf ==-1||_gaaf > _bba {_ebce =append (_ebce ,_dcfc );
-_dcfc =&TextMarkArray {};};};}else if _bccc ==nil {if _efda ==0&&_bba > 0{_ebce =append (_ebce ,_dcfc );_dcfc =&TextMarkArray {};};}else {if _aac !=_bccc {_ebce =append (_ebce ,_dcfc );_dcfc =&TextMarkArray {};};};_bccc =_aac ;_dcfc .Append (_fgbea );if _bba ==(_ebca -1){_ebce =append (_ebce ,_dcfc );
-};};return _ebce ;};func _cacef (_agfda float64 )bool {return _c .Abs (_agfda )< _ddgfe };func (_ccbd *stateStack )size ()int {return len (*_ccbd )};
+func (_cacdc *textLine) String() string {
+	return _fa.Sprintf("\u0025\u002e2\u0066\u0020\u0025\u0036\u002e\u0032\u0066\u0020\u0066\u006f\u006e\u0074\u0073\u0069\u007a\u0065\u003d\u0025\u002e\u0032\u0066\u0020\"%\u0073\u0022", _cacdc._adaa, _cacdc.PdfRectangle, _cacdc._fgfb, _cacdc.text())
+}
+
+func (_ecfd *ruling) alignsSec(_egafed *ruling) bool {
+	const _begd = _ddgfe + 1.0
+	return _ecfd._ggecg-_begd <= _egafed._gebf && _egafed._ggecg-_begd <= _ecfd._gebf
+}
+
+func _febc(_bdda, _cbed *textPara) bool { return _cfcef(_bdda._cbfdb, _cbed._cbfdb) }
+
+func _fffbe(_gdgdb, _bbdcb int) uint64 { return uint64(_gdgdb)*0x1000000 + uint64(_bbdcb) }
+
+func _edec(_gbebc float64) bool { return _c.Abs(_gbebc) < _bff }
+
+func (_ecdg *textLine) markWordBoundaries() {
+	_ddad := _gcdc * _ecdg._fgfb
+	for _ffdac, _bfef := range _ecdg._gbaa[1:] {
+		if _baca(_bfef, _ecdg._gbaa[_ffdac]) >= _ddad {
+			_bfef._efccdf = true
+		}
+	}
+}
+
+type pathSection struct {
+	_fdgf []*subpath
+	_cb.Color
+}
+
+func _egbf(_aace _cd.Point) _cd.Matrix { return _cd.TranslationMatrix(_aace.X, _aace.Y) }
+
+func _fecfd(_ecfdb, _abgc int) int {
+	if _ecfdb > _abgc {
+		return _ecfdb
+	}
+	return _abgc
+}
+
+type rulingKind int
+
+func _fgcfa(_dgabb []*textMark, _cbadg _ad.PdfRectangle, _dbegd bool) []*textWord {
+	var _egde []*textWord
+	var _efgcf *textWord
+	if _ggcc {
+		_bg.Log.Info("\u006d\u0061\u006beT\u0065\u0078\u0074\u0057\u006f\u0072\u0064\u0073\u003a\u0020\u0025\u0064\u0020\u006d\u0061\u0072\u006b\u0073", len(_dgabb))
+	}
+	_dcaeb := func() {
+		if _efgcf != nil {
+			_edbf := _efgcf.computeText()
+			if !_ecdc(_edbf) {
+				_efgcf._fgaa = _edbf
+				_egde = append(_egde, _efgcf)
+				if _ggcc {
+					_bg.Log.Info("\u0061\u0064\u0064Ne\u0077\u0057\u006f\u0072\u0064\u003a\u0020\u0025\u0064\u003a\u0020\u0077\u006f\u0072\u0064\u003d\u0025\u0073", len(_egde)-1, _efgcf.String())
+					for _decadb, _gdbgf := range _efgcf._ddfc {
+						_fa.Printf("\u0025\u0034\u0064\u003a\u0020\u0025\u0073\u000a", _decadb, _gdbgf.String())
+					}
+				}
+			}
+			_efgcf = nil
+		}
+	}
+	for _, _dgdag := range _dgabb {
+		if _dbdb && _efgcf != nil && len(_efgcf._ddfc) > 0 {
+			_dagedc := _efgcf._ddfc[len(_efgcf._ddfc)-1]
+			_ddcf, _eagdf := _efdaf(_dgdag._acfa)
+			_bcge, _fgafbe := _efdaf(_dagedc._acfa)
+			if _eagdf && !_fgafbe && _dagedc.inDiacriticArea(_dgdag) {
+				_efgcf.addDiacritic(_ddcf)
+				continue
+			}
+			if _fgafbe && !_eagdf && _dgdag.inDiacriticArea(_dagedc) {
+				_efgcf._ddfc = _efgcf._ddfc[:len(_efgcf._ddfc)-1]
+				_efgcf.appendMark(_dgdag, _cbadg)
+				_efgcf.addDiacritic(_bcge)
+				continue
+			}
+		}
+		_fecfe := _ecdc(_dgdag._acfa)
+		if _fecfe {
+			_dcaeb()
+			continue
+		}
+		if _efgcf == nil && !_fecfe {
+			_efgcf = _gefdg([]*textMark{_dgdag}, _cbadg)
+			continue
+		}
+		_cbccd := _efgcf._bbebf
+		_cbaab := _c.Abs(_fgdd(_cbadg, _dgdag)-_efgcf._fcgaa) / _cbccd
+		_ggbc := _baca(_dgdag, _efgcf) / _cbccd
+		_eedgb := _efgcf.Width() + _dgdag.Width()
+		if _dbegd && _dgdag._eefe.Angle() != 0.0 {
+			_eaffa := _c.Abs(_eedgb * _c.Tan(_dgdag._eefe.Angle()) / _cbccd)
+			if _cbaab > _eaffa {
+				_cbaab -= _eaffa
+			} else {
+				_cbaab = 0.0
+			}
+		}
+		if _ggbc >= _egdcb || !(-_degc <= _ggbc && _cbaab <= _dfdd) {
+			_dcaeb()
+			_efgcf = _gefdg([]*textMark{_dgdag}, _cbadg)
+			continue
+		}
+		_efgcf.appendMark(_dgdag, _cbadg)
+	}
+	_dcaeb()
+	return _egde
+}
+
+const _fgaf = 1.0 / 1000.0
+
+func _eae(_afe []Font, _aa string) bool {
+	for _, _gcdg := range _afe {
+		if _gcdg.FontName == _aa {
+			return true
+		}
+	}
+	return false
+}
+
+func _dbba(_ded *TextMarkArray) []*TextMarkArray {
+	_geaf := _ded.Elements()
+	_ebca := len(_geaf)
+	var _bccc _afa.PdfObject
+	_ebce := []*TextMarkArray{}
+	_dcfc := &TextMarkArray{}
+	_efda := -1
+	for _bba, _fgbea := range _geaf {
+		_aac := _fgbea.DirectObject
+		_efda = _fgbea.Index
+		if _aac == nil {
+			_gaaf := _adfe(_ded, _bba)
+			if _bccc != nil {
+				if _gaaf == -1 || _gaaf > _bba {
+					_ebce = append(_ebce, _dcfc)
+					_dcfc = &TextMarkArray{}
+				}
+			}
+		} else if _bccc == nil {
+			if _efda == 0 && _bba > 0 {
+				_ebce = append(_ebce, _dcfc)
+				_dcfc = &TextMarkArray{}
+			}
+		} else {
+			if _aac != _bccc {
+				_ebce = append(_ebce, _dcfc)
+				_dcfc = &TextMarkArray{}
+			}
+		}
+		_bccc = _aac
+		_dcfc.Append(_fgbea)
+		if _bba == (_ebca - 1) {
+			_ebce = append(_ebce, _dcfc)
+		}
+	}
+	return _ebce
+}
+
+func _cacef(_agfda float64) bool { return _c.Abs(_agfda) < _ddgfe }
+
+func (_ccbd *stateStack) size() int { return len(*_ccbd) }
 
 // TextMarkArray is a collection of TextMarks.
-type TextMarkArray struct{_fde []TextMark };
+type TextMarkArray struct{ _fde []TextMark }
 
 // Search searches the pages specified by `pages`.
-func (_fbed *Editor )Search (pattern string ,pages []int )(map[int ]Match ,error ){_cdce ,_ ,_beg :=_fbed .getMatches (pattern ,pages );return _cdce ,_beg ;};func (_cgdd *textWord )bbox ()_ad .PdfRectangle {return _cgdd .PdfRectangle };func _egbe (_cdcd float64 )float64 {return _aebca *_c .Round (_cdcd /_aebca )};
-func _begb (_eaga []*textWord ,_bdeb float64 ,_acbe ,_dbab rulingList )*wordBag {_ccge :=_aaea (_eaga [0],_bdeb ,_acbe ,_dbab );for _ ,_fdfd :=range _eaga [1:]{_caaf :=_gfde (_fdfd ._fcgaa );_ccge ._fdeg [_caaf ]=append (_ccge ._fdeg [_caaf ],_fdfd );_ccge .PdfRectangle =_faea (_ccge .PdfRectangle ,_fdfd .PdfRectangle );
-};_ccge .sort ();return _ccge ;};func _cdga (_deff ,_ebdd _cd .Point )rulingKind {_ebef :=_c .Abs (_deff .X -_ebdd .X );_cccd :=_c .Abs (_deff .Y -_ebdd .Y );return _ccdce (_ebef ,_cccd ,_efba );};func (_bffa compositeCell )parasBBox ()(paraList ,_ad .PdfRectangle ){return _bffa .paraList ,_bffa .PdfRectangle ;
-};func (_adf *imageExtractContext )extractInlineImage (_fcg *_af .ContentStreamInlineImage ,_bfgg _af .GraphicsState ,_bbe *_ad .PdfPageResources )error {_dddc ,_acbc :=_fcg .ToImage (_bbe );if _acbc !=nil {return _acbc ;};_eef ,_acbc :=_fcg .GetColorSpace (_bbe );
-if _acbc !=nil {return _acbc ;};if _eef ==nil {_eef =_ad .NewPdfColorspaceDeviceGray ();};_ceed ,_acbc :=_eef .ImageToRGB (*_dddc );if _acbc !=nil {return _acbc ;};_baa :=ImageMark {Image :&_ceed ,Width :_bfgg .CTM .ScalingFactorX (),Height :_bfgg .CTM .ScalingFactorY (),Angle :_bfgg .CTM .Angle ()};
-_baa .X ,_baa .Y =_bfgg .CTM .Translation ();_adf ._fdc =append (_adf ._fdc ,_baa );_adf ._cff ++;return nil ;};func (_cfgc *textWord )appendMark (_eabbg *textMark ,_cgdce _ad .PdfRectangle ){_cfgc ._ddfc =append (_cfgc ._ddfc ,_eabbg );_cfgc .PdfRectangle =_faea (_cfgc .PdfRectangle ,_eabbg .PdfRectangle );
-if _eabbg ._caadf > _cfgc ._bbebf {_cfgc ._bbebf =_eabbg ._caadf ;};_cfgc ._fcgaa =_cgdce .Ury -_cfgc .PdfRectangle .Lly ;};func _abcbd (_ggeff *textLine )bool {_bbcfb :=true ;_gbff :=-1;for _ ,_efaa :=range _ggeff ._gbaa {for _ ,_adaee :=range _efaa ._ddfc {_fccg :=_adaee ._daaf ;
-if _gbff ==-1{_gbff =_fccg ;}else {if _gbff !=_fccg {_bbcfb =false ;break ;};};};};return _bbcfb ;};func (_ecfff *ruling )alignsPrimary (_gbfdc *ruling )bool {return _ecfff ._gafe ==_gbfdc ._gafe &&_c .Abs (_ecfff ._ecfb -_gbfdc ._ecfb )< _ddgfe *0.5;};
-func (_dcdg *textTable )computeBbox ()_ad .PdfRectangle {var _fcff _ad .PdfRectangle ;_gfagd :=false ;for _bdgbe :=0;_bdgbe < _dcdg ._aaga ;_bdgbe ++{for _dfaeb :=0;_dfaeb < _dcdg ._cfadc ;_dfaeb ++{_dcffde :=_dcdg .get (_dfaeb ,_bdgbe );if _dcffde ==nil {continue ;
-};if !_gfagd {_fcff =_dcffde .PdfRectangle ;_gfagd =true ;}else {_fcff =_faea (_fcff ,_dcffde .PdfRectangle );};};};return _fcff ;};func _cbadf (_agfb []*textLine ,_cebeg map[float64 ][]*textLine ,_fadd []float64 ,_cbga int ,_ffba ,_dabfd float64 )[]*list {_bcgb :=[]*list {};
-_fdefb :=_cbga ;_cbga =_cbga +1;_afca :=_fadd [_fdefb ];_dace :=_cebeg [_afca ];_aceb :=_fefdb (_dace ,_dabfd ,_ffba );for _gffbc ,_edgba :=range _aceb {var _dgcb float64 ;_feab :=[]*list {};_fdade :=_edgba ._adaa ;_daabe :=_dabfd ;if _gffbc < len (_aceb )-1{_daabe =_aceb [_gffbc +1]._adaa ;
-};if _cbga < len (_fadd ){_feab =_cbadf (_agfb ,_cebeg ,_fadd ,_cbga ,_fdade ,_daabe );};_dgcb =_daabe ;if len (_feab )> 0{_eeffb :=_feab [0];if len (_eeffb ._aage )> 0{_dgcb =_eeffb ._aage [0]._adaa ;};};_eafa :=[]*textLine {_edgba };_agag :=_daaca (_edgba ,_agfb ,_fdade ,_dgcb );
-_eafa =append (_eafa ,_agag ...);_debd :=_cbda (_eafa ,"\u0062\u0075\u006c\u006c\u0065\u0074",_feab );_debd ._bdeac =_dbfff (_eafa ,"");_bcgb =append (_bcgb ,_debd );};return _bcgb ;};func (_ffbg *compositeCell )updateBBox (){for _ ,_dceb :=range _ffbg .paraList {_ffbg .PdfRectangle =_faea (_ffbg .PdfRectangle ,_dceb .PdfRectangle );
-};};
+func (_fbed *Editor) Search(pattern string, pages []int) (map[int]Match, error) {
+	_cdce, _, _beg := _fbed.getMatches(pattern, pages)
+	return _cdce, _beg
+}
+
+func (_cgdd *textWord) bbox() _ad.PdfRectangle { return _cgdd.PdfRectangle }
+
+func _egbe(_cdcd float64) float64 { return _aebca * _c.Round(_cdcd/_aebca) }
+
+func _begb(_eaga []*textWord, _bdeb float64, _acbe, _dbab rulingList) *wordBag {
+	_ccge := _aaea(_eaga[0], _bdeb, _acbe, _dbab)
+	for _, _fdfd := range _eaga[1:] {
+		_caaf := _gfde(_fdfd._fcgaa)
+		_ccge._fdeg[_caaf] = append(_ccge._fdeg[_caaf], _fdfd)
+		_ccge.PdfRectangle = _faea(_ccge.PdfRectangle, _fdfd.PdfRectangle)
+	}
+	_ccge.sort()
+	return _ccge
+}
+
+func _cdga(_deff, _ebdd _cd.Point) rulingKind {
+	_ebef := _c.Abs(_deff.X - _ebdd.X)
+	_cccd := _c.Abs(_deff.Y - _ebdd.Y)
+	return _ccdce(_ebef, _cccd, _efba)
+}
+
+func (_bffa compositeCell) parasBBox() (paraList, _ad.PdfRectangle) {
+	return _bffa.paraList, _bffa.PdfRectangle
+}
+
+func (_adf *imageExtractContext) extractInlineImage(_fcg *_af.ContentStreamInlineImage, _bfgg _af.GraphicsState, _bbe *_ad.PdfPageResources) error {
+	_dddc, _acbc := _fcg.ToImage(_bbe)
+	if _acbc != nil {
+		return _acbc
+	}
+	_eef, _acbc := _fcg.GetColorSpace(_bbe)
+	if _acbc != nil {
+		return _acbc
+	}
+	if _eef == nil {
+		_eef = _ad.NewPdfColorspaceDeviceGray()
+	}
+	_ceed, _acbc := _eef.ImageToRGB(*_dddc)
+	if _acbc != nil {
+		return _acbc
+	}
+	_baa := ImageMark{Image: &_ceed, Width: _bfgg.CTM.ScalingFactorX(), Height: _bfgg.CTM.ScalingFactorY(), Angle: _bfgg.CTM.Angle()}
+	_baa.X, _baa.Y = _bfgg.CTM.Translation()
+	_adf._fdc = append(_adf._fdc, _baa)
+	_adf._cff++
+	return nil
+}
+
+func (_cfgc *textWord) appendMark(_eabbg *textMark, _cgdce _ad.PdfRectangle) {
+	_cfgc._ddfc = append(_cfgc._ddfc, _eabbg)
+	_cfgc.PdfRectangle = _faea(_cfgc.PdfRectangle, _eabbg.PdfRectangle)
+	if _eabbg._caadf > _cfgc._bbebf {
+		_cfgc._bbebf = _eabbg._caadf
+	}
+	_cfgc._fcgaa = _cgdce.Ury - _cfgc.PdfRectangle.Lly
+}
+
+func _abcbd(_ggeff *textLine) bool {
+	_bbcfb := true
+	_gbff := -1
+	for _, _efaa := range _ggeff._gbaa {
+		for _, _adaee := range _efaa._ddfc {
+			_fccg := _adaee._daaf
+			if _gbff == -1 {
+				_gbff = _fccg
+			} else {
+				if _gbff != _fccg {
+					_bbcfb = false
+					break
+				}
+			}
+		}
+	}
+	return _bbcfb
+}
+
+func (_ecfff *ruling) alignsPrimary(_gbfdc *ruling) bool {
+	return _ecfff._gafe == _gbfdc._gafe && _c.Abs(_ecfff._ecfb-_gbfdc._ecfb) < _ddgfe*0.5
+}
+
+func (_dcdg *textTable) computeBbox() _ad.PdfRectangle {
+	var _fcff _ad.PdfRectangle
+	_gfagd := false
+	for _bdgbe := 0; _bdgbe < _dcdg._aaga; _bdgbe++ {
+		for _dfaeb := 0; _dfaeb < _dcdg._cfadc; _dfaeb++ {
+			_dcffde := _dcdg.get(_dfaeb, _bdgbe)
+			if _dcffde == nil {
+				continue
+			}
+			if !_gfagd {
+				_fcff = _dcffde.PdfRectangle
+				_gfagd = true
+			} else {
+				_fcff = _faea(_fcff, _dcffde.PdfRectangle)
+			}
+		}
+	}
+	return _fcff
+}
+
+func _cbadf(_agfb []*textLine, _cebeg map[float64][]*textLine, _fadd []float64, _cbga int, _ffba, _dabfd float64) []*list {
+	_bcgb := []*list{}
+	_fdefb := _cbga
+	_cbga = _cbga + 1
+	_afca := _fadd[_fdefb]
+	_dace := _cebeg[_afca]
+	_aceb := _fefdb(_dace, _dabfd, _ffba)
+	for _gffbc, _edgba := range _aceb {
+		var _dgcb float64
+		_feab := []*list{}
+		_fdade := _edgba._adaa
+		_daabe := _dabfd
+		if _gffbc < len(_aceb)-1 {
+			_daabe = _aceb[_gffbc+1]._adaa
+		}
+		if _cbga < len(_fadd) {
+			_feab = _cbadf(_agfb, _cebeg, _fadd, _cbga, _fdade, _daabe)
+		}
+		_dgcb = _daabe
+		if len(_feab) > 0 {
+			_eeffb := _feab[0]
+			if len(_eeffb._aage) > 0 {
+				_dgcb = _eeffb._aage[0]._adaa
+			}
+		}
+		_eafa := []*textLine{_edgba}
+		_agag := _daaca(_edgba, _agfb, _fdade, _dgcb)
+		_eafa = append(_eafa, _agag...)
+		_debd := _cbda(_eafa, "\u0062\u0075\u006c\u006c\u0065\u0074", _feab)
+		_debd._bdeac = _dbfff(_eafa, "")
+		_bcgb = append(_bcgb, _debd)
+	}
+	return _bcgb
+}
+
+func (_ffbg *compositeCell) updateBBox() {
+	for _, _dceb := range _ffbg.paraList {
+		_ffbg.PdfRectangle = _faea(_ffbg.PdfRectangle, _dceb.PdfRectangle)
+	}
+}
 
 // ExtractTextWithStats works like ExtractText but returns the number of characters in the output
 // (`numChars`) and the number of characters that were not decoded (`numMisses`).
-func (_bge *Extractor )ExtractTextWithStats ()(_afcb string ,_aga int ,_dcb int ,_ebg error ){_gcge ,_aga ,_dcb ,_ebg :=_bge .ExtractPageText ();if _ebg !=nil {return "",_aga ,_dcb ,_ebg ;};return _gcge .Text (),_aga ,_dcb ,nil ;};func (_gddf *subpath )close (){if !_gbcfg (_gddf ._bfgb [0],_gddf .last ()){_gddf .add (_gddf ._bfgb [0]);
-};_gddf ._bgfa =true ;_gddf .removeDuplicates ();};func _agada (_bcac ,_ffeg _cd .Point )rulingKind {_cfdgf :=_c .Abs (_bcac .X -_ffeg .X );_aacg :=_c .Abs (_bcac .Y -_ffeg .Y );return _ccdce (_cfdgf ,_aacg ,_cfda );};func _gbcfg (_cbeab ,_egegd _cd .Point )bool {return _cbeab .X ==_egegd .X &&_cbeab .Y ==_egegd .Y };
-const _ggfc =20;
+func (_bge *Extractor) ExtractTextWithStats() (_afcb string, _aga int, _dcb int, _ebg error) {
+	_gcge, _aga, _dcb, _ebg := _bge.ExtractPageText()
+	if _ebg != nil {
+		return "", _aga, _dcb, _ebg
+	}
+	return _gcge.Text(), _aga, _dcb, nil
+}
+
+func (_gddf *subpath) close() {
+	if !_gbcfg(_gddf._bfgb[0], _gddf.last()) {
+		_gddf.add(_gddf._bfgb[0])
+	}
+	_gddf._bgfa = true
+	_gddf.removeDuplicates()
+}
+
+func _agada(_bcac, _ffeg _cd.Point) rulingKind {
+	_cfdgf := _c.Abs(_bcac.X - _ffeg.X)
+	_aacg := _c.Abs(_bcac.Y - _ffeg.Y)
+	return _ccdce(_cfdgf, _aacg, _cfda)
+}
+
+func _gbcfg(_cbeab, _egegd _cd.Point) bool { return _cbeab.X == _egegd.X && _cbeab.Y == _egegd.Y }
+
+const _ggfc = 20
 
 // String returns a description of `p`.
-func (_bddac *textPara )String ()string {if _bddac ._gddfg {return _fa .Sprintf ("\u0025\u0036\u002e\u0032\u0066\u0020\u005b\u0045\u004d\u0050\u0054\u0059\u005d",_bddac .PdfRectangle );};_dbeg :="";if _bddac ._fbbfg !=nil {_dbeg =_fa .Sprintf ("\u005b\u0025\u0064\u0078\u0025\u0064\u005d\u0020",_bddac ._fbbfg ._cfadc ,_bddac ._fbbfg ._aaga );
-};return _fa .Sprintf ("\u0025\u0036\u002e\u0032f \u0025\u0073\u0025\u0064\u0020\u006c\u0069\u006e\u0065\u0073\u0020\u0025\u0071",_bddac .PdfRectangle ,_dbeg ,len (_bddac ._feea ),_fagdg (_bddac .text (),50));};func _cggc (_dcec ,_cggd bounded )float64 {_dgbd :=_cedab (_dcec ,_cggd );
-if !_edec (_dgbd ){return _dgbd ;};return _cbff (_dcec ,_cggd );};func (_acacc *ruling )equals (_efde *ruling )bool {return _acacc ._gafe ==_efde ._gafe &&_ffac (_acacc ._ecfb ,_efde ._ecfb )&&_ffac (_acacc ._ggecg ,_efde ._ggecg )&&_ffac (_acacc ._gebf ,_efde ._gebf );
-};func (_cacf *subpath )removeDuplicates (){if len (_cacf ._bfgb )==0{return ;};_fdbe :=[]_cd .Point {_cacf ._bfgb [0]};for _ ,_fcbf :=range _cacf ._bfgb [1:]{if !_gbcfg (_fcbf ,_fdbe [len (_fdbe )-1]){_fdbe =append (_fdbe ,_fcbf );};};_cacf ._bfgb =_fdbe ;
-};func (_efdddf *textPara )toTextMarks (_cfaf *int )[]TextMark {if _efdddf ._fbbfg ==nil {return _efdddf .toCellTextMarks (_cfaf );};var _gaebg []TextMark ;for _cfdgd :=0;_cfdgd < _efdddf ._fbbfg ._aaga ;_cfdgd ++{for _gafbb :=0;_gafbb < _efdddf ._fbbfg ._cfadc ;
-_gafbb ++{_efcc :=_efdddf ._fbbfg .get (_gafbb ,_cfdgd );if _efcc ==nil {_gaebg =_cfdbba (_gaebg ,_cfaf ,"\u0009");}else {_afce :=_efcc .toCellTextMarks (_cfaf );_gaebg =append (_gaebg ,_afce ...);};_gaebg =_cfdbba (_gaebg ,_cfaf ,"\u0020");};if _cfdgd < _efdddf ._fbbfg ._aaga -1{_gaebg =_cfdbba (_gaebg ,_cfaf ,"\u000a");
-};};_bdged :=_efdddf ._fbbfg ;if _bdged .isExportable (){_cgdb :=_bdged .toTextTable ();_gaebg =_bead (_gaebg ,&_cgdb );};return _gaebg ;};
+func (_bddac *textPara) String() string {
+	if _bddac._gddfg {
+		return _fa.Sprintf("\u0025\u0036\u002e\u0032\u0066\u0020\u005b\u0045\u004d\u0050\u0054\u0059\u005d", _bddac.PdfRectangle)
+	}
+	_dbeg := ""
+	if _bddac._fbbfg != nil {
+		_dbeg = _fa.Sprintf("\u005b\u0025\u0064\u0078\u0025\u0064\u005d\u0020", _bddac._fbbfg._cfadc, _bddac._fbbfg._aaga)
+	}
+	return _fa.Sprintf("\u0025\u0036\u002e\u0032f \u0025\u0073\u0025\u0064\u0020\u006c\u0069\u006e\u0065\u0073\u0020\u0025\u0071", _bddac.PdfRectangle, _dbeg, len(_bddac._feea), _fagdg(_bddac.text(), 50))
+}
+
+func _cggc(_dcec, _cggd bounded) float64 {
+	_dgbd := _cedab(_dcec, _cggd)
+	if !_edec(_dgbd) {
+		return _dgbd
+	}
+	return _cbff(_dcec, _cggd)
+}
+
+func (_acacc *ruling) equals(_efde *ruling) bool {
+	return _acacc._gafe == _efde._gafe && _ffac(_acacc._ecfb, _efde._ecfb) && _ffac(_acacc._ggecg, _efde._ggecg) && _ffac(_acacc._gebf, _efde._gebf)
+}
+
+func (_cacf *subpath) removeDuplicates() {
+	if len(_cacf._bfgb) == 0 {
+		return
+	}
+	_fdbe := []_cd.Point{_cacf._bfgb[0]}
+	for _, _fcbf := range _cacf._bfgb[1:] {
+		if !_gbcfg(_fcbf, _fdbe[len(_fdbe)-1]) {
+			_fdbe = append(_fdbe, _fcbf)
+		}
+	}
+	_cacf._bfgb = _fdbe
+}
+
+func (_efdddf *textPara) toTextMarks(_cfaf *int) []TextMark {
+	if _efdddf._fbbfg == nil {
+		return _efdddf.toCellTextMarks(_cfaf)
+	}
+	var _gaebg []TextMark
+	for _cfdgd := 0; _cfdgd < _efdddf._fbbfg._aaga; _cfdgd++ {
+		for _gafbb := 0; _gafbb < _efdddf._fbbfg._cfadc; _gafbb++ {
+			_efcc := _efdddf._fbbfg.get(_gafbb, _cfdgd)
+			if _efcc == nil {
+				_gaebg = _cfdbba(_gaebg, _cfaf, "\u0009")
+			} else {
+				_afce := _efcc.toCellTextMarks(_cfaf)
+				_gaebg = append(_gaebg, _afce...)
+			}
+			_gaebg = _cfdbba(_gaebg, _cfaf, "\u0020")
+		}
+		if _cfdgd < _efdddf._fbbfg._aaga-1 {
+			_gaebg = _cfdbba(_gaebg, _cfaf, "\u000a")
+		}
+	}
+	_bdged := _efdddf._fbbfg
+	if _bdged.isExportable() {
+		_cgdb := _bdged.toTextTable()
+		_gaebg = _bead(_gaebg, &_cgdb)
+	}
+	return _gaebg
+}
 
 // PageTextOptions holds various options available in extraction process.
-type PageTextOptions struct{_dfda bool ;_eedf ExtractionMode ;};func (_cegfa *textTable )emptyCompositeRow (_ecgeg int )bool {for _dfbe :=0;_dfbe < _cegfa ._cfadc ;_dfbe ++{if _eaadff ,_fgcdd :=_cegfa ._cafd [_fffbe (_dfbe ,_ecgeg )];_fgcdd {if len (_eaadff .paraList )> 0{return false ;
-};};};return true ;};func _ffac (_gefaf ,_gcgef float64 )bool {return _c .Abs (_gefaf -_gcgef )<=_edcb };func _bgag (_badd []*textLine )map[float64 ][]*textLine {_eg .Slice (_badd ,func (_bbcab ,_fbgdd int )bool {return _badd [_bbcab ]._adaa < _badd [_fbgdd ]._adaa });
-_febde :=map[float64 ][]*textLine {};for _ ,_cabdg :=range _badd {_dfgge :=_dagb (_cabdg );_dfgge =_c .Round (_dfgge );_febde [_dfgge ]=append (_febde [_dfgge ],_cabdg );};return _febde ;};func (_dgedd rulingList )primaries ()[]float64 {_ccgcf :=make (map[float64 ]struct{},len (_dgedd ));
-for _ ,_ggbg :=range _dgedd {_ccgcf [_ggbg ._ecfb ]=struct{}{};};_dacd :=make ([]float64 ,len (_ccgcf ));_dbcba :=0;for _aebcad :=range _ccgcf {_dacd [_dbcba ]=_aebcad ;_dbcba ++;};_eg .Float64s (_dacd );return _dacd ;};type wordBag struct{_ad .PdfRectangle ;
-_eagga float64 ;_fegfc ,_fbee rulingList ;_gdca float64 ;_fdeg map[int ][]*textWord ;};
+type PageTextOptions struct {
+	_dfda bool
+	_eedf ExtractionMode
+}
+
+func (_cegfa *textTable) emptyCompositeRow(_ecgeg int) bool {
+	for _dfbe := 0; _dfbe < _cegfa._cfadc; _dfbe++ {
+		if _eaadff, _fgcdd := _cegfa._cafd[_fffbe(_dfbe, _ecgeg)]; _fgcdd {
+			if len(_eaadff.paraList) > 0 {
+				return false
+			}
+		}
+	}
+	return true
+}
+
+func _ffac(_gefaf, _gcgef float64) bool { return _c.Abs(_gefaf-_gcgef) <= _edcb }
+
+func _bgag(_badd []*textLine) map[float64][]*textLine {
+	_eg.Slice(_badd, func(_bbcab, _fbgdd int) bool { return _badd[_bbcab]._adaa < _badd[_fbgdd]._adaa })
+	_febde := map[float64][]*textLine{}
+	for _, _cabdg := range _badd {
+		_dfgge := _dagb(_cabdg)
+		_dfgge = _c.Round(_dfgge)
+		_febde[_dfgge] = append(_febde[_dfgge], _cabdg)
+	}
+	return _febde
+}
+
+func (_dgedd rulingList) primaries() []float64 {
+	_ccgcf := make(map[float64]struct{}, len(_dgedd))
+	for _, _ggbg := range _dgedd {
+		_ccgcf[_ggbg._ecfb] = struct{}{}
+	}
+	_dacd := make([]float64, len(_ccgcf))
+	_dbcba := 0
+	for _aebcad := range _ccgcf {
+		_dacd[_dbcba] = _aebcad
+		_dbcba++
+	}
+	_eg.Float64s(_dacd)
+	return _dacd
+}
+
+type wordBag struct {
+	_ad.PdfRectangle
+	_eagga        float64
+	_fegfc, _fbee rulingList
+	_gdca         float64
+	_fdeg         map[int][]*textWord
+}
 
 // ImageMark represents an image drawn on a page and its position in device coordinates.
 // All coordinates are in device coordinates.
-type ImageMark struct{Image *_ad .Image ;
+type ImageMark struct {
+	Image *_ad.Image
 
-// Dimensions of the image as displayed in the PDF.
-Width float64 ;Height float64 ;
+	// Dimensions of the image as displayed in the PDF.
+	Width  float64
+	Height float64
 
-// Position of the image in PDF coordinates (lower left corner).
-X float64 ;Y float64 ;
+	// Position of the image in PDF coordinates (lower left corner).
+	X float64
+	Y float64
 
-// Angle in degrees, if rotated.
-Angle float64 ;};func _ebdad (_geaa []compositeCell )[]float64 {var _dgeff []*textLine ;_egga :=0;for _ ,_gafeb :=range _geaa {_egga +=len (_gafeb .paraList );_dgeff =append (_dgeff ,_gafeb .lines ()...);};_eg .Slice (_dgeff ,func (_cgfbb ,_fddd int )bool {_gfae ,_dafb :=_dgeff [_cgfbb ],_dgeff [_fddd ];
-_cbaeb ,_cbbgb :=_gfae ._adaa ,_dafb ._adaa ;if !_edec (_cbaeb -_cbbgb ){return _cbaeb < _cbbgb ;};return _gfae .Llx < _dafb .Llx ;});if _ggegb {_fa .Printf ("\u0020\u0020\u0020 r\u006f\u0077\u0042\u006f\u0072\u0064\u0065\u0072\u0073:\u0020%\u0064 \u0070a\u0072\u0061\u0073\u0020\u0025\u0064\u0020\u006c\u0069\u006e\u0065\u0073\u000a",_egga ,len (_dgeff ));
-for _bfbegc ,_ebbfc :=range _dgeff {_fa .Printf ("\u0025\u0038\u0064\u003a\u0020\u0025\u0073\u000a",_bfbegc ,_ebbfc );};};var _abfae []float64 ;_cbgc :=_dgeff [0];var _fcged [][]*textLine ;_gbfa :=[]*textLine {_cbgc };for _dabgc ,_geff :=range _dgeff [1:]{if _geff .Ury < _cbgc .Lly {_deed :=0.5*(_geff .Ury +_cbgc .Lly );
-if _ggegb {_fa .Printf ("\u0025\u0034\u0064\u003a\u0020\u0025\u0036\u002e\u0032\u0066\u0020\u003c\u0020\u0025\u0036.\u0032f\u0020\u0062\u006f\u0072\u0064\u0065\u0072\u003d\u0025\u0036\u002e\u0032\u0066\u000a"+"\u0009\u0020\u0071\u003d\u0025\u0073\u000a\u0009\u0020p\u003d\u0025\u0073\u000a",_dabgc ,_geff .Ury ,_cbgc .Lly ,_deed ,_cbgc ,_geff );
-};_abfae =append (_abfae ,_deed );_fcged =append (_fcged ,_gbfa );_gbfa =nil ;};_gbfa =append (_gbfa ,_geff );if _geff .Lly < _cbgc .Lly {_cbgc =_geff ;};};if len (_gbfa )> 0{_fcged =append (_fcged ,_gbfa );};if _ggegb {_fa .Printf (" \u0020\u0020\u0020\u0020\u0020\u0020 \u0072\u006f\u0077\u0043\u006f\u0072\u0072\u0069\u0064o\u0072\u0073\u003d%\u0036.\u0032\u0066\u000a",_abfae );
-};if _ggegb {_bg .Log .Info ("\u0072\u006f\u0077\u003d\u0025\u0064",len (_geaa ));for _cedcf ,_fgea :=range _geaa {_fa .Printf ("\u0025\u0034\u0064\u003a\u0020\u0025\u0073\u000a",_cedcf ,_fgea );};_bg .Log .Info ("\u0067r\u006f\u0075\u0070\u0073\u003d\u0025d",len (_fcged ));
-for _ddccd ,_acbfd :=range _fcged {_fa .Printf ("\u0025\u0034\u0064\u003a\u0020\u0025\u0064\u000a",_ddccd ,len (_acbfd ));for _eede ,_bfce :=range _acbfd {_fa .Printf ("\u0025\u0038\u0064\u003a\u0020\u0025\u0073\u000a",_eede ,_bfce );};};};_ccbfe :=true ;
-for _fgadd ,_bfebg :=range _fcged {_caca :=true ;for _adfa ,_aadg :=range _geaa {if _ggegb {_fa .Printf ("\u0020\u0020\u0020\u007e\u007e\u007e\u0067\u0072\u006f\u0075\u0070\u0020\u0025\u0064\u0020\u006f\u0066\u0020\u0025\u0064\u0020\u0063\u0065\u006cl\u0020\u0025\u0064\u0020\u006ff\u0020\u0025d\u0020\u0025\u0073\u000a",_fgadd ,len (_fcged ),_adfa ,len (_geaa ),_aadg );
-};if !_aadg .hasLines (_bfebg ){if _ggegb {_fa .Printf ("\u0020\u0020\u0020\u0021\u0021\u0021\u0067\u0072\u006f\u0075\u0070\u0020\u0025d\u0020\u006f\u0066\u0020\u0025\u0064 \u0063\u0065\u006c\u006c\u0020\u0025\u0064\u0020\u006f\u0066\u0020\u0025\u0064 \u004f\u0055\u0054\u000a",_fgadd ,len (_fcged ),_adfa ,len (_geaa ));
-};_caca =false ;break ;};};if !_caca {_ccbfe =false ;break ;};};if !_ccbfe {if _ggegb {_bg .Log .Info ("\u0072\u006f\u0077\u0020\u0063o\u0072\u0072\u0069\u0064\u006f\u0072\u0073\u0020\u0064\u006f\u006e\u0027\u0074 \u0073\u0070\u0061\u006e\u0020\u0061\u006c\u006c\u0020\u0063\u0065\u006c\u006c\u0073\u0020\u0069\u006e\u0020\u0072\u006f\u0077\u002e\u0020\u0069\u0067\u006e\u006f\u0072\u0069\u006eg");
-};_abfae =nil ;};if _ggegb &&_abfae !=nil {_fa .Printf ("\u0020\u0020\u0020\u0020\u0020\u0020\u0020\u0020\u002a\u002a*\u0072\u006f\u0077\u0043\u006f\u0072\u0072i\u0064\u006f\u0072\u0073\u003d\u0025\u0036\u002e\u0032\u0066\u000a",_abfae );};return _abfae ;
-};func (_bfbbe rulingList )findPrimSec (_agbg ,_fdcbg float64 )*ruling {for _ ,_facbbe :=range _bfbbe {if _edec (_facbbe ._ecfb -_agbg )&&_facbbe ._ggecg -_edcb <=_fdcbg &&_fdcbg <=_facbbe ._gebf +_edcb {return _facbbe ;};};return nil ;};func (_edf *textObject )setTextRise (_dfae float64 ){if _edf ==nil {return ;
-};_edf ._dggef ._cfec =_dfae ;};func (_bbcad *textTable )bbox ()_ad .PdfRectangle {return _bbcad .PdfRectangle };type shapesState struct{_fggg _cd .Matrix ;_dcfcb _cd .Matrix ;_fec []*subpath ;_eaba bool ;_aaba _cd .Point ;_affd *textObject ;};func (_agcc *stateStack )push (_fcc *textState ){_cecf :=*_fcc ;
-*_agcc =append (*_agcc ,&_cecf )};
+	// Angle in degrees, if rotated.
+	Angle float64
+}
+
+func _ebdad(_geaa []compositeCell) []float64 {
+	var _dgeff []*textLine
+	_egga := 0
+	for _, _gafeb := range _geaa {
+		_egga += len(_gafeb.paraList)
+		_dgeff = append(_dgeff, _gafeb.lines()...)
+	}
+	_eg.Slice(_dgeff, func(_cgfbb, _fddd int) bool {
+		_gfae, _dafb := _dgeff[_cgfbb], _dgeff[_fddd]
+		_cbaeb, _cbbgb := _gfae._adaa, _dafb._adaa
+		if !_edec(_cbaeb - _cbbgb) {
+			return _cbaeb < _cbbgb
+		}
+		return _gfae.Llx < _dafb.Llx
+	})
+	if _ggegb {
+		_fa.Printf("\u0020\u0020\u0020 r\u006f\u0077\u0042\u006f\u0072\u0064\u0065\u0072\u0073:\u0020%\u0064 \u0070a\u0072\u0061\u0073\u0020\u0025\u0064\u0020\u006c\u0069\u006e\u0065\u0073\u000a", _egga, len(_dgeff))
+		for _bfbegc, _ebbfc := range _dgeff {
+			_fa.Printf("\u0025\u0038\u0064\u003a\u0020\u0025\u0073\u000a", _bfbegc, _ebbfc)
+		}
+	}
+	var _abfae []float64
+	_cbgc := _dgeff[0]
+	var _fcged [][]*textLine
+	_gbfa := []*textLine{_cbgc}
+	for _dabgc, _geff := range _dgeff[1:] {
+		if _geff.Ury < _cbgc.Lly {
+			_deed := 0.5 * (_geff.Ury + _cbgc.Lly)
+			if _ggegb {
+				_fa.Printf("\u0025\u0034\u0064\u003a\u0020\u0025\u0036\u002e\u0032\u0066\u0020\u003c\u0020\u0025\u0036.\u0032f\u0020\u0062\u006f\u0072\u0064\u0065\u0072\u003d\u0025\u0036\u002e\u0032\u0066\u000a"+"\u0009\u0020\u0071\u003d\u0025\u0073\u000a\u0009\u0020p\u003d\u0025\u0073\u000a", _dabgc, _geff.Ury, _cbgc.Lly, _deed, _cbgc, _geff)
+			}
+			_abfae = append(_abfae, _deed)
+			_fcged = append(_fcged, _gbfa)
+			_gbfa = nil
+		}
+		_gbfa = append(_gbfa, _geff)
+		if _geff.Lly < _cbgc.Lly {
+			_cbgc = _geff
+		}
+	}
+	if len(_gbfa) > 0 {
+		_fcged = append(_fcged, _gbfa)
+	}
+	if _ggegb {
+		_fa.Printf(" \u0020\u0020\u0020\u0020\u0020\u0020 \u0072\u006f\u0077\u0043\u006f\u0072\u0072\u0069\u0064o\u0072\u0073\u003d%\u0036.\u0032\u0066\u000a", _abfae)
+	}
+	if _ggegb {
+		_bg.Log.Info("\u0072\u006f\u0077\u003d\u0025\u0064", len(_geaa))
+		for _cedcf, _fgea := range _geaa {
+			_fa.Printf("\u0025\u0034\u0064\u003a\u0020\u0025\u0073\u000a", _cedcf, _fgea)
+		}
+		_bg.Log.Info("\u0067r\u006f\u0075\u0070\u0073\u003d\u0025d", len(_fcged))
+		for _ddccd, _acbfd := range _fcged {
+			_fa.Printf("\u0025\u0034\u0064\u003a\u0020\u0025\u0064\u000a", _ddccd, len(_acbfd))
+			for _eede, _bfce := range _acbfd {
+				_fa.Printf("\u0025\u0038\u0064\u003a\u0020\u0025\u0073\u000a", _eede, _bfce)
+			}
+		}
+	}
+	_ccbfe := true
+	for _fgadd, _bfebg := range _fcged {
+		_caca := true
+		for _adfa, _aadg := range _geaa {
+			if _ggegb {
+				_fa.Printf("\u0020\u0020\u0020\u007e\u007e\u007e\u0067\u0072\u006f\u0075\u0070\u0020\u0025\u0064\u0020\u006f\u0066\u0020\u0025\u0064\u0020\u0063\u0065\u006cl\u0020\u0025\u0064\u0020\u006ff\u0020\u0025d\u0020\u0025\u0073\u000a", _fgadd, len(_fcged), _adfa, len(_geaa), _aadg)
+			}
+			if !_aadg.hasLines(_bfebg) {
+				if _ggegb {
+					_fa.Printf("\u0020\u0020\u0020\u0021\u0021\u0021\u0067\u0072\u006f\u0075\u0070\u0020\u0025d\u0020\u006f\u0066\u0020\u0025\u0064 \u0063\u0065\u006c\u006c\u0020\u0025\u0064\u0020\u006f\u0066\u0020\u0025\u0064 \u004f\u0055\u0054\u000a", _fgadd, len(_fcged), _adfa, len(_geaa))
+				}
+				_caca = false
+				break
+			}
+		}
+		if !_caca {
+			_ccbfe = false
+			break
+		}
+	}
+	if !_ccbfe {
+		if _ggegb {
+			_bg.Log.Info("\u0072\u006f\u0077\u0020\u0063o\u0072\u0072\u0069\u0064\u006f\u0072\u0073\u0020\u0064\u006f\u006e\u0027\u0074 \u0073\u0070\u0061\u006e\u0020\u0061\u006c\u006c\u0020\u0063\u0065\u006c\u006c\u0073\u0020\u0069\u006e\u0020\u0072\u006f\u0077\u002e\u0020\u0069\u0067\u006e\u006f\u0072\u0069\u006eg")
+		}
+		_abfae = nil
+	}
+	if _ggegb && _abfae != nil {
+		_fa.Printf("\u0020\u0020\u0020\u0020\u0020\u0020\u0020\u0020\u002a\u002a*\u0072\u006f\u0077\u0043\u006f\u0072\u0072i\u0064\u006f\u0072\u0073\u003d\u0025\u0036\u002e\u0032\u0066\u000a", _abfae)
+	}
+	return _abfae
+}
+
+func (_bfbbe rulingList) findPrimSec(_agbg, _fdcbg float64) *ruling {
+	for _, _facbbe := range _bfbbe {
+		if _edec(_facbbe._ecfb-_agbg) && _facbbe._ggecg-_edcb <= _fdcbg && _fdcbg <= _facbbe._gebf+_edcb {
+			return _facbbe
+		}
+	}
+	return nil
+}
+
+func (_edf *textObject) setTextRise(_dfae float64) {
+	if _edf == nil {
+		return
+	}
+	_edf._dggef._cfec = _dfae
+}
+
+func (_bbcad *textTable) bbox() _ad.PdfRectangle { return _bbcad.PdfRectangle }
+
+type shapesState struct {
+	_fggg  _cd.Matrix
+	_dcfcb _cd.Matrix
+	_fec   []*subpath
+	_eaba  bool
+	_aaba  _cd.Point
+	_affd  *textObject
+}
+
+func (_agcc *stateStack) push(_fcc *textState) {
+	_cecf := *_fcc
+	*_agcc = append(*_agcc, &_cecf)
+}

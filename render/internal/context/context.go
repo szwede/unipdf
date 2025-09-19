@@ -9,32 +9,306 @@
 // Use of this source code is governed by the UniDoc End User License Agreement
 // terms that can be accessed at https://unidoc.io/eula/
 
-package context ;import (_d "errors";_cf "github.com/unidoc/freetype/truetype";_a "github.com/unidoc/unipdf/v4/core";_gd "github.com/unidoc/unipdf/v4/internal/cmap";_cg "github.com/unidoc/unipdf/v4/internal/textencoding";_df "github.com/unidoc/unipdf/v4/internal/transform";
-_ga "github.com/unidoc/unipdf/v4/model";_cc "golang.org/x/image/font";_c "image";_b "image/color";_gc "strconv";_bg "strings";);func (_dd *TextFont )GetCharMetrics (code _cg .CharCode )(float64 ,float64 ,bool ){if _geee ,_dfe :=_dd .Font .GetCharMetrics (code );
-_dfe &&_geee .Wx !=0{return _geee .Wx ,_geee .Wy ,_dfe ;};if _dd ._bdc ==nil {return 0,0,false ;};_deaa ,_edd :=_dd ._bdc .GetCharMetrics (code );return _deaa .Wx ,_deaa .Wy ,_edd &&_deaa .Wx !=0;};type FillRule int ;const (TextRenderingModeFill TextRenderingMode =iota ;
-TextRenderingModeStroke ;TextRenderingModeFillStroke ;TextRenderingModeInvisible ;TextRenderingModeFillClip ;TextRenderingModeStrokeClip ;TextRenderingModeFillStrokeClip ;TextRenderingModeClip ;);type Pattern interface{ColorAt (_be ,_f int )_b .Color ;
-};type TextFont struct{Font *_ga .PdfFont ;Size float64 ;_dea *_cf .Font ;_bdc *_ga .PdfFont ;};func (_bdd *TextFont )CharcodeToRunes (charcode _cg .CharCode )(_cg .CharCode ,[]rune ){_ba :=[]_cg .CharCode {charcode };if _bdd ._bdc ==nil ||_bdd ._bdc ==_bdd .Font {return _bdd .charcodeToRunesSimple (charcode );
-};_aga :=_bdd ._bdc .CharcodesToUnicode (_ba );_ged ,_ :=_bdd .Font .RunesToCharcodeBytes (_aga );_bb :=_bdd .Font .BytesToCharcodes (_ged );_fca :=charcode ;if len (_bb )> 0&&_bb [0]!=0{_fca =_bb [0];};if string (_aga )==string (_gd .MissingCodeRune )&&_bdd ._bdc .BaseFont ()==_bdd .Font .BaseFont (){return _bdd .charcodeToRunesSimple (charcode );
-};return _fca ,_aga ;};func (_fbcc *TextState )Translate (tx ,ty float64 ){_fbcc .Tm =_fbcc .Tm .Mult (_df .TranslationMatrix (tx ,ty ));};func (_fc *TextFont )NewFace (size float64 )_cc .Face {return _cf .NewFace (_fc ._dea ,&_cf .Options {Size :size });
-};type TextState struct{Tc float64 ;Tw float64 ;Th float64 ;Tl float64 ;Tf *TextFont ;Ts float64 ;Tm _df .Matrix ;Tlm _df .Matrix ;Tr TextRenderingMode ;GlobalScale float64 ;};func NewTextFontFromPath (filePath string ,size float64 )(*TextFont ,error ){_ebc ,_adg :=_ga .NewPdfFontFromTTFFile (filePath );
-if _adg !=nil {return nil ,_adg ;};return NewTextFont (_ebc ,size );};const (FillRuleWinding FillRule =iota ;FillRuleEvenOdd ;);func (_aaa *TextFont )BytesToCharcodes (data []byte )[]_cg .CharCode {if _aaa ._bdc !=nil {return _aaa ._bdc .BytesToCharcodes (data );
-};return _aaa .Font .BytesToCharcodes (data );};func NewTextFont (font *_ga .PdfFont ,size float64 )(*TextFont ,error ){_dead :=font .FontDescriptor ();if _dead ==nil {return nil ,_d .New ("\u0063\u006fu\u006c\u0064\u0020\u006e\u006f\u0074\u0020\u0067\u0065\u0074\u0020\u0066\u006f\u006e\u0074\u0020\u0064\u0065\u0073\u0063\u0072\u0069pt\u006f\u0072");
-};_fdg ,_bfa :=_a .GetStream (_dead .FontFile2 );if !_bfa {return nil ,_d .New ("\u006di\u0073\u0073\u0069\u006e\u0067\u0020\u0066\u006f\u006e\u0074\u0020f\u0069\u006c\u0065\u0020\u0073\u0074\u0072\u0065\u0061\u006d");};_aef ,_fge :=_a .DecodeStream (_fdg );
-if _fge !=nil {return nil ,_fge ;};_feb ,_fge :=_cf .Parse (_aef );if _fge !=nil {return nil ,_fge ;};_eca :=font .FontDescriptor ().FontName .String ();_cfg :=len (_eca )> 7&&_eca [6]=='+';if _dead .Flags !=nil {_eg ,_gg :=_gc .Atoi (_dead .Flags .String ());
-if _gg ==nil &&_eg ==32{_cfg =false ;};};if !_feb .HasCmap ()&&(!_bg .Contains (font .Encoder ().String (),"\u0049d\u0065\u006e\u0074\u0069\u0074\u0079-")||!_cfg ){return nil ,_d .New ("\u006e\u006f c\u006d\u0061\u0070 \u0061\u006e\u0064\u0020enc\u006fdi\u006e\u0067\u0020\u0069\u0073\u0020\u006eot\u0020\u0069\u0064\u0065\u006e\u0074\u0069t\u0079");
-};return &TextFont {Font :font ,Size :size ,_dea :_feb },nil ;};func (_ca *TextState )ProcTd (tx ,ty float64 ){_ca .Tlm .Concat (_df .TranslationMatrix (tx ,ty ));_ca .Tm =_ca .Tlm .Clone ();};const (LineJoinRound LineJoin =iota ;LineJoinBevel ;);type LineCap int ;
-func NewTextState ()TextState {return TextState {Th :100,Tm :_df .IdentityMatrix (),Tlm :_df .IdentityMatrix ()};};func (_bc *TextState )ProcTm (a ,b ,c ,d ,e ,f float64 ){_bc .Tm =_df .NewMatrix (a ,b ,c ,d ,e ,f );_bc .Tlm =_bc .Tm .Clone ();};func (_gcfg *TextState )ProcQ (data []byte ,ctx Context ){_gcfg .ProcTStar ();
-_gcfg .ProcTj (data ,ctx )};func (_aac *TextState )ProcTD (tx ,ty float64 ){_aac .Tl =-ty ;_aac .ProcTd (tx ,ty )};func (_cege *TextState )Reset (){_cege .Tm =_df .IdentityMatrix ();_cege .Tlm =_df .IdentityMatrix ()};func (_gbg *TextState )ProcTj (data []byte ,ctx Context ){_fa :=_gbg .Tf .Size ;
-_abf :=_gbg .Th /100.0;_gcfe :=_gbg .GlobalScale ;_ega :=_df .NewMatrix (_fa *_abf ,0,0,_fa ,0,_gbg .Ts );_egc :=ctx .Matrix ();_fcd :=_egc .Clone ().Mult (_gbg .Tm .Clone ().Mult (_ega )).ScalingFactorY ();_aca :=_gbg .Tf .NewFace (_fcd );_bac :=_gbg .Tf .BytesToCharcodes (data );
-for _ ,_efb :=range _bac {_cbe ,_bgb :=_gbg .Tf .CharcodeToRunes (_efb );_gedg :=string (_bgb );if _gedg =="\u0000"{continue ;};_add :=_egc .Clone ().Mult (_gbg .Tm .Clone ().Mult (_ega ));_ffaf :=_add .ScalingFactorY ();_add =_add .Scale (1/_ffaf ,-1/_ffaf );
-if _gbg .Tr !=TextRenderingModeInvisible {ctx .SetMatrix (_add );ctx .DrawString (_gedg ,_aca ,0,0);ctx .SetMatrix (_egc );};_edg :=0.0;if _gedg =="\u0020"{_edg =_gbg .Tw ;};_afg ,_ ,_ceb :=_gbg .Tf .GetCharMetrics (_cbe );if _ceb {_afg =_afg *0.001*_fa ;
-}else {_afg ,_ =ctx .MeasureString (_gedg ,_aca );_afg =_afg /_gcfe ;};_fee :=(_afg +_gbg .Tc +_edg )*_abf ;_gbg .Tm =_gbg .Tm .Mult (_df .TranslationMatrix (_fee ,0));};};func (_gge *TextState )ProcDQ (data []byte ,aw ,ac float64 ,ctx Context ){_gge .Tw =aw ;
-_gge .Tc =ac ;_gge .ProcQ (data ,ctx );};func (_bfg *TextFont )charcodeToRunesSimple (_da _cg .CharCode )(_cg .CharCode ,[]rune ){_bad :=[]_cg .CharCode {_da };if _bfg .Font .IsSimple ()&&_bfg ._dea !=nil {if _ffa :=_bfg ._dea .Index (rune (_da ));_ffa > 0{return _da ,[]rune {rune (_da )};
-};};if _bfg ._dea !=nil &&!_bfg ._dea .HasCmap ()&&_bg .Contains (_bfg .Font .Encoder ().String (),"\u0049d\u0065\u006e\u0074\u0069\u0074\u0079-"){if _fea :=_bfg ._dea .Index (rune (_da ));_fea > 0{return _da ,[]rune {rune (_da )};};};return _da ,_bfg .Font .CharcodesToUnicode (_bad );
-};func (_gf *TextFont )WithSize (size float64 ,originalFont *_ga .PdfFont )*TextFont {return &TextFont {Font :_gf .Font ,Size :size ,_dea :_gf ._dea ,_bdc :originalFont };};type TextRenderingMode int ;type Gradient interface{Pattern ;AddColorStop (_fb float64 ,_bd _b .Color );
-};const (LineCapRound LineCap =iota ;LineCapButt ;LineCapSquare ;);func (_gff *TextState )ProcTStar (){_gff .ProcTd (0,-_gff .Tl )};type LineJoin int ;func (_aea *TextState )ProcTf (font *TextFont ){_aea .Tf =font };type Context interface{Push ();Pop ();
-Matrix ()_df .Matrix ;SetMatrix (_cgf _df .Matrix );Translate (_fg ,_bf float64 );Scale (_ge ,_e float64 );Rotate (_ce float64 );MoveTo (_fbc ,_gag float64 );LineTo (_ab ,_cgg float64 );CubicTo (_ccf ,_ag ,_ceg ,_dc ,_bdf ,_ac float64 );QuadraticTo (_gb ,_cggd ,_bff ,_gec float64 );
-NewSubPath ();ClosePath ();ClearPath ();Clip ();ClipPreserve ();ResetClip ();LineWidth ()float64 ;SetLineWidth (_af float64 );SetLineCap (_aa LineCap );SetLineJoin (_abd LineJoin );SetDash (_ef ...float64 );SetDashOffset (_de float64 );Fill ();FillPreserve ();
-Stroke ();StrokePreserve ();SetRGBA (_gbb ,_cd ,_db ,_aag float64 );SetFillRGBA (_cfc ,_dcc ,_fd ,_ae float64 );SetFillStyle (_ad Pattern );SetFillRule (_ee FillRule );SetStrokeRGBA (_gad ,_agb ,_gdb ,_ccd float64 );SetStrokeStyle (_eb Pattern );FillPattern ()Pattern ;
-StrokePattern ()Pattern ;TextState ()*TextState ;DrawString (_fe string ,_gac _cc .Face ,_fgb ,_aad float64 );MeasureString (_gee string ,_eea _cc .Face )(_afe ,_fbf float64 );DrawRectangle (_fbcf ,_cb ,_ff ,_eeaa float64 );DrawImage (_fgc _c .Image ,_cde ,_abdb int );
-DrawImageAnchored (_gcf _c .Image ,_geef ,_ed int ,_ec ,_efd float64 );Height ()int ;Width ()int ;};
+package context
+
+import (
+	_d "errors"
+	_a "github.com/szwede/unipdf/v4/core"
+	_gd "github.com/szwede/unipdf/v4/internal/cmap"
+	_cg "github.com/szwede/unipdf/v4/internal/textencoding"
+	_df "github.com/szwede/unipdf/v4/internal/transform"
+	_ga "github.com/szwede/unipdf/v4/model"
+	_cf "github.com/unidoc/freetype/truetype"
+	_cc "golang.org/x/image/font"
+	_c "image"
+	_b "image/color"
+	_gc "strconv"
+	_bg "strings"
+)
+
+func (_dd *TextFont) GetCharMetrics(code _cg.CharCode) (float64, float64, bool) {
+	if _geee, _dfe := _dd.Font.GetCharMetrics(code); _dfe && _geee.Wx != 0 {
+		return _geee.Wx, _geee.Wy, _dfe
+	}
+	if _dd._bdc == nil {
+		return 0, 0, false
+	}
+	_deaa, _edd := _dd._bdc.GetCharMetrics(code)
+	return _deaa.Wx, _deaa.Wy, _edd && _deaa.Wx != 0
+}
+
+type FillRule int
+
+const (
+	TextRenderingModeFill TextRenderingMode = iota
+	TextRenderingModeStroke
+	TextRenderingModeFillStroke
+	TextRenderingModeInvisible
+	TextRenderingModeFillClip
+	TextRenderingModeStrokeClip
+	TextRenderingModeFillStrokeClip
+	TextRenderingModeClip
+)
+
+type Pattern interface {
+	ColorAt(_be, _f int) _b.Color
+}
+
+type TextFont struct {
+	Font *_ga.PdfFont
+	Size float64
+	_dea *_cf.Font
+	_bdc *_ga.PdfFont
+}
+
+func (_bdd *TextFont) CharcodeToRunes(charcode _cg.CharCode) (_cg.CharCode, []rune) {
+	_ba := []_cg.CharCode{charcode}
+	if _bdd._bdc == nil || _bdd._bdc == _bdd.Font {
+		return _bdd.charcodeToRunesSimple(charcode)
+	}
+	_aga := _bdd._bdc.CharcodesToUnicode(_ba)
+	_ged, _ := _bdd.Font.RunesToCharcodeBytes(_aga)
+	_bb := _bdd.Font.BytesToCharcodes(_ged)
+	_fca := charcode
+	if len(_bb) > 0 && _bb[0] != 0 {
+		_fca = _bb[0]
+	}
+	if string(_aga) == string(_gd.MissingCodeRune) && _bdd._bdc.BaseFont() == _bdd.Font.BaseFont() {
+		return _bdd.charcodeToRunesSimple(charcode)
+	}
+	return _fca, _aga
+}
+
+func (_fbcc *TextState) Translate(tx, ty float64) {
+	_fbcc.Tm = _fbcc.Tm.Mult(_df.TranslationMatrix(tx, ty))
+}
+
+func (_fc *TextFont) NewFace(size float64) _cc.Face {
+	return _cf.NewFace(_fc._dea, &_cf.Options{Size: size})
+}
+
+type TextState struct {
+	Tc          float64
+	Tw          float64
+	Th          float64
+	Tl          float64
+	Tf          *TextFont
+	Ts          float64
+	Tm          _df.Matrix
+	Tlm         _df.Matrix
+	Tr          TextRenderingMode
+	GlobalScale float64
+}
+
+func NewTextFontFromPath(filePath string, size float64) (*TextFont, error) {
+	_ebc, _adg := _ga.NewPdfFontFromTTFFile(filePath)
+	if _adg != nil {
+		return nil, _adg
+	}
+	return NewTextFont(_ebc, size)
+}
+
+const (
+	FillRuleWinding FillRule = iota
+	FillRuleEvenOdd
+)
+
+func (_aaa *TextFont) BytesToCharcodes(data []byte) []_cg.CharCode {
+	if _aaa._bdc != nil {
+		return _aaa._bdc.BytesToCharcodes(data)
+	}
+	return _aaa.Font.BytesToCharcodes(data)
+}
+
+func NewTextFont(font *_ga.PdfFont, size float64) (*TextFont, error) {
+	_dead := font.FontDescriptor()
+	if _dead == nil {
+		return nil, _d.New("\u0063\u006fu\u006c\u0064\u0020\u006e\u006f\u0074\u0020\u0067\u0065\u0074\u0020\u0066\u006f\u006e\u0074\u0020\u0064\u0065\u0073\u0063\u0072\u0069pt\u006f\u0072")
+	}
+	_fdg, _bfa := _a.GetStream(_dead.FontFile2)
+	if !_bfa {
+		return nil, _d.New("\u006di\u0073\u0073\u0069\u006e\u0067\u0020\u0066\u006f\u006e\u0074\u0020f\u0069\u006c\u0065\u0020\u0073\u0074\u0072\u0065\u0061\u006d")
+	}
+	_aef, _fge := _a.DecodeStream(_fdg)
+	if _fge != nil {
+		return nil, _fge
+	}
+	_feb, _fge := _cf.Parse(_aef)
+	if _fge != nil {
+		return nil, _fge
+	}
+	_eca := font.FontDescriptor().FontName.String()
+	_cfg := len(_eca) > 7 && _eca[6] == '+'
+	if _dead.Flags != nil {
+		_eg, _gg := _gc.Atoi(_dead.Flags.String())
+		if _gg == nil && _eg == 32 {
+			_cfg = false
+		}
+	}
+	if !_feb.HasCmap() && (!_bg.Contains(font.Encoder().String(), "\u0049d\u0065\u006e\u0074\u0069\u0074\u0079-") || !_cfg) {
+		return nil, _d.New("\u006e\u006f c\u006d\u0061\u0070 \u0061\u006e\u0064\u0020enc\u006fdi\u006e\u0067\u0020\u0069\u0073\u0020\u006eot\u0020\u0069\u0064\u0065\u006e\u0074\u0069t\u0079")
+	}
+	return &TextFont{Font: font, Size: size, _dea: _feb}, nil
+}
+
+func (_ca *TextState) ProcTd(tx, ty float64) {
+	_ca.Tlm.Concat(_df.TranslationMatrix(tx, ty))
+	_ca.Tm = _ca.Tlm.Clone()
+}
+
+const (
+	LineJoinRound LineJoin = iota
+	LineJoinBevel
+)
+
+type LineCap int
+
+func NewTextState() TextState {
+	return TextState{Th: 100, Tm: _df.IdentityMatrix(), Tlm: _df.IdentityMatrix()}
+}
+
+func (_bc *TextState) ProcTm(a, b, c, d, e, f float64) {
+	_bc.Tm = _df.NewMatrix(a, b, c, d, e, f)
+	_bc.Tlm = _bc.Tm.Clone()
+}
+
+func (_gcfg *TextState) ProcQ(data []byte, ctx Context) {
+	_gcfg.ProcTStar()
+	_gcfg.ProcTj(data, ctx)
+}
+
+func (_aac *TextState) ProcTD(tx, ty float64) { _aac.Tl = -ty; _aac.ProcTd(tx, ty) }
+
+func (_cege *TextState) Reset() {
+	_cege.Tm = _df.IdentityMatrix()
+	_cege.Tlm = _df.IdentityMatrix()
+}
+
+func (_gbg *TextState) ProcTj(data []byte, ctx Context) {
+	_fa := _gbg.Tf.Size
+	_abf := _gbg.Th / 100.0
+	_gcfe := _gbg.GlobalScale
+	_ega := _df.NewMatrix(_fa*_abf, 0, 0, _fa, 0, _gbg.Ts)
+	_egc := ctx.Matrix()
+	_fcd := _egc.Clone().Mult(_gbg.Tm.Clone().Mult(_ega)).ScalingFactorY()
+	_aca := _gbg.Tf.NewFace(_fcd)
+	_bac := _gbg.Tf.BytesToCharcodes(data)
+	for _, _efb := range _bac {
+		_cbe, _bgb := _gbg.Tf.CharcodeToRunes(_efb)
+		_gedg := string(_bgb)
+		if _gedg == "\u0000" {
+			continue
+		}
+		_add := _egc.Clone().Mult(_gbg.Tm.Clone().Mult(_ega))
+		_ffaf := _add.ScalingFactorY()
+		_add = _add.Scale(1/_ffaf, -1/_ffaf)
+		if _gbg.Tr != TextRenderingModeInvisible {
+			ctx.SetMatrix(_add)
+			ctx.DrawString(_gedg, _aca, 0, 0)
+			ctx.SetMatrix(_egc)
+		}
+		_edg := 0.0
+		if _gedg == "\u0020" {
+			_edg = _gbg.Tw
+		}
+		_afg, _, _ceb := _gbg.Tf.GetCharMetrics(_cbe)
+		if _ceb {
+			_afg = _afg * 0.001 * _fa
+		} else {
+			_afg, _ = ctx.MeasureString(_gedg, _aca)
+			_afg = _afg / _gcfe
+		}
+		_fee := (_afg + _gbg.Tc + _edg) * _abf
+		_gbg.Tm = _gbg.Tm.Mult(_df.TranslationMatrix(_fee, 0))
+	}
+}
+
+func (_gge *TextState) ProcDQ(data []byte, aw, ac float64, ctx Context) {
+	_gge.Tw = aw
+	_gge.Tc = ac
+	_gge.ProcQ(data, ctx)
+}
+
+func (_bfg *TextFont) charcodeToRunesSimple(_da _cg.CharCode) (_cg.CharCode, []rune) {
+	_bad := []_cg.CharCode{_da}
+	if _bfg.Font.IsSimple() && _bfg._dea != nil {
+		if _ffa := _bfg._dea.Index(rune(_da)); _ffa > 0 {
+			return _da, []rune{rune(_da)}
+		}
+	}
+	if _bfg._dea != nil && !_bfg._dea.HasCmap() && _bg.Contains(_bfg.Font.Encoder().String(), "\u0049d\u0065\u006e\u0074\u0069\u0074\u0079-") {
+		if _fea := _bfg._dea.Index(rune(_da)); _fea > 0 {
+			return _da, []rune{rune(_da)}
+		}
+	}
+	return _da, _bfg.Font.CharcodesToUnicode(_bad)
+}
+
+func (_gf *TextFont) WithSize(size float64, originalFont *_ga.PdfFont) *TextFont {
+	return &TextFont{Font: _gf.Font, Size: size, _dea: _gf._dea, _bdc: originalFont}
+}
+
+type TextRenderingMode int
+
+type Gradient interface {
+	Pattern
+	AddColorStop(_fb float64, _bd _b.Color)
+}
+
+const (
+	LineCapRound LineCap = iota
+	LineCapButt
+	LineCapSquare
+)
+
+func (_gff *TextState) ProcTStar() { _gff.ProcTd(0, -_gff.Tl) }
+
+type LineJoin int
+
+func (_aea *TextState) ProcTf(font *TextFont) { _aea.Tf = font }
+
+type Context interface {
+	Push()
+	Pop()
+	Matrix() _df.Matrix
+	SetMatrix(_cgf _df.Matrix)
+	Translate(_fg, _bf float64)
+	Scale(_ge, _e float64)
+	Rotate(_ce float64)
+	MoveTo(_fbc, _gag float64)
+	LineTo(_ab, _cgg float64)
+	CubicTo(_ccf, _ag, _ceg, _dc, _bdf, _ac float64)
+	QuadraticTo(_gb, _cggd, _bff, _gec float64)
+	NewSubPath()
+	ClosePath()
+	ClearPath()
+	Clip()
+	ClipPreserve()
+	ResetClip()
+	LineWidth() float64
+	SetLineWidth(_af float64)
+	SetLineCap(_aa LineCap)
+	SetLineJoin(_abd LineJoin)
+	SetDash(_ef ...float64)
+	SetDashOffset(_de float64)
+	Fill()
+	FillPreserve()
+	Stroke()
+	StrokePreserve()
+	SetRGBA(_gbb, _cd, _db, _aag float64)
+	SetFillRGBA(_cfc, _dcc, _fd, _ae float64)
+	SetFillStyle(_ad Pattern)
+	SetFillRule(_ee FillRule)
+	SetStrokeRGBA(_gad, _agb, _gdb, _ccd float64)
+	SetStrokeStyle(_eb Pattern)
+	FillPattern() Pattern
+	StrokePattern() Pattern
+	TextState() *TextState
+	DrawString(_fe string, _gac _cc.Face, _fgb, _aad float64)
+	MeasureString(_gee string, _eea _cc.Face) (_afe, _fbf float64)
+	DrawRectangle(_fbcf, _cb, _ff, _eeaa float64)
+	DrawImage(_fgc _c.Image, _cde, _abdb int)
+	DrawImageAnchored(_gcf _c.Image, _geef, _ed int, _ec, _efd float64)
+	Height() int
+	Width() int
+}

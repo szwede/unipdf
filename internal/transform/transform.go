@@ -9,21 +9,177 @@
 // Use of this source code is governed by the UniDoc End User License Agreement
 // terms that can be accessed at https://unidoc.io/eula/
 
-package transform ;import (_d "fmt";_g "github.com/unidoc/unipdf/v4/common";_dd "math";);func (_fd Matrix )String ()string {_ee ,_cd ,_ff ,_ef ,_df ,_ab :=_fd [0],_fd [1],_fd [3],_fd [4],_fd [6],_fd [7];return _d .Sprintf ("\u005b\u00257\u002e\u0034\u0066\u002c%\u0037\u002e4\u0066\u002c\u0025\u0037\u002e\u0034\u0066\u002c%\u0037\u002e\u0034\u0066\u003a\u0025\u0037\u002e\u0034\u0066\u002c\u00257\u002e\u0034\u0066\u005d",_ee ,_cd ,_ff ,_ef ,_df ,_ab );
-};func ScaleMatrix (x ,y float64 )Matrix {return NewMatrix (x ,0,0,y ,0,0)};func (_ecaf *Point )Set (x ,y float64 ){_ecaf .X ,_ecaf .Y =x ,y };func ShearMatrix (x ,y float64 )Matrix {return NewMatrix (1,y ,x ,1,0,0)};func (_cf Matrix )ScalingFactorX ()float64 {return _dd .Hypot (_cf [0],_cf [1])};
-func (_ddf Matrix )Translate (tx ,ty float64 )Matrix {return _ddf .Mult (TranslationMatrix (tx ,ty ))};func TranslationMatrix (tx ,ty float64 )Matrix {return NewMatrix (1,0,0,1,tx ,ty )};func (_b *Matrix )Shear (x ,y float64 ){_b .Concat (ShearMatrix (x ,y ))};
-func (_fe *Matrix )Set (a ,b ,c ,d ,tx ,ty float64 ){_fe [0],_fe [1]=a ,b ;_fe [3],_fe [4]=c ,d ;_fe [6],_fe [7]=tx ,ty ;_fe .clampRange ();};func (_cg Matrix )Angle ()float64 {_bd :=_dd .Atan2 (-_cg [1],_cg [0]);if _bd < 0.0{_bd +=2*_dd .Pi ;};return _bd /_dd .Pi *180.0;
-};func (_fce *Matrix )clampRange (){for _aca ,_bgf :=range _fce {if _bgf > _cbg {_g .Log .Debug ("\u0043L\u0041M\u0050\u003a\u0020\u0025\u0067\u0020\u002d\u003e\u0020\u0025\u0067",_bgf ,_cbg );_fce [_aca ]=_cbg ;}else if _bgf < -_cbg {_g .Log .Debug ("\u0043L\u0041M\u0050\u003a\u0020\u0025\u0067\u0020\u002d\u003e\u0020\u0025\u0067",_bgf ,-_cbg );
-_fce [_aca ]=-_cbg ;};};};func (_eb Point )Displace (delta Point )Point {return Point {_eb .X +delta .X ,_eb .Y +delta .Y }};func IdentityMatrix ()Matrix {return NewMatrix (1,0,0,1,0,0)};func (_cffa Point )Rotate (theta float64 )Point {_bdg :=_dd .Hypot (_cffa .X ,_cffa .Y );
-_cc :=_dd .Atan2 (_cffa .Y ,_cffa .X );_eff ,_ebc :=_dd .Sincos (_cc +theta /180.0*_dd .Pi );return Point {_bdg *_ebc ,_bdg *_eff };};func (_bb Matrix )Unrealistic ()bool {_dg ,_ggg ,_bbg ,_ade :=_dd .Abs (_bb [0]),_dd .Abs (_bb [1]),_dd .Abs (_bb [3]),_dd .Abs (_bb [4]);
-_aaf :=_dg > _cac &&_ade > _cac ;_acd :=_ggg > _cac &&_bbg > _cac ;return !(_aaf ||_acd );};const _gdd =1e-10;func (_cb Matrix )Transform (x ,y float64 )(float64 ,float64 ){_fec :=x *_cb [0]+y *_cb [3]+_cb [6];_gd :=x *_cb [1]+y *_cb [4]+_cb [7];return _fec ,_gd ;
-};func (_gb Matrix )Mult (b Matrix )Matrix {_gb .Concat (b );return _gb };func NewMatrix (a ,b ,c ,d ,tx ,ty float64 )Matrix {_fb :=Matrix {a ,b ,0,c ,d ,0,tx ,ty ,1};_fb .clampRange ();return _fb ;};func NewPoint (x ,y float64 )Point {return Point {X :x ,Y :y }};
-const _cbg =1e9;func (_ea Matrix )Translation ()(float64 ,float64 ){return _ea [6],_ea [7]};func (_af *Matrix )Clone ()Matrix {return NewMatrix (_af [0],_af [1],_af [3],_af [4],_af [6],_af [7])};func (_cff Matrix )Inverse ()(Matrix ,bool ){_cfb ,_de :=_cff [0],_cff [1];
-_fa ,_cbb :=_cff [3],_cff [4];_eca ,_fag :=_cff [6],_cff [7];_ca :=_cfb *_cbb -_de *_fa ;if _dd .Abs (_ca )< _ce {return Matrix {},false ;};_bgb ,_ed :=_cbb /_ca ,-_de /_ca ;_ac ,_ad :=-_fa /_ca ,_cfb /_ca ;_dfg :=-(_bgb *_eca +_ac *_fag );_eea :=-(_ed *_eca +_ad *_fag );
-return NewMatrix (_bgb ,_ed ,_ac ,_ad ,_dfg ,_eea ),true ;};const _ce =1.0e-6;func (_abb Point )Interpolate (b Point ,t float64 )Point {return Point {X :(1-t )*_abb .X +t *b .X ,Y :(1-t )*_abb .Y +t *b .Y };};func (_a Matrix )Round (precision float64 )Matrix {for _c :=range _a {_a [_c ]=_dd .Round (_a [_c ]/precision )*precision ;
-};return _a ;};func (_dda Matrix )Scale (xScale ,yScale float64 )Matrix {return _dda .Mult (ScaleMatrix (xScale ,yScale ));};func RotationMatrix (angle float64 )Matrix {_f :=_dd .Cos (angle );_ec :=_dd .Sin (angle );return NewMatrix (_f ,_ec ,-_ec ,_f ,0,0);
-};func (_ga *Point )Transform (a ,b ,c ,d ,tx ,ty float64 ){_eg :=NewMatrix (a ,b ,c ,d ,tx ,ty );_ga .transformByMatrix (_eg );};func (_bf Point )String ()string {return _d .Sprintf ("(\u0025\u002e\u0032\u0066\u002c\u0025\u002e\u0032\u0066\u0029",_bf .X ,_bf .Y );
-};func (_ge *Point )transformByMatrix (_ae Matrix ){_ge .X ,_ge .Y =_ae .Transform (_ge .X ,_ge .Y )};func (_ag Point )Distance (b Point )float64 {return _dd .Hypot (_ag .X -b .X ,_ag .Y -b .Y )};func (_gg Matrix )Identity ()bool {return _gg [0]==1&&_gg [1]==0&&_gg [2]==0&&_gg [3]==0&&_gg [4]==1&&_gg [5]==0&&_gg [6]==0&&_gg [7]==0&&_gg [8]==1;
-};func NewMatrixFromTransforms (xScale ,yScale ,theta ,tx ,ty float64 )Matrix {return IdentityMatrix ().Scale (xScale ,yScale ).Rotate (theta ).Translate (tx ,ty );};type Matrix [9]float64 ;func (_fbg *Matrix )Concat (b Matrix ){*_fbg =Matrix {b [0]*_fbg [0]+b [1]*_fbg [3],b [0]*_fbg [1]+b [1]*_fbg [4],0,b [3]*_fbg [0]+b [4]*_fbg [3],b [3]*_fbg [1]+b [4]*_fbg [4],0,b [6]*_fbg [0]+b [7]*_fbg [3]+_fbg [6],b [6]*_fbg [1]+b [7]*_fbg [4]+_fbg [7],1};
-_fbg .clampRange ();};type Point struct{X float64 ;Y float64 ;};func (_bg Matrix )ScalingFactorY ()float64 {return _dd .Hypot (_bg [3],_bg [4])};const _cac =1e-6;func (_aa Matrix )Rotate (theta float64 )Matrix {return _aa .Mult (RotationMatrix (theta ))};
-func (_fc Matrix )Singular ()bool {return _dd .Abs (_fc [0]*_fc [4]-_fc [1]*_fc [3])< _gdd };
+package transform
+
+import (
+	_d "fmt"
+	_g "github.com/szwede/unipdf/v4/common"
+	_dd "math"
+)
+
+func (_fd Matrix) String() string {
+	_ee, _cd, _ff, _ef, _df, _ab := _fd[0], _fd[1], _fd[3], _fd[4], _fd[6], _fd[7]
+	return _d.Sprintf("\u005b\u00257\u002e\u0034\u0066\u002c%\u0037\u002e4\u0066\u002c\u0025\u0037\u002e\u0034\u0066\u002c%\u0037\u002e\u0034\u0066\u003a\u0025\u0037\u002e\u0034\u0066\u002c\u00257\u002e\u0034\u0066\u005d", _ee, _cd, _ff, _ef, _df, _ab)
+}
+
+func ScaleMatrix(x, y float64) Matrix { return NewMatrix(x, 0, 0, y, 0, 0) }
+
+func (_ecaf *Point) Set(x, y float64) { _ecaf.X, _ecaf.Y = x, y }
+
+func ShearMatrix(x, y float64) Matrix { return NewMatrix(1, y, x, 1, 0, 0) }
+
+func (_cf Matrix) ScalingFactorX() float64 { return _dd.Hypot(_cf[0], _cf[1]) }
+
+func (_ddf Matrix) Translate(tx, ty float64) Matrix { return _ddf.Mult(TranslationMatrix(tx, ty)) }
+
+func TranslationMatrix(tx, ty float64) Matrix { return NewMatrix(1, 0, 0, 1, tx, ty) }
+
+func (_b *Matrix) Shear(x, y float64) { _b.Concat(ShearMatrix(x, y)) }
+
+func (_fe *Matrix) Set(a, b, c, d, tx, ty float64) {
+	_fe[0], _fe[1] = a, b
+	_fe[3], _fe[4] = c, d
+	_fe[6], _fe[7] = tx, ty
+	_fe.clampRange()
+}
+
+func (_cg Matrix) Angle() float64 {
+	_bd := _dd.Atan2(-_cg[1], _cg[0])
+	if _bd < 0.0 {
+		_bd += 2 * _dd.Pi
+	}
+	return _bd / _dd.Pi * 180.0
+}
+
+func (_fce *Matrix) clampRange() {
+	for _aca, _bgf := range _fce {
+		if _bgf > _cbg {
+			_g.Log.Debug("\u0043L\u0041M\u0050\u003a\u0020\u0025\u0067\u0020\u002d\u003e\u0020\u0025\u0067", _bgf, _cbg)
+			_fce[_aca] = _cbg
+		} else if _bgf < -_cbg {
+			_g.Log.Debug("\u0043L\u0041M\u0050\u003a\u0020\u0025\u0067\u0020\u002d\u003e\u0020\u0025\u0067", _bgf, -_cbg)
+			_fce[_aca] = -_cbg
+		}
+	}
+}
+
+func (_eb Point) Displace(delta Point) Point { return Point{_eb.X + delta.X, _eb.Y + delta.Y} }
+
+func IdentityMatrix() Matrix { return NewMatrix(1, 0, 0, 1, 0, 0) }
+
+func (_cffa Point) Rotate(theta float64) Point {
+	_bdg := _dd.Hypot(_cffa.X, _cffa.Y)
+	_cc := _dd.Atan2(_cffa.Y, _cffa.X)
+	_eff, _ebc := _dd.Sincos(_cc + theta/180.0*_dd.Pi)
+	return Point{_bdg * _ebc, _bdg * _eff}
+}
+
+func (_bb Matrix) Unrealistic() bool {
+	_dg, _ggg, _bbg, _ade := _dd.Abs(_bb[0]), _dd.Abs(_bb[1]), _dd.Abs(_bb[3]), _dd.Abs(_bb[4])
+	_aaf := _dg > _cac && _ade > _cac
+	_acd := _ggg > _cac && _bbg > _cac
+	return !(_aaf || _acd)
+}
+
+const _gdd = 1e-10
+
+func (_cb Matrix) Transform(x, y float64) (float64, float64) {
+	_fec := x*_cb[0] + y*_cb[3] + _cb[6]
+	_gd := x*_cb[1] + y*_cb[4] + _cb[7]
+	return _fec, _gd
+}
+
+func (_gb Matrix) Mult(b Matrix) Matrix { _gb.Concat(b); return _gb }
+
+func NewMatrix(a, b, c, d, tx, ty float64) Matrix {
+	_fb := Matrix{a, b, 0, c, d, 0, tx, ty, 1}
+	_fb.clampRange()
+	return _fb
+}
+
+func NewPoint(x, y float64) Point { return Point{X: x, Y: y} }
+
+const _cbg = 1e9
+
+func (_ea Matrix) Translation() (float64, float64) { return _ea[6], _ea[7] }
+
+func (_af *Matrix) Clone() Matrix { return NewMatrix(_af[0], _af[1], _af[3], _af[4], _af[6], _af[7]) }
+
+func (_cff Matrix) Inverse() (Matrix, bool) {
+	_cfb, _de := _cff[0], _cff[1]
+	_fa, _cbb := _cff[3], _cff[4]
+	_eca, _fag := _cff[6], _cff[7]
+	_ca := _cfb*_cbb - _de*_fa
+	if _dd.Abs(_ca) < _ce {
+		return Matrix{}, false
+	}
+	_bgb, _ed := _cbb/_ca, -_de/_ca
+	_ac, _ad := -_fa/_ca, _cfb/_ca
+	_dfg := -(_bgb*_eca + _ac*_fag)
+	_eea := -(_ed*_eca + _ad*_fag)
+	return NewMatrix(_bgb, _ed, _ac, _ad, _dfg, _eea), true
+}
+
+const _ce = 1.0e-6
+
+func (_abb Point) Interpolate(b Point, t float64) Point {
+	return Point{X: (1-t)*_abb.X + t*b.X, Y: (1-t)*_abb.Y + t*b.Y}
+}
+
+func (_a Matrix) Round(precision float64) Matrix {
+	for _c := range _a {
+		_a[_c] = _dd.Round(_a[_c]/precision) * precision
+	}
+	return _a
+}
+
+func (_dda Matrix) Scale(xScale, yScale float64) Matrix {
+	return _dda.Mult(ScaleMatrix(xScale, yScale))
+}
+
+func RotationMatrix(angle float64) Matrix {
+	_f := _dd.Cos(angle)
+	_ec := _dd.Sin(angle)
+	return NewMatrix(_f, _ec, -_ec, _f, 0, 0)
+}
+
+func (_ga *Point) Transform(a, b, c, d, tx, ty float64) {
+	_eg := NewMatrix(a, b, c, d, tx, ty)
+	_ga.transformByMatrix(_eg)
+}
+
+func (_bf Point) String() string {
+	return _d.Sprintf("(\u0025\u002e\u0032\u0066\u002c\u0025\u002e\u0032\u0066\u0029", _bf.X, _bf.Y)
+}
+
+func (_ge *Point) transformByMatrix(_ae Matrix) { _ge.X, _ge.Y = _ae.Transform(_ge.X, _ge.Y) }
+
+func (_ag Point) Distance(b Point) float64 { return _dd.Hypot(_ag.X-b.X, _ag.Y-b.Y) }
+
+func (_gg Matrix) Identity() bool {
+	return _gg[0] == 1 && _gg[1] == 0 && _gg[2] == 0 && _gg[3] == 0 && _gg[4] == 1 && _gg[5] == 0 && _gg[6] == 0 && _gg[7] == 0 && _gg[8] == 1
+}
+
+func NewMatrixFromTransforms(xScale, yScale, theta, tx, ty float64) Matrix {
+	return IdentityMatrix().Scale(xScale, yScale).Rotate(theta).Translate(tx, ty)
+}
+
+type Matrix [9]float64
+
+func (_fbg *Matrix) Concat(b Matrix) {
+	*_fbg = Matrix{b[0]*_fbg[0] + b[1]*_fbg[3], b[0]*_fbg[1] + b[1]*_fbg[4], 0, b[3]*_fbg[0] + b[4]*_fbg[3], b[3]*_fbg[1] + b[4]*_fbg[4], 0, b[6]*_fbg[0] + b[7]*_fbg[3] + _fbg[6], b[6]*_fbg[1] + b[7]*_fbg[4] + _fbg[7], 1}
+	_fbg.clampRange()
+}
+
+type Point struct {
+	X float64
+	Y float64
+}
+
+func (_bg Matrix) ScalingFactorY() float64 { return _dd.Hypot(_bg[3], _bg[4]) }
+
+const _cac = 1e-6
+
+func (_aa Matrix) Rotate(theta float64) Matrix { return _aa.Mult(RotationMatrix(theta)) }
+
+func (_fc Matrix) Singular() bool { return _dd.Abs(_fc[0]*_fc[4]-_fc[1]*_fc[3]) < _gdd }

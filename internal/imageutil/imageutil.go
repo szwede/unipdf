@@ -9,394 +9,4292 @@
 // Use of this source code is governed by the UniDoc End User License Agreement
 // terms that can be accessed at https://unidoc.io/eula/
 
-package imageutil ;import (_d "encoding/binary";_fc "errors";_c "fmt";_ef "github.com/unidoc/unipdf/v4/common";_ff "github.com/unidoc/unipdf/v4/internal/bitwise";_g "image";_e "image/color";_bg "image/draw";_b "math";);func (_gce *Monochrome )At (x ,y int )_e .Color {_ccebd ,_ :=_gce .ColorAt (x ,y );
-return _ccebd };func (_eece *NRGBA32 )Base ()*ImageBase {return &_eece .ImageBase };func _aagf (_eafae _g .Image ,_acega int )(_g .Rectangle ,bool ,[]byte ){_fcbg :=_eafae .Bounds ();var (_bbaa bool ;_ggga []byte ;);switch _fdff :=_eafae .(type ){case SMasker :_bbaa =_fdff .HasAlpha ();
-case NRGBA ,RGBA ,*_g .RGBA64 ,nrgba64 ,*_g .NYCbCrA :_ggga =make ([]byte ,_fcbg .Max .X *_fcbg .Max .Y *_acega );case *_g .Paletted :if !_fdff .Opaque (){_ggga =make ([]byte ,_fcbg .Max .X *_fcbg .Max .Y *_acega );};};return _fcbg ,_bbaa ,_ggga ;};func _ceg (_ebb *Monochrome ,_fcf ,_beg int )(*Monochrome ,error ){if _ebb ==nil {return nil ,_fc .New ("\u0073o\u0075r\u0063\u0065\u0020\u006e\u006ft\u0020\u0064e\u0066\u0069\u006e\u0065\u0064");
-};if _fcf <=0||_beg <=0{return nil ,_fc .New ("\u0069\u006e\u0076\u0061\u006c\u0069\u0064\u0020\u0073\u0063\u0061l\u0065\u0020\u0066\u0061\u0063\u0074\u006f\u0072\u003a\u0020<\u003d\u0020\u0030");};if _fcf ==_beg {if _fcf ==1{return _ebb .copy (),nil ;
-};if _fcf ==2||_fcf ==4||_fcf ==8{_beb ,_ggb :=_fa (_ebb ,_fcf );if _ggb !=nil {return nil ,_ggb ;};return _beb ,nil ;};};_bfd :=_fcf *_ebb .Width ;_gcc :=_beg *_ebb .Height ;_ae :=_edg (_bfd ,_gcc );_aa :=_ae .BytesPerLine ;var (_ded ,_cge ,_fbf ,_afe ,_bc int ;
-_bfc byte ;_aec error ;);for _cge =0;_cge < _ebb .Height ;_cge ++{_ded =_beg *_cge *_aa ;for _fbf =0;_fbf < _ebb .Width ;_fbf ++{if _ffd :=_ebb .getBitAt (_fbf ,_cge );_ffd {_bc =_fcf *_fbf ;for _afe =0;_afe < _fcf ;_afe ++{_ae .setIndexedBit (_ded *8+_bc +_afe );
-};};};for _afe =1;_afe < _beg ;_afe ++{_bag :=_ded +_afe *_aa ;for _fe :=0;_fe < _aa ;_fe ++{if _bfc ,_aec =_ae .getByte (_ded +_fe );_aec !=nil {return nil ,_aec ;};if _aec =_ae .setByte (_bag +_fe ,_bfc );_aec !=nil {return nil ,_aec ;};};};};return _ae ,nil ;
-};type Gray interface{GrayAt (_gegae ,_deda int )_e .Gray ;SetGray (_effc ,_bfcb int ,_gbfa _e .Gray );};func _ffee (_gaebf _g .Image ,_decfb Image ,_dadb _g .Rectangle ){if _dbgag ,_cccg :=_gaebf .(SMasker );_cccg &&_dbgag .HasAlpha (){_decfb .(SMasker ).MakeAlpha ();
-};switch _gdde :=_gaebf .(type ){case Gray :_abee (_gdde ,_decfb .(NRGBA ),_dadb );case NRGBA :_agaa (_gdde ,_decfb .(NRGBA ),_dadb );case *_g .NYCbCrA :_eaef (_gdde ,_decfb .(NRGBA ),_dadb );case CMYK :_dbdg (_gdde ,_decfb .(NRGBA ),_dadb );case RGBA :_acfd (_gdde ,_decfb .(NRGBA ),_dadb );
-case nrgba64 :_defg (_gdde ,_decfb .(NRGBA ),_dadb );default:_abd (_gaebf ,_decfb ,_dadb );};};func _egdc (_cbe _g .Image )(Image ,error ){if _fafg ,_eaf :=_cbe .(*CMYK32 );_eaf {return _fafg .Copy (),nil ;};_afb :=_cbe .Bounds ();_gca ,_abc :=NewImage (_afb .Max .X ,_afb .Max .Y ,8,4,nil ,nil ,nil );
-if _abc !=nil {return nil ,_abc ;};switch _gcdg :=_cbe .(type ){case CMYK :_fedf (_gcdg ,_gca .(CMYK ),_afb );case Gray :_gaa (_gcdg ,_gca .(CMYK ),_afb );case NRGBA :_ecb (_gcdg ,_gca .(CMYK ),_afb );case RGBA :_gad (_gcdg ,_gca .(CMYK ),_afb );default:_abd (_cbe ,_gca ,_afb );
-};return _gca ,nil ;};func (_gfg *CMYK32 )Copy ()Image {return &CMYK32 {ImageBase :_gfg .copy ()}};func (_ebfa *CMYK32 )Set (x ,y int ,c _e .Color ){_cccb :=4*(y *_ebfa .Width +x );if _cccb +3>=len (_ebfa .Data ){return ;};_bdf :=_e .CMYKModel .Convert (c ).(_e .CMYK );
-_ebfa .Data [_cccb ]=_bdf .C ;_ebfa .Data [_cccb +1]=_bdf .M ;_ebfa .Data [_cccb +2]=_bdf .Y ;_ebfa .Data [_cccb +3]=_bdf .K ;};func _bege (_cdc _e .RGBA )_e .NRGBA {switch _cdc .A {case 0xff:return _e .NRGBA {R :_cdc .R ,G :_cdc .G ,B :_cdc .B ,A :0xff};
-case 0x00:return _e .NRGBA {};default:_ebde ,_daea ,_eeb ,_aea :=_cdc .RGBA ();_ebde =(_ebde *0xffff)/_aea ;_daea =(_daea *0xffff)/_aea ;_eeb =(_eeb *0xffff)/_aea ;return _e .NRGBA {R :uint8 (_ebde >>8),G :uint8 (_daea >>8),B :uint8 (_eeb >>8),A :uint8 (_aea >>8)};
-};};type CMYK interface{CMYKAt (_age ,_fdd int )_e .CMYK ;SetCMYK (_ecaa ,_cag int ,_gega _e .CMYK );};func (_fggb *Gray4 )Bounds ()_g .Rectangle {return _g .Rectangle {Max :_g .Point {X :_fggb .Width ,Y :_fggb .Height }};};func (_abff colorConverter )Convert (src _g .Image )(Image ,error ){return _abff ._feb (src )};
-type Gray4 struct{ImageBase };func _fdcf (_gfd _e .RGBA )_e .CMYK {_egda ,_cffb ,_cbdb ,_bffe :=_e .RGBToCMYK (_gfd .R ,_gfd .G ,_gfd .B );return _e .CMYK {C :_egda ,M :_cffb ,Y :_cbdb ,K :_bffe };};func ColorAtCMYK (x ,y ,width int ,data []byte ,decode []float64 )(_e .CMYK ,error ){_eag :=4*(y *width +x );
-if _eag +3>=len (data ){return _e .CMYK {},_c .Errorf ("\u0069\u006d\u0061\u0067\u0065\u0020\u0063\u006f\u006f\u0072\u0064\u0069\u006ea\u0074\u0065\u0073\u0020\u006f\u0075t\u0020\u006f\u0066\u0020\u0072\u0061\u006e\u0067\u0065\u0020\u0028\u0025\u0064,\u0020\u0025\u0064\u0029",x ,y );
-};C :=data [_eag ]&0xff;M :=data [_eag +1]&0xff;Y :=data [_eag +2]&0xff;K :=data [_eag +3]&0xff;if len (decode )==8{C =uint8 (uint32 (LinearInterpolate (float64 (C ),0,255,decode [0],decode [1]))&0xff);M =uint8 (uint32 (LinearInterpolate (float64 (M ),0,255,decode [2],decode [3]))&0xff);
-Y =uint8 (uint32 (LinearInterpolate (float64 (Y ),0,255,decode [4],decode [5]))&0xff);K =uint8 (uint32 (LinearInterpolate (float64 (K ),0,255,decode [6],decode [7]))&0xff);};return _e .CMYK {C :C ,M :M ,Y :Y ,K :K },nil ;};func (_febg *Monochrome )ResolveDecode ()error {if len (_febg .Decode )!=2{return nil ;
-};if _febg .Decode [0]==1&&_febg .Decode [1]==0{if _bba :=_febg .InverseData ();_bba !=nil {return _bba ;};_febg .Decode =nil ;};return nil ;};func (_ead *Monochrome )clearBit (_gadd ,_bga int ){_ead .Data [_gadd ]&=^(0x80>>uint (_bga &7))};func (_gbf *CMYK32 )Base ()*ImageBase {return &_gbf .ImageBase };
-func (_caab *Gray2 )Histogram ()(_ffbc [256]int ){for _edd :=0;_edd < _caab .Width ;_edd ++{for _egdd :=0;_egdd < _caab .Height ;_egdd ++{_ffbc [_caab .GrayAt (_edd ,_egdd ).Y ]++;};};return _ffbc ;};func NewImageBase (width int ,height int ,bitsPerComponent int ,colorComponents int ,data []byte ,alpha []byte ,decode []float64 )ImageBase {_dccb :=ImageBase {Width :width ,Height :height ,BitsPerComponent :bitsPerComponent ,ColorComponents :colorComponents ,Data :data ,Alpha :alpha ,Decode :decode ,BytesPerLine :BytesPerLine (width ,bitsPerComponent ,colorComponents )};
-if data ==nil {_dccb .Data =make ([]byte ,height *_dccb .BytesPerLine );};return _dccb ;};func (_aab *Monochrome )ScaleLow (width ,height int )(*Monochrome ,error ){if width < 0||height < 0{return nil ,_fc .New ("\u0070\u0072\u006f\u0076\u0069\u0064e\u0064\u0020\u0069\u006e\u0076\u0061\u006c\u0069\u0064\u0020\u0077\u0069\u0064t\u0068\u0020\u0061\u006e\u0064\u0020\u0068e\u0069\u0067\u0068\u0074");
-};_cfaf :=_edg (width ,height );_afab :=make ([]int ,height );_eef :=make ([]int ,width );_ccag :=float64 (_aab .Width )/float64 (width );_fbd :=float64 (_aab .Height )/float64 (height );for _geca :=0;_geca < height ;_geca ++{_afab [_geca ]=int (_b .Min (_fbd *float64 (_geca )+0.5,float64 (_aab .Height -1)));
-};for _cgcb :=0;_cgcb < width ;_cgcb ++{_eef [_cgcb ]=int (_b .Min (_ccag *float64 (_cgcb )+0.5,float64 (_aab .Width -1)));};_ecaag :=-1;_gafd :=byte (0);for _decg :=0;_decg < height ;_decg ++{_ffga :=_afab [_decg ]*_aab .BytesPerLine ;_cegd :=_decg *_cfaf .BytesPerLine ;
-for _cdg :=0;_cdg < width ;_cdg ++{_bbd :=_eef [_cdg ];if _bbd !=_ecaag {_gafd =_aab .getBit (_ffga ,_bbd );if _gafd !=0{_cfaf .setBit (_cegd ,_cdg );};_ecaag =_bbd ;}else {if _gafd !=0{_cfaf .setBit (_cegd ,_cdg );};};};};return _cfaf ,nil ;};var _ NRGBA =&NRGBA16 {};
-func _fcdgc (_dcb CMYK ,_geeag RGBA ,_abeef _g .Rectangle ){for _faae :=0;_faae < _abeef .Max .X ;_faae ++{for _ebaf :=0;_ebaf < _abeef .Max .Y ;_ebaf ++{_adcc :=_dcb .CMYKAt (_faae ,_ebaf );_geeag .SetRGBA (_faae ,_ebaf ,_dgb (_adcc ));};};};func FromGoImage (i _g .Image )(Image ,error ){switch _cdcd :=i .(type ){case Image :return _cdcd .Copy (),nil ;
-case Gray :return GrayConverter .Convert (i );case *_g .Gray16 :return Gray16Converter .Convert (i );case CMYK :return CMYKConverter .Convert (i );case *_g .NRGBA64 :return NRGBA64Converter .Convert (i );default:return NRGBAConverter .Convert (i );};};
-func (_eaa *NRGBA16 )Copy ()Image {return &NRGBA16 {ImageBase :_eaa .copy ()}};func (_gbefa *RGBA32 )Copy ()Image {return &RGBA32 {ImageBase :_gbefa .copy ()}};func _gdad (_dfad _g .Image )(Image ,error ){if _ecae ,_cefe :=_dfad .(*NRGBA16 );_cefe {return _ecae .Copy (),nil ;
-};_eagf :=_dfad .Bounds ();_bgde ,_bdbe :=NewImage (_eagf .Max .X ,_eagf .Max .Y ,4,3,nil ,nil ,nil );if _bdbe !=nil {return nil ,_bdbe ;};_ffee (_dfad ,_bgde ,_eagf );return _bgde ,nil ;};func _cca (_bggd _e .NRGBA64 )_e .NRGBA {return _e .NRGBA {R :uint8 (_bggd .R >>8),G :uint8 (_bggd .G >>8),B :uint8 (_bggd .B >>8),A :uint8 (_bggd .A >>8)};
-};func _caa ()(_efe [256]uint32 ){for _cee :=0;_cee < 256;_cee ++{if _cee &0x01!=0{_efe [_cee ]|=0xf;};if _cee &0x02!=0{_efe [_cee ]|=0xf0;};if _cee &0x04!=0{_efe [_cee ]|=0xf00;};if _cee &0x08!=0{_efe [_cee ]|=0xf000;};if _cee &0x10!=0{_efe [_cee ]|=0xf0000;
-};if _cee &0x20!=0{_efe [_cee ]|=0xf00000;};if _cee &0x40!=0{_efe [_cee ]|=0xf000000;};if _cee &0x80!=0{_efe [_cee ]|=0xf0000000;};};return _efe ;};func (_ffaf *ImageBase )setTwoBytes (_fdaef int ,_ade uint16 )error {if _fdaef +1> len (_ffaf .Data )-1{return _fc .New ("\u0069n\u0064e\u0078\u0020\u006f\u0075\u0074 \u006f\u0066 \u0072\u0061\u006e\u0067\u0065");
-};_ffaf .Data [_fdaef ]=byte ((_ade &0xff00)>>8);_ffaf .Data [_fdaef +1]=byte (_ade &0xff);return nil ;};func (_geea *Monochrome )ExpandBinary (factor int )(*Monochrome ,error ){if !IsPowerOf2 (uint (factor )){return nil ,_c .Errorf ("\u0069\u006e\u0076\u0061\u006c\u0069\u0064\u0020\u0065\u0078\u0070\u0061\u006e\u0064\u0020b\u0069n\u0061\u0072\u0079\u0020\u0066\u0061\u0063\u0074\u006f\u0072\u003a\u0020\u0025\u0064",factor );
-};return _fa (_geea ,factor );};func (_aafa *Monochrome )ColorModel ()_e .Model {return MonochromeModel (_aafa .ModelThreshold )};func (_cgbca *ImageBase )newAlpha (){_gdg :=BytesPerLine (_cgbca .Width ,_cgbca .BitsPerComponent ,1);_cgbca .Alpha =make ([]byte ,_cgbca .Height *_gdg );
-};func (_bbf monochromeModel )Convert (c _e .Color )_e .Color {_effa :=_e .GrayModel .Convert (c ).(_e .Gray );return _dgd (_effa ,_bbf );};func (_daeg *Monochrome )setGrayBit (_adbg ,_dedg int ){_daeg .Data [_adbg ]|=0x80>>uint (_dedg &7)};func (_ceea *RGBA32 )Bounds ()_g .Rectangle {return _g .Rectangle {Max :_g .Point {X :_ceea .Width ,Y :_ceea .Height }};
-};func _ceaf (_gdae Gray ,_cfa nrgba64 ,_bef _g .Rectangle ){for _geda :=0;_geda < _bef .Max .X ;_geda ++{for _cgff :=0;_cgff < _bef .Max .Y ;_cgff ++{_dbg :=_geddf (_cfa .NRGBA64At (_geda ,_cgff ));_gdae .SetGray (_geda ,_cgff ,_dbg );};};};var _ Image =&NRGBA64 {};
-func (_bcgg *Gray4 )Set (x ,y int ,c _e .Color ){if x >=_bcgg .Width ||y >=_bcgg .Height {return ;};_dcfe :=Gray4Model .Convert (c ).(_e .Gray );_bcgg .setGray (x ,y ,_dcfe );};func ColorAtNRGBA (x ,y ,width ,bytesPerLine ,bitsPerColor int ,data ,alpha []byte ,decode []float64 )(_e .Color ,error ){switch bitsPerColor {case 4:return ColorAtNRGBA16 (x ,y ,width ,bytesPerLine ,data ,alpha ,decode );
-case 8:return ColorAtNRGBA32 (x ,y ,width ,data ,alpha ,decode );case 16:return ColorAtNRGBA64 (x ,y ,width ,data ,alpha ,decode );default:return nil ,_c .Errorf ("\u0075\u006e\u0073\u0075\u0070\u0070\u006fr\u0074\u0065\u0064 \u0072\u0067\u0062\u0020b\u0069\u0074\u0073\u0020\u0070\u0065\u0072\u0020\u0063\u006f\u006c\u006f\u0072\u0020\u0061\u006d\u006f\u0075\u006e\u0074\u003a\u0020\u0027\u0025\u0064\u0027",bitsPerColor );
-};};func (_aceg *CMYK32 )At (x ,y int )_e .Color {_ecab ,_ :=_aceg .ColorAt (x ,y );return _ecab };func (_abdd *Gray4 )Validate ()error {if len (_abdd .Data )!=_abdd .Height *_abdd .BytesPerLine {return ErrInvalidImage ;};return nil ;};func _gad (_bda RGBA ,_fgae CMYK ,_bfg _g .Rectangle ){for _fede :=0;
-_fede < _bfg .Max .X ;_fede ++{for _dg :=0;_dg < _bfg .Max .Y ;_dg ++{_gbd :=_bda .RGBAAt (_fede ,_dg );_fgae .SetCMYK (_fede ,_dg ,_fdcf (_gbd ));};};};func _addf (_geegb _g .Image )(Image ,error ){if _gecafg ,_egfa :=_geegb .(*RGBA32 );_egfa {return _gecafg .Copy (),nil ;
-};_agaf ,_ecef ,_bdge :=_aagf (_geegb ,1);_fcga :=&RGBA32 {ImageBase :NewImageBase (_agaf .Max .X ,_agaf .Max .Y ,8,3,nil ,_bdge ,nil )};_ccagc (_geegb ,_fcga ,_agaf );if len (_bdge )!=0&&!_ecef {if _efedc :=_bede (_bdge ,_fcga );_efedc !=nil {return nil ,_efedc ;
-};};return _fcga ,nil ;};func (_aadd *Monochrome )Bounds ()_g .Rectangle {return _g .Rectangle {Max :_g .Point {X :_aadd .Width ,Y :_aadd .Height }};};func _eaef (_gbfb *_g .NYCbCrA ,_gfgb NRGBA ,_acgc _g .Rectangle ){for _dagea :=0;_dagea < _acgc .Max .X ;
-_dagea ++{for _befa :=0;_befa < _acgc .Max .Y ;_befa ++{_cfffd :=_gbfb .NYCbCrAAt (_dagea ,_befa );_gfgb .SetNRGBA (_dagea ,_befa ,_bbbd (_cfffd ));};};};func MonochromeThresholdConverter (threshold uint8 )ColorConverter {return &monochromeThresholdConverter {Threshold :threshold };
-};func _cfage (_efbfc ,_ddbae RGBA ,_fdeb _g .Rectangle ){for _ffgd :=0;_ffgd < _fdeb .Max .X ;_ffgd ++{for _dgefb :=0;_dgefb < _fdeb .Max .Y ;_dgefb ++{_ddbae .SetRGBA (_ffgd ,_dgefb ,_efbfc .RGBAAt (_ffgd ,_dgefb ));};};};func (_bagff *Gray16 )Copy ()Image {return &Gray16 {ImageBase :_bagff .copy ()}};
-func (_cege *CMYK32 )ColorAt (x ,y int )(_e .Color ,error ){return ColorAtCMYK (x ,y ,_cege .Width ,_cege .Data ,_cege .Decode );};func _ced (_fcg ,_ecf *Monochrome ,_fcd []byte ,_ebf int )(_bed error ){var (_efea ,_ccg ,_gee ,_cfef ,_efac ,_ddd ,_cgd ,_cfc int ;
-_dce ,_aad ,_gbe ,_agf uint32 ;_aga ,_bd byte ;_afeb uint16 ;);_ccb :=make ([]byte ,4);_db :=make ([]byte ,4);for _gee =0;_gee < _fcg .Height -1;_gee ,_cfef =_gee +2,_cfef +1{_efea =_gee *_fcg .BytesPerLine ;_ccg =_cfef *_ecf .BytesPerLine ;for _efac ,_ddd =0,0;
-_efac < _ebf ;_efac ,_ddd =_efac +4,_ddd +1{for _cgd =0;_cgd < 4;_cgd ++{_cfc =_efea +_efac +_cgd ;if _cfc <=len (_fcg .Data )-1&&_cfc < _efea +_fcg .BytesPerLine {_ccb [_cgd ]=_fcg .Data [_cfc ];}else {_ccb [_cgd ]=0x00;};_cfc =_efea +_fcg .BytesPerLine +_efac +_cgd ;
-if _cfc <=len (_fcg .Data )-1&&_cfc < _efea +(2*_fcg .BytesPerLine ){_db [_cgd ]=_fcg .Data [_cfc ];}else {_db [_cgd ]=0x00;};};_dce =_d .BigEndian .Uint32 (_ccb );_aad =_d .BigEndian .Uint32 (_db );_gbe =_dce &_aad ;_gbe |=_gbe <<1;_agf =_dce |_aad ;_agf &=_agf <<1;
-_aad =_gbe |_agf ;_aad &=0xaaaaaaaa;_dce =_aad |(_aad <<7);_aga =byte (_dce >>24);_bd =byte ((_dce >>8)&0xff);_cfc =_ccg +_ddd ;if _cfc +1==len (_ecf .Data )-1||_cfc +1>=_ccg +_ecf .BytesPerLine {if _bed =_ecf .setByte (_cfc ,_fcd [_aga ]);_bed !=nil {return _c .Errorf ("\u0069n\u0064\u0065\u0078\u003a\u0020\u0025d",_cfc );
-};}else {_afeb =(uint16 (_fcd [_aga ])<<8)|uint16 (_fcd [_bd ]);if _bed =_ecf .setTwoBytes (_cfc ,_afeb );_bed !=nil {return _c .Errorf ("s\u0065\u0074\u0074\u0069\u006e\u0067 \u0074\u0077\u006f\u0020\u0062\u0079t\u0065\u0073\u0020\u0066\u0061\u0069\u006ce\u0064\u002c\u0020\u0069\u006e\u0064\u0065\u0078\u003a\u0020%\u0064",_cfc );
-};_ddd ++;};};};return nil ;};func (_egg *CMYK32 )Validate ()error {if len (_egg .Data )!=4*_egg .Width *_egg .Height {return _fc .New ("i\u006e\u0076\u0061\u006c\u0069\u0064\u0020\u0069\u006da\u0067\u0065\u0020\u0064\u0061\u0074\u0061 s\u0069\u007a\u0065\u0020f\u006f\u0072\u0020\u0070\u0072\u006f\u0076\u0069\u0064ed\u0020\u0064i\u006d\u0065\u006e\u0073\u0069\u006f\u006e\u0073");
-};return nil ;};type NRGBA16 struct{ImageBase };func _ccd (_gbfe _e .NRGBA64 )_e .RGBA {_bbc ,_dfdc ,_ccec ,_gadb :=_gbfe .RGBA ();return _e .RGBA {R :uint8 (_bbc >>8),G :uint8 (_dfdc >>8),B :uint8 (_ccec >>8),A :uint8 (_gadb >>8)};};func _edaf (_cdbe *Monochrome ,_deaa ,_dafb ,_aeef ,_ccdaf int ,_dgef RasterOperator ){if _deaa < 0{_aeef +=_deaa ;
-_deaa =0;};_caea :=_deaa +_aeef -_cdbe .Width ;if _caea > 0{_aeef -=_caea ;};if _dafb < 0{_ccdaf +=_dafb ;_dafb =0;};_agbbf :=_dafb +_ccdaf -_cdbe .Height ;if _agbbf > 0{_ccdaf -=_agbbf ;};if _aeef <=0||_ccdaf <=0{return ;};if (_deaa &7)==0{_abe (_cdbe ,_deaa ,_dafb ,_aeef ,_ccdaf ,_dgef );
-}else {_bfaac (_cdbe ,_deaa ,_dafb ,_aeef ,_ccdaf ,_dgef );};};func (_fce *Gray8 )SetGray (x ,y int ,g _e .Gray ){_dcefa :=y *_fce .BytesPerLine +x ;if _dcefa > len (_fce .Data )-1{return ;};_fce .Data [_dcefa ]=g .Y ;};var _ Image =&Gray4 {};func (_gdc *Gray8 )ColorModel ()_e .Model {return _e .GrayModel };
-func (_dage *NRGBA16 )Set (x ,y int ,c _e .Color ){_gfda :=y *_dage .BytesPerLine +x *3/2;if _gfda +1>=len (_dage .Data ){return ;};_fdbea :=NRGBA16Model .Convert (c ).(_e .NRGBA );_dage .setNRGBA (x ,y ,_gfda ,_fdbea );};func _eea (_aecd ,_gdag *Monochrome ,_ebbae []byte ,_fee int )(_afa error ){var (_aae ,_fcfb ,_gdec ,_ede ,_adf ,_cdd ,_eca ,_fcfc int ;
-_acfa ,_fgc ,_fgd ,_bce uint32 ;_ccc ,_gge byte ;_bee uint16 ;);_agb :=make ([]byte ,4);_dfd :=make ([]byte ,4);for _gdec =0;_gdec < _aecd .Height -1;_gdec ,_ede =_gdec +2,_ede +1{_aae =_gdec *_aecd .BytesPerLine ;_fcfb =_ede *_gdag .BytesPerLine ;for _adf ,_cdd =0,0;
-_adf < _fee ;_adf ,_cdd =_adf +4,_cdd +1{for _eca =0;_eca < 4;_eca ++{_fcfc =_aae +_adf +_eca ;if _fcfc <=len (_aecd .Data )-1&&_fcfc < _aae +_aecd .BytesPerLine {_agb [_eca ]=_aecd .Data [_fcfc ];}else {_agb [_eca ]=0x00;};_fcfc =_aae +_aecd .BytesPerLine +_adf +_eca ;
-if _fcfc <=len (_aecd .Data )-1&&_fcfc < _aae +(2*_aecd .BytesPerLine ){_dfd [_eca ]=_aecd .Data [_fcfc ];}else {_dfd [_eca ]=0x00;};};_acfa =_d .BigEndian .Uint32 (_agb );_fgc =_d .BigEndian .Uint32 (_dfd );_fgd =_acfa &_fgc ;_fgd |=_fgd <<1;_bce =_acfa |_fgc ;
-_bce &=_bce <<1;_fgc =_fgd &_bce ;_fgc &=0xaaaaaaaa;_acfa =_fgc |(_fgc <<7);_ccc =byte (_acfa >>24);_gge =byte ((_acfa >>8)&0xff);_fcfc =_fcfb +_cdd ;if _fcfc +1==len (_gdag .Data )-1||_fcfc +1>=_fcfb +_gdag .BytesPerLine {if _afa =_gdag .setByte (_fcfc ,_ebbae [_ccc ]);
-_afa !=nil {return _c .Errorf ("\u0069n\u0064\u0065\u0078\u003a\u0020\u0025d",_fcfc );};}else {_bee =(uint16 (_ebbae [_ccc ])<<8)|uint16 (_ebbae [_gge ]);if _afa =_gdag .setTwoBytes (_fcfc ,_bee );_afa !=nil {return _c .Errorf ("s\u0065\u0074\u0074\u0069\u006e\u0067 \u0074\u0077\u006f\u0020\u0062\u0079t\u0065\u0073\u0020\u0066\u0061\u0069\u006ce\u0064\u002c\u0020\u0069\u006e\u0064\u0065\u0078\u003a\u0020%\u0064",_fcfc );
-};_cdd ++;};};};return nil ;};func (_ffdc *Gray4 )SetGray (x ,y int ,g _e .Gray ){if x >=_ffdc .Width ||y >=_ffdc .Height {return ;};g =_gcdd (g );_ffdc .setGray (x ,y ,g );};func (_geb *Monochrome )IsUnpadded ()bool {return (_geb .Width *_geb .Height )==len (_geb .Data )};
-func _bede (_eabe []byte ,_bcgge Image )error {_gced :=true ;for _ecd :=0;_ecd < len (_eabe );_ecd ++{if _eabe [_ecd ]!=0xff{_gced =false ;break ;};};if _gced {switch _fbdc :=_bcgge .(type ){case *NRGBA32 :_fbdc .Alpha =nil ;case *NRGBA64 :_fbdc .Alpha =nil ;
-default:return _c .Errorf ("i\u006ete\u0072n\u0061l\u0020\u0065\u0072\u0072\u006fr\u0020\u002d\u0020i\u006d\u0061\u0067\u0065\u0020s\u0068\u006f\u0075l\u0064\u0020\u0062\u0065\u0020\u006f\u0066\u0020\u0074\u0079\u0070e\u0020\u002a\u004eRGB\u0041\u0033\u0032\u0020\u006f\u0072 \u002a\u004e\u0052\u0047\u0042\u0041\u0036\u0034\u0020\u0062\u0075\u0074 \u0069s\u003a\u0020\u0025\u0054",_bcgge );
-};};return nil ;};func _gf ()(_dca [256]uint64 ){for _ega :=0;_ega < 256;_ega ++{if _ega &0x01!=0{_dca [_ega ]|=0xff;};if _ega &0x02!=0{_dca [_ega ]|=0xff00;};if _ega &0x04!=0{_dca [_ega ]|=0xff0000;};if _ega &0x08!=0{_dca [_ega ]|=0xff000000;};if _ega &0x10!=0{_dca [_ega ]|=0xff00000000;
-};if _ega &0x20!=0{_dca [_ega ]|=0xff0000000000;};if _ega &0x40!=0{_dca [_ega ]|=0xff000000000000;};if _ega &0x80!=0{_dca [_ega ]|=0xff00000000000000;};};return _dca ;};func (_adg *ImageBase )setEightFullBytes (_efgc int ,_ecc uint64 )error {if _efgc +7> len (_adg .Data )-1{return _fc .New ("\u0069n\u0064e\u0078\u0020\u006f\u0075\u0074 \u006f\u0066 \u0072\u0061\u006e\u0067\u0065");
-};_adg .Data [_efgc ]=byte ((_ecc &0xff00000000000000)>>56);_adg .Data [_efgc +1]=byte ((_ecc &0xff000000000000)>>48);_adg .Data [_efgc +2]=byte ((_ecc &0xff0000000000)>>40);_adg .Data [_efgc +3]=byte ((_ecc &0xff00000000)>>32);_adg .Data [_efgc +4]=byte ((_ecc &0xff000000)>>24);
-_adg .Data [_efgc +5]=byte ((_ecc &0xff0000)>>16);_adg .Data [_efgc +6]=byte ((_ecc &0xff00)>>8);_adg .Data [_efgc +7]=byte (_ecc &0xff);return nil ;};func (_acd *NRGBA16 )NRGBAAt (x ,y int )_e .NRGBA {_dfbe ,_ :=ColorAtNRGBA16 (x ,y ,_acd .Width ,_acd .BytesPerLine ,_acd .Data ,_acd .Alpha ,_acd .Decode );
-return _dfbe ;};type Gray8 struct{ImageBase };func (_bdb *Gray4 )GrayAt (x ,y int )_e .Gray {_fbfb ,_ :=ColorAtGray4BPC (x ,y ,_bdb .BytesPerLine ,_bdb .Data ,_bdb .Decode );return _fbfb ;};func init (){_gfeg ()};func _egge (_fgbc *Monochrome ,_cecg ,_daf ,_dgfb ,_cdaf int ,_gfaa RasterOperator ,_fef *Monochrome ,_aecb ,_egdg int )error {var (_gbdfe bool ;
-_dfca bool ;_dgg int ;_egdgc int ;_edc int ;_ggbc bool ;_ecaac byte ;_agbd int ;_edce int ;_ccgg int ;_gbfd ,_fcdg int ;);_ecaf :=8-(_cecg &7);_cgag :=_dbcf [_ecaf ];_gbcc :=_fgbc .BytesPerLine *_daf +(_cecg >>3);_fffe :=_fef .BytesPerLine *_egdg +(_aecb >>3);
-if _dgfb < _ecaf {_gbdfe =true ;_cgag &=_febgc [8-_ecaf +_dgfb ];};if !_gbdfe {_dgg =(_dgfb -_ecaf )>>3;if _dgg > 0{_dfca =true ;_egdgc =_gbcc +1;_edc =_fffe +1;};};_agbd =(_cecg +_dgfb )&7;if !(_gbdfe ||_agbd ==0){_ggbc =true ;_ecaac =_febgc [_agbd ];
-_edce =_gbcc +1+_dgg ;_ccgg =_fffe +1+_dgg ;};switch _gfaa {case PixSrc :for _gbfd =0;_gbfd < _cdaf ;_gbfd ++{_fgbc .Data [_gbcc ]=_aaec (_fgbc .Data [_gbcc ],_fef .Data [_fffe ],_cgag );_gbcc +=_fgbc .BytesPerLine ;_fffe +=_fef .BytesPerLine ;};if _dfca {for _gbfd =0;
-_gbfd < _cdaf ;_gbfd ++{for _fcdg =0;_fcdg < _dgg ;_fcdg ++{_fgbc .Data [_egdgc +_fcdg ]=_fef .Data [_edc +_fcdg ];};_egdgc +=_fgbc .BytesPerLine ;_edc +=_fef .BytesPerLine ;};};if _ggbc {for _gbfd =0;_gbfd < _cdaf ;_gbfd ++{_fgbc .Data [_edce ]=_aaec (_fgbc .Data [_edce ],_fef .Data [_ccgg ],_ecaac );
-_edce +=_fgbc .BytesPerLine ;_ccgg +=_fef .BytesPerLine ;};};case PixNotSrc :for _gbfd =0;_gbfd < _cdaf ;_gbfd ++{_fgbc .Data [_gbcc ]=_aaec (_fgbc .Data [_gbcc ],^_fef .Data [_fffe ],_cgag );_gbcc +=_fgbc .BytesPerLine ;_fffe +=_fef .BytesPerLine ;};if _dfca {for _gbfd =0;
-_gbfd < _cdaf ;_gbfd ++{for _fcdg =0;_fcdg < _dgg ;_fcdg ++{_fgbc .Data [_egdgc +_fcdg ]=^_fef .Data [_edc +_fcdg ];};_egdgc +=_fgbc .BytesPerLine ;_edc +=_fef .BytesPerLine ;};};if _ggbc {for _gbfd =0;_gbfd < _cdaf ;_gbfd ++{_fgbc .Data [_edce ]=_aaec (_fgbc .Data [_edce ],^_fef .Data [_ccgg ],_ecaac );
-_edce +=_fgbc .BytesPerLine ;_ccgg +=_fef .BytesPerLine ;};};case PixSrcOrDst :for _gbfd =0;_gbfd < _cdaf ;_gbfd ++{_fgbc .Data [_gbcc ]=_aaec (_fgbc .Data [_gbcc ],_fef .Data [_fffe ]|_fgbc .Data [_gbcc ],_cgag );_gbcc +=_fgbc .BytesPerLine ;_fffe +=_fef .BytesPerLine ;
-};if _dfca {for _gbfd =0;_gbfd < _cdaf ;_gbfd ++{for _fcdg =0;_fcdg < _dgg ;_fcdg ++{_fgbc .Data [_egdgc +_fcdg ]|=_fef .Data [_edc +_fcdg ];};_egdgc +=_fgbc .BytesPerLine ;_edc +=_fef .BytesPerLine ;};};if _ggbc {for _gbfd =0;_gbfd < _cdaf ;_gbfd ++{_fgbc .Data [_edce ]=_aaec (_fgbc .Data [_edce ],_fef .Data [_ccgg ]|_fgbc .Data [_edce ],_ecaac );
-_edce +=_fgbc .BytesPerLine ;_ccgg +=_fef .BytesPerLine ;};};case PixSrcAndDst :for _gbfd =0;_gbfd < _cdaf ;_gbfd ++{_fgbc .Data [_gbcc ]=_aaec (_fgbc .Data [_gbcc ],_fef .Data [_fffe ]&_fgbc .Data [_gbcc ],_cgag );_gbcc +=_fgbc .BytesPerLine ;_fffe +=_fef .BytesPerLine ;
-};if _dfca {for _gbfd =0;_gbfd < _cdaf ;_gbfd ++{for _fcdg =0;_fcdg < _dgg ;_fcdg ++{_fgbc .Data [_egdgc +_fcdg ]&=_fef .Data [_edc +_fcdg ];};_egdgc +=_fgbc .BytesPerLine ;_edc +=_fef .BytesPerLine ;};};if _ggbc {for _gbfd =0;_gbfd < _cdaf ;_gbfd ++{_fgbc .Data [_edce ]=_aaec (_fgbc .Data [_edce ],_fef .Data [_ccgg ]&_fgbc .Data [_edce ],_ecaac );
-_edce +=_fgbc .BytesPerLine ;_ccgg +=_fef .BytesPerLine ;};};case PixSrcXorDst :for _gbfd =0;_gbfd < _cdaf ;_gbfd ++{_fgbc .Data [_gbcc ]=_aaec (_fgbc .Data [_gbcc ],_fef .Data [_fffe ]^_fgbc .Data [_gbcc ],_cgag );_gbcc +=_fgbc .BytesPerLine ;_fffe +=_fef .BytesPerLine ;
-};if _dfca {for _gbfd =0;_gbfd < _cdaf ;_gbfd ++{for _fcdg =0;_fcdg < _dgg ;_fcdg ++{_fgbc .Data [_egdgc +_fcdg ]^=_fef .Data [_edc +_fcdg ];};_egdgc +=_fgbc .BytesPerLine ;_edc +=_fef .BytesPerLine ;};};if _ggbc {for _gbfd =0;_gbfd < _cdaf ;_gbfd ++{_fgbc .Data [_edce ]=_aaec (_fgbc .Data [_edce ],_fef .Data [_ccgg ]^_fgbc .Data [_edce ],_ecaac );
-_edce +=_fgbc .BytesPerLine ;_ccgg +=_fef .BytesPerLine ;};};case PixNotSrcOrDst :for _gbfd =0;_gbfd < _cdaf ;_gbfd ++{_fgbc .Data [_gbcc ]=_aaec (_fgbc .Data [_gbcc ],^(_fef .Data [_fffe ])|_fgbc .Data [_gbcc ],_cgag );_gbcc +=_fgbc .BytesPerLine ;_fffe +=_fef .BytesPerLine ;
-};if _dfca {for _gbfd =0;_gbfd < _cdaf ;_gbfd ++{for _fcdg =0;_fcdg < _dgg ;_fcdg ++{_fgbc .Data [_egdgc +_fcdg ]|=^(_fef .Data [_edc +_fcdg ]);};_egdgc +=_fgbc .BytesPerLine ;_edc +=_fef .BytesPerLine ;};};if _ggbc {for _gbfd =0;_gbfd < _cdaf ;_gbfd ++{_fgbc .Data [_edce ]=_aaec (_fgbc .Data [_edce ],^(_fef .Data [_ccgg ])|_fgbc .Data [_edce ],_ecaac );
-_edce +=_fgbc .BytesPerLine ;_ccgg +=_fef .BytesPerLine ;};};case PixNotSrcAndDst :for _gbfd =0;_gbfd < _cdaf ;_gbfd ++{_fgbc .Data [_gbcc ]=_aaec (_fgbc .Data [_gbcc ],^(_fef .Data [_fffe ])&_fgbc .Data [_gbcc ],_cgag );_gbcc +=_fgbc .BytesPerLine ;_fffe +=_fef .BytesPerLine ;
-};if _dfca {for _gbfd =0;_gbfd < _cdaf ;_gbfd ++{for _fcdg =0;_fcdg < _dgg ;_fcdg ++{_fgbc .Data [_egdgc +_fcdg ]&=^_fef .Data [_edc +_fcdg ];};_egdgc +=_fgbc .BytesPerLine ;_edc +=_fef .BytesPerLine ;};};if _ggbc {for _gbfd =0;_gbfd < _cdaf ;_gbfd ++{_fgbc .Data [_edce ]=_aaec (_fgbc .Data [_edce ],^(_fef .Data [_ccgg ])&_fgbc .Data [_edce ],_ecaac );
-_edce +=_fgbc .BytesPerLine ;_ccgg +=_fef .BytesPerLine ;};};case PixSrcOrNotDst :for _gbfd =0;_gbfd < _cdaf ;_gbfd ++{_fgbc .Data [_gbcc ]=_aaec (_fgbc .Data [_gbcc ],_fef .Data [_fffe ]|^(_fgbc .Data [_gbcc ]),_cgag );_gbcc +=_fgbc .BytesPerLine ;_fffe +=_fef .BytesPerLine ;
-};if _dfca {for _gbfd =0;_gbfd < _cdaf ;_gbfd ++{for _fcdg =0;_fcdg < _dgg ;_fcdg ++{_fgbc .Data [_egdgc +_fcdg ]=_fef .Data [_edc +_fcdg ]|^(_fgbc .Data [_egdgc +_fcdg ]);};_egdgc +=_fgbc .BytesPerLine ;_edc +=_fef .BytesPerLine ;};};if _ggbc {for _gbfd =0;
-_gbfd < _cdaf ;_gbfd ++{_fgbc .Data [_edce ]=_aaec (_fgbc .Data [_edce ],_fef .Data [_ccgg ]|^(_fgbc .Data [_edce ]),_ecaac );_edce +=_fgbc .BytesPerLine ;_ccgg +=_fef .BytesPerLine ;};};case PixSrcAndNotDst :for _gbfd =0;_gbfd < _cdaf ;_gbfd ++{_fgbc .Data [_gbcc ]=_aaec (_fgbc .Data [_gbcc ],_fef .Data [_fffe ]&^(_fgbc .Data [_gbcc ]),_cgag );
-_gbcc +=_fgbc .BytesPerLine ;_fffe +=_fef .BytesPerLine ;};if _dfca {for _gbfd =0;_gbfd < _cdaf ;_gbfd ++{for _fcdg =0;_fcdg < _dgg ;_fcdg ++{_fgbc .Data [_egdgc +_fcdg ]=_fef .Data [_edc +_fcdg ]&^(_fgbc .Data [_egdgc +_fcdg ]);};_egdgc +=_fgbc .BytesPerLine ;
-_edc +=_fef .BytesPerLine ;};};if _ggbc {for _gbfd =0;_gbfd < _cdaf ;_gbfd ++{_fgbc .Data [_edce ]=_aaec (_fgbc .Data [_edce ],_fef .Data [_ccgg ]&^(_fgbc .Data [_edce ]),_ecaac );_edce +=_fgbc .BytesPerLine ;_ccgg +=_fef .BytesPerLine ;};};case PixNotPixSrcOrDst :for _gbfd =0;
-_gbfd < _cdaf ;_gbfd ++{_fgbc .Data [_gbcc ]=_aaec (_fgbc .Data [_gbcc ],^(_fef .Data [_fffe ]|_fgbc .Data [_gbcc ]),_cgag );_gbcc +=_fgbc .BytesPerLine ;_fffe +=_fef .BytesPerLine ;};if _dfca {for _gbfd =0;_gbfd < _cdaf ;_gbfd ++{for _fcdg =0;_fcdg < _dgg ;
-_fcdg ++{_fgbc .Data [_egdgc +_fcdg ]=^(_fef .Data [_edc +_fcdg ]|_fgbc .Data [_egdgc +_fcdg ]);};_egdgc +=_fgbc .BytesPerLine ;_edc +=_fef .BytesPerLine ;};};if _ggbc {for _gbfd =0;_gbfd < _cdaf ;_gbfd ++{_fgbc .Data [_edce ]=_aaec (_fgbc .Data [_edce ],^(_fef .Data [_ccgg ]|_fgbc .Data [_edce ]),_ecaac );
-_edce +=_fgbc .BytesPerLine ;_ccgg +=_fef .BytesPerLine ;};};case PixNotPixSrcAndDst :for _gbfd =0;_gbfd < _cdaf ;_gbfd ++{_fgbc .Data [_gbcc ]=_aaec (_fgbc .Data [_gbcc ],^(_fef .Data [_fffe ]&_fgbc .Data [_gbcc ]),_cgag );_gbcc +=_fgbc .BytesPerLine ;
-_fffe +=_fef .BytesPerLine ;};if _dfca {for _gbfd =0;_gbfd < _cdaf ;_gbfd ++{for _fcdg =0;_fcdg < _dgg ;_fcdg ++{_fgbc .Data [_egdgc +_fcdg ]=^(_fef .Data [_edc +_fcdg ]&_fgbc .Data [_egdgc +_fcdg ]);};_egdgc +=_fgbc .BytesPerLine ;_edc +=_fef .BytesPerLine ;
-};};if _ggbc {for _gbfd =0;_gbfd < _cdaf ;_gbfd ++{_fgbc .Data [_edce ]=_aaec (_fgbc .Data [_edce ],^(_fef .Data [_ccgg ]&_fgbc .Data [_edce ]),_ecaac );_edce +=_fgbc .BytesPerLine ;_ccgg +=_fef .BytesPerLine ;};};case PixNotPixSrcXorDst :for _gbfd =0;
-_gbfd < _cdaf ;_gbfd ++{_fgbc .Data [_gbcc ]=_aaec (_fgbc .Data [_gbcc ],^(_fef .Data [_fffe ]^_fgbc .Data [_gbcc ]),_cgag );_gbcc +=_fgbc .BytesPerLine ;_fffe +=_fef .BytesPerLine ;};if _dfca {for _gbfd =0;_gbfd < _cdaf ;_gbfd ++{for _fcdg =0;_fcdg < _dgg ;
-_fcdg ++{_fgbc .Data [_egdgc +_fcdg ]=^(_fef .Data [_edc +_fcdg ]^_fgbc .Data [_egdgc +_fcdg ]);};_egdgc +=_fgbc .BytesPerLine ;_edc +=_fef .BytesPerLine ;};};if _ggbc {for _gbfd =0;_gbfd < _cdaf ;_gbfd ++{_fgbc .Data [_edce ]=_aaec (_fgbc .Data [_edce ],^(_fef .Data [_ccgg ]^_fgbc .Data [_edce ]),_ecaac );
-_edce +=_fgbc .BytesPerLine ;_ccgg +=_fef .BytesPerLine ;};};default:_ef .Log .Debug ("I\u006e\u0076\u0061\u006c\u0069\u0064 \u0072\u0061\u0073\u0074\u0065\u0072\u0020\u006f\u0070e\u0072\u0061\u0074o\u0072:\u0020\u0025\u0064",_gfaa );return _fc .New ("\u0069\u006e\u0076al\u0069\u0064\u0020\u0072\u0061\u0073\u0074\u0065\u0072\u0020\u006f\u0070\u0065\u0072\u0061\u0074\u006f\u0072");
-};return nil ;};func (_beacf *NRGBA16 )ColorModel ()_e .Model {return NRGBA16Model };func _beagb (_fcfe int ,_dbecd int )error {return _c .Errorf ("\u0069\u006d\u0061\u0067\u0065\u0020\u0063\u006f\u006f\u0072\u0064\u0069\u006ea\u0074\u0065\u0073\u0020\u006f\u0075t\u0020\u006f\u0066\u0020\u0072\u0061\u006e\u0067\u0065\u0020\u0028\u0025\u0064,\u0020\u0025\u0064\u0029",_fcfe ,_dbecd );
-};func (_dacc *NRGBA16 )At (x ,y int )_e .Color {_ecacc ,_ :=_dacc .ColorAt (x ,y );return _ecacc };func (_cfg *Monochrome )setGray (_cagc int ,_ffbg _e .Gray ,_feac int ){if _ffbg .Y ==0{_cfg .clearBit (_feac ,_cagc );}else {_cfg .setGrayBit (_feac ,_cagc );
-};};func (_bfdc *Monochrome )getBitAt (_cgca ,_edeg int )bool {_cfff :=_edeg *_bfdc .BytesPerLine +(_cgca >>3);_ccbf :=_cgca &0x07;_gfe :=uint (7-_ccbf );if _cfff > len (_bfdc .Data )-1{return false ;};if (_bfdc .Data [_cfff ]>>_gfe )&0x01>=1{return true ;
-};return false ;};func InDelta (expected ,current ,delta float64 )bool {_bfaae :=expected -current ;if _bfaae <=-delta ||_bfaae >=delta {return false ;};return true ;};func (_ada *CMYK32 )SetCMYK (x ,y int ,c _e .CMYK ){_fdc :=4*(y *_ada .Width +x );if _fdc +3>=len (_ada .Data ){return ;
-};_ada .Data [_fdc ]=c .C ;_ada .Data [_fdc +1]=c .M ;_ada .Data [_fdc +2]=c .Y ;_ada .Data [_fdc +3]=c .K ;};func (_eae *Gray2 )GrayAt (x ,y int )_e .Gray {_dcfa ,_ :=ColorAtGray2BPC (x ,y ,_eae .BytesPerLine ,_eae .Data ,_eae .Decode );return _dcfa ;
-};func _ffgc (_caba *Monochrome ,_gbdf ,_gfbb ,_bgeb ,_ccdb int ,_dbda RasterOperator ,_aeec *Monochrome ,_aeg ,_edbg int )error {if _caba ==nil {return _fc .New ("\u006e\u0069\u006c\u0020\u0027\u0064\u0065\u0073\u0074\u0027\u0020\u0042i\u0074\u006d\u0061\u0070");
-};if _dbda ==PixDst {return nil ;};switch _dbda {case PixClr ,PixSet ,PixNotDst :_edaf (_caba ,_gbdf ,_gfbb ,_bgeb ,_ccdb ,_dbda );return nil ;};if _aeec ==nil {_ef .Log .Debug ("\u0052a\u0073\u0074e\u0072\u004f\u0070\u0065r\u0061\u0074\u0069o\u006e\u0020\u0073\u006f\u0075\u0072\u0063\u0065\u0020bi\u0074\u006d\u0061p\u0020\u0069s\u0020\u006e\u006f\u0074\u0020\u0064e\u0066\u0069n\u0065\u0064");
-return _fc .New ("\u006e\u0069l\u0020\u0027\u0073r\u0063\u0027\u0020\u0062\u0069\u0074\u006d\u0061\u0070");};if _fffb :=_agab (_caba ,_gbdf ,_gfbb ,_bgeb ,_ccdb ,_dbda ,_aeec ,_aeg ,_edbg );_fffb !=nil {return _fffb ;};return nil ;};func (_bdee *NRGBA64 )Base ()*ImageBase {return &_bdee .ImageBase };
-func AddDataPadding (width ,height ,bitsPerComponent ,colorComponents int ,data []byte )([]byte ,error ){_afcc :=BytesPerLine (width ,bitsPerComponent ,colorComponents );if _afcc ==width *colorComponents *bitsPerComponent /8{return data ,nil ;};_dbge :=width *colorComponents *bitsPerComponent ;
-_accg :=_afcc *8;_daac :=8-(_accg -_dbge );_gaeg :=_ff .NewReader (data );_ccge :=_afcc -1;_aca :=make ([]byte ,_ccge );_fdbd :=make ([]byte ,height *_afcc );_adge :=_ff .NewWriterMSB (_fdbd );var _ageb uint64 ;var _agac error ;for _acad :=0;_acad < height ;
-_acad ++{_ ,_agac =_gaeg .Read (_aca );if _agac !=nil {return nil ,_agac ;};_ ,_agac =_adge .Write (_aca );if _agac !=nil {return nil ,_agac ;};_ageb ,_agac =_gaeg .ReadBits (byte (_daac ));if _agac !=nil {return nil ,_agac ;};_ ,_agac =_adge .WriteBits (_ageb ,_daac );
-if _agac !=nil {return nil ,_agac ;};_adge .FinishByte ();};return _fdbd ,nil ;};func (_ccbc *Monochrome )AddPadding ()(_fadc error ){if _cbgc :=((_ccbc .Width *_ccbc .Height )+7)>>3;len (_ccbc .Data )< _cbgc {return _c .Errorf ("\u0069\u006e\u0076\u0061\u006c\u0069\u0064\u0020\u0064a\u0074\u0061\u0020\u006c\u0065\u006e\u0067\u0074\u0068\u003a\u0020\u0027\u0025\u0064\u0027\u002e\u0020\u0054\u0068\u0065\u0020\u0064\u0061t\u0061\u0020s\u0068\u006fu\u006c\u0064\u0020\u0063\u006f\u006e\u0074\u0061\u0069\u006e\u0020\u0061\u0074 l\u0065\u0061\u0073\u0074\u003a\u0020\u0027\u0025\u0064'\u0020\u0062\u0079\u0074\u0065\u0073",len (_ccbc .Data ),_cbgc );
-};_gbee :=_ccbc .Width %8;if _gbee ==0{return nil ;};_ceef :=_ccbc .Width /8;_cgdgg :=_ff .NewReader (_ccbc .Data );_bcg :=make ([]byte ,_ccbc .Height *_ccbc .BytesPerLine );_dcgc :=_ff .NewWriterMSB (_bcg );_ggc :=make ([]byte ,_ceef );var (_afc int ;
-_cgbc uint64 ;);for _afc =0;_afc < _ccbc .Height ;_afc ++{if _ ,_fadc =_cgdgg .Read (_ggc );_fadc !=nil {return _fadc ;};if _ ,_fadc =_dcgc .Write (_ggc );_fadc !=nil {return _fadc ;};if _cgbc ,_fadc =_cgdgg .ReadBits (byte (_gbee ));_fadc !=nil {return _fadc ;
-};if _fadc =_dcgc .WriteByte (byte (_cgbc )<<uint (8-_gbee ));_fadc !=nil {return _fadc ;};};_ccbc .Data =_dcgc .Data ();return nil ;};func (_ffa *Gray2 )Set (x ,y int ,c _e .Color ){if x >=_ffa .Width ||y >=_ffa .Height {return ;};_adbd :=Gray2Model .Convert (c ).(_e .Gray );
-_adbc :=y *_ffa .BytesPerLine ;_dadff :=_adbc +(x >>2);_dfbg :=_adbd .Y >>6;_ffa .Data [_dadff ]=(_ffa .Data [_dadff ]&(^(0xc0>>uint (2*((x )&3)))))|(_dfbg <<uint (6-2*(x &3)));};func (_bbe *Monochrome )copy ()*Monochrome {_gdef :=_edg (_bbe .Width ,_bbe .Height );
-_gdef .ModelThreshold =_bbe .ModelThreshold ;_gdef .Data =make ([]byte ,len (_bbe .Data ));copy (_gdef .Data ,_bbe .Data );if len (_bbe .Decode )!=0{_gdef .Decode =make ([]float64 ,len (_bbe .Decode ));copy (_gdef .Decode ,_bbe .Decode );};if len (_bbe .Alpha )!=0{_gdef .Alpha =make ([]byte ,len (_bbe .Alpha ));
-copy (_gdef .Alpha ,_bbe .Alpha );};return _gdef ;};func (_ecfd *ImageBase )HasAlpha ()bool {if _ecfd .Alpha ==nil {return false ;};for _eecd :=range _ecfd .Alpha {if _ecfd .Alpha [_eecd ]!=0xff{return true ;};};return false ;};func (_gcebd *RGBA32 )RGBAAt (x ,y int )_e .RGBA {_dcgca ,_ :=ColorAtRGBA32 (x ,y ,_gcebd .Width ,_gcebd .Data ,_gcebd .Alpha ,_gcebd .Decode );
-return _dcgca ;};func _cbbad (_gdab _e .Color )_e .Color {_bcbd :=_e .NRGBAModel .Convert (_gdab ).(_e .NRGBA );return _dcfb (_bcbd );};func NewImage (width ,height ,bitsPerComponent ,colorComponents int ,data ,alpha []byte ,decode []float64 )(Image ,error ){_gedbg :=NewImageBase (width ,height ,bitsPerComponent ,colorComponents ,data ,alpha ,decode );
-var _adbda Image ;switch colorComponents {case 1:switch bitsPerComponent {case 1:_adbda =&Monochrome {ImageBase :_gedbg ,ModelThreshold :0x0f};case 2:_adbda =&Gray2 {ImageBase :_gedbg };case 4:_adbda =&Gray4 {ImageBase :_gedbg };case 8:_adbda =&Gray8 {ImageBase :_gedbg };
-case 16:_adbda =&Gray16 {ImageBase :_gedbg };};case 3:switch bitsPerComponent {case 4:_adbda =&NRGBA16 {ImageBase :_gedbg };case 8:_adbda =&NRGBA32 {ImageBase :_gedbg };case 16:_adbda =&NRGBA64 {ImageBase :_gedbg };};case 4:_adbda =&CMYK32 {ImageBase :_gedbg };
-};if _adbda ==nil {return nil ,ErrInvalidImage ;};return _adbda ,nil ;};func (_bgbe *Gray8 )ColorAt (x ,y int )(_e .Color ,error ){return ColorAtGray8BPC (x ,y ,_bgbe .BytesPerLine ,_bgbe .Data ,_bgbe .Decode );};func RasterOperation (dest *Monochrome ,dx ,dy ,dw ,dh int ,op RasterOperator ,src *Monochrome ,sx ,sy int )error {return _ffgc (dest ,dx ,dy ,dw ,dh ,op ,src ,sx ,sy );
-};func (_dgc *NRGBA64 )ColorModel ()_e .Model {return _e .NRGBA64Model };func (_dbc *Gray4 )Histogram ()(_fffcg [256]int ){for _caga :=0;_caga < _dbc .Width ;_caga ++{for _fdfc :=0;_fdfc < _dbc .Height ;_fdfc ++{_fffcg [_dbc .GrayAt (_caga ,_fdfc ).Y ]++;
-};};return _fffcg ;};func _cad (_daee Gray ,_fdgb NRGBA ,_cef _g .Rectangle ){for _ddfa :=0;_ddfa < _cef .Max .X ;_ddfa ++{for _cgcca :=0;_cgcca < _cef .Max .Y ;_cgcca ++{_bab :=_gdee (_fdgb .NRGBAAt (_ddfa ,_cgcca ));_daee .SetGray (_ddfa ,_cgcca ,_bab );
-};};};func (_gdeed *Gray16 )ColorAt (x ,y int )(_e .Color ,error ){return ColorAtGray16BPC (x ,y ,_gdeed .BytesPerLine ,_gdeed .Data ,_gdeed .Decode );};func (_fdgge *NRGBA16 )SetNRGBA (x ,y int ,c _e .NRGBA ){_ffe :=y *_fdgge .BytesPerLine +x *3/2;if _ffe +1>=len (_fdgge .Data ){return ;
-};c =_dcfb (c );_fdgge .setNRGBA (x ,y ,_ffe ,c );};func _bbbd (_dda _e .NYCbCrA )_e .NRGBA {_baf :=int32 (_dda .Y )*0x10101;_dccc :=int32 (_dda .Cb )-128;_faag :=int32 (_dda .Cr )-128;_cffa :=_baf +91881*_faag ;if uint32 (_cffa )&0xff000000==0{_cffa >>=8;
-}else {_cffa =^(_cffa >>31)&0xffff;};_dabg :=_baf -22554*_dccc -46802*_faag ;if uint32 (_dabg )&0xff000000==0{_dabg >>=8;}else {_dabg =^(_dabg >>31)&0xffff;};_eab :=_baf +116130*_dccc ;if uint32 (_eab )&0xff000000==0{_eab >>=8;}else {_eab =^(_eab >>31)&0xffff;
-};return _e .NRGBA {R :uint8 (_cffa >>8),G :uint8 (_dabg >>8),B :uint8 (_eab >>8),A :_dda .A };};func ScaleAlphaToMonochrome (data []byte ,width ,height int )([]byte ,error ){_ce :=BytesPerLine (width ,8,1);if len (data )< _ce *height {return nil ,nil ;
-};_a :=&Gray8 {NewImageBase (width ,height ,8,1,data ,nil ,nil )};_ca ,_bb :=MonochromeConverter .Convert (_a );if _bb !=nil {return nil ,_bb ;};return _ca .Base ().Data ,nil ;};type NRGBA64 struct{ImageBase };func ImgToGray (i _g .Image )*_g .Gray {if _cacg ,_acef :=i .(*_g .Gray );
-_acef {return _cacg ;};_geba :=i .Bounds ();_bddc :=_g .NewGray (_geba );for _cabae :=0;_cabae < _geba .Max .X ;_cabae ++{for _fgda :=0;_fgda < _geba .Max .Y ;_fgda ++{_adcbe :=i .At (_cabae ,_fgda );_bddc .Set (_cabae ,_fgda ,_adcbe );};};return _bddc ;
-};func _abe (_dcee *Monochrome ,_fcb ,_dedad int ,_dafg ,_fcdbc int ,_abaa RasterOperator ){var (_fbfd int ;_adcf byte ;_daef ,_gafa int ;_fcfcd int ;);_cbbgc :=_dafg >>3;_bdaf :=_dafg &7;if _bdaf > 0{_adcf =_febgc [_bdaf ];};_fbfd =_dcee .BytesPerLine *_dedad +(_fcb >>3);
-switch _abaa {case PixClr :for _daef =0;_daef < _fcdbc ;_daef ++{_fcfcd =_fbfd +_daef *_dcee .BytesPerLine ;for _gafa =0;_gafa < _cbbgc ;_gafa ++{_dcee .Data [_fcfcd ]=0x0;_fcfcd ++;};if _bdaf > 0{_dcee .Data [_fcfcd ]=_aaec (_dcee .Data [_fcfcd ],0x0,_adcf );
-};};case PixSet :for _daef =0;_daef < _fcdbc ;_daef ++{_fcfcd =_fbfd +_daef *_dcee .BytesPerLine ;for _gafa =0;_gafa < _cbbgc ;_gafa ++{_dcee .Data [_fcfcd ]=0xff;_fcfcd ++;};if _bdaf > 0{_dcee .Data [_fcfcd ]=_aaec (_dcee .Data [_fcfcd ],0xff,_adcf );
-};};case PixNotDst :for _daef =0;_daef < _fcdbc ;_daef ++{_fcfcd =_fbfd +_daef *_dcee .BytesPerLine ;for _gafa =0;_gafa < _cbbgc ;_gafa ++{_dcee .Data [_fcfcd ]=^_dcee .Data [_fcfcd ];_fcfcd ++;};if _bdaf > 0{_dcee .Data [_fcfcd ]=_aaec (_dcee .Data [_fcfcd ],^_dcee .Data [_fcfcd ],_adcf );
-};};};};func _efbf (_fadf NRGBA ,_agebg RGBA ,_fdce _g .Rectangle ){for _ebbc :=0;_ebbc < _fdce .Max .X ;_ebbc ++{for _ebeg :=0;_ebeg < _fdce .Max .Y ;_ebeg ++{_eeefd :=_fadf .NRGBAAt (_ebbc ,_ebeg );_agebg .SetRGBA (_ebbc ,_ebeg ,_fabc (_eeefd ));};};
-};type monochromeThresholdConverter struct{Threshold uint8 ;};func _acfd (_cdaab RGBA ,_gecg NRGBA ,_ebad _g .Rectangle ){for _bffec :=0;_bffec < _ebad .Max .X ;_bffec ++{for _ddbg :=0;_ddbg < _ebad .Max .Y ;_ddbg ++{_afbg :=_cdaab .RGBAAt (_bffec ,_ddbg );
-_gecg .SetNRGBA (_bffec ,_ddbg ,_bege (_afbg ));};};};func (_dgbe *ImageBase )copy ()ImageBase {_cbdc :=*_dgbe ;_cbdc .Data =make ([]byte ,len (_dgbe .Data ));copy (_cbdc .Data ,_dgbe .Data );return _cbdc ;};func _gdee (_fde _e .NRGBA )_e .Gray {var _gfga _e .NRGBA ;
-if _fde ==_gfga {return _e .Gray {Y :0xff};};_baa ,_cce ,_beef ,_ :=_fde .RGBA ();_aac :=(19595*_baa +38470*_cce +7471*_beef +1<<15)>>24;return _e .Gray {Y :uint8 (_aac )};};func _eg (_dcg ,_gb *Monochrome )(_ge error ){_bge :=_gb .BytesPerLine ;_cg :=_dcg .BytesPerLine ;
-_dd :=_gb .BytesPerLine *4-_dcg .BytesPerLine ;var (_eb ,_ffb byte ;_af uint32 ;_bff ,_ffc ,_ac ,_cb ,_dad ,_ed ,_adb int ;);for _ac =0;_ac < _gb .Height ;_ac ++{_bff =_ac *_bge ;_ffc =4*_ac *_cg ;for _cb =0;_cb < _bge ;_cb ++{_eb =_gb .Data [_bff +_cb ];
-_af =_dadf [_eb ];_ed =_ffc +_cb *4;if _dd !=0&&(_cb +1)*4> _dcg .BytesPerLine {for _dad =_dd ;_dad > 0;_dad --{_ffb =byte ((_af >>uint (_dad *8))&0xff);_adb =_ed +(_dd -_dad );if _ge =_dcg .setByte (_adb ,_ffb );_ge !=nil {return _ge ;};};}else if _ge =_dcg .setFourBytes (_ed ,_af );
-_ge !=nil {return _ge ;};if _ge =_dcg .setFourBytes (_ffc +_cb *4,_dadf [_gb .Data [_bff +_cb ]]);_ge !=nil {return _ge ;};};for _dad =1;_dad < 4;_dad ++{for _cb =0;_cb < _cg ;_cb ++{if _ge =_dcg .setByte (_ffc +_dad *_cg +_cb ,_dcg .Data [_ffc +_cb ]);
-_ge !=nil {return _ge ;};};};};return nil ;};func _gfeg (){for _aaffg :=0;_aaffg < 256;_aaffg ++{_dbgf [_aaffg ]=uint8 (_aaffg &0x1)+(uint8 (_aaffg >>1)&0x1)+(uint8 (_aaffg >>2)&0x1)+(uint8 (_aaffg >>3)&0x1)+(uint8 (_aaffg >>4)&0x1)+(uint8 (_aaffg >>5)&0x1)+(uint8 (_aaffg >>6)&0x1)+(uint8 (_aaffg >>7)&0x1);
-};};func _bgc (_bca int )[]uint {var _bfa []uint ;_fdf :=_bca ;_afd :=_fdf /8;if _afd !=0{for _gcf :=0;_gcf < _afd ;_gcf ++{_bfa =append (_bfa ,8);};_ddb :=_fdf %8;_fdf =0;if _ddb !=0{_fdf =_ddb ;};};_bbb :=_fdf /4;if _bbb !=0{for _fda :=0;_fda < _bbb ;
-_fda ++{_bfa =append (_bfa ,4);};_efaa :=_fdf %4;_fdf =0;if _efaa !=0{_fdf =_efaa ;};};_faf :=_fdf /2;if _faf !=0{for _egd :=0;_egd < _faf ;_egd ++{_bfa =append (_bfa ,2);};};return _bfa ;};func _gga (_ggec _e .Gray )_e .Gray {_defb :=_ggec .Y >>6;_defb |=_defb <<2;
-_ggec .Y =_defb |_defb <<4;return _ggec ;};func _abb (_cfgd _g .Image ,_abbg Image ,_aege _g .Rectangle ){if _cdgd ,_badf :=_cfgd .(SMasker );_badf &&_cdgd .HasAlpha (){_abbg .(SMasker ).MakeAlpha ();};_abd (_cfgd ,_abbg ,_aege );};var (Gray2Model =_e .ModelFunc (_fdgc );
-Gray4Model =_e .ModelFunc (_cfdc );NRGBA16Model =_e .ModelFunc (_cbbad ););func (_cbbg *Gray16 )At (x ,y int )_e .Color {_cagd ,_ :=_cbbg .ColorAt (x ,y );return _cagd };var _ Gray =&Gray8 {};func _ccgd (_dff *_g .Gray ,_ecbb uint8 )*_g .Gray {_dged :=_dff .Bounds ();
-_gdcd :=_g .NewGray (_dged );for _ecgc :=0;_ecgc < _dged .Dx ();_ecgc ++{for _gefa :=0;_gefa < _dged .Dy ();_gefa ++{_ffeb :=_dff .GrayAt (_ecgc ,_gefa );_gdcd .SetGray (_ecgc ,_gefa ,_e .Gray {Y :_dccg (_ffeb .Y ,_ecbb )});};};return _gdcd ;};func _fb (_ga ,_caf *Monochrome )(_gc error ){_de :=_caf .BytesPerLine ;
-_cc :=_ga .BytesPerLine ;var _gec ,_cgg ,_be ,_dag ,_ea int ;for _be =0;_be < _caf .Height ;_be ++{_gec =_be *_de ;_cgg =8*_be *_cc ;for _dag =0;_dag < _de ;_dag ++{if _gc =_ga .setEightBytes (_cgg +_dag *8,_cbd [_caf .Data [_gec +_dag ]]);_gc !=nil {return _gc ;
-};};for _ea =1;_ea < 8;_ea ++{for _dag =0;_dag < _cc ;_dag ++{if _gc =_ga .setByte (_cgg +_ea *_cc +_dag ,_ga .Data [_cgg +_dag ]);_gc !=nil {return _gc ;};};};};return nil ;};func (_fbg *Monochrome )Copy ()Image {return &Monochrome {ImageBase :_fbg .ImageBase .copy (),ModelThreshold :_fbg .ModelThreshold };
-};func (_gebb *RGBA32 )Validate ()error {if len (_gebb .Data )!=3*_gebb .Width *_gebb .Height {return _fc .New ("i\u006e\u0076\u0061\u006c\u0069\u0064\u0020\u0069\u006da\u0067\u0065\u0020\u0064\u0061\u0074\u0061 s\u0069\u007a\u0065\u0020f\u006f\u0072\u0020\u0070\u0072\u006f\u0076\u0069\u0064ed\u0020\u0064i\u006d\u0065\u006e\u0073\u0069\u006f\u006e\u0073");
-};return nil ;};var _ Image =&Gray8 {};func (_fgef *Gray8 )At (x ,y int )_e .Color {_dfc ,_ :=_fgef .ColorAt (x ,y );return _dfc };func (_ggfa *NRGBA64 )At (x ,y int )_e .Color {_ebcb ,_ :=_ggfa .ColorAt (x ,y );return _ebcb };func ColorAt (x ,y ,width ,bitsPerColor ,colorComponents ,bytesPerLine int ,data ,alpha []byte ,decode []float64 )(_e .Color ,error ){switch colorComponents {case 1:return ColorAtGrayscale (x ,y ,bitsPerColor ,bytesPerLine ,data ,decode );
-case 3:return ColorAtNRGBA (x ,y ,width ,bytesPerLine ,bitsPerColor ,data ,alpha ,decode );case 4:return ColorAtCMYK (x ,y ,width ,data ,decode );default:return nil ,_c .Errorf ("\u0070\u0072\u006f\u0076\u0069\u0064\u0065\u0064\u0020\u0069\u006e\u0076\u0061\u006c\u0069\u0064\u0020\u0063o\u006c\u006f\u0072\u0020\u0063\u006f\u006dp\u006f\u006e\u0065\u006e\u0074\u0020\u0066\u006f\u0072\u0020\u0074h\u0065\u0020\u0069\u006d\u0061\u0067\u0065\u003a\u0020\u0025\u0064",colorComponents );
-};};func _bfaac (_fcbb *Monochrome ,_deab ,_bdffb int ,_ecfff ,_cacf int ,_ceefa RasterOperator ){var (_dcce bool ;_dbac bool ;_efb int ;_dfbc int ;_adeb int ;_dacf int ;_fcdfa bool ;_aaed byte ;);_fcbf :=8-(_deab &7);_dcge :=_dbcf [_fcbf ];_dfe :=_fcbb .BytesPerLine *_bdffb +(_deab >>3);
-if _ecfff < _fcbf {_dcce =true ;_dcge &=_febgc [8-_fcbf +_ecfff ];};if !_dcce {_efb =(_ecfff -_fcbf )>>3;if _efb !=0{_dbac =true ;_dfbc =_dfe +1;};};_adeb =(_deab +_ecfff )&7;if !(_dcce ||_adeb ==0){_fcdfa =true ;_aaed =_febgc [_adeb ];_dacf =_dfe +1+_efb ;
-};var _bgcc ,_bcde int ;switch _ceefa {case PixClr :for _bgcc =0;_bgcc < _cacf ;_bgcc ++{_fcbb .Data [_dfe ]=_aaec (_fcbb .Data [_dfe ],0x0,_dcge );_dfe +=_fcbb .BytesPerLine ;};if _dbac {for _bgcc =0;_bgcc < _cacf ;_bgcc ++{for _bcde =0;_bcde < _efb ;
-_bcde ++{_fcbb .Data [_dfbc +_bcde ]=0x0;};_dfbc +=_fcbb .BytesPerLine ;};};if _fcdfa {for _bgcc =0;_bgcc < _cacf ;_bgcc ++{_fcbb .Data [_dacf ]=_aaec (_fcbb .Data [_dacf ],0x0,_aaed );_dacf +=_fcbb .BytesPerLine ;};};case PixSet :for _bgcc =0;_bgcc < _cacf ;
-_bgcc ++{_fcbb .Data [_dfe ]=_aaec (_fcbb .Data [_dfe ],0xff,_dcge );_dfe +=_fcbb .BytesPerLine ;};if _dbac {for _bgcc =0;_bgcc < _cacf ;_bgcc ++{for _bcde =0;_bcde < _efb ;_bcde ++{_fcbb .Data [_dfbc +_bcde ]=0xff;};_dfbc +=_fcbb .BytesPerLine ;};};if _fcdfa {for _bgcc =0;
-_bgcc < _cacf ;_bgcc ++{_fcbb .Data [_dacf ]=_aaec (_fcbb .Data [_dacf ],0xff,_aaed );_dacf +=_fcbb .BytesPerLine ;};};case PixNotDst :for _bgcc =0;_bgcc < _cacf ;_bgcc ++{_fcbb .Data [_dfe ]=_aaec (_fcbb .Data [_dfe ],^_fcbb .Data [_dfe ],_dcge );_dfe +=_fcbb .BytesPerLine ;
-};if _dbac {for _bgcc =0;_bgcc < _cacf ;_bgcc ++{for _bcde =0;_bcde < _efb ;_bcde ++{_fcbb .Data [_dfbc +_bcde ]=^(_fcbb .Data [_dfbc +_bcde ]);};_dfbc +=_fcbb .BytesPerLine ;};};if _fcdfa {for _bgcc =0;_bgcc < _cacf ;_bgcc ++{_fcbb .Data [_dacf ]=_aaec (_fcbb .Data [_dacf ],^_fcbb .Data [_dacf ],_aaed );
-_dacf +=_fcbb .BytesPerLine ;};};};};func (_gdeg *Gray16 )SetGray (x ,y int ,g _e .Gray ){_cagcc :=(y *_gdeg .BytesPerLine /2+x )*2;if _cagcc +1>=len (_gdeg .Data ){return ;};_gdeg .Data [_cagcc ]=g .Y ;_gdeg .Data [_cagcc +1]=g .Y ;};func _abd (_ebd _g .Image ,_aef Image ,_edf _g .Rectangle ){for _bfgf :=0;
-_bfgf < _edf .Max .X ;_bfgf ++{for _ebe :=0;_ebe < _edf .Max .Y ;_ebe ++{_cgdg :=_ebd .At (_bfgf ,_ebe );_aef .Set (_bfgf ,_ebe ,_cgdg );};};};func (_dedc *Monochrome )Scale (scale float64 )(*Monochrome ,error ){var _faef bool ;_fccf :=scale ;if scale < 1{_fccf =1/scale ;
-_faef =true ;};_fbc :=NextPowerOf2 (uint (_fccf ));if InDelta (float64 (_fbc ),_fccf ,0.001){if _faef {return _dedc .ReduceBinary (_fccf );};return _dedc .ExpandBinary (int (_fbc ));};_fea :=int (_b .RoundToEven (float64 (_dedc .Width )*scale ));_aefc :=int (_b .RoundToEven (float64 (_dedc .Height )*scale ));
-return _dedc .ScaleLow (_fea ,_aefc );};func (_fcdca *Monochrome )GrayAt (x ,y int )_e .Gray {_bffa ,_ :=ColorAtGray1BPC (x ,y ,_fcdca .BytesPerLine ,_fcdca .Data ,_fcdca .Decode );return _bffa ;};func (_fdgf *Gray8 )Set (x ,y int ,c _e .Color ){_adfa :=y *_fdgf .BytesPerLine +x ;
-if _adfa > len (_fdgf .Data )-1{return ;};_gaca :=_e .GrayModel .Convert (c );_fdgf .Data [_adfa ]=_gaca .(_e .Gray ).Y ;};func BytesPerLine (width ,bitsPerComponent ,colorComponents int )int {return ((width *bitsPerComponent )*colorComponents +7)>>3;};
-type Gray16 struct{ImageBase };func (_bdbd *Gray8 )Validate ()error {if len (_bdbd .Data )!=_bdbd .Height *_bdbd .BytesPerLine {return ErrInvalidImage ;};return nil ;};func ColorAtRGBA32 (x ,y ,width int ,data ,alpha []byte ,decode []float64 )(_e .RGBA ,error ){_cefd :=y *width +x ;
-_gebe :=3*_cefd ;if _gebe +2>=len (data ){return _e .RGBA {},_c .Errorf ("\u0069\u006d\u0061\u0067\u0065\u0020\u0063\u006f\u006f\u0072\u0064\u0069\u006ea\u0074\u0065\u0073\u0020\u006f\u0075t\u0020\u006f\u0066\u0020\u0072\u0061\u006e\u0067\u0065\u0020\u0028\u0025\u0064,\u0020\u0025\u0064\u0029",x ,y );
-};_gcgc :=uint8 (0xff);if alpha !=nil &&len (alpha )> _cefd {_gcgc =alpha [_cefd ];};_cccd ,_ccga ,_gbcbc :=data [_gebe ],data [_gebe +1],data [_gebe +2];if len (decode )==6{_cccd =uint8 (uint32 (LinearInterpolate (float64 (_cccd ),0,255,decode [0],decode [1]))&0xff);
-_ccga =uint8 (uint32 (LinearInterpolate (float64 (_ccga ),0,255,decode [2],decode [3]))&0xff);_gbcbc =uint8 (uint32 (LinearInterpolate (float64 (_gbcbc ),0,255,decode [4],decode [5]))&0xff);};return _e .RGBA {R :_cccd ,G :_ccga ,B :_gbcbc ,A :_gcgc },nil ;
-};func _gadf (_gdaf _e .NRGBA )_e .Gray {_beec ,_cea ,_aed ,_ :=_gdaf .RGBA ();_aefg :=(19595*_beec +38470*_cea +7471*_aed +1<<15)>>24;return _e .Gray {Y :uint8 (_aefg )};};func (_cfea *Gray4 )At (x ,y int )_e .Color {_ebfg ,_ :=_cfea .ColorAt (x ,y );
-return _ebfg };type shift int ;func _bdcc (_bcfe _g .Image )(Image ,error ){if _dddc ,_effgc :=_bcfe .(*NRGBA32 );_effgc {return _dddc .Copy (),nil ;};_acbe ,_cdea ,_cegb :=_aagf (_bcfe ,1);_dbdb ,_eead :=NewImage (_acbe .Max .X ,_acbe .Max .Y ,8,3,nil ,_cegb ,nil );
-if _eead !=nil {return nil ,_eead ;};_ffee (_bcfe ,_dbdb ,_acbe );if len (_cegb )!=0&&!_cdea {if _gdcf :=_bede (_cegb ,_dbdb );_gdcf !=nil {return nil ,_gdcf ;};};return _dbdb ,nil ;};func MonochromeModel (threshold uint8 )_e .Model {return monochromeModel (threshold )};
-func _dgb (_ffdf _e .CMYK )_e .RGBA {_fcda ,_dee ,_adc :=_e .CMYKToRGB (_ffdf .C ,_ffdf .M ,_ffdf .Y ,_ffdf .K );return _e .RGBA {R :_fcda ,G :_dee ,B :_adc ,A :0xff};};func _geddf (_gaff _e .NRGBA64 )_e .Gray {var _fdca _e .NRGBA64 ;if _gaff ==_fdca {return _e .Gray {Y :0xff};
-};_bfbe ,_dab ,_fadg ,_ :=_gaff .RGBA ();_eaga :=(19595*_bfbe +38470*_dab +7471*_fadg +1<<15)>>24;return _e .Gray {Y :uint8 (_eaga )};};func (_fade *NRGBA16 )ColorAt (x ,y int )(_e .Color ,error ){return ColorAtNRGBA16 (x ,y ,_fade .Width ,_fade .BytesPerLine ,_fade .Data ,_fade .Alpha ,_fade .Decode );
-};var _ Gray =&Gray2 {};type colorConverter struct{_feb func (_fcca _g .Image )(Image ,error );};type RGBA32 struct{ImageBase };func _gace (_faff *_g .NYCbCrA ,_gdaa RGBA ,_cgdb _g .Rectangle ){for _dbdba :=0;_dbdba < _cgdb .Max .X ;_dbdba ++{for _cfgda :=0;
-_cfgda < _cgdb .Max .Y ;_cfgda ++{_bebbd :=_faff .NYCbCrAAt (_dbdba ,_cfgda );_gdaa .SetRGBA (_dbdba ,_cfgda ,_dbe (_bebbd ));};};};func (_bbcf *Gray4 )setGray (_gebf int ,_fgeb int ,_dacd _e .Gray ){_dcga :=_fgeb *_bbcf .BytesPerLine ;_egdag :=_dcga +(_gebf >>1);
-if _egdag >=len (_bbcf .Data ){return ;};_fddg :=_dacd .Y >>4;_bbcf .Data [_egdag ]=(_bbcf .Data [_egdag ]&(^(0xf0>>uint (4*(_gebf &1)))))|(_fddg <<uint (4-4*(_gebf &1)));};var _ _g .Image =&Gray4 {};func (_fcdf *ImageBase )setFourBytes (_gfac int ,_dea uint32 )error {if _gfac +3> len (_fcdf .Data )-1{return _c .Errorf ("\u0069n\u0064\u0065\u0078\u003a\u0020\u0027\u0025\u0064\u0027\u0020\u006fu\u0074\u0020\u006f\u0066\u0020\u0072\u0061\u006e\u0067\u0065",_gfac );
-};_fcdf .Data [_gfac ]=byte ((_dea &0xff000000)>>24);_fcdf .Data [_gfac +1]=byte ((_dea &0xff0000)>>16);_fcdf .Data [_gfac +2]=byte ((_dea &0xff00)>>8);_fcdf .Data [_gfac +3]=byte (_dea &0xff);return nil ;};func _abcd (_bcbc _g .Image )(Image ,error ){if _cede ,_bea :=_bcbc .(*Gray4 );
-_bea {return _cede .Copy (),nil ;};_fcgd :=_bcbc .Bounds ();_dbec ,_beefa :=NewImage (_fcgd .Max .X ,_fcgd .Max .Y ,4,1,nil ,nil ,nil );if _beefa !=nil {return nil ,_beefa ;};_ccda (_bcbc ,_dbec ,_fcgd );return _dbec ,nil ;};func _dcfb (_cdgg _e .NRGBA )_e .NRGBA {_cdgg .R =_cdgg .R >>4|(_cdgg .R >>4)<<4;
-_cdgg .G =_cdgg .G >>4|(_cdgg .G >>4)<<4;_cdgg .B =_cdgg .B >>4|(_cdgg .B >>4)<<4;return _cdgg ;};func (_affd *Monochrome )Validate ()error {if len (_affd .Data )!=_affd .Height *_affd .BytesPerLine {return ErrInvalidImage ;};return nil ;};type NRGBA interface{NRGBAAt (_faga ,_geafa int )_e .NRGBA ;
-SetNRGBA (_eaff ,_ageag int ,_afgf _e .NRGBA );};func (_cffac *Gray8 )Histogram ()(_ddba [256]int ){for _gaeb :=0;_gaeb < len (_cffac .Data );_gaeb ++{_ddba [_cffac .Data [_gaeb ]]++;};return _ddba ;};func _ccda (_bfge _g .Image ,_ffag Image ,_cada _g .Rectangle ){switch _gef :=_bfge .(type ){case Gray :_adbf (_gef ,_ffag .(Gray ),_cada );
-case NRGBA :_dgee (_gef ,_ffag .(Gray ),_cada );case CMYK :_cbga (_gef ,_ffag .(Gray ),_cada );case RGBA :_ebag (_gef ,_ffag .(Gray ),_cada );default:_abd (_bfge ,_ffag ,_cada );};};func (_bbca *NRGBA16 )Validate ()error {if len (_bbca .Data )!=3*_bbca .Width *_bbca .Height /2{return _fc .New ("i\u006e\u0076\u0061\u006c\u0069\u0064\u0020\u0069\u006da\u0067\u0065\u0020\u0064\u0061\u0074\u0061 s\u0069\u007a\u0065\u0020f\u006f\u0072\u0020\u0070\u0072\u006f\u0076\u0069\u0064ed\u0020\u0064i\u006d\u0065\u006e\u0073\u0069\u006f\u006e\u0073");
-};return nil ;};func (_cbda *Monochrome )Set (x ,y int ,c _e .Color ){_geaf :=y *_cbda .BytesPerLine +x >>3;if _geaf > len (_cbda .Data )-1{return ;};_cafe :=_cbda .ColorModel ().Convert (c ).(_e .Gray );_cbda .setGray (x ,_cafe ,_geaf );};func _geg (_ecg ,_ddcb *Monochrome ,_ddbc []byte ,_fae int )(_ddf error ){var (_acf ,_bgf ,_cbde ,_afg ,_abfb ,_eff ,_ece ,_ege int ;
-_faa ,_ffbb uint32 ;_fed ,_fff byte ;_acg uint16 ;);_gde :=make ([]byte ,4);_cff :=make ([]byte ,4);for _cbde =0;_cbde < _ecg .Height -1;_cbde ,_afg =_cbde +2,_afg +1{_acf =_cbde *_ecg .BytesPerLine ;_bgf =_afg *_ddcb .BytesPerLine ;for _abfb ,_eff =0,0;
-_abfb < _fae ;_abfb ,_eff =_abfb +4,_eff +1{for _ece =0;_ece < 4;_ece ++{_ege =_acf +_abfb +_ece ;if _ege <=len (_ecg .Data )-1&&_ege < _acf +_ecg .BytesPerLine {_gde [_ece ]=_ecg .Data [_ege ];}else {_gde [_ece ]=0x00;};_ege =_acf +_ecg .BytesPerLine +_abfb +_ece ;
-if _ege <=len (_ecg .Data )-1&&_ege < _acf +(2*_ecg .BytesPerLine ){_cff [_ece ]=_ecg .Data [_ege ];}else {_cff [_ece ]=0x00;};};_faa =_d .BigEndian .Uint32 (_gde );_ffbb =_d .BigEndian .Uint32 (_cff );_ffbb |=_faa ;_ffbb |=_ffbb <<1;_ffbb &=0xaaaaaaaa;
-_faa =_ffbb |(_ffbb <<7);_fed =byte (_faa >>24);_fff =byte ((_faa >>8)&0xff);_ege =_bgf +_eff ;if _ege +1==len (_ddcb .Data )-1||_ege +1>=_bgf +_ddcb .BytesPerLine {_ddcb .Data [_ege ]=_ddbc [_fed ];}else {_acg =(uint16 (_ddbc [_fed ])<<8)|uint16 (_ddbc [_fff ]);
-if _ddf =_ddcb .setTwoBytes (_ege ,_acg );_ddf !=nil {return _c .Errorf ("s\u0065\u0074\u0074\u0069\u006e\u0067 \u0074\u0077\u006f\u0020\u0062\u0079t\u0065\u0073\u0020\u0066\u0061\u0069\u006ce\u0064\u002c\u0020\u0069\u006e\u0064\u0065\u0078\u003a\u0020%\u0064",_ege );
-};_eff ++;};};};return nil ;};func (_ageac *monochromeThresholdConverter )Convert (img _g .Image )(Image ,error ){if _cbge ,_fcgb :=img .(*Monochrome );_fcgb {return _cbge .Copy (),nil ;};_bdff :=img .Bounds ();_ceab ,_gafg :=NewImage (_bdff .Max .X ,_bdff .Max .Y ,1,1,nil ,nil ,nil );
-if _gafg !=nil {return nil ,_gafg ;};_ceab .(*Monochrome ).ModelThreshold =_ageac .Threshold ;for _cfag :=0;_cfag < _bdff .Max .X ;_cfag ++{for _eeea :=0;_eeea < _bdff .Max .Y ;_eeea ++{_aaf :=img .At (_cfag ,_eeea );_ceab .Set (_cfag ,_eeea ,_aaf );};
-};return _ceab ,nil ;};func ColorAtGray16BPC (x ,y ,bytesPerLine int ,data []byte ,decode []float64 )(_e .Gray16 ,error ){_deg :=(y *bytesPerLine /2+x )*2;if _deg +1>=len (data ){return _e .Gray16 {},_c .Errorf ("\u0069\u006d\u0061\u0067\u0065\u0020\u0063\u006f\u006f\u0072\u0064\u0069\u006ea\u0074\u0065\u0073\u0020\u006f\u0075t\u0020\u006f\u0066\u0020\u0072\u0061\u006e\u0067\u0065\u0020\u0028\u0025\u0064,\u0020\u0025\u0064\u0029",x ,y );
-};_dadfe :=uint16 (data [_deg ])<<8|uint16 (data [_deg +1]);if len (decode )==2{_dadfe =uint16 (uint64 (LinearInterpolate (float64 (_dadfe ),0,65535,decode [0],decode [1])));};return _e .Gray16 {Y :_dadfe },nil ;};func (_acfc *NRGBA32 )At (x ,y int )_e .Color {_gaegf ,_ :=_acfc .ColorAt (x ,y );
-return _gaegf };func (_eed *NRGBA32 )NRGBAAt (x ,y int )_e .NRGBA {_bega ,_ :=ColorAtNRGBA32 (x ,y ,_eed .Width ,_eed .Data ,_eed .Alpha ,_eed .Decode );return _bega ;};func _fa (_ee *Monochrome ,_dc int )(*Monochrome ,error ){if _ee ==nil {return nil ,_fc .New ("\u0073o\u0075r\u0063\u0065\u0020\u006e\u006ft\u0020\u0064e\u0066\u0069\u006e\u0065\u0064");
-};if _dc ==1{return _ee .copy (),nil ;};if !IsPowerOf2 (uint (_dc )){return nil ,_c .Errorf ("\u0070\u0072\u006fvi\u0064\u0065\u0064\u0020\u0069\u006e\u0076\u0061\u006ci\u0064 \u0065x\u0070a\u006e\u0064\u0020\u0066\u0061\u0063\u0074\u006f\u0072\u003a\u0020\u0025\u0064",_dc );
-};_fg :=_bgc (_dc );return _gg (_ee ,_dc ,_fg );};func (_ddfg *ImageBase )MakeAlpha (){_ddfg .newAlpha ()};func _da (_fd ,_ad *Monochrome )(_eec error ){_fge :=_ad .BytesPerLine ;_dae :=_fd .BytesPerLine ;var (_ba byte ;_df uint16 ;_ag ,_fga ,_cfb ,_cfe ,_bbg int ;
-);for _cfb =0;_cfb < _ad .Height ;_cfb ++{_ag =_cfb *_fge ;_fga =2*_cfb *_dae ;for _cfe =0;_cfe < _fge ;_cfe ++{_ba =_ad .Data [_ag +_cfe ];_df =_ebba [_ba ];_bbg =_fga +_cfe *2;if _fd .BytesPerLine !=_ad .BytesPerLine *2&&(_cfe +1)*2> _fd .BytesPerLine {_eec =_fd .setByte (_bbg ,byte (_df >>8));
-}else {_eec =_fd .setTwoBytes (_bbg ,_df );};if _eec !=nil {return _eec ;};};for _cfe =0;_cfe < _dae ;_cfe ++{_bbg =_fga +_dae +_cfe ;_ba =_fd .Data [_fga +_cfe ];if _eec =_fd .setByte (_bbg ,_ba );_eec !=nil {return _eec ;};};};return nil ;};var _ Image =&Gray2 {};
-type Image interface{_bg .Image ;Base ()*ImageBase ;Copy ()Image ;Pix ()[]byte ;ColorAt (_cbba ,_baebc int )(_e .Color ,error );Validate ()error ;};func (_ggba *Gray16 )Histogram ()(_eagd [256]int ){for _fedd :=0;_fedd < _ggba .Width ;_fedd ++{for _fdbe :=0;
-_fdbe < _ggba .Height ;_fdbe ++{_eagd [_ggba .GrayAt (_fedd ,_fdbe ).Y ]++;};};return _eagd ;};func (_fdaae *RGBA32 )ColorAt (x ,y int )(_e .Color ,error ){return ColorAtRGBA32 (x ,y ,_fdaae .Width ,_fdaae .Data ,_fdaae .Alpha ,_fdaae .Decode );};func (_acged *Gray2 )Bounds ()_g .Rectangle {return _g .Rectangle {Max :_g .Point {X :_acged .Width ,Y :_acged .Height }};
-};func (_eeec *ImageBase )Pix ()[]byte {return _eeec .Data };func (_fdfca *NRGBA32 )ColorAt (x ,y int )(_e .Color ,error ){return ColorAtNRGBA32 (x ,y ,_fdfca .Width ,_fdfca .Data ,_fdfca .Alpha ,_fdfca .Decode );};func (_gag *Monochrome )ColorAt (x ,y int )(_e .Color ,error ){return ColorAtGray1BPC (x ,y ,_gag .BytesPerLine ,_gag .Data ,_gag .Decode );
-};func (_aebb *Gray4 )Base ()*ImageBase {return &_aebb .ImageBase };var _ _g .Image =&Gray16 {};func (_acbf *NRGBA64 )Copy ()Image {return &NRGBA64 {ImageBase :_acbf .copy ()}};func (_ggeb *RGBA32 )ColorModel ()_e .Model {return _e .NRGBAModel };func (_cdgb *RGBA32 )At (x ,y int )_e .Color {_decb ,_ :=_cdgb .ColorAt (x ,y );
-return _decb };func (_defbc *NRGBA64 )ColorAt (x ,y int )(_e .Color ,error ){return ColorAtNRGBA64 (x ,y ,_defbc .Width ,_defbc .Data ,_defbc .Alpha ,_defbc .Decode );};const (PixSrc RasterOperator =0xc;PixDst RasterOperator =0xa;PixNotSrc RasterOperator =0x3;
-PixNotDst RasterOperator =0x5;PixClr RasterOperator =0x0;PixSet RasterOperator =0xf;PixSrcOrDst RasterOperator =0xe;PixSrcAndDst RasterOperator =0x8;PixSrcXorDst RasterOperator =0x6;PixNotSrcOrDst RasterOperator =0xb;PixNotSrcAndDst RasterOperator =0x2;
-PixSrcOrNotDst RasterOperator =0xd;PixSrcAndNotDst RasterOperator =0x4;PixNotPixSrcOrDst RasterOperator =0x1;PixNotPixSrcAndDst RasterOperator =0x7;PixNotPixSrcXorDst RasterOperator =0x9;PixPaint =PixSrcOrDst ;PixSubtract =PixNotSrcAndDst ;PixMask =PixSrcAndDst ;
-);func (_ebc *NRGBA32 )Validate ()error {if len (_ebc .Data )!=3*_ebc .Width *_ebc .Height {return _fc .New ("i\u006e\u0076\u0061\u006c\u0069\u0064\u0020\u0069\u006da\u0067\u0065\u0020\u0064\u0061\u0074\u0061 s\u0069\u007a\u0065\u0020f\u006f\u0072\u0020\u0070\u0072\u006f\u0076\u0069\u0064ed\u0020\u0064i\u006d\u0065\u006e\u0073\u0069\u006f\u006e\u0073");
-};return nil ;};var _ _g .Image =&Gray2 {};var _ NRGBA =&NRGBA32 {};type NRGBA32 struct{ImageBase };func (_aegc *NRGBA32 )Copy ()Image {return &NRGBA32 {ImageBase :_aegc .copy ()}};func (_gagf *NRGBA64 )Set (x ,y int ,c _e .Color ){_bddg :=(y *_gagf .Width +x )*2;
-_dbb :=_bddg *3;if _dbb +5>=len (_gagf .Data ){return ;};_ecfe :=_e .NRGBA64Model .Convert (c ).(_e .NRGBA64 );_gagf .setNRGBA64 (_dbb ,_ecfe ,_bddg );};func _fdbf (_fdfe _e .CMYK )_e .Gray {_bfdg ,_ggg ,_cfbeb :=_e .CMYKToRGB (_fdfe .C ,_fdfe .M ,_fdfe .Y ,_fdfe .K );
-_daad :=(19595*uint32 (_bfdg )+38470*uint32 (_ggg )+7471*uint32 (_cfbeb )+1<<7)>>16;return _e .Gray {Y :uint8 (_daad )};};func GrayHistogram (g Gray )(_bcgea [256]int ){switch _fafd :=g .(type ){case Histogramer :return _fafd .Histogram ();case _g .Image :_geaa :=_fafd .Bounds ();
-for _gbbb :=0;_gbbb < _geaa .Max .X ;_gbbb ++{for _bcbdc :=0;_bcbdc < _geaa .Max .Y ;_bcbdc ++{_bcgea [g .GrayAt (_gbbb ,_bcbdc ).Y ]++;};};return _bcgea ;default:return [256]int {};};};func AutoThresholdTriangle (histogram [256]int )uint8 {var _dedgf ,_dbdc ,_dgfd ,_bgga int ;
-for _fdba :=0;_fdba < len (histogram );_fdba ++{if histogram [_fdba ]> 0{_dedgf =_fdba ;break ;};};if _dedgf > 0{_dedgf --;};for _dgefe :=255;_dgefe > 0;_dgefe --{if histogram [_dgefe ]> 0{_bgga =_dgefe ;break ;};};if _bgga < 255{_bgga ++;};for _ffdd :=0;
-_ffdd < 256;_ffdd ++{if histogram [_ffdd ]> _dbdc {_dgfd =_ffdd ;_dbdc =histogram [_ffdd ];};};var _aadb bool ;if (_dgfd -_dedgf )< (_bgga -_dgfd ){_aadb =true ;var _acaf int ;_dfgf :=255;for _acaf < _dfgf {_eedd :=histogram [_acaf ];histogram [_acaf ]=histogram [_dfgf ];
-histogram [_dfgf ]=_eedd ;_acaf ++;_dfgf --;};_dedgf =255-_bgga ;_dgfd =255-_dgfd ;};if _dedgf ==_dgfd {return uint8 (_dedgf );};_begeg :=float64 (histogram [_dgfd ]);_dgbf :=float64 (_dedgf -_dgfd );_eefd :=_b .Sqrt (_begeg *_begeg +_dgbf *_dgbf );_begeg /=_eefd ;
-_dgbf /=_eefd ;_eefd =_begeg *float64 (_dedgf )+_dgbf *float64 (histogram [_dedgf ]);_bdda :=_dedgf ;var _ebdb float64 ;for _bfeg :=_dedgf +1;_bfeg <=_dgfd ;_bfeg ++{_gbeg :=_begeg *float64 (_bfeg )+_dgbf *float64 (histogram [_bfeg ])-_eefd ;if _gbeg > _ebdb {_bdda =_bfeg ;
-_ebdb =_gbeg ;};};_bdda --;if _aadb {var _edcef int ;_cddg :=255;for _edcef < _cddg {_aafe :=histogram [_edcef ];histogram [_edcef ]=histogram [_cddg ];histogram [_cddg ]=_aafe ;_edcef ++;_cddg --;};return uint8 (255-_bdda );};return uint8 (_bdda );};func (_ceed *NRGBA64 )Bounds ()_g .Rectangle {return _g .Rectangle {Max :_g .Point {X :_ceed .Width ,Y :_ceed .Height }};
-};func (_ggca *Gray16 )ColorModel ()_e .Model {return _e .Gray16Model };func (_bbdf *Monochrome )RasterOperation (dx ,dy ,dw ,dh int ,op RasterOperator ,src *Monochrome ,sx ,sy int )error {return _ffgc (_bbdf ,dx ,dy ,dw ,dh ,op ,src ,sx ,sy );};func _gaa (_bcf Gray ,_ceb CMYK ,_bgg _g .Rectangle ){for _ecff :=0;
-_ecff < _bgg .Max .X ;_ecff ++{for _cgc :=0;_cgc < _bgg .Max .Y ;_cgc ++{_gea :=_bcf .GrayAt (_ecff ,_cgc );_ceb .SetCMYK (_ecff ,_cgc ,_facg (_gea ));};};};func _dgee (_ccbfg NRGBA ,_cdgf Gray ,_fadd _g .Rectangle ){for _ddcf :=0;_ddcf < _fadd .Max .X ;
-_ddcf ++{for _cfdb :=0;_cfdb < _fadd .Max .Y ;_cfdb ++{_baeb :=_gadf (_ccbfg .NRGBAAt (_ddcf ,_cfdb ));_cdgf .SetGray (_ddcf ,_cfdb ,_baeb );};};};type ImageBase struct{Width ,Height int ;BitsPerComponent ,ColorComponents int ;Data ,Alpha []byte ;Decode []float64 ;
-BytesPerLine int ;};func _bae (_ab *Monochrome ,_gda ...int )(_dde *Monochrome ,_cgb error ){if _ab ==nil {return nil ,_fc .New ("\u0073o\u0075\u0072\u0063\u0065 \u0062\u0069\u0074\u006d\u0061p\u0020n\u006ft\u0020\u0064\u0065\u0066\u0069\u006e\u0065d");
-};if len (_gda )==0{return nil ,_fc .New ("\u0074h\u0065\u0072e\u0020\u006d\u0075s\u0074\u0020\u0062\u0065\u0020\u0061\u0074 \u006c\u0065\u0061\u0073\u0074\u0020o\u006e\u0065\u0020\u006c\u0065\u0076\u0065\u006c\u0020\u006f\u0066 \u0072\u0065\u0064\u0075\u0063\u0074\u0069\u006f\u006e");
-};_bfb :=_fbfc ();_dde =_ab ;for _ ,_ddc :=range _gda {if _ddc <=0{break ;};_dde ,_cgb =_cbg (_dde ,_ddc ,_bfb );if _cgb !=nil {return nil ,_cgb ;};};return _dde ,nil ;};func (_fabg *Gray8 )Bounds ()_g .Rectangle {return _g .Rectangle {Max :_g .Point {X :_fabg .Width ,Y :_fabg .Height }};
-};func (_cbae *Monochrome )Histogram ()(_cefg [256]int ){for _ ,_fagg :=range _cbae .Data {_cefg [0xff]+=int (_dbgf [_cbae .Data [_fagg ]]);};return _cefg ;};func (_bgb *Monochrome )setBit (_efaca ,_acb int ){_bgb .Data [_efaca +(_acb >>3)]|=0x80>>uint (_acb &7)};
-func (_egf *CMYK32 )ColorModel ()_e .Model {return _e .CMYKModel };func ColorAtNRGBA64 (x ,y ,width int ,data ,alpha []byte ,decode []float64 )(_e .NRGBA64 ,error ){_gceb :=(y *width +x )*2;_gcedf :=_gceb *3;if _gcedf +5>=len (data ){return _e .NRGBA64 {},_c .Errorf ("\u0069\u006d\u0061\u0067\u0065\u0020\u0063\u006f\u006f\u0072\u0064\u0069\u006ea\u0074\u0065\u0073\u0020\u006f\u0075t\u0020\u006f\u0066\u0020\u0072\u0061\u006e\u0067\u0065\u0020\u0028\u0025\u0064,\u0020\u0025\u0064\u0029",x ,y );
-};const _dgefg =0xffff;_bffg :=uint16 (_dgefg );if alpha !=nil &&len (alpha )> _gceb +1{_bffg =uint16 (alpha [_gceb ])<<8|uint16 (alpha [_gceb +1]);};_cacc :=uint16 (data [_gcedf ])<<8|uint16 (data [_gcedf +1]);_fcdfe :=uint16 (data [_gcedf +2])<<8|uint16 (data [_gcedf +3]);
-_dgbd :=uint16 (data [_gcedf +4])<<8|uint16 (data [_gcedf +5]);if len (decode )==6{_cacc =uint16 (uint64 (LinearInterpolate (float64 (_cacc ),0,65535,decode [0],decode [1]))&_dgefg );_fcdfe =uint16 (uint64 (LinearInterpolate (float64 (_fcdfe ),0,65535,decode [2],decode [3]))&_dgefg );
-_dgbd =uint16 (uint64 (LinearInterpolate (float64 (_dgbd ),0,65535,decode [4],decode [5]))&_dgefg );};return _e .NRGBA64 {R :_cacc ,G :_fcdfe ,B :_dgbd ,A :_bffg },nil ;};func (_fagd *CMYK32 )CMYKAt (x ,y int )_e .CMYK {_bcac ,_ :=ColorAtCMYK (x ,y ,_fagd .Width ,_fagd .Data ,_fagd .Decode );
-return _bcac ;};func ColorAtGray4BPC (x ,y ,bytesPerLine int ,data []byte ,decode []float64 )(_e .Gray ,error ){_edaa :=y *bytesPerLine +x >>1;if _edaa >=len (data ){return _e .Gray {},_c .Errorf ("\u0069\u006d\u0061\u0067\u0065\u0020\u0063\u006f\u006f\u0072\u0064\u0069\u006ea\u0074\u0065\u0073\u0020\u006f\u0075t\u0020\u006f\u0066\u0020\u0072\u0061\u006e\u0067\u0065\u0020\u0028\u0025\u0064,\u0020\u0025\u0064\u0029",x ,y );
-};_fbfa :=data [_edaa ]>>uint (4-(x &1)*4)&0xf;if len (decode )==2{_fbfa =uint8 (uint32 (LinearInterpolate (float64 (_fbfa ),0,15,decode [0],decode [1]))&0xf);};return _e .Gray {Y :_fbfa *17&0xff},nil ;};func ColorAtGrayscale (x ,y ,bitsPerColor ,bytesPerLine int ,data []byte ,decode []float64 )(_e .Color ,error ){switch bitsPerColor {case 1:return ColorAtGray1BPC (x ,y ,bytesPerLine ,data ,decode );
-case 2:return ColorAtGray2BPC (x ,y ,bytesPerLine ,data ,decode );case 4:return ColorAtGray4BPC (x ,y ,bytesPerLine ,data ,decode );case 8:return ColorAtGray8BPC (x ,y ,bytesPerLine ,data ,decode );case 16:return ColorAtGray16BPC (x ,y ,bytesPerLine ,data ,decode );
-default:return nil ,_c .Errorf ("\u0075\u006e\u0073\u0075\u0070\u0070\u006f\u0072\u0074\u0065\u0064\u0020\u0067\u0072\u0061\u0079\u0020\u0073c\u0061\u006c\u0065\u0020\u0062\u0069\u0074s\u0020\u0070\u0065\u0072\u0020\u0063\u006f\u006c\u006f\u0072\u0020a\u006d\u006f\u0075\u006e\u0074\u003a\u0020\u0027\u0025\u0064\u0027",bitsPerColor );
-};};func _dbe (_faac _e .NYCbCrA )_e .RGBA {_agea ,_ddbce ,_cffe ,_dfa :=_bbbd (_faac ).RGBA ();return _e .RGBA {R :uint8 (_agea >>8),G :uint8 (_ddbce >>8),B :uint8 (_cffe >>8),A :uint8 (_dfa >>8)};};func _gac (_beeg _e .RGBA )_e .Gray {_bdfg :=(19595*uint32 (_beeg .R )+38470*uint32 (_beeg .G )+7471*uint32 (_beeg .B )+1<<7)>>16;
-return _e .Gray {Y :uint8 (_bdfg )};};func _adbf (_dbga ,_cbbc Gray ,_dacb _g .Rectangle ){for _gfb :=0;_gfb < _dacb .Max .X ;_gfb ++{for _egcg :=0;_egcg < _dacb .Max .Y ;_egcg ++{_cbbc .SetGray (_gfb ,_egcg ,_dbga .GrayAt (_gfb ,_egcg ));};};};func _badd (_cdf int ,_effe int )int {if _cdf < _effe {return _cdf ;
-};return _effe ;};const (_fcgbf shift =iota ;_aefb ;);func (_egfb *CMYK32 )Bounds ()_g .Rectangle {return _g .Rectangle {Max :_g .Point {X :_egfb .Width ,Y :_egfb .Height }};};func _ccagc (_dddd _g .Image ,_fcba Image ,_abce _g .Rectangle ){if _fbaf ,_cedfb :=_dddd .(SMasker );
-_cedfb &&_fbaf .HasAlpha (){_fcba .(SMasker ).MakeAlpha ();};switch _dccf :=_dddd .(type ){case Gray :_daefd (_dccf ,_fcba .(RGBA ),_abce );case NRGBA :_efbf (_dccf ,_fcba .(RGBA ),_abce );case *_g .NYCbCrA :_gace (_dccf ,_fcba .(RGBA ),_abce );case CMYK :_fcdgc (_dccf ,_fcba .(RGBA ),_abce );
-case RGBA :_cfage (_dccf ,_fcba .(RGBA ),_abce );case nrgba64 :_gagd (_dccf ,_fcba .(RGBA ),_abce );default:_abd (_dddd ,_fcba ,_abce );};};func (_bbae *Gray16 )GrayAt (x ,y int )_e .Gray {_aee ,_ :=_bbae .ColorAt (x ,y );return _e .Gray {Y :uint8 (_aee .(_e .Gray16 ).Y >>8)};
-};func (_dbf *Gray2 )Copy ()Image {return &Gray2 {ImageBase :_dbf .copy ()}};func ColorAtNRGBA32 (x ,y ,width int ,data ,alpha []byte ,decode []float64 )(_e .NRGBA ,error ){_cfbb :=y *width +x ;_gbdfa :=3*_cfbb ;if _gbdfa +2>=len (data ){return _e .NRGBA {},_c .Errorf ("\u0069\u006d\u0061\u0067\u0065\u0020\u0063\u006f\u006f\u0072\u0064\u0069\u006ea\u0074\u0065\u0073\u0020\u006f\u0075t\u0020\u006f\u0066\u0020\u0072\u0061\u006e\u0067\u0065\u0020\u0028\u0025\u0064,\u0020\u0025\u0064\u0029",x ,y );
-};_cgae :=uint8 (0xff);if alpha !=nil &&len (alpha )> _cfbb {_cgae =alpha [_cfbb ];};_agd ,_dgdg ,_gcg :=data [_gbdfa ],data [_gbdfa +1],data [_gbdfa +2];if len (decode )==6{_efgg :=LinearInterpolate (float64 (_agd ),0,255.0,decode [0],decode [1]);_ebgf :=LinearInterpolate (float64 (_dgdg ),0,255.0,decode [2],decode [3]);
-_bgec :=LinearInterpolate (float64 (_gcg ),0,255.0,decode [4],decode [5]);if _efgg <=1.0&&_ebgf <=1.0&&_bgec <=1.0{_efgg *=255.0;_ebgf *=255.0;_bgec *=255.0;};_agd =uint8 (_efgg )&0xff;_dgdg =uint8 (_ebgf )&0xff;_gcg =uint8 (_bgec )&0xff;};return _e .NRGBA {R :_agd ,G :_dgdg ,B :_gcg ,A :_cgae },nil ;
-};var _ Gray =&Gray4 {};func IsPowerOf2 (n uint )bool {return n > 0&&(n &(n -1))==0};var _ _g .Image =&NRGBA32 {};func NextPowerOf2 (n uint )uint {if IsPowerOf2 (n ){return n ;};return 1<<(_agfd (n )+1);};func (_fddgb *RGBA32 )Base ()*ImageBase {return &_fddgb .ImageBase };
-var _ _g .Image =&RGBA32 {};func (_fdaa *NRGBA64 )Validate ()error {if len (_fdaa .Data )!=3*2*_fdaa .Width *_fdaa .Height {return _fc .New ("i\u006e\u0076\u0061\u006c\u0069\u0064\u0020\u0069\u006da\u0067\u0065\u0020\u0064\u0061\u0074\u0061 s\u0069\u007a\u0065\u0020f\u006f\u0072\u0020\u0070\u0072\u006f\u0076\u0069\u0064ed\u0020\u0064i\u006d\u0065\u006e\u0073\u0069\u006f\u006e\u0073");
-};return nil ;};func _edg (_cfbf ,_dfb int )*Monochrome {return &Monochrome {ImageBase :NewImageBase (_cfbf ,_dfb ,1,1,nil ,nil ,nil ),ModelThreshold :0x0f};};func _fdgc (_fdfb _e .Color )_e .Color {_dcfd :=_e .GrayModel .Convert (_fdfb ).(_e .Gray );return _gga (_dcfd );
-};func (_babf *Monochrome )ReduceBinary (factor float64 )(*Monochrome ,error ){_bcge :=_agfd (uint (factor ));if !IsPowerOf2 (uint (factor )){_bcge ++;};_deeb :=make ([]int ,_bcge );for _fdbb :=range _deeb {_deeb [_fdbb ]=4;};_gcae ,_cadd :=_bae (_babf ,_deeb ...);
-if _cadd !=nil {return nil ,_cadd ;};return _gcae ,nil ;};func IsGrayImgBlackAndWhite (i *_g .Gray )bool {return _gff (i )};var _ Image =&NRGBA16 {};var _ Gray =&Gray16 {};func (_aaff *Gray16 )Set (x ,y int ,c _e .Color ){_dcab :=(y *_aaff .BytesPerLine /2+x )*2;
-if _dcab +1>=len (_aaff .Data ){return ;};_bbfg :=_e .Gray16Model .Convert (c ).(_e .Gray16 );_aaff .Data [_dcab ],_aaff .Data [_dcab +1]=uint8 (_bbfg .Y >>8),uint8 (_bbfg .Y &0xff);};func (_edb *Monochrome )SetGray (x ,y int ,g _e .Gray ){_eda :=y *_edb .BytesPerLine +x >>3;
-if _eda > len (_edb .Data )-1{return ;};g =_dgd (g ,monochromeModel (_edb .ModelThreshold ));_edb .setGray (x ,g ,_eda );};func (_gceg *Gray4 )ColorModel ()_e .Model {return Gray4Model };var _ Image =&RGBA32 {};func _daefd (_acfe Gray ,_gdac RGBA ,_edgg _g .Rectangle ){for _daec :=0;
-_daec < _edgg .Max .X ;_daec ++{for _ebea :=0;_ebea < _edgg .Max .Y ;_ebea ++{_bdgf :=_acfe .GrayAt (_daec ,_ebea );_gdac .SetRGBA (_daec ,_ebea ,_gecd (_bdgf ));};};};func (_dbd *ImageBase )setEightPartlyBytes (_aeee ,_ceggb int ,_bdd uint64 )(_dbgfb error ){var (_bfgb byte ;
-_ddfb int ;);for _fbge :=1;_fbge <=_ceggb ;_fbge ++{_ddfb =64-_fbge *8;_bfgb =byte (_bdd >>uint (_ddfb )&0xff);if _dbgfb =_dbd .setByte (_aeee +_fbge -1,_bfgb );_dbgfb !=nil {return _dbgfb ;};};_bde :=_dbd .BytesPerLine *8-_dbd .Width ;if _bde ==0{return nil ;
-};_ddfb -=8;_bfgb =byte (_bdd >>uint (_ddfb )&0xff)<<uint (_bde );if _dbgfb =_dbd .setByte (_aeee +_ceggb ,_bfgb );_dbgfb !=nil {return _dbgfb ;};return nil ;};var _ Image =&Monochrome {};func _cbga (_cdee CMYK ,_egeb Gray ,_gggd _g .Rectangle ){for _fgad :=0;
-_fgad < _gggd .Max .X ;_fgad ++{for _abcb :=0;_abcb < _gggd .Max .Y ;_abcb ++{_baff :=_fdbf (_cdee .CMYKAt (_fgad ,_abcb ));_egeb .SetGray (_fgad ,_abcb ,_baff );};};};func _ebag (_fbbb RGBA ,_eac Gray ,_eebe _g .Rectangle ){for _bbbb :=0;_bbbb < _eebe .Max .X ;
-_bbbb ++{for _cgffg :=0;_cgffg < _eebe .Max .Y ;_cgffg ++{_gfa :=_gac (_fbbb .RGBAAt (_bbbb ,_cgffg ));_eac .SetGray (_bbbb ,_cgffg ,_gfa );};};};var _ Image =&CMYK32 {};func _aaec (_afad ,_cdce ,_bdce byte )byte {return (_afad &^(_bdce ))|(_cdce &_bdce )};
-func (_eggg *NRGBA32 )setRGBA (_bcga int ,_fca _e .NRGBA ){_fdde :=3*_bcga ;_eggg .Data [_fdde ]=_fca .R ;_eggg .Data [_fdde +1]=_fca .G ;_eggg .Data [_fdde +2]=_fca .B ;if _bcga < len (_eggg .Alpha ){_eggg .Alpha [_bcga ]=_fca .A ;};};var _ _g .Image =&NRGBA64 {};
-func (_gdgc *NRGBA32 )SetNRGBA (x ,y int ,c _e .NRGBA ){_gdf :=y *_gdgc .Width +x ;_cbf :=3*_gdf ;if _cbf +2>=len (_gdgc .Data ){return ;};_gdgc .setRGBA (_gdf ,c );};var _dbgf [256]uint8 ;func (_cde *Gray16 )Bounds ()_g .Rectangle {return _g .Rectangle {Max :_g .Point {X :_cde .Width ,Y :_cde .Height }};
-};func _ecb (_efg NRGBA ,_gab CMYK ,_adac _g .Rectangle ){for _ccf :=0;_ccf < _adac .Max .X ;_ccf ++{for _gaf :=0;_gaf < _adac .Max .Y ;_gaf ++{_bad :=_efg .NRGBAAt (_ccf ,_gaf );_gab .SetCMYK (_ccf ,_gaf ,_acge (_bad ));};};};func _gg (_bf *Monochrome ,_cf int ,_ffg []uint )(*Monochrome ,error ){_dcf :=_cf *_bf .Width ;
-_ggd :=_cf *_bf .Height ;_ec :=_edg (_dcf ,_ggd );for _fad ,_gd :=range _ffg {var _fcc error ;switch _gd {case 2:_fcc =_da (_ec ,_bf );case 4:_fcc =_eg (_ec ,_bf );case 8:_fcc =_fb (_ec ,_bf );};if _fcc !=nil {return nil ,_fcc ;};if _fad !=len (_ffg )-1{_bf =_ec .copy ();
-};};return _ec ,nil ;};func _bbfc (_fagdf _g .Image ,_ffgac uint8 )*_g .Gray {_debe :=_fagdf .Bounds ();_bccd :=_g .NewGray (_debe );var (_eafg _e .Color ;_bdabg _e .Gray ;);for _edbd :=0;_edbd < _debe .Max .X ;_edbd ++{for _egee :=0;_egee < _debe .Max .Y ;
-_egee ++{_eafg =_fagdf .At (_edbd ,_egee );_bccd .Set (_edbd ,_egee ,_eafg );_bdabg =_bccd .GrayAt (_edbd ,_egee );_bccd .SetGray (_edbd ,_egee ,_e .Gray {Y :_dccg (_bdabg .Y ,_ffgac )});};};return _bccd ;};func (_acee *NRGBA16 )Bounds ()_g .Rectangle {return _g .Rectangle {Max :_g .Point {X :_acee .Width ,Y :_acee .Height }};
-};func (_dabf *Gray8 )Base ()*ImageBase {return &_dabf .ImageBase };func (_beac *Gray8 )GrayAt (x ,y int )_e .Gray {_defa ,_ :=ColorAtGray8BPC (x ,y ,_beac .BytesPerLine ,_beac .Data ,_beac .Decode );return _defa ;};func (_dgfe *Gray8 )Copy ()Image {return &Gray8 {ImageBase :_dgfe .copy ()}};
-func _cbg (_fag *Monochrome ,_egc int ,_ged []byte )(_abf *Monochrome ,_fdb error ){const _cd ="\u0072\u0065d\u0075\u0063\u0065R\u0061\u006e\u006b\u0042\u0069\u006e\u0061\u0072\u0079";if _fag ==nil {return nil ,_fc .New ("\u0073o\u0075\u0072\u0063\u0065 \u0062\u0069\u0074\u006d\u0061p\u0020n\u006ft\u0020\u0064\u0065\u0066\u0069\u006e\u0065d");
-};if _egc < 1||_egc > 4{return nil ,_fc .New ("\u006c\u0065\u0076\u0065\u006c\u0020\u006d\u0075\u0073\u0074 \u0062\u0065\u0020\u0069\u006e\u0020\u0073e\u0074\u0020\u007b\u0031\u002c\u0032\u002c\u0033\u002c\u0034\u007d");};if _fag .Height <=1{return nil ,_fc .New ("\u0073\u006f\u0075rc\u0065\u0020\u0068\u0065\u0069\u0067\u0068\u0074\u0020m\u0075s\u0074 \u0062e\u0020\u0061\u0074\u0020\u006c\u0065\u0061\u0073\u0074\u0020\u0027\u0032\u0027");
-};_abf =_edg (_fag .Width /2,_fag .Height /2);if _ged ==nil {_ged =_fbfc ();};_cdb :=_badd (_fag .BytesPerLine ,2*_abf .BytesPerLine );switch _egc {case 1:_fdb =_geg (_fag ,_abf ,_ged ,_cdb );case 2:_fdb =_ced (_fag ,_abf ,_ged ,_cdb );case 3:_fdb =_eea (_fag ,_abf ,_ged ,_cdb );
-case 4:_fdb =_aba (_fag ,_abf ,_ged ,_cdb );};if _fdb !=nil {return nil ,_fdb ;};return _abf ,nil ;};func _fedf (_cdaa ,_bceg CMYK ,_cgf _g .Rectangle ){for _cegg :=0;_cegg < _cgf .Max .X ;_cegg ++{for _dec :=0;_dec < _cgf .Max .Y ;_dec ++{_bceg .SetCMYK (_cegg ,_dec ,_cdaa .CMYKAt (_cegg ,_dec ));
-};};};func (_cead *Monochrome )setIndexedBit (_gcac int ){_cead .Data [(_gcac >>3)]|=0x80>>uint (_gcac &7)};func (_gbfaf *Gray2 )Validate ()error {if len (_gbfaf .Data )!=_gbfaf .Height *_gbfaf .BytesPerLine {return ErrInvalidImage ;};return nil ;};func (_cab *Gray2 )ColorAt (x ,y int )(_e .Color ,error ){return ColorAtGray2BPC (x ,y ,_cab .BytesPerLine ,_cab .Data ,_cab .Decode );
-};func (_edgd *NRGBA32 )Bounds ()_g .Rectangle {return _g .Rectangle {Max :_g .Point {X :_edgd .Width ,Y :_edgd .Height }};};var _ RGBA =&RGBA32 {};func _acge (_fdae _e .NRGBA )_e .CMYK {_cceb ,_gaae ,_febf ,_ :=_fdae .RGBA ();_dge ,_eba ,_cgcc ,_dgbc :=_e .RGBToCMYK (uint8 (_cceb >>8),uint8 (_gaae >>8),uint8 (_febf >>8));
-return _e .CMYK {C :_dge ,M :_eba ,Y :_cgcc ,K :_dgbc };};var _ _g .Image =&Gray8 {};func (_dgbb *NRGBA64 )NRGBA64At (x ,y int )_e .NRGBA64 {_aeed ,_ :=ColorAtNRGBA64 (x ,y ,_dgbb .Width ,_dgbb .Data ,_dgbb .Alpha ,_dgbb .Decode );return _aeed ;};func (_cfda *ImageBase )getByte (_gcdc int )(byte ,error ){if _gcdc > len (_cfda .Data )-1||_gcdc < 0{return 0,_c .Errorf ("\u0069\u006e\u0064\u0065x:\u0020\u0025\u0064\u0020\u006f\u0075\u0074\u0020\u006f\u0066\u0020\u0072\u0061\u006eg\u0065",_gcdc );
-};return _cfda .Data [_gcdc ],nil ;};var _ _g .Image =&Monochrome {};func ColorAtGray8BPC (x ,y ,bytesPerLine int ,data []byte ,decode []float64 )(_e .Gray ,error ){_agcg :=y *bytesPerLine +x ;if _agcg >=len (data ){return _e .Gray {},_c .Errorf ("\u0069\u006d\u0061\u0067\u0065\u0020\u0063\u006f\u006f\u0072\u0064\u0069\u006ea\u0074\u0065\u0073\u0020\u006f\u0075t\u0020\u006f\u0066\u0020\u0072\u0061\u006e\u0067\u0065\u0020\u0028\u0025\u0064,\u0020\u0025\u0064\u0029",x ,y );
-};_dbea :=data [_agcg ];if len (decode )==2{_dbea =uint8 (uint32 (LinearInterpolate (float64 (_dbea ),0,255,decode [0],decode [1]))&0xff);};return _e .Gray {Y :_dbea },nil ;};func ColorAtNRGBA16 (x ,y ,width ,bytesPerLine int ,data ,alpha []byte ,decode []float64 )(_e .NRGBA ,error ){_gebcg :=y *bytesPerLine +x *3/2;
-if _gebcg +1>=len (data ){return _e .NRGBA {},_beagb (x ,y );};const (_ccaa =0xf;_bbcc =uint8 (0xff););_ceae :=_bbcc ;if alpha !=nil {_bdba :=y *BytesPerLine (width ,4,1);if _bdba < len (alpha ){if x %2==0{_ceae =(alpha [_bdba ]>>uint (4))&_ccaa ;}else {_ceae =alpha [_bdba ]&_ccaa ;
-};_ceae |=_ceae <<4;};};var _gfec ,_daged ,_cfdg uint8 ;if x *3%2==0{_gfec =(data [_gebcg ]>>uint (4))&_ccaa ;_daged =data [_gebcg ]&_ccaa ;_cfdg =(data [_gebcg +1]>>uint (4))&_ccaa ;}else {_gfec =data [_gebcg ]&_ccaa ;_daged =(data [_gebcg +1]>>uint (4))&_ccaa ;
-_cfdg =data [_gebcg +1]&_ccaa ;};if len (decode )==6{_gfec =uint8 (uint32 (LinearInterpolate (float64 (_gfec ),0,15,decode [0],decode [1]))&0xf);_daged =uint8 (uint32 (LinearInterpolate (float64 (_daged ),0,15,decode [2],decode [3]))&0xf);_cfdg =uint8 (uint32 (LinearInterpolate (float64 (_cfdg ),0,15,decode [4],decode [5]))&0xf);
-};return _e .NRGBA {R :(_gfec <<4)|(_gfec &0xf),G :(_daged <<4)|(_daged &0xf),B :(_cfdg <<4)|(_cfdg &0xf),A :_ceae },nil ;};type monochromeModel uint8 ;func _bdfb (_eeeb *Monochrome ,_bfda ,_efad ,_ffagf ,_eccd int ,_efeg RasterOperator ,_effff *Monochrome ,_ccbb ,_daeb int )error {var (_gaaae bool ;
-_bedd bool ;_afff byte ;_bfbg int ;_bbafce int ;_daca int ;_bgag int ;_bdga bool ;_baaab int ;_beae int ;_gafgb int ;_abaf bool ;_becf byte ;_dabfb int ;_aefa int ;_cebe int ;_beab byte ;_gbga int ;_gcff int ;_fabgf uint ;_geeg uint ;_eagag byte ;_aabc shift ;
-_cfcc bool ;_gbcb bool ;_aacg ,_cdbc int ;);if _ccbb &7!=0{_gcff =8-(_ccbb &7);};if _bfda &7!=0{_bbafce =8-(_bfda &7);};if _gcff ==0&&_bbafce ==0{_eagag =_dbcf [0];}else {if _bbafce > _gcff {_fabgf =uint (_bbafce -_gcff );}else {_fabgf =uint (8-(_gcff -_bbafce ));
-};_geeg =8-_fabgf ;_eagag =_dbcf [_fabgf ];};if (_bfda &7)!=0{_gaaae =true ;_bfbg =8-(_bfda &7);_afff =_dbcf [_bfbg ];_daca =_eeeb .BytesPerLine *_efad +(_bfda >>3);_bgag =_effff .BytesPerLine *_daeb +(_ccbb >>3);_gbga =8-(_ccbb &7);if _bfbg > _gbga {_aabc =_fcgbf ;
-if _ffagf >=_gcff {_cfcc =true ;};}else {_aabc =_aefb ;};};if _ffagf < _bfbg {_bedd =true ;_afff &=_febgc [8-_bfbg +_ffagf ];};if !_bedd {_baaab =(_ffagf -_bfbg )>>3;if _baaab !=0{_bdga =true ;_beae =_eeeb .BytesPerLine *_efad +((_bfda +_bbafce )>>3);_gafgb =_effff .BytesPerLine *_daeb +((_ccbb +_bbafce )>>3);
-};};_dabfb =(_bfda +_ffagf )&7;if !(_bedd ||_dabfb ==0){_abaf =true ;_becf =_febgc [_dabfb ];_aefa =_eeeb .BytesPerLine *_efad +((_bfda +_bbafce )>>3)+_baaab ;_cebe =_effff .BytesPerLine *_daeb +((_ccbb +_bbafce )>>3)+_baaab ;if _dabfb > int (_geeg ){_gbcb =true ;
-};};switch _efeg {case PixSrc :if _gaaae {for _aacg =0;_aacg < _eccd ;_aacg ++{if _aabc ==_fcgbf {_beab =_effff .Data [_bgag ]<<_fabgf ;if _cfcc {_beab =_aaec (_beab ,_effff .Data [_bgag +1]>>_geeg ,_eagag );};}else {_beab =_effff .Data [_bgag ]>>_geeg ;
-};_eeeb .Data [_daca ]=_aaec (_eeeb .Data [_daca ],_beab ,_afff );_daca +=_eeeb .BytesPerLine ;_bgag +=_effff .BytesPerLine ;};};if _bdga {for _aacg =0;_aacg < _eccd ;_aacg ++{for _cdbc =0;_cdbc < _baaab ;_cdbc ++{_beab =_aaec (_effff .Data [_gafgb +_cdbc ]<<_fabgf ,_effff .Data [_gafgb +_cdbc +1]>>_geeg ,_eagag );
-_eeeb .Data [_beae +_cdbc ]=_beab ;};_beae +=_eeeb .BytesPerLine ;_gafgb +=_effff .BytesPerLine ;};};if _abaf {for _aacg =0;_aacg < _eccd ;_aacg ++{_beab =_effff .Data [_cebe ]<<_fabgf ;if _gbcb {_beab =_aaec (_beab ,_effff .Data [_cebe +1]>>_geeg ,_eagag );
-};_eeeb .Data [_aefa ]=_aaec (_eeeb .Data [_aefa ],_beab ,_becf );_aefa +=_eeeb .BytesPerLine ;_cebe +=_effff .BytesPerLine ;};};case PixNotSrc :if _gaaae {for _aacg =0;_aacg < _eccd ;_aacg ++{if _aabc ==_fcgbf {_beab =_effff .Data [_bgag ]<<_fabgf ;if _cfcc {_beab =_aaec (_beab ,_effff .Data [_bgag +1]>>_geeg ,_eagag );
-};}else {_beab =_effff .Data [_bgag ]>>_geeg ;};_eeeb .Data [_daca ]=_aaec (_eeeb .Data [_daca ],^_beab ,_afff );_daca +=_eeeb .BytesPerLine ;_bgag +=_effff .BytesPerLine ;};};if _bdga {for _aacg =0;_aacg < _eccd ;_aacg ++{for _cdbc =0;_cdbc < _baaab ;
-_cdbc ++{_beab =_aaec (_effff .Data [_gafgb +_cdbc ]<<_fabgf ,_effff .Data [_gafgb +_cdbc +1]>>_geeg ,_eagag );_eeeb .Data [_beae +_cdbc ]=^_beab ;};_beae +=_eeeb .BytesPerLine ;_gafgb +=_effff .BytesPerLine ;};};if _abaf {for _aacg =0;_aacg < _eccd ;_aacg ++{_beab =_effff .Data [_cebe ]<<_fabgf ;
-if _gbcb {_beab =_aaec (_beab ,_effff .Data [_cebe +1]>>_geeg ,_eagag );};_eeeb .Data [_aefa ]=_aaec (_eeeb .Data [_aefa ],^_beab ,_becf );_aefa +=_eeeb .BytesPerLine ;_cebe +=_effff .BytesPerLine ;};};case PixSrcOrDst :if _gaaae {for _aacg =0;_aacg < _eccd ;
-_aacg ++{if _aabc ==_fcgbf {_beab =_effff .Data [_bgag ]<<_fabgf ;if _cfcc {_beab =_aaec (_beab ,_effff .Data [_bgag +1]>>_geeg ,_eagag );};}else {_beab =_effff .Data [_bgag ]>>_geeg ;};_eeeb .Data [_daca ]=_aaec (_eeeb .Data [_daca ],_beab |_eeeb .Data [_daca ],_afff );
-_daca +=_eeeb .BytesPerLine ;_bgag +=_effff .BytesPerLine ;};};if _bdga {for _aacg =0;_aacg < _eccd ;_aacg ++{for _cdbc =0;_cdbc < _baaab ;_cdbc ++{_beab =_aaec (_effff .Data [_gafgb +_cdbc ]<<_fabgf ,_effff .Data [_gafgb +_cdbc +1]>>_geeg ,_eagag );_eeeb .Data [_beae +_cdbc ]|=_beab ;
-};_beae +=_eeeb .BytesPerLine ;_gafgb +=_effff .BytesPerLine ;};};if _abaf {for _aacg =0;_aacg < _eccd ;_aacg ++{_beab =_effff .Data [_cebe ]<<_fabgf ;if _gbcb {_beab =_aaec (_beab ,_effff .Data [_cebe +1]>>_geeg ,_eagag );};_eeeb .Data [_aefa ]=_aaec (_eeeb .Data [_aefa ],_beab |_eeeb .Data [_aefa ],_becf );
-_aefa +=_eeeb .BytesPerLine ;_cebe +=_effff .BytesPerLine ;};};case PixSrcAndDst :if _gaaae {for _aacg =0;_aacg < _eccd ;_aacg ++{if _aabc ==_fcgbf {_beab =_effff .Data [_bgag ]<<_fabgf ;if _cfcc {_beab =_aaec (_beab ,_effff .Data [_bgag +1]>>_geeg ,_eagag );
-};}else {_beab =_effff .Data [_bgag ]>>_geeg ;};_eeeb .Data [_daca ]=_aaec (_eeeb .Data [_daca ],_beab &_eeeb .Data [_daca ],_afff );_daca +=_eeeb .BytesPerLine ;_bgag +=_effff .BytesPerLine ;};};if _bdga {for _aacg =0;_aacg < _eccd ;_aacg ++{for _cdbc =0;
-_cdbc < _baaab ;_cdbc ++{_beab =_aaec (_effff .Data [_gafgb +_cdbc ]<<_fabgf ,_effff .Data [_gafgb +_cdbc +1]>>_geeg ,_eagag );_eeeb .Data [_beae +_cdbc ]&=_beab ;};_beae +=_eeeb .BytesPerLine ;_gafgb +=_effff .BytesPerLine ;};};if _abaf {for _aacg =0;
-_aacg < _eccd ;_aacg ++{_beab =_effff .Data [_cebe ]<<_fabgf ;if _gbcb {_beab =_aaec (_beab ,_effff .Data [_cebe +1]>>_geeg ,_eagag );};_eeeb .Data [_aefa ]=_aaec (_eeeb .Data [_aefa ],_beab &_eeeb .Data [_aefa ],_becf );_aefa +=_eeeb .BytesPerLine ;_cebe +=_effff .BytesPerLine ;
-};};case PixSrcXorDst :if _gaaae {for _aacg =0;_aacg < _eccd ;_aacg ++{if _aabc ==_fcgbf {_beab =_effff .Data [_bgag ]<<_fabgf ;if _cfcc {_beab =_aaec (_beab ,_effff .Data [_bgag +1]>>_geeg ,_eagag );};}else {_beab =_effff .Data [_bgag ]>>_geeg ;};_eeeb .Data [_daca ]=_aaec (_eeeb .Data [_daca ],_beab ^_eeeb .Data [_daca ],_afff );
-_daca +=_eeeb .BytesPerLine ;_bgag +=_effff .BytesPerLine ;};};if _bdga {for _aacg =0;_aacg < _eccd ;_aacg ++{for _cdbc =0;_cdbc < _baaab ;_cdbc ++{_beab =_aaec (_effff .Data [_gafgb +_cdbc ]<<_fabgf ,_effff .Data [_gafgb +_cdbc +1]>>_geeg ,_eagag );_eeeb .Data [_beae +_cdbc ]^=_beab ;
-};_beae +=_eeeb .BytesPerLine ;_gafgb +=_effff .BytesPerLine ;};};if _abaf {for _aacg =0;_aacg < _eccd ;_aacg ++{_beab =_effff .Data [_cebe ]<<_fabgf ;if _gbcb {_beab =_aaec (_beab ,_effff .Data [_cebe +1]>>_geeg ,_eagag );};_eeeb .Data [_aefa ]=_aaec (_eeeb .Data [_aefa ],_beab ^_eeeb .Data [_aefa ],_becf );
-_aefa +=_eeeb .BytesPerLine ;_cebe +=_effff .BytesPerLine ;};};case PixNotSrcOrDst :if _gaaae {for _aacg =0;_aacg < _eccd ;_aacg ++{if _aabc ==_fcgbf {_beab =_effff .Data [_bgag ]<<_fabgf ;if _cfcc {_beab =_aaec (_beab ,_effff .Data [_bgag +1]>>_geeg ,_eagag );
-};}else {_beab =_effff .Data [_bgag ]>>_geeg ;};_eeeb .Data [_daca ]=_aaec (_eeeb .Data [_daca ],^_beab |_eeeb .Data [_daca ],_afff );_daca +=_eeeb .BytesPerLine ;_bgag +=_effff .BytesPerLine ;};};if _bdga {for _aacg =0;_aacg < _eccd ;_aacg ++{for _cdbc =0;
-_cdbc < _baaab ;_cdbc ++{_beab =_aaec (_effff .Data [_gafgb +_cdbc ]<<_fabgf ,_effff .Data [_gafgb +_cdbc +1]>>_geeg ,_eagag );_eeeb .Data [_beae +_cdbc ]|=^_beab ;};_beae +=_eeeb .BytesPerLine ;_gafgb +=_effff .BytesPerLine ;};};if _abaf {for _aacg =0;
-_aacg < _eccd ;_aacg ++{_beab =_effff .Data [_cebe ]<<_fabgf ;if _gbcb {_beab =_aaec (_beab ,_effff .Data [_cebe +1]>>_geeg ,_eagag );};_eeeb .Data [_aefa ]=_aaec (_eeeb .Data [_aefa ],^_beab |_eeeb .Data [_aefa ],_becf );_aefa +=_eeeb .BytesPerLine ;_cebe +=_effff .BytesPerLine ;
-};};case PixNotSrcAndDst :if _gaaae {for _aacg =0;_aacg < _eccd ;_aacg ++{if _aabc ==_fcgbf {_beab =_effff .Data [_bgag ]<<_fabgf ;if _cfcc {_beab =_aaec (_beab ,_effff .Data [_bgag +1]>>_geeg ,_eagag );};}else {_beab =_effff .Data [_bgag ]>>_geeg ;};_eeeb .Data [_daca ]=_aaec (_eeeb .Data [_daca ],^_beab &_eeeb .Data [_daca ],_afff );
-_daca +=_eeeb .BytesPerLine ;_bgag +=_effff .BytesPerLine ;};};if _bdga {for _aacg =0;_aacg < _eccd ;_aacg ++{for _cdbc =0;_cdbc < _baaab ;_cdbc ++{_beab =_aaec (_effff .Data [_gafgb +_cdbc ]<<_fabgf ,_effff .Data [_gafgb +_cdbc +1]>>_geeg ,_eagag );_eeeb .Data [_beae +_cdbc ]&=^_beab ;
-};_beae +=_eeeb .BytesPerLine ;_gafgb +=_effff .BytesPerLine ;};};if _abaf {for _aacg =0;_aacg < _eccd ;_aacg ++{_beab =_effff .Data [_cebe ]<<_fabgf ;if _gbcb {_beab =_aaec (_beab ,_effff .Data [_cebe +1]>>_geeg ,_eagag );};_eeeb .Data [_aefa ]=_aaec (_eeeb .Data [_aefa ],^_beab &_eeeb .Data [_aefa ],_becf );
-_aefa +=_eeeb .BytesPerLine ;_cebe +=_effff .BytesPerLine ;};};case PixSrcOrNotDst :if _gaaae {for _aacg =0;_aacg < _eccd ;_aacg ++{if _aabc ==_fcgbf {_beab =_effff .Data [_bgag ]<<_fabgf ;if _cfcc {_beab =_aaec (_beab ,_effff .Data [_bgag +1]>>_geeg ,_eagag );
-};}else {_beab =_effff .Data [_bgag ]>>_geeg ;};_eeeb .Data [_daca ]=_aaec (_eeeb .Data [_daca ],_beab |^_eeeb .Data [_daca ],_afff );_daca +=_eeeb .BytesPerLine ;_bgag +=_effff .BytesPerLine ;};};if _bdga {for _aacg =0;_aacg < _eccd ;_aacg ++{for _cdbc =0;
-_cdbc < _baaab ;_cdbc ++{_beab =_aaec (_effff .Data [_gafgb +_cdbc ]<<_fabgf ,_effff .Data [_gafgb +_cdbc +1]>>_geeg ,_eagag );_eeeb .Data [_beae +_cdbc ]=_beab |^_eeeb .Data [_beae +_cdbc ];};_beae +=_eeeb .BytesPerLine ;_gafgb +=_effff .BytesPerLine ;
-};};if _abaf {for _aacg =0;_aacg < _eccd ;_aacg ++{_beab =_effff .Data [_cebe ]<<_fabgf ;if _gbcb {_beab =_aaec (_beab ,_effff .Data [_cebe +1]>>_geeg ,_eagag );};_eeeb .Data [_aefa ]=_aaec (_eeeb .Data [_aefa ],_beab |^_eeeb .Data [_aefa ],_becf );_aefa +=_eeeb .BytesPerLine ;
-_cebe +=_effff .BytesPerLine ;};};case PixSrcAndNotDst :if _gaaae {for _aacg =0;_aacg < _eccd ;_aacg ++{if _aabc ==_fcgbf {_beab =_effff .Data [_bgag ]<<_fabgf ;if _cfcc {_beab =_aaec (_beab ,_effff .Data [_bgag +1]>>_geeg ,_eagag );};}else {_beab =_effff .Data [_bgag ]>>_geeg ;
-};_eeeb .Data [_daca ]=_aaec (_eeeb .Data [_daca ],_beab &^_eeeb .Data [_daca ],_afff );_daca +=_eeeb .BytesPerLine ;_bgag +=_effff .BytesPerLine ;};};if _bdga {for _aacg =0;_aacg < _eccd ;_aacg ++{for _cdbc =0;_cdbc < _baaab ;_cdbc ++{_beab =_aaec (_effff .Data [_gafgb +_cdbc ]<<_fabgf ,_effff .Data [_gafgb +_cdbc +1]>>_geeg ,_eagag );
-_eeeb .Data [_beae +_cdbc ]=_beab &^_eeeb .Data [_beae +_cdbc ];};_beae +=_eeeb .BytesPerLine ;_gafgb +=_effff .BytesPerLine ;};};if _abaf {for _aacg =0;_aacg < _eccd ;_aacg ++{_beab =_effff .Data [_cebe ]<<_fabgf ;if _gbcb {_beab =_aaec (_beab ,_effff .Data [_cebe +1]>>_geeg ,_eagag );
-};_eeeb .Data [_aefa ]=_aaec (_eeeb .Data [_aefa ],_beab &^_eeeb .Data [_aefa ],_becf );_aefa +=_eeeb .BytesPerLine ;_cebe +=_effff .BytesPerLine ;};};case PixNotPixSrcOrDst :if _gaaae {for _aacg =0;_aacg < _eccd ;_aacg ++{if _aabc ==_fcgbf {_beab =_effff .Data [_bgag ]<<_fabgf ;
-if _cfcc {_beab =_aaec (_beab ,_effff .Data [_bgag +1]>>_geeg ,_eagag );};}else {_beab =_effff .Data [_bgag ]>>_geeg ;};_eeeb .Data [_daca ]=_aaec (_eeeb .Data [_daca ],^(_beab |_eeeb .Data [_daca ]),_afff );_daca +=_eeeb .BytesPerLine ;_bgag +=_effff .BytesPerLine ;
-};};if _bdga {for _aacg =0;_aacg < _eccd ;_aacg ++{for _cdbc =0;_cdbc < _baaab ;_cdbc ++{_beab =_aaec (_effff .Data [_gafgb +_cdbc ]<<_fabgf ,_effff .Data [_gafgb +_cdbc +1]>>_geeg ,_eagag );_eeeb .Data [_beae +_cdbc ]=^(_beab |_eeeb .Data [_beae +_cdbc ]);
-};_beae +=_eeeb .BytesPerLine ;_gafgb +=_effff .BytesPerLine ;};};if _abaf {for _aacg =0;_aacg < _eccd ;_aacg ++{_beab =_effff .Data [_cebe ]<<_fabgf ;if _gbcb {_beab =_aaec (_beab ,_effff .Data [_cebe +1]>>_geeg ,_eagag );};_eeeb .Data [_aefa ]=_aaec (_eeeb .Data [_aefa ],^(_beab |_eeeb .Data [_aefa ]),_becf );
-_aefa +=_eeeb .BytesPerLine ;_cebe +=_effff .BytesPerLine ;};};case PixNotPixSrcAndDst :if _gaaae {for _aacg =0;_aacg < _eccd ;_aacg ++{if _aabc ==_fcgbf {_beab =_effff .Data [_bgag ]<<_fabgf ;if _cfcc {_beab =_aaec (_beab ,_effff .Data [_bgag +1]>>_geeg ,_eagag );
-};}else {_beab =_effff .Data [_bgag ]>>_geeg ;};_eeeb .Data [_daca ]=_aaec (_eeeb .Data [_daca ],^(_beab &_eeeb .Data [_daca ]),_afff );_daca +=_eeeb .BytesPerLine ;_bgag +=_effff .BytesPerLine ;};};if _bdga {for _aacg =0;_aacg < _eccd ;_aacg ++{for _cdbc =0;
-_cdbc < _baaab ;_cdbc ++{_beab =_aaec (_effff .Data [_gafgb +_cdbc ]<<_fabgf ,_effff .Data [_gafgb +_cdbc +1]>>_geeg ,_eagag );_eeeb .Data [_beae +_cdbc ]=^(_beab &_eeeb .Data [_beae +_cdbc ]);};_beae +=_eeeb .BytesPerLine ;_gafgb +=_effff .BytesPerLine ;
-};};if _abaf {for _aacg =0;_aacg < _eccd ;_aacg ++{_beab =_effff .Data [_cebe ]<<_fabgf ;if _gbcb {_beab =_aaec (_beab ,_effff .Data [_cebe +1]>>_geeg ,_eagag );};_eeeb .Data [_aefa ]=_aaec (_eeeb .Data [_aefa ],^(_beab &_eeeb .Data [_aefa ]),_becf );_aefa +=_eeeb .BytesPerLine ;
-_cebe +=_effff .BytesPerLine ;};};case PixNotPixSrcXorDst :if _gaaae {for _aacg =0;_aacg < _eccd ;_aacg ++{if _aabc ==_fcgbf {_beab =_effff .Data [_bgag ]<<_fabgf ;if _cfcc {_beab =_aaec (_beab ,_effff .Data [_bgag +1]>>_geeg ,_eagag );};}else {_beab =_effff .Data [_bgag ]>>_geeg ;
-};_eeeb .Data [_daca ]=_aaec (_eeeb .Data [_daca ],^(_beab ^_eeeb .Data [_daca ]),_afff );_daca +=_eeeb .BytesPerLine ;_bgag +=_effff .BytesPerLine ;};};if _bdga {for _aacg =0;_aacg < _eccd ;_aacg ++{for _cdbc =0;_cdbc < _baaab ;_cdbc ++{_beab =_aaec (_effff .Data [_gafgb +_cdbc ]<<_fabgf ,_effff .Data [_gafgb +_cdbc +1]>>_geeg ,_eagag );
-_eeeb .Data [_beae +_cdbc ]=^(_beab ^_eeeb .Data [_beae +_cdbc ]);};_beae +=_eeeb .BytesPerLine ;_gafgb +=_effff .BytesPerLine ;};};if _abaf {for _aacg =0;_aacg < _eccd ;_aacg ++{_beab =_effff .Data [_cebe ]<<_fabgf ;if _gbcb {_beab =_aaec (_beab ,_effff .Data [_cebe +1]>>_geeg ,_eagag );
-};_eeeb .Data [_aefa ]=_aaec (_eeeb .Data [_aefa ],^(_beab ^_eeeb .Data [_aefa ]),_becf );_aefa +=_eeeb .BytesPerLine ;_cebe +=_effff .BytesPerLine ;};};default:_ef .Log .Debug ("\u004f\u0070e\u0072\u0061\u0074\u0069\u006f\u006e\u003a\u0020\u0027\u0025\u0064\u0027\u0020\u006e\u006f\u0074\u0020\u0070\u0065\u0072\u006d\u0069tt\u0065\u0064",_efeg );
-return _fc .New ("\u0072\u0061\u0073\u0074\u0065\u0072\u0020\u006f\u0070\u0065r\u0061\u0074\u0069\u006f\u006e\u0020\u006eo\u0074\u0020\u0070\u0065\u0072\u006d\u0069\u0074\u0074\u0065\u0064");};return nil ;};func _gecd (_dba _e .Gray )_e .RGBA {return _e .RGBA {R :_dba .Y ,G :_dba .Y ,B :_dba .Y ,A :0xff}};
-type CMYK32 struct{ImageBase };func _fbfc ()(_aecg []byte ){_aecg =make ([]byte ,256);for _fgeg :=0;_fgeg < 256;_fgeg ++{_cfbe :=byte (_fgeg );_aecg [_cfbe ]=(_cfbe &0x01)|((_cfbe &0x04)>>1)|((_cfbe &0x10)>>2)|((_cfbe &0x40)>>3)|((_cfbe &0x02)<<3)|((_cfbe &0x08)<<2)|((_cfbe &0x20)<<1)|(_cfbe &0x80);
-};return _aecg ;};var (MonochromeConverter =ConverterFunc (_abcc );Gray2Converter =ConverterFunc (_fedc );Gray4Converter =ConverterFunc (_abcd );GrayConverter =ConverterFunc (_aagc );Gray16Converter =ConverterFunc (_faagc );NRGBA16Converter =ConverterFunc (_gdad );
-NRGBAConverter =ConverterFunc (_bdcc );NRGBA64Converter =ConverterFunc (_fbgb );RGBAConverter =ConverterFunc (_addf );CMYKConverter =ConverterFunc (_egdc ););func (_bbfe *NRGBA16 )Base ()*ImageBase {return &_bbfe .ImageBase };func (_cgdd *Gray2 )At (x ,y int )_e .Color {_bbaf ,_ :=_cgdd .ColorAt (x ,y );
-return _bbaf };type Gray2 struct{ImageBase };var (_febgc =[]byte {0x00,0x80,0xC0,0xE0,0xF0,0xF8,0xFC,0xFE,0xFF};_dbcf =[]byte {0x00,0x01,0x03,0x07,0x0F,0x1F,0x3F,0x7F,0xFF};);func (_bbge *NRGBA32 )ColorModel ()_e .Model {return _e .NRGBAModel };func (_bfce *Gray4 )Copy ()Image {return &Gray4 {ImageBase :_bfce .copy ()}};
-func _abcc (_gdd _g .Image )(Image ,error ){if _ddad ,_ggdc :=_gdd .(*Monochrome );_ggdc {return _ddad ,nil ;};_dgf :=_gdd .Bounds ();var _aeac Gray ;switch _aead :=_gdd .(type ){case Gray :_aeac =_aead ;case NRGBA :_aeac =&Gray8 {ImageBase :NewImageBase (_dgf .Max .X ,_dgf .Max .Y ,8,1,nil ,nil ,nil )};
-_cad (_aeac ,_aead ,_dgf );case nrgba64 :_aeac =&Gray8 {ImageBase :NewImageBase (_dgf .Max .X ,_dgf .Max .Y ,8,1,nil ,nil ,nil )};_ceaf (_aeac ,_aead ,_dgf );default:_gedb ,_cfbea :=GrayConverter .Convert (_gdd );if _cfbea !=nil {return nil ,_cfbea ;};
-_aeac =_gedb .(Gray );};_cfd ,_ggdg :=NewImage (_dgf .Max .X ,_dgf .Max .Y ,1,1,nil ,nil ,nil );if _ggdg !=nil {return nil ,_ggdg ;};_bcc :=_cfd .(*Monochrome );_ebee :=AutoThresholdTriangle (GrayHistogram (_aeac ));for _acgb :=0;_acgb < _dgf .Max .X ;
-_acgb ++{for _cggf :=0;_cggf < _dgf .Max .Y ;_cggf ++{_cba :=_dgd (_aeac .GrayAt (_acgb ,_cggf ),monochromeModel (_ebee ));_bcc .SetGray (_acgb ,_cggf ,_cba );};};return _cfd ,nil ;};func (_acc *Gray4 )ColorAt (x ,y int )(_e .Color ,error ){return ColorAtGray4BPC (x ,y ,_acc .BytesPerLine ,_acc .Data ,_acc .Decode );
-};type ColorConverter interface{Convert (_cec _g .Image )(Image ,error );};func _fac (_gedd ,_gcd int ,_gba []byte )*Monochrome {_ggf :=_edg (_gedd ,_gcd );_ggf .Data =_gba ;return _ggf ;};func (_abg *Gray2 )Base ()*ImageBase {return &_abg .ImageBase };
-func _fabc (_ffgg _e .NRGBA )_e .RGBA {_aff ,_bcad ,_egef ,_eggb :=_ffgg .RGBA ();return _e .RGBA {R :uint8 (_aff >>8),G :uint8 (_bcad >>8),B :uint8 (_egef >>8),A :uint8 (_eggb >>8)};};func _gcdd (_bdbg _e .Gray )_e .Gray {_bdbg .Y >>=4;_bdbg .Y |=_bdbg .Y <<4;
-return _bdbg };func (_bcag *ImageBase )GetAlpha ()[]byte {return _bcag .Alpha };func _aba (_fcfg ,_efab *Monochrome ,_aeb []byte ,_fab int )(_cac error ){var (_fcdc ,_gbed ,_eee ,_dcc ,_ace ,_effg ,_dcef ,_daa int ;_cae ,_aag uint32 ;_bffb ,_cda byte ;
-_bdc uint16 ;);_def :=make ([]byte ,4);_fgab :=make ([]byte ,4);for _eee =0;_eee < _fcfg .Height -1;_eee ,_dcc =_eee +2,_dcc +1{_fcdc =_eee *_fcfg .BytesPerLine ;_gbed =_dcc *_efab .BytesPerLine ;for _ace ,_effg =0,0;_ace < _fab ;_ace ,_effg =_ace +4,_effg +1{for _dcef =0;
-_dcef < 4;_dcef ++{_daa =_fcdc +_ace +_dcef ;if _daa <=len (_fcfg .Data )-1&&_daa < _fcdc +_fcfg .BytesPerLine {_def [_dcef ]=_fcfg .Data [_daa ];}else {_def [_dcef ]=0x00;};_daa =_fcdc +_fcfg .BytesPerLine +_ace +_dcef ;if _daa <=len (_fcfg .Data )-1&&_daa < _fcdc +(2*_fcfg .BytesPerLine ){_fgab [_dcef ]=_fcfg .Data [_daa ];
-}else {_fgab [_dcef ]=0x00;};};_cae =_d .BigEndian .Uint32 (_def );_aag =_d .BigEndian .Uint32 (_fgab );_aag &=_cae ;_aag &=_aag <<1;_aag &=0xaaaaaaaa;_cae =_aag |(_aag <<7);_bffb =byte (_cae >>24);_cda =byte ((_cae >>8)&0xff);_daa =_gbed +_effg ;if _daa +1==len (_efab .Data )-1||_daa +1>=_gbed +_efab .BytesPerLine {_efab .Data [_daa ]=_aeb [_bffb ];
-if _cac =_efab .setByte (_daa ,_aeb [_bffb ]);_cac !=nil {return _c .Errorf ("\u0069n\u0064\u0065\u0078\u003a\u0020\u0025d",_daa );};}else {_bdc =(uint16 (_aeb [_bffb ])<<8)|uint16 (_aeb [_cda ]);if _cac =_efab .setTwoBytes (_daa ,_bdc );_cac !=nil {return _c .Errorf ("s\u0065\u0074\u0074\u0069\u006e\u0067 \u0074\u0077\u006f\u0020\u0062\u0079t\u0065\u0073\u0020\u0066\u0061\u0069\u006ce\u0064\u002c\u0020\u0069\u006e\u0064\u0065\u0078\u003a\u0020%\u0064",_daa );
-};_effg ++;};};};return nil ;};func ColorAtGray1BPC (x ,y ,bytesPerLine int ,data []byte ,decode []float64 )(_e .Gray ,error ){_efgd :=y *bytesPerLine +x >>3;if _efgd >=len (data ){return _e .Gray {},_c .Errorf ("\u0069\u006d\u0061\u0067\u0065\u0020\u0063\u006f\u006f\u0072\u0064\u0069\u006ea\u0074\u0065\u0073\u0020\u006f\u0075t\u0020\u006f\u0066\u0020\u0072\u0061\u006e\u0067\u0065\u0020\u0028\u0025\u0064,\u0020\u0025\u0064\u0029",x ,y );
-};_befb :=data [_efgd ]>>uint (7-(x &7))&1;if len (decode )==2{_befb =uint8 (LinearInterpolate (float64 (_befb ),0.0,1.0,decode [0],decode [1]))&1;};return _e .Gray {Y :_befb *255},nil ;};func _cfdc (_acba _e .Color )_e .Color {_fecf :=_e .GrayModel .Convert (_acba ).(_e .Gray );
-return _gcdd (_fecf );};func _cdeed (_cggfg *_g .Gray16 ,_dfef uint8 )*_g .Gray {_fcbbd :=_cggfg .Bounds ();_fbbbb :=_g .NewGray (_fcbbd );for _dgbg :=0;_dgbg < _fcbbd .Dx ();_dgbg ++{for _dfgc :=0;_dfgc < _fcbbd .Dy ();_dfgc ++{_bddf :=_cggfg .Gray16At (_dgbg ,_dfgc );
-_fbbbb .SetGray (_dgbg ,_dfgc ,_e .Gray {Y :_dccg (uint8 (_bddf .Y /256),_dfef )});};};return _fbbbb ;};func _facg (_geed _e .Gray )_e .CMYK {return _e .CMYK {K :0xff-_geed .Y }};var (_ebba =_bebb ();_dadf =_caa ();_cbd =_gf (););func (_afaa *Monochrome )InverseData ()error {return _afaa .RasterOperation (0,0,_afaa .Width ,_afaa .Height ,PixNotDst ,nil ,0,0);
-};func (_ebda *Monochrome )Base ()*ImageBase {return &_ebda .ImageBase };func (_baaa *ImageBase )setByte (_abcf int ,_bffd byte )error {if _abcf > len (_baaa .Data )-1{return _fc .New ("\u0069n\u0064e\u0078\u0020\u006f\u0075\u0074 \u006f\u0066 \u0072\u0061\u006e\u0067\u0065");
-};_baaa .Data [_abcf ]=_bffd ;return nil ;};type SMasker interface{HasAlpha ()bool ;GetAlpha ()[]byte ;MakeAlpha ();};func _agab (_gebc *Monochrome ,_dbgea ,_accgc int ,_dgea ,_fdgg int ,_cfae RasterOperator ,_gaaa *Monochrome ,_feg ,_agca int )error {var _ffcd ,_cdcf ,_agbb ,_gecaf int ;
-if _dbgea < 0{_feg -=_dbgea ;_dgea +=_dbgea ;_dbgea =0;};if _feg < 0{_dbgea -=_feg ;_dgea +=_feg ;_feg =0;};_ffcd =_dbgea +_dgea -_gebc .Width ;if _ffcd > 0{_dgea -=_ffcd ;};_cdcf =_feg +_dgea -_gaaa .Width ;if _cdcf > 0{_dgea -=_cdcf ;};if _accgc < 0{_agca -=_accgc ;
-_fdgg +=_accgc ;_accgc =0;};if _agca < 0{_accgc -=_agca ;_fdgg +=_agca ;_agca =0;};_agbb =_accgc +_fdgg -_gebc .Height ;if _agbb > 0{_fdgg -=_agbb ;};_gecaf =_agca +_fdgg -_gaaa .Height ;if _gecaf > 0{_fdgg -=_gecaf ;};if _dgea <=0||_fdgg <=0{return nil ;
-};var _eeef error ;switch {case _dbgea &7==0&&_feg &7==0:_eeef =_aaa (_gebc ,_dbgea ,_accgc ,_dgea ,_fdgg ,_cfae ,_gaaa ,_feg ,_agca );case _dbgea &7==_feg &7:_eeef =_egge (_gebc ,_dbgea ,_accgc ,_dgea ,_fdgg ,_cfae ,_gaaa ,_feg ,_agca );default:_eeef =_bdfb (_gebc ,_dbgea ,_accgc ,_dgea ,_fdgg ,_cfae ,_gaaa ,_feg ,_agca );
-};if _eeef !=nil {return _eeef ;};return nil ;};func _fbgb (_dgfbg _g .Image )(Image ,error ){if _eeaf ,_gecc :=_dgfbg .(*NRGBA64 );_gecc {return _eeaf .Copy (),nil ;};_fedb ,_acaa ,_efega :=_aagf (_dgfbg ,2);_ddbaa ,_gedad :=NewImage (_fedb .Max .X ,_fedb .Max .Y ,16,3,nil ,_efega ,nil );
-if _gedad !=nil {return nil ,_gedad ;};_abb (_dgfbg ,_ddbaa ,_fedb );if len (_efega )!=0&&!_acaa {if _gbaf :=_bede (_efega ,_ddbaa );_gbaf !=nil {return nil ,_gbaf ;};};return _ddbaa ,nil ;};type RGBA interface{RGBAAt (_gbdc ,_dfaa int )_e .RGBA ;SetRGBA (_feba ,_bgca int ,_degb _e .RGBA );
-};func ConverterFunc (converterFunc func (_fgde _g .Image )(Image ,error ))ColorConverter {return colorConverter {_feb :converterFunc };};func _eadfa (_aeba uint8 )bool {if _aeba ==0||_aeba ==255{return true ;};return false ;};var ErrInvalidImage =_fc .New ("i\u006e\u0076\u0061\u006c\u0069\u0064\u0020\u0069\u006da\u0067\u0065\u0020\u0064\u0061\u0074\u0061 s\u0069\u007a\u0065\u0020f\u006f\u0072\u0020\u0070\u0072\u006f\u0076\u0069\u0064ed\u0020\u0064i\u006d\u0065\u006e\u0073\u0069\u006f\u006e\u0073");
-func (_decfd *Gray2 )SetGray (x ,y int ,gray _e .Gray ){_effb :=_gga (gray );_gedbc :=y *_decfd .BytesPerLine ;_ecac :=_gedbc +(x >>2);if _ecac >=len (_decfd .Data ){return ;};_egb :=_effb .Y >>6;_decfd .Data [_ecac ]=(_decfd .Data [_ecac ]&(^(0xc0>>uint (2*((x )&3)))))|(_egb <<uint (6-2*(x &3)));
-};func (_gae *Monochrome )getBit (_bfe ,_gcca int )uint8 {return _gae .Data [_bfe +(_gcca >>3)]>>uint (7-(_gcca &7))&1;};var _ _g .Image =&NRGBA16 {};func ColorAtGray2BPC (x ,y ,bytesPerLine int ,data []byte ,decode []float64 )(_e .Gray ,error ){_fgb :=y *bytesPerLine +x >>2;
-if _fgb >=len (data ){return _e .Gray {},_c .Errorf ("\u0069\u006d\u0061\u0067\u0065\u0020\u0063\u006f\u006f\u0072\u0064\u0069\u006ea\u0074\u0065\u0073\u0020\u006f\u0075t\u0020\u006f\u0066\u0020\u0072\u0061\u006e\u0067\u0065\u0020\u0028\u0025\u0064,\u0020\u0025\u0064\u0029",x ,y );
-};_bbag :=data [_fgb ]>>uint (6-(x &3)*2)&3;if len (decode )==2{_bbag =uint8 (uint32 (LinearInterpolate (float64 (_bbag ),0,3.0,decode [0],decode [1]))&3);};return _e .Gray {Y :_bbag *85},nil ;};func _dbdg (_cccgf CMYK ,_ggdge NRGBA ,_becfa _g .Rectangle ){for _badb :=0;
-_badb < _becfa .Max .X ;_badb ++{for _edef :=0;_edef < _becfa .Max .Y ;_edef ++{_fdaca :=_cccgf .CMYKAt (_badb ,_edef );_ggdge .SetNRGBA (_badb ,_edef ,_aadf (_fdaca ));};};};func _gff (_dgcg *_g .Gray )bool {for _bdeb :=0;_bdeb < len (_dgcg .Pix );_bdeb ++{if !_eadfa (_dgcg .Pix [_bdeb ]){return false ;
-};};return true ;};type Histogramer interface{Histogram ()[256]int ;};func (_fggf *Gray16 )Validate ()error {if len (_fggf .Data )!=_fggf .Height *_fggf .BytesPerLine {return ErrInvalidImage ;};return nil ;};var _ Image =&Gray16 {};func (_bagf *Gray16 )Base ()*ImageBase {return &_bagf .ImageBase };
-func _faagc (_add _g .Image )(Image ,error ){if _ccad ,_acec :=_add .(*Gray16 );_acec {return _ccad .Copy (),nil ;};_dece :=_add .Bounds ();_gbae ,_eeee :=NewImage (_dece .Max .X ,_dece .Max .Y ,16,1,nil ,nil ,nil );if _eeee !=nil {return nil ,_eeee ;};
-_ccda (_add ,_gbae ,_dece );return _gbae ,nil ;};func GetConverter (bitsPerComponent ,colorComponents int )(ColorConverter ,error ){switch colorComponents {case 1:switch bitsPerComponent {case 1:return MonochromeConverter ,nil ;case 2:return Gray2Converter ,nil ;
-case 4:return Gray4Converter ,nil ;case 8:return GrayConverter ,nil ;case 16:return Gray16Converter ,nil ;};case 3:switch bitsPerComponent {case 4:return NRGBA16Converter ,nil ;case 8:return NRGBAConverter ,nil ;case 16:return NRGBA64Converter ,nil ;};
-case 4:return CMYKConverter ,nil ;};return nil ,_c .Errorf ("\u0070\u0072\u006f\u0076\u0069\u0064\u0065\u0064\u0020\u0069\u006e\u0076\u0061l\u0069\u0064\u0020\u0063\u006f\u006c\u006f\u0072\u0043o\u006e\u0076\u0065\u0072\u0074\u0065\u0072\u0020\u0070\u0061\u0072\u0061\u006d\u0065t\u0065\u0072\u0073\u002e\u0020\u0042\u0069\u0074\u0073\u0050\u0065\u0072\u0043\u006f\u006d\u0070\u006f\u006e\u0065\u006e\u0074\u003a\u0020\u0025\u0064\u002c\u0020\u0043\u006f\u006co\u0072\u0043\u006f\u006d\u0070\u006f\u006e\u0065\u006et\u0073\u003a \u0025\u0064",bitsPerComponent ,colorComponents );
-};func (_gegc *NRGBA16 )setNRGBA (_agag ,_fdbbc ,_bgab int ,_eaac _e .NRGBA ){if _agag *3%2==0{_gegc .Data [_bgab ]=(_eaac .R >>4)<<4|(_eaac .G >>4);_gegc .Data [_bgab +1]=(_eaac .B >>4)<<4|(_gegc .Data [_bgab +1]&0xf);}else {_gegc .Data [_bgab ]=(_gegc .Data [_bgab ]&0xf0)|(_eaac .R >>4);
-_gegc .Data [_bgab +1]=(_eaac .G >>4)<<4|(_eaac .B >>4);};if _gegc .Alpha !=nil {_bddb :=_fdbbc *BytesPerLine (_gegc .Width ,4,1);if _bddb < len (_gegc .Alpha ){if _agag %2==0{_gegc .Alpha [_bddb ]=(_eaac .A >>uint (4))<<uint (4)|(_gegc .Alpha [_bgab ]&0xf);
-}else {_gegc .Alpha [_bddb ]=(_gegc .Alpha [_bddb ]&0xf0)|(_eaac .A >>uint (4));};};};};func _aadf (_ebbg _e .CMYK )_e .NRGBA {_ebg ,_fdg ,_abfa :=_e .CMYKToRGB (_ebbg .C ,_ebbg .M ,_ebbg .Y ,_ebbg .K );return _e .NRGBA {R :_ebg ,G :_fdg ,B :_abfa ,A :0xff};
-};func _fedc (_agc _g .Image )(Image ,error ){if _efff ,_gdefb :=_agc .(*Gray2 );_gdefb {return _efff .Copy (),nil ;};_gabe :=_agc .Bounds ();_fdea ,_edee :=NewImage (_gabe .Max .X ,_gabe .Max .Y ,2,1,nil ,nil ,nil );if _edee !=nil {return nil ,_edee ;
-};_ccda (_agc ,_fdea ,_gabe );return _fdea ,nil ;};func (_bac *RGBA32 )Set (x ,y int ,c _e .Color ){_cbgb :=y *_bac .Width +x ;_bccc :=3*_cbgb ;if _bccc +2>=len (_bac .Data ){return ;};_gfgd :=_e .RGBAModel .Convert (c ).(_e .RGBA );_bac .setRGBA (_cbgb ,_gfgd );
-};func _bebb ()(_fbb [256]uint16 ){for _efa :=0;_efa < 256;_efa ++{if _efa &0x01!=0{_fbb [_efa ]|=0x3;};if _efa &0x02!=0{_fbb [_efa ]|=0xc;};if _efa &0x04!=0{_fbb [_efa ]|=0x30;};if _efa &0x08!=0{_fbb [_efa ]|=0xc0;};if _efa &0x10!=0{_fbb [_efa ]|=0x300;
-};if _efa &0x20!=0{_fbb [_efa ]|=0xc00;};if _efa &0x40!=0{_fbb [_efa ]|=0x3000;};if _efa &0x80!=0{_fbb [_efa ]|=0xc000;};};return _fbb ;};func _dgd (_decf _e .Gray ,_gead monochromeModel )_e .Gray {if _decf .Y > uint8 (_gead ){return _e .Gray {Y :_b .MaxUint8 };
-};return _e .Gray {};};func _aagc (_egba _g .Image )(Image ,error ){if _cafb ,_bcgd :=_egba .(*Gray8 );_bcgd {return _cafb .Copy (),nil ;};_bbafc :=_egba .Bounds ();_bdg ,_cbef :=NewImage (_bbafc .Max .X ,_bbafc .Max .Y ,8,1,nil ,nil ,nil );if _cbef !=nil {return nil ,_cbef ;
-};_ccda (_egba ,_bdg ,_bbafc );return _bdg ,nil ;};func _aaa (_gdeedd *Monochrome ,_ecbd ,_cgce ,_cfbg ,_baffa int ,_beagg RasterOperator ,_gbg *Monochrome ,_fdbbb ,_bfbb int )error {var (_gbef byte ;_bec int ;_bfaf int ;_cbdaf ,_baee int ;_eeeg ,_dcaba int ;
-);_dbeb :=_cfbg >>3;_daead :=_cfbg &7;if _daead > 0{_gbef =_febgc [_daead ];};_bec =_gbg .BytesPerLine *_bfbb +(_fdbbb >>3);_bfaf =_gdeedd .BytesPerLine *_cgce +(_ecbd >>3);switch _beagg {case PixSrc :for _eeeg =0;_eeeg < _baffa ;_eeeg ++{_cbdaf =_bec +_eeeg *_gbg .BytesPerLine ;
-_baee =_bfaf +_eeeg *_gdeedd .BytesPerLine ;for _dcaba =0;_dcaba < _dbeb ;_dcaba ++{_gdeedd .Data [_baee ]=_gbg .Data [_cbdaf ];_baee ++;_cbdaf ++;};if _daead > 0{_gdeedd .Data [_baee ]=_aaec (_gdeedd .Data [_baee ],_gbg .Data [_cbdaf ],_gbef );};};case PixNotSrc :for _eeeg =0;
-_eeeg < _baffa ;_eeeg ++{_cbdaf =_bec +_eeeg *_gbg .BytesPerLine ;_baee =_bfaf +_eeeg *_gdeedd .BytesPerLine ;for _dcaba =0;_dcaba < _dbeb ;_dcaba ++{_gdeedd .Data [_baee ]=^(_gbg .Data [_cbdaf ]);_baee ++;_cbdaf ++;};if _daead > 0{_gdeedd .Data [_baee ]=_aaec (_gdeedd .Data [_baee ],^_gbg .Data [_cbdaf ],_gbef );
-};};case PixSrcOrDst :for _eeeg =0;_eeeg < _baffa ;_eeeg ++{_cbdaf =_bec +_eeeg *_gbg .BytesPerLine ;_baee =_bfaf +_eeeg *_gdeedd .BytesPerLine ;for _dcaba =0;_dcaba < _dbeb ;_dcaba ++{_gdeedd .Data [_baee ]|=_gbg .Data [_cbdaf ];_baee ++;_cbdaf ++;};if _daead > 0{_gdeedd .Data [_baee ]=_aaec (_gdeedd .Data [_baee ],_gbg .Data [_cbdaf ]|_gdeedd .Data [_baee ],_gbef );
-};};case PixSrcAndDst :for _eeeg =0;_eeeg < _baffa ;_eeeg ++{_cbdaf =_bec +_eeeg *_gbg .BytesPerLine ;_baee =_bfaf +_eeeg *_gdeedd .BytesPerLine ;for _dcaba =0;_dcaba < _dbeb ;_dcaba ++{_gdeedd .Data [_baee ]&=_gbg .Data [_cbdaf ];_baee ++;_cbdaf ++;};
-if _daead > 0{_gdeedd .Data [_baee ]=_aaec (_gdeedd .Data [_baee ],_gbg .Data [_cbdaf ]&_gdeedd .Data [_baee ],_gbef );};};case PixSrcXorDst :for _eeeg =0;_eeeg < _baffa ;_eeeg ++{_cbdaf =_bec +_eeeg *_gbg .BytesPerLine ;_baee =_bfaf +_eeeg *_gdeedd .BytesPerLine ;
-for _dcaba =0;_dcaba < _dbeb ;_dcaba ++{_gdeedd .Data [_baee ]^=_gbg .Data [_cbdaf ];_baee ++;_cbdaf ++;};if _daead > 0{_gdeedd .Data [_baee ]=_aaec (_gdeedd .Data [_baee ],_gbg .Data [_cbdaf ]^_gdeedd .Data [_baee ],_gbef );};};case PixNotSrcOrDst :for _eeeg =0;
-_eeeg < _baffa ;_eeeg ++{_cbdaf =_bec +_eeeg *_gbg .BytesPerLine ;_baee =_bfaf +_eeeg *_gdeedd .BytesPerLine ;for _dcaba =0;_dcaba < _dbeb ;_dcaba ++{_gdeedd .Data [_baee ]|=^(_gbg .Data [_cbdaf ]);_baee ++;_cbdaf ++;};if _daead > 0{_gdeedd .Data [_baee ]=_aaec (_gdeedd .Data [_baee ],^(_gbg .Data [_cbdaf ])|_gdeedd .Data [_baee ],_gbef );
-};};case PixNotSrcAndDst :for _eeeg =0;_eeeg < _baffa ;_eeeg ++{_cbdaf =_bec +_eeeg *_gbg .BytesPerLine ;_baee =_bfaf +_eeeg *_gdeedd .BytesPerLine ;for _dcaba =0;_dcaba < _dbeb ;_dcaba ++{_gdeedd .Data [_baee ]&=^(_gbg .Data [_cbdaf ]);_baee ++;_cbdaf ++;
-};if _daead > 0{_gdeedd .Data [_baee ]=_aaec (_gdeedd .Data [_baee ],^(_gbg .Data [_cbdaf ])&_gdeedd .Data [_baee ],_gbef );};};case PixSrcOrNotDst :for _eeeg =0;_eeeg < _baffa ;_eeeg ++{_cbdaf =_bec +_eeeg *_gbg .BytesPerLine ;_baee =_bfaf +_eeeg *_gdeedd .BytesPerLine ;
-for _dcaba =0;_dcaba < _dbeb ;_dcaba ++{_gdeedd .Data [_baee ]=_gbg .Data [_cbdaf ]|^(_gdeedd .Data [_baee ]);_baee ++;_cbdaf ++;};if _daead > 0{_gdeedd .Data [_baee ]=_aaec (_gdeedd .Data [_baee ],_gbg .Data [_cbdaf ]|^(_gdeedd .Data [_baee ]),_gbef );
-};};case PixSrcAndNotDst :for _eeeg =0;_eeeg < _baffa ;_eeeg ++{_cbdaf =_bec +_eeeg *_gbg .BytesPerLine ;_baee =_bfaf +_eeeg *_gdeedd .BytesPerLine ;for _dcaba =0;_dcaba < _dbeb ;_dcaba ++{_gdeedd .Data [_baee ]=_gbg .Data [_cbdaf ]&^(_gdeedd .Data [_baee ]);
-_baee ++;_cbdaf ++;};if _daead > 0{_gdeedd .Data [_baee ]=_aaec (_gdeedd .Data [_baee ],_gbg .Data [_cbdaf ]&^(_gdeedd .Data [_baee ]),_gbef );};};case PixNotPixSrcOrDst :for _eeeg =0;_eeeg < _baffa ;_eeeg ++{_cbdaf =_bec +_eeeg *_gbg .BytesPerLine ;_baee =_bfaf +_eeeg *_gdeedd .BytesPerLine ;
-for _dcaba =0;_dcaba < _dbeb ;_dcaba ++{_gdeedd .Data [_baee ]=^(_gbg .Data [_cbdaf ]|_gdeedd .Data [_baee ]);_baee ++;_cbdaf ++;};if _daead > 0{_gdeedd .Data [_baee ]=_aaec (_gdeedd .Data [_baee ],^(_gbg .Data [_cbdaf ]|_gdeedd .Data [_baee ]),_gbef );
-};};case PixNotPixSrcAndDst :for _eeeg =0;_eeeg < _baffa ;_eeeg ++{_cbdaf =_bec +_eeeg *_gbg .BytesPerLine ;_baee =_bfaf +_eeeg *_gdeedd .BytesPerLine ;for _dcaba =0;_dcaba < _dbeb ;_dcaba ++{_gdeedd .Data [_baee ]=^(_gbg .Data [_cbdaf ]&_gdeedd .Data [_baee ]);
-_baee ++;_cbdaf ++;};if _daead > 0{_gdeedd .Data [_baee ]=_aaec (_gdeedd .Data [_baee ],^(_gbg .Data [_cbdaf ]&_gdeedd .Data [_baee ]),_gbef );};};case PixNotPixSrcXorDst :for _eeeg =0;_eeeg < _baffa ;_eeeg ++{_cbdaf =_bec +_eeeg *_gbg .BytesPerLine ;_baee =_bfaf +_eeeg *_gdeedd .BytesPerLine ;
-for _dcaba =0;_dcaba < _dbeb ;_dcaba ++{_gdeedd .Data [_baee ]=^(_gbg .Data [_cbdaf ]^_gdeedd .Data [_baee ]);_baee ++;_cbdaf ++;};if _daead > 0{_gdeedd .Data [_baee ]=_aaec (_gdeedd .Data [_baee ],^(_gbg .Data [_cbdaf ]^_gdeedd .Data [_baee ]),_gbef );
-};};default:_ef .Log .Debug ("\u0050\u0072ov\u0069\u0064\u0065d\u0020\u0069\u006e\u0076ali\u0064 r\u0061\u0073\u0074\u0065\u0072\u0020\u006fpe\u0072\u0061\u0074\u006f\u0072\u003a\u0020%\u0076",_beagg );return _fc .New ("\u0069\u006e\u0076al\u0069\u0064\u0020\u0072\u0061\u0073\u0074\u0065\u0072\u0020\u006f\u0070\u0065\u0072\u0061\u0074\u006f\u0072");
-};return nil ;};func _agfd (_gbc uint )uint {var _baad uint ;for _gbc !=0{_gbc >>=1;_baad ++;};return _baad -1;};var _ Image =&NRGBA32 {};func ImgToBinary (i _g .Image ,threshold uint8 )*_g .Gray {switch _acac :=i .(type ){case *_g .Gray :if _gff (_acac ){return _acac ;
-};return _ccgd (_acac ,threshold );case *_g .Gray16 :return _cdeed (_acac ,threshold );default:return _bbfc (_acac ,threshold );};};func (_fgf *Gray2 )ColorModel ()_e .Model {return Gray2Model };func (_bgdf *ImageBase )setEightBytes (_cecc int ,_eafa uint64 )error {_aebc :=_bgdf .BytesPerLine -(_cecc %_bgdf .BytesPerLine );
-if _bgdf .BytesPerLine !=_bgdf .Width >>3{_aebc --;};if _aebc >=8{return _bgdf .setEightFullBytes (_cecc ,_eafa );};return _bgdf .setEightPartlyBytes (_cecc ,_aebc ,_eafa );};type Monochrome struct{ImageBase ;ModelThreshold uint8 ;};func (_bdea *NRGBA64 )SetNRGBA64 (x ,y int ,c _e .NRGBA64 ){_fgca :=(y *_bdea .Width +x )*2;
-_gaaef :=_fgca *3;if _gaaef +5>=len (_bdea .Data ){return ;};_bdea .setNRGBA64 (_gaaef ,c ,_fgca );};func LinearInterpolate (x ,xmin ,xmax ,ymin ,ymax float64 )float64 {if _b .Abs (xmax -xmin )< 0.000001{return ymin ;};_ecee :=ymin +(x -xmin )*(ymax -ymin )/(xmax -xmin );
-return _ecee ;};type nrgba64 interface{NRGBA64At (_dcca ,_fecfg int )_e .NRGBA64 ;SetNRGBA64 (_eacd ,_gcdcd int ,_ceff _e .NRGBA64 );};func (_fabd *NRGBA32 )Set (x ,y int ,c _e .Color ){_acgd :=y *_fabd .Width +x ;_deb :=3*_acgd ;if _deb +2>=len (_fabd .Data ){return ;
-};_dfda :=_e .NRGBAModel .Convert (c ).(_e .NRGBA );_fabd .setRGBA (_acgd ,_dfda );};func _gagd (_bgdg nrgba64 ,_cegda RGBA ,_fbda _g .Rectangle ){for _abbge :=0;_abbge < _fbda .Max .X ;_abbge ++{for _fgfa :=0;_fgfa < _fbda .Max .Y ;_fgfa ++{_abaag :=_bgdg .NRGBA64At (_abbge ,_fgfa );
-_cegda .SetRGBA (_abbge ,_fgfa ,_ccd (_abaag ));};};};var _ Gray =&Monochrome {};func _abee (_cedf Gray ,_aecgc NRGBA ,_gbde _g .Rectangle ){for _cecga :=0;_cecga < _gbde .Max .X ;_cecga ++{for _egcc :=0;_egcc < _gbde .Max .Y ;_egcc ++{_abeb :=_cedf .GrayAt (_cecga ,_egcc );
-_aecgc .SetNRGBA (_cecga ,_egcc ,_ccbe (_abeb ));};};};func _agaa (_cdbca ,_effd NRGBA ,_afdb _g .Rectangle ){for _fdac :=0;_fdac < _afdb .Max .X ;_fdac ++{for _dbdd :=0;_dbdd < _afdb .Max .Y ;_dbdd ++{_effd .SetNRGBA (_fdac ,_dbdd ,_cdbca .NRGBAAt (_fdac ,_dbdd ));
-};};};func (_eggd *RGBA32 )SetRGBA (x ,y int ,c _e .RGBA ){_efaag :=y *_eggd .Width +x ;_cfga :=3*_efaag ;if _cfga +2>=len (_eggd .Data ){return ;};_eggd .setRGBA (_efaag ,c );};type RasterOperator int ;func _ccbe (_bcb _e .Gray )_e .NRGBA {return _e .NRGBA {R :_bcb .Y ,G :_bcb .Y ,B :_bcb .Y ,A :0xff}};
-func _dccg (_ffbba ,_fgbg uint8 )uint8 {if _ffbba < _fgbg {return 255;};return 0;};func (_bfdgg *RGBA32 )setRGBA (_cebc int ,_edea _e .RGBA ){_bbde :=3*_cebc ;_bfdgg .Data [_bbde ]=_edea .R ;_bfdgg .Data [_bbde +1]=_edea .G ;_bfdgg .Data [_bbde +2]=_edea .B ;
-if _cebc < len (_bfdgg .Alpha ){_bfdgg .Alpha [_cebc ]=_edea .A ;};};func _defg (_bgfc nrgba64 ,_gfc NRGBA ,_afcd _g .Rectangle ){for _bced :=0;_bced < _afcd .Max .X ;_bced ++{for _eeag :=0;_eeag < _afcd .Max .Y ;_eeag ++{_cggd :=_bgfc .NRGBA64At (_bced ,_eeag );
-_gfc .SetNRGBA (_bced ,_eeag ,_cca (_cggd ));};};};func (_bcda *NRGBA64 )setNRGBA64 (_fedg int ,_aadda _e .NRGBA64 ,_bfea int ){_bcda .Data [_fedg ]=uint8 (_aadda .R >>8);_bcda .Data [_fedg +1]=uint8 (_aadda .R &0xff);_bcda .Data [_fedg +2]=uint8 (_aadda .G >>8);
-_bcda .Data [_fedg +3]=uint8 (_aadda .G &0xff);_bcda .Data [_fedg +4]=uint8 (_aadda .B >>8);_bcda .Data [_fedg +5]=uint8 (_aadda .B &0xff);if _bfea +1< len (_bcda .Alpha ){_bcda .Alpha [_bfea ]=uint8 (_aadda .A >>8);_bcda .Alpha [_bfea +1]=uint8 (_aadda .A &0xff);
-};};
+package imageutil
+
+import (
+	_d "encoding/binary"
+	_fc "errors"
+	_c "fmt"
+	_ef "github.com/szwede/unipdf/v4/common"
+	_ff "github.com/szwede/unipdf/v4/internal/bitwise"
+	_g "image"
+	_e "image/color"
+	_bg "image/draw"
+	_b "math"
+)
+
+func (_gce *Monochrome) At(x, y int) _e.Color {
+	_ccebd, _ := _gce.ColorAt(x, y)
+	return _ccebd
+}
+
+func (_eece *NRGBA32) Base() *ImageBase { return &_eece.ImageBase }
+
+func _aagf(_eafae _g.Image, _acega int) (_g.Rectangle, bool, []byte) {
+	_fcbg := _eafae.Bounds()
+	var (
+		_bbaa bool
+		_ggga []byte
+	)
+	switch _fdff := _eafae.(type) {
+	case SMasker:
+		_bbaa = _fdff.HasAlpha()
+	case NRGBA, RGBA, *_g.RGBA64, nrgba64, *_g.NYCbCrA:
+		_ggga = make([]byte, _fcbg.Max.X*_fcbg.Max.Y*_acega)
+	case *_g.Paletted:
+		if !_fdff.Opaque() {
+			_ggga = make([]byte, _fcbg.Max.X*_fcbg.Max.Y*_acega)
+		}
+	}
+	return _fcbg, _bbaa, _ggga
+}
+
+func _ceg(_ebb *Monochrome, _fcf, _beg int) (*Monochrome, error) {
+	if _ebb == nil {
+		return nil, _fc.New("\u0073o\u0075r\u0063\u0065\u0020\u006e\u006ft\u0020\u0064e\u0066\u0069\u006e\u0065\u0064")
+	}
+	if _fcf <= 0 || _beg <= 0 {
+		return nil, _fc.New("\u0069\u006e\u0076\u0061\u006c\u0069\u0064\u0020\u0073\u0063\u0061l\u0065\u0020\u0066\u0061\u0063\u0074\u006f\u0072\u003a\u0020<\u003d\u0020\u0030")
+	}
+	if _fcf == _beg {
+		if _fcf == 1 {
+			return _ebb.copy(), nil
+		}
+		if _fcf == 2 || _fcf == 4 || _fcf == 8 {
+			_beb, _ggb := _fa(_ebb, _fcf)
+			if _ggb != nil {
+				return nil, _ggb
+			}
+			return _beb, nil
+		}
+	}
+	_bfd := _fcf * _ebb.Width
+	_gcc := _beg * _ebb.Height
+	_ae := _edg(_bfd, _gcc)
+	_aa := _ae.BytesPerLine
+	var (
+		_ded, _cge, _fbf, _afe, _bc int
+		_bfc                        byte
+		_aec                        error
+	)
+	for _cge = 0; _cge < _ebb.Height; _cge++ {
+		_ded = _beg * _cge * _aa
+		for _fbf = 0; _fbf < _ebb.Width; _fbf++ {
+			if _ffd := _ebb.getBitAt(_fbf, _cge); _ffd {
+				_bc = _fcf * _fbf
+				for _afe = 0; _afe < _fcf; _afe++ {
+					_ae.setIndexedBit(_ded*8 + _bc + _afe)
+				}
+			}
+		}
+		for _afe = 1; _afe < _beg; _afe++ {
+			_bag := _ded + _afe*_aa
+			for _fe := 0; _fe < _aa; _fe++ {
+				if _bfc, _aec = _ae.getByte(_ded + _fe); _aec != nil {
+					return nil, _aec
+				}
+				if _aec = _ae.setByte(_bag+_fe, _bfc); _aec != nil {
+					return nil, _aec
+				}
+			}
+		}
+	}
+	return _ae, nil
+}
+
+type Gray interface {
+	GrayAt(_gegae, _deda int) _e.Gray
+	SetGray(_effc, _bfcb int, _gbfa _e.Gray)
+}
+
+func _ffee(_gaebf _g.Image, _decfb Image, _dadb _g.Rectangle) {
+	if _dbgag, _cccg := _gaebf.(SMasker); _cccg && _dbgag.HasAlpha() {
+		_decfb.(SMasker).MakeAlpha()
+	}
+	switch _gdde := _gaebf.(type) {
+	case Gray:
+		_abee(_gdde, _decfb.(NRGBA), _dadb)
+	case NRGBA:
+		_agaa(_gdde, _decfb.(NRGBA), _dadb)
+	case *_g.NYCbCrA:
+		_eaef(_gdde, _decfb.(NRGBA), _dadb)
+	case CMYK:
+		_dbdg(_gdde, _decfb.(NRGBA), _dadb)
+	case RGBA:
+		_acfd(_gdde, _decfb.(NRGBA), _dadb)
+	case nrgba64:
+		_defg(_gdde, _decfb.(NRGBA), _dadb)
+	default:
+		_abd(_gaebf, _decfb, _dadb)
+	}
+}
+
+func _egdc(_cbe _g.Image) (Image, error) {
+	if _fafg, _eaf := _cbe.(*CMYK32); _eaf {
+		return _fafg.Copy(), nil
+	}
+	_afb := _cbe.Bounds()
+	_gca, _abc := NewImage(_afb.Max.X, _afb.Max.Y, 8, 4, nil, nil, nil)
+	if _abc != nil {
+		return nil, _abc
+	}
+	switch _gcdg := _cbe.(type) {
+	case CMYK:
+		_fedf(_gcdg, _gca.(CMYK), _afb)
+	case Gray:
+		_gaa(_gcdg, _gca.(CMYK), _afb)
+	case NRGBA:
+		_ecb(_gcdg, _gca.(CMYK), _afb)
+	case RGBA:
+		_gad(_gcdg, _gca.(CMYK), _afb)
+	default:
+		_abd(_cbe, _gca, _afb)
+	}
+	return _gca, nil
+}
+
+func (_gfg *CMYK32) Copy() Image { return &CMYK32{ImageBase: _gfg.copy()} }
+
+func (_ebfa *CMYK32) Set(x, y int, c _e.Color) {
+	_cccb := 4 * (y*_ebfa.Width + x)
+	if _cccb+3 >= len(_ebfa.Data) {
+		return
+	}
+	_bdf := _e.CMYKModel.Convert(c).(_e.CMYK)
+	_ebfa.Data[_cccb] = _bdf.C
+	_ebfa.Data[_cccb+1] = _bdf.M
+	_ebfa.Data[_cccb+2] = _bdf.Y
+	_ebfa.Data[_cccb+3] = _bdf.K
+}
+
+func _bege(_cdc _e.RGBA) _e.NRGBA {
+	switch _cdc.A {
+	case 0xff:
+		return _e.NRGBA{R: _cdc.R, G: _cdc.G, B: _cdc.B, A: 0xff}
+	case 0x00:
+		return _e.NRGBA{}
+	default:
+		_ebde, _daea, _eeb, _aea := _cdc.RGBA()
+		_ebde = (_ebde * 0xffff) / _aea
+		_daea = (_daea * 0xffff) / _aea
+		_eeb = (_eeb * 0xffff) / _aea
+		return _e.NRGBA{R: uint8(_ebde >> 8), G: uint8(_daea >> 8), B: uint8(_eeb >> 8), A: uint8(_aea >> 8)}
+	}
+}
+
+type CMYK interface {
+	CMYKAt(_age, _fdd int) _e.CMYK
+	SetCMYK(_ecaa, _cag int, _gega _e.CMYK)
+}
+
+func (_fggb *Gray4) Bounds() _g.Rectangle {
+	return _g.Rectangle{Max: _g.Point{X: _fggb.Width, Y: _fggb.Height}}
+}
+
+func (_abff colorConverter) Convert(src _g.Image) (Image, error) { return _abff._feb(src) }
+
+type Gray4 struct{ ImageBase }
+
+func _fdcf(_gfd _e.RGBA) _e.CMYK {
+	_egda, _cffb, _cbdb, _bffe := _e.RGBToCMYK(_gfd.R, _gfd.G, _gfd.B)
+	return _e.CMYK{C: _egda, M: _cffb, Y: _cbdb, K: _bffe}
+}
+
+func ColorAtCMYK(x, y, width int, data []byte, decode []float64) (_e.CMYK, error) {
+	_eag := 4 * (y*width + x)
+	if _eag+3 >= len(data) {
+		return _e.CMYK{}, _c.Errorf("\u0069\u006d\u0061\u0067\u0065\u0020\u0063\u006f\u006f\u0072\u0064\u0069\u006ea\u0074\u0065\u0073\u0020\u006f\u0075t\u0020\u006f\u0066\u0020\u0072\u0061\u006e\u0067\u0065\u0020\u0028\u0025\u0064,\u0020\u0025\u0064\u0029", x, y)
+	}
+	C := data[_eag] & 0xff
+	M := data[_eag+1] & 0xff
+	Y := data[_eag+2] & 0xff
+	K := data[_eag+3] & 0xff
+	if len(decode) == 8 {
+		C = uint8(uint32(LinearInterpolate(float64(C), 0, 255, decode[0], decode[1])) & 0xff)
+		M = uint8(uint32(LinearInterpolate(float64(M), 0, 255, decode[2], decode[3])) & 0xff)
+		Y = uint8(uint32(LinearInterpolate(float64(Y), 0, 255, decode[4], decode[5])) & 0xff)
+		K = uint8(uint32(LinearInterpolate(float64(K), 0, 255, decode[6], decode[7])) & 0xff)
+	}
+	return _e.CMYK{C: C, M: M, Y: Y, K: K}, nil
+}
+
+func (_febg *Monochrome) ResolveDecode() error {
+	if len(_febg.Decode) != 2 {
+		return nil
+	}
+	if _febg.Decode[0] == 1 && _febg.Decode[1] == 0 {
+		if _bba := _febg.InverseData(); _bba != nil {
+			return _bba
+		}
+		_febg.Decode = nil
+	}
+	return nil
+}
+
+func (_ead *Monochrome) clearBit(_gadd, _bga int) { _ead.Data[_gadd] &= ^(0x80 >> uint(_bga&7)) }
+
+func (_gbf *CMYK32) Base() *ImageBase { return &_gbf.ImageBase }
+
+func (_caab *Gray2) Histogram() (_ffbc [256]int) {
+	for _edd := 0; _edd < _caab.Width; _edd++ {
+		for _egdd := 0; _egdd < _caab.Height; _egdd++ {
+			_ffbc[_caab.GrayAt(_edd, _egdd).Y]++
+		}
+	}
+	return _ffbc
+}
+
+func NewImageBase(width int, height int, bitsPerComponent int, colorComponents int, data []byte, alpha []byte, decode []float64) ImageBase {
+	_dccb := ImageBase{Width: width, Height: height, BitsPerComponent: bitsPerComponent, ColorComponents: colorComponents, Data: data, Alpha: alpha, Decode: decode, BytesPerLine: BytesPerLine(width, bitsPerComponent, colorComponents)}
+	if data == nil {
+		_dccb.Data = make([]byte, height*_dccb.BytesPerLine)
+	}
+	return _dccb
+}
+
+func (_aab *Monochrome) ScaleLow(width, height int) (*Monochrome, error) {
+	if width < 0 || height < 0 {
+		return nil, _fc.New("\u0070\u0072\u006f\u0076\u0069\u0064e\u0064\u0020\u0069\u006e\u0076\u0061\u006c\u0069\u0064\u0020\u0077\u0069\u0064t\u0068\u0020\u0061\u006e\u0064\u0020\u0068e\u0069\u0067\u0068\u0074")
+	}
+	_cfaf := _edg(width, height)
+	_afab := make([]int, height)
+	_eef := make([]int, width)
+	_ccag := float64(_aab.Width) / float64(width)
+	_fbd := float64(_aab.Height) / float64(height)
+	for _geca := 0; _geca < height; _geca++ {
+		_afab[_geca] = int(_b.Min(_fbd*float64(_geca)+0.5, float64(_aab.Height-1)))
+	}
+	for _cgcb := 0; _cgcb < width; _cgcb++ {
+		_eef[_cgcb] = int(_b.Min(_ccag*float64(_cgcb)+0.5, float64(_aab.Width-1)))
+	}
+	_ecaag := -1
+	_gafd := byte(0)
+	for _decg := 0; _decg < height; _decg++ {
+		_ffga := _afab[_decg] * _aab.BytesPerLine
+		_cegd := _decg * _cfaf.BytesPerLine
+		for _cdg := 0; _cdg < width; _cdg++ {
+			_bbd := _eef[_cdg]
+			if _bbd != _ecaag {
+				_gafd = _aab.getBit(_ffga, _bbd)
+				if _gafd != 0 {
+					_cfaf.setBit(_cegd, _cdg)
+				}
+				_ecaag = _bbd
+			} else {
+				if _gafd != 0 {
+					_cfaf.setBit(_cegd, _cdg)
+				}
+			}
+		}
+	}
+	return _cfaf, nil
+}
+
+var _ NRGBA = &NRGBA16{}
+
+func _fcdgc(_dcb CMYK, _geeag RGBA, _abeef _g.Rectangle) {
+	for _faae := 0; _faae < _abeef.Max.X; _faae++ {
+		for _ebaf := 0; _ebaf < _abeef.Max.Y; _ebaf++ {
+			_adcc := _dcb.CMYKAt(_faae, _ebaf)
+			_geeag.SetRGBA(_faae, _ebaf, _dgb(_adcc))
+		}
+	}
+}
+
+func FromGoImage(i _g.Image) (Image, error) {
+	switch _cdcd := i.(type) {
+	case Image:
+		return _cdcd.Copy(), nil
+	case Gray:
+		return GrayConverter.Convert(i)
+	case *_g.Gray16:
+		return Gray16Converter.Convert(i)
+	case CMYK:
+		return CMYKConverter.Convert(i)
+	case *_g.NRGBA64:
+		return NRGBA64Converter.Convert(i)
+	default:
+		return NRGBAConverter.Convert(i)
+	}
+}
+
+func (_eaa *NRGBA16) Copy() Image { return &NRGBA16{ImageBase: _eaa.copy()} }
+
+func (_gbefa *RGBA32) Copy() Image { return &RGBA32{ImageBase: _gbefa.copy()} }
+
+func _gdad(_dfad _g.Image) (Image, error) {
+	if _ecae, _cefe := _dfad.(*NRGBA16); _cefe {
+		return _ecae.Copy(), nil
+	}
+	_eagf := _dfad.Bounds()
+	_bgde, _bdbe := NewImage(_eagf.Max.X, _eagf.Max.Y, 4, 3, nil, nil, nil)
+	if _bdbe != nil {
+		return nil, _bdbe
+	}
+	_ffee(_dfad, _bgde, _eagf)
+	return _bgde, nil
+}
+
+func _cca(_bggd _e.NRGBA64) _e.NRGBA {
+	return _e.NRGBA{R: uint8(_bggd.R >> 8), G: uint8(_bggd.G >> 8), B: uint8(_bggd.B >> 8), A: uint8(_bggd.A >> 8)}
+}
+
+func _caa() (_efe [256]uint32) {
+	for _cee := 0; _cee < 256; _cee++ {
+		if _cee&0x01 != 0 {
+			_efe[_cee] |= 0xf
+		}
+		if _cee&0x02 != 0 {
+			_efe[_cee] |= 0xf0
+		}
+		if _cee&0x04 != 0 {
+			_efe[_cee] |= 0xf00
+		}
+		if _cee&0x08 != 0 {
+			_efe[_cee] |= 0xf000
+		}
+		if _cee&0x10 != 0 {
+			_efe[_cee] |= 0xf0000
+		}
+		if _cee&0x20 != 0 {
+			_efe[_cee] |= 0xf00000
+		}
+		if _cee&0x40 != 0 {
+			_efe[_cee] |= 0xf000000
+		}
+		if _cee&0x80 != 0 {
+			_efe[_cee] |= 0xf0000000
+		}
+	}
+	return _efe
+}
+
+func (_ffaf *ImageBase) setTwoBytes(_fdaef int, _ade uint16) error {
+	if _fdaef+1 > len(_ffaf.Data)-1 {
+		return _fc.New("\u0069n\u0064e\u0078\u0020\u006f\u0075\u0074 \u006f\u0066 \u0072\u0061\u006e\u0067\u0065")
+	}
+	_ffaf.Data[_fdaef] = byte((_ade & 0xff00) >> 8)
+	_ffaf.Data[_fdaef+1] = byte(_ade & 0xff)
+	return nil
+}
+
+func (_geea *Monochrome) ExpandBinary(factor int) (*Monochrome, error) {
+	if !IsPowerOf2(uint(factor)) {
+		return nil, _c.Errorf("\u0069\u006e\u0076\u0061\u006c\u0069\u0064\u0020\u0065\u0078\u0070\u0061\u006e\u0064\u0020b\u0069n\u0061\u0072\u0079\u0020\u0066\u0061\u0063\u0074\u006f\u0072\u003a\u0020\u0025\u0064", factor)
+	}
+	return _fa(_geea, factor)
+}
+
+func (_aafa *Monochrome) ColorModel() _e.Model { return MonochromeModel(_aafa.ModelThreshold) }
+
+func (_cgbca *ImageBase) newAlpha() {
+	_gdg := BytesPerLine(_cgbca.Width, _cgbca.BitsPerComponent, 1)
+	_cgbca.Alpha = make([]byte, _cgbca.Height*_gdg)
+}
+
+func (_bbf monochromeModel) Convert(c _e.Color) _e.Color {
+	_effa := _e.GrayModel.Convert(c).(_e.Gray)
+	return _dgd(_effa, _bbf)
+}
+
+func (_daeg *Monochrome) setGrayBit(_adbg, _dedg int) { _daeg.Data[_adbg] |= 0x80 >> uint(_dedg&7) }
+
+func (_ceea *RGBA32) Bounds() _g.Rectangle {
+	return _g.Rectangle{Max: _g.Point{X: _ceea.Width, Y: _ceea.Height}}
+}
+
+func _ceaf(_gdae Gray, _cfa nrgba64, _bef _g.Rectangle) {
+	for _geda := 0; _geda < _bef.Max.X; _geda++ {
+		for _cgff := 0; _cgff < _bef.Max.Y; _cgff++ {
+			_dbg := _geddf(_cfa.NRGBA64At(_geda, _cgff))
+			_gdae.SetGray(_geda, _cgff, _dbg)
+		}
+	}
+}
+
+var _ Image = &NRGBA64{}
+
+func (_bcgg *Gray4) Set(x, y int, c _e.Color) {
+	if x >= _bcgg.Width || y >= _bcgg.Height {
+		return
+	}
+	_dcfe := Gray4Model.Convert(c).(_e.Gray)
+	_bcgg.setGray(x, y, _dcfe)
+}
+
+func ColorAtNRGBA(x, y, width, bytesPerLine, bitsPerColor int, data, alpha []byte, decode []float64) (_e.Color, error) {
+	switch bitsPerColor {
+	case 4:
+		return ColorAtNRGBA16(x, y, width, bytesPerLine, data, alpha, decode)
+	case 8:
+		return ColorAtNRGBA32(x, y, width, data, alpha, decode)
+	case 16:
+		return ColorAtNRGBA64(x, y, width, data, alpha, decode)
+	default:
+		return nil, _c.Errorf("\u0075\u006e\u0073\u0075\u0070\u0070\u006fr\u0074\u0065\u0064 \u0072\u0067\u0062\u0020b\u0069\u0074\u0073\u0020\u0070\u0065\u0072\u0020\u0063\u006f\u006c\u006f\u0072\u0020\u0061\u006d\u006f\u0075\u006e\u0074\u003a\u0020\u0027\u0025\u0064\u0027", bitsPerColor)
+	}
+}
+
+func (_aceg *CMYK32) At(x, y int) _e.Color { _ecab, _ := _aceg.ColorAt(x, y); return _ecab }
+
+func (_abdd *Gray4) Validate() error {
+	if len(_abdd.Data) != _abdd.Height*_abdd.BytesPerLine {
+		return ErrInvalidImage
+	}
+	return nil
+}
+
+func _gad(_bda RGBA, _fgae CMYK, _bfg _g.Rectangle) {
+	for _fede := 0; _fede < _bfg.Max.X; _fede++ {
+		for _dg := 0; _dg < _bfg.Max.Y; _dg++ {
+			_gbd := _bda.RGBAAt(_fede, _dg)
+			_fgae.SetCMYK(_fede, _dg, _fdcf(_gbd))
+		}
+	}
+}
+
+func _addf(_geegb _g.Image) (Image, error) {
+	if _gecafg, _egfa := _geegb.(*RGBA32); _egfa {
+		return _gecafg.Copy(), nil
+	}
+	_agaf, _ecef, _bdge := _aagf(_geegb, 1)
+	_fcga := &RGBA32{ImageBase: NewImageBase(_agaf.Max.X, _agaf.Max.Y, 8, 3, nil, _bdge, nil)}
+	_ccagc(_geegb, _fcga, _agaf)
+	if len(_bdge) != 0 && !_ecef {
+		if _efedc := _bede(_bdge, _fcga); _efedc != nil {
+			return nil, _efedc
+		}
+	}
+	return _fcga, nil
+}
+
+func (_aadd *Monochrome) Bounds() _g.Rectangle {
+	return _g.Rectangle{Max: _g.Point{X: _aadd.Width, Y: _aadd.Height}}
+}
+
+func _eaef(_gbfb *_g.NYCbCrA, _gfgb NRGBA, _acgc _g.Rectangle) {
+	for _dagea := 0; _dagea < _acgc.Max.X; _dagea++ {
+		for _befa := 0; _befa < _acgc.Max.Y; _befa++ {
+			_cfffd := _gbfb.NYCbCrAAt(_dagea, _befa)
+			_gfgb.SetNRGBA(_dagea, _befa, _bbbd(_cfffd))
+		}
+	}
+}
+
+func MonochromeThresholdConverter(threshold uint8) ColorConverter {
+	return &monochromeThresholdConverter{Threshold: threshold}
+}
+
+func _cfage(_efbfc, _ddbae RGBA, _fdeb _g.Rectangle) {
+	for _ffgd := 0; _ffgd < _fdeb.Max.X; _ffgd++ {
+		for _dgefb := 0; _dgefb < _fdeb.Max.Y; _dgefb++ {
+			_ddbae.SetRGBA(_ffgd, _dgefb, _efbfc.RGBAAt(_ffgd, _dgefb))
+		}
+	}
+}
+
+func (_bagff *Gray16) Copy() Image { return &Gray16{ImageBase: _bagff.copy()} }
+
+func (_cege *CMYK32) ColorAt(x, y int) (_e.Color, error) {
+	return ColorAtCMYK(x, y, _cege.Width, _cege.Data, _cege.Decode)
+}
+
+func _ced(_fcg, _ecf *Monochrome, _fcd []byte, _ebf int) (_bed error) {
+	var (
+		_efea, _ccg, _gee, _cfef, _efac, _ddd, _cgd, _cfc int
+		_dce, _aad, _gbe, _agf                            uint32
+		_aga, _bd                                         byte
+		_afeb                                             uint16
+	)
+	_ccb := make([]byte, 4)
+	_db := make([]byte, 4)
+	for _gee = 0; _gee < _fcg.Height-1; _gee, _cfef = _gee+2, _cfef+1 {
+		_efea = _gee * _fcg.BytesPerLine
+		_ccg = _cfef * _ecf.BytesPerLine
+		for _efac, _ddd = 0, 0; _efac < _ebf; _efac, _ddd = _efac+4, _ddd+1 {
+			for _cgd = 0; _cgd < 4; _cgd++ {
+				_cfc = _efea + _efac + _cgd
+				if _cfc <= len(_fcg.Data)-1 && _cfc < _efea+_fcg.BytesPerLine {
+					_ccb[_cgd] = _fcg.Data[_cfc]
+				} else {
+					_ccb[_cgd] = 0x00
+				}
+				_cfc = _efea + _fcg.BytesPerLine + _efac + _cgd
+				if _cfc <= len(_fcg.Data)-1 && _cfc < _efea+(2*_fcg.BytesPerLine) {
+					_db[_cgd] = _fcg.Data[_cfc]
+				} else {
+					_db[_cgd] = 0x00
+				}
+			}
+			_dce = _d.BigEndian.Uint32(_ccb)
+			_aad = _d.BigEndian.Uint32(_db)
+			_gbe = _dce & _aad
+			_gbe |= _gbe << 1
+			_agf = _dce | _aad
+			_agf &= _agf << 1
+			_aad = _gbe | _agf
+			_aad &= 0xaaaaaaaa
+			_dce = _aad | (_aad << 7)
+			_aga = byte(_dce >> 24)
+			_bd = byte((_dce >> 8) & 0xff)
+			_cfc = _ccg + _ddd
+			if _cfc+1 == len(_ecf.Data)-1 || _cfc+1 >= _ccg+_ecf.BytesPerLine {
+				if _bed = _ecf.setByte(_cfc, _fcd[_aga]); _bed != nil {
+					return _c.Errorf("\u0069n\u0064\u0065\u0078\u003a\u0020\u0025d", _cfc)
+				}
+			} else {
+				_afeb = (uint16(_fcd[_aga]) << 8) | uint16(_fcd[_bd])
+				if _bed = _ecf.setTwoBytes(_cfc, _afeb); _bed != nil {
+					return _c.Errorf("s\u0065\u0074\u0074\u0069\u006e\u0067 \u0074\u0077\u006f\u0020\u0062\u0079t\u0065\u0073\u0020\u0066\u0061\u0069\u006ce\u0064\u002c\u0020\u0069\u006e\u0064\u0065\u0078\u003a\u0020%\u0064", _cfc)
+				}
+				_ddd++
+			}
+		}
+	}
+	return nil
+}
+
+func (_egg *CMYK32) Validate() error {
+	if len(_egg.Data) != 4*_egg.Width*_egg.Height {
+		return _fc.New("i\u006e\u0076\u0061\u006c\u0069\u0064\u0020\u0069\u006da\u0067\u0065\u0020\u0064\u0061\u0074\u0061 s\u0069\u007a\u0065\u0020f\u006f\u0072\u0020\u0070\u0072\u006f\u0076\u0069\u0064ed\u0020\u0064i\u006d\u0065\u006e\u0073\u0069\u006f\u006e\u0073")
+	}
+	return nil
+}
+
+type NRGBA16 struct{ ImageBase }
+
+func _ccd(_gbfe _e.NRGBA64) _e.RGBA {
+	_bbc, _dfdc, _ccec, _gadb := _gbfe.RGBA()
+	return _e.RGBA{R: uint8(_bbc >> 8), G: uint8(_dfdc >> 8), B: uint8(_ccec >> 8), A: uint8(_gadb >> 8)}
+}
+
+func _edaf(_cdbe *Monochrome, _deaa, _dafb, _aeef, _ccdaf int, _dgef RasterOperator) {
+	if _deaa < 0 {
+		_aeef += _deaa
+		_deaa = 0
+	}
+	_caea := _deaa + _aeef - _cdbe.Width
+	if _caea > 0 {
+		_aeef -= _caea
+	}
+	if _dafb < 0 {
+		_ccdaf += _dafb
+		_dafb = 0
+	}
+	_agbbf := _dafb + _ccdaf - _cdbe.Height
+	if _agbbf > 0 {
+		_ccdaf -= _agbbf
+	}
+	if _aeef <= 0 || _ccdaf <= 0 {
+		return
+	}
+	if (_deaa & 7) == 0 {
+		_abe(_cdbe, _deaa, _dafb, _aeef, _ccdaf, _dgef)
+	} else {
+		_bfaac(_cdbe, _deaa, _dafb, _aeef, _ccdaf, _dgef)
+	}
+}
+
+func (_fce *Gray8) SetGray(x, y int, g _e.Gray) {
+	_dcefa := y*_fce.BytesPerLine + x
+	if _dcefa > len(_fce.Data)-1 {
+		return
+	}
+	_fce.Data[_dcefa] = g.Y
+}
+
+var _ Image = &Gray4{}
+
+func (_gdc *Gray8) ColorModel() _e.Model { return _e.GrayModel }
+
+func (_dage *NRGBA16) Set(x, y int, c _e.Color) {
+	_gfda := y*_dage.BytesPerLine + x*3/2
+	if _gfda+1 >= len(_dage.Data) {
+		return
+	}
+	_fdbea := NRGBA16Model.Convert(c).(_e.NRGBA)
+	_dage.setNRGBA(x, y, _gfda, _fdbea)
+}
+
+func _eea(_aecd, _gdag *Monochrome, _ebbae []byte, _fee int) (_afa error) {
+	var (
+		_aae, _fcfb, _gdec, _ede, _adf, _cdd, _eca, _fcfc int
+		_acfa, _fgc, _fgd, _bce                           uint32
+		_ccc, _gge                                        byte
+		_bee                                              uint16
+	)
+	_agb := make([]byte, 4)
+	_dfd := make([]byte, 4)
+	for _gdec = 0; _gdec < _aecd.Height-1; _gdec, _ede = _gdec+2, _ede+1 {
+		_aae = _gdec * _aecd.BytesPerLine
+		_fcfb = _ede * _gdag.BytesPerLine
+		for _adf, _cdd = 0, 0; _adf < _fee; _adf, _cdd = _adf+4, _cdd+1 {
+			for _eca = 0; _eca < 4; _eca++ {
+				_fcfc = _aae + _adf + _eca
+				if _fcfc <= len(_aecd.Data)-1 && _fcfc < _aae+_aecd.BytesPerLine {
+					_agb[_eca] = _aecd.Data[_fcfc]
+				} else {
+					_agb[_eca] = 0x00
+				}
+				_fcfc = _aae + _aecd.BytesPerLine + _adf + _eca
+				if _fcfc <= len(_aecd.Data)-1 && _fcfc < _aae+(2*_aecd.BytesPerLine) {
+					_dfd[_eca] = _aecd.Data[_fcfc]
+				} else {
+					_dfd[_eca] = 0x00
+				}
+			}
+			_acfa = _d.BigEndian.Uint32(_agb)
+			_fgc = _d.BigEndian.Uint32(_dfd)
+			_fgd = _acfa & _fgc
+			_fgd |= _fgd << 1
+			_bce = _acfa | _fgc
+			_bce &= _bce << 1
+			_fgc = _fgd & _bce
+			_fgc &= 0xaaaaaaaa
+			_acfa = _fgc | (_fgc << 7)
+			_ccc = byte(_acfa >> 24)
+			_gge = byte((_acfa >> 8) & 0xff)
+			_fcfc = _fcfb + _cdd
+			if _fcfc+1 == len(_gdag.Data)-1 || _fcfc+1 >= _fcfb+_gdag.BytesPerLine {
+				if _afa = _gdag.setByte(_fcfc, _ebbae[_ccc]); _afa != nil {
+					return _c.Errorf("\u0069n\u0064\u0065\u0078\u003a\u0020\u0025d", _fcfc)
+				}
+			} else {
+				_bee = (uint16(_ebbae[_ccc]) << 8) | uint16(_ebbae[_gge])
+				if _afa = _gdag.setTwoBytes(_fcfc, _bee); _afa != nil {
+					return _c.Errorf("s\u0065\u0074\u0074\u0069\u006e\u0067 \u0074\u0077\u006f\u0020\u0062\u0079t\u0065\u0073\u0020\u0066\u0061\u0069\u006ce\u0064\u002c\u0020\u0069\u006e\u0064\u0065\u0078\u003a\u0020%\u0064", _fcfc)
+				}
+				_cdd++
+			}
+		}
+	}
+	return nil
+}
+
+func (_ffdc *Gray4) SetGray(x, y int, g _e.Gray) {
+	if x >= _ffdc.Width || y >= _ffdc.Height {
+		return
+	}
+	g = _gcdd(g)
+	_ffdc.setGray(x, y, g)
+}
+
+func (_geb *Monochrome) IsUnpadded() bool { return (_geb.Width * _geb.Height) == len(_geb.Data) }
+
+func _bede(_eabe []byte, _bcgge Image) error {
+	_gced := true
+	for _ecd := 0; _ecd < len(_eabe); _ecd++ {
+		if _eabe[_ecd] != 0xff {
+			_gced = false
+			break
+		}
+	}
+	if _gced {
+		switch _fbdc := _bcgge.(type) {
+		case *NRGBA32:
+			_fbdc.Alpha = nil
+		case *NRGBA64:
+			_fbdc.Alpha = nil
+		default:
+			return _c.Errorf("i\u006ete\u0072n\u0061l\u0020\u0065\u0072\u0072\u006fr\u0020\u002d\u0020i\u006d\u0061\u0067\u0065\u0020s\u0068\u006f\u0075l\u0064\u0020\u0062\u0065\u0020\u006f\u0066\u0020\u0074\u0079\u0070e\u0020\u002a\u004eRGB\u0041\u0033\u0032\u0020\u006f\u0072 \u002a\u004e\u0052\u0047\u0042\u0041\u0036\u0034\u0020\u0062\u0075\u0074 \u0069s\u003a\u0020\u0025\u0054", _bcgge)
+		}
+	}
+	return nil
+}
+
+func _gf() (_dca [256]uint64) {
+	for _ega := 0; _ega < 256; _ega++ {
+		if _ega&0x01 != 0 {
+			_dca[_ega] |= 0xff
+		}
+		if _ega&0x02 != 0 {
+			_dca[_ega] |= 0xff00
+		}
+		if _ega&0x04 != 0 {
+			_dca[_ega] |= 0xff0000
+		}
+		if _ega&0x08 != 0 {
+			_dca[_ega] |= 0xff000000
+		}
+		if _ega&0x10 != 0 {
+			_dca[_ega] |= 0xff00000000
+		}
+		if _ega&0x20 != 0 {
+			_dca[_ega] |= 0xff0000000000
+		}
+		if _ega&0x40 != 0 {
+			_dca[_ega] |= 0xff000000000000
+		}
+		if _ega&0x80 != 0 {
+			_dca[_ega] |= 0xff00000000000000
+		}
+	}
+	return _dca
+}
+
+func (_adg *ImageBase) setEightFullBytes(_efgc int, _ecc uint64) error {
+	if _efgc+7 > len(_adg.Data)-1 {
+		return _fc.New("\u0069n\u0064e\u0078\u0020\u006f\u0075\u0074 \u006f\u0066 \u0072\u0061\u006e\u0067\u0065")
+	}
+	_adg.Data[_efgc] = byte((_ecc & 0xff00000000000000) >> 56)
+	_adg.Data[_efgc+1] = byte((_ecc & 0xff000000000000) >> 48)
+	_adg.Data[_efgc+2] = byte((_ecc & 0xff0000000000) >> 40)
+	_adg.Data[_efgc+3] = byte((_ecc & 0xff00000000) >> 32)
+	_adg.Data[_efgc+4] = byte((_ecc & 0xff000000) >> 24)
+	_adg.Data[_efgc+5] = byte((_ecc & 0xff0000) >> 16)
+	_adg.Data[_efgc+6] = byte((_ecc & 0xff00) >> 8)
+	_adg.Data[_efgc+7] = byte(_ecc & 0xff)
+	return nil
+}
+
+func (_acd *NRGBA16) NRGBAAt(x, y int) _e.NRGBA {
+	_dfbe, _ := ColorAtNRGBA16(x, y, _acd.Width, _acd.BytesPerLine, _acd.Data, _acd.Alpha, _acd.Decode)
+	return _dfbe
+}
+
+type Gray8 struct{ ImageBase }
+
+func (_bdb *Gray4) GrayAt(x, y int) _e.Gray {
+	_fbfb, _ := ColorAtGray4BPC(x, y, _bdb.BytesPerLine, _bdb.Data, _bdb.Decode)
+	return _fbfb
+}
+
+func init() { _gfeg() }
+
+func _egge(_fgbc *Monochrome, _cecg, _daf, _dgfb, _cdaf int, _gfaa RasterOperator, _fef *Monochrome, _aecb, _egdg int) error {
+	var (
+		_gbdfe       bool
+		_dfca        bool
+		_dgg         int
+		_egdgc       int
+		_edc         int
+		_ggbc        bool
+		_ecaac       byte
+		_agbd        int
+		_edce        int
+		_ccgg        int
+		_gbfd, _fcdg int
+	)
+	_ecaf := 8 - (_cecg & 7)
+	_cgag := _dbcf[_ecaf]
+	_gbcc := _fgbc.BytesPerLine*_daf + (_cecg >> 3)
+	_fffe := _fef.BytesPerLine*_egdg + (_aecb >> 3)
+	if _dgfb < _ecaf {
+		_gbdfe = true
+		_cgag &= _febgc[8-_ecaf+_dgfb]
+	}
+	if !_gbdfe {
+		_dgg = (_dgfb - _ecaf) >> 3
+		if _dgg > 0 {
+			_dfca = true
+			_egdgc = _gbcc + 1
+			_edc = _fffe + 1
+		}
+	}
+	_agbd = (_cecg + _dgfb) & 7
+	if !(_gbdfe || _agbd == 0) {
+		_ggbc = true
+		_ecaac = _febgc[_agbd]
+		_edce = _gbcc + 1 + _dgg
+		_ccgg = _fffe + 1 + _dgg
+	}
+	switch _gfaa {
+	case PixSrc:
+		for _gbfd = 0; _gbfd < _cdaf; _gbfd++ {
+			_fgbc.Data[_gbcc] = _aaec(_fgbc.Data[_gbcc], _fef.Data[_fffe], _cgag)
+			_gbcc += _fgbc.BytesPerLine
+			_fffe += _fef.BytesPerLine
+		}
+		if _dfca {
+			for _gbfd = 0; _gbfd < _cdaf; _gbfd++ {
+				for _fcdg = 0; _fcdg < _dgg; _fcdg++ {
+					_fgbc.Data[_egdgc+_fcdg] = _fef.Data[_edc+_fcdg]
+				}
+				_egdgc += _fgbc.BytesPerLine
+				_edc += _fef.BytesPerLine
+			}
+		}
+		if _ggbc {
+			for _gbfd = 0; _gbfd < _cdaf; _gbfd++ {
+				_fgbc.Data[_edce] = _aaec(_fgbc.Data[_edce], _fef.Data[_ccgg], _ecaac)
+				_edce += _fgbc.BytesPerLine
+				_ccgg += _fef.BytesPerLine
+			}
+		}
+	case PixNotSrc:
+		for _gbfd = 0; _gbfd < _cdaf; _gbfd++ {
+			_fgbc.Data[_gbcc] = _aaec(_fgbc.Data[_gbcc], ^_fef.Data[_fffe], _cgag)
+			_gbcc += _fgbc.BytesPerLine
+			_fffe += _fef.BytesPerLine
+		}
+		if _dfca {
+			for _gbfd = 0; _gbfd < _cdaf; _gbfd++ {
+				for _fcdg = 0; _fcdg < _dgg; _fcdg++ {
+					_fgbc.Data[_egdgc+_fcdg] = ^_fef.Data[_edc+_fcdg]
+				}
+				_egdgc += _fgbc.BytesPerLine
+				_edc += _fef.BytesPerLine
+			}
+		}
+		if _ggbc {
+			for _gbfd = 0; _gbfd < _cdaf; _gbfd++ {
+				_fgbc.Data[_edce] = _aaec(_fgbc.Data[_edce], ^_fef.Data[_ccgg], _ecaac)
+				_edce += _fgbc.BytesPerLine
+				_ccgg += _fef.BytesPerLine
+			}
+		}
+	case PixSrcOrDst:
+		for _gbfd = 0; _gbfd < _cdaf; _gbfd++ {
+			_fgbc.Data[_gbcc] = _aaec(_fgbc.Data[_gbcc], _fef.Data[_fffe]|_fgbc.Data[_gbcc], _cgag)
+			_gbcc += _fgbc.BytesPerLine
+			_fffe += _fef.BytesPerLine
+		}
+		if _dfca {
+			for _gbfd = 0; _gbfd < _cdaf; _gbfd++ {
+				for _fcdg = 0; _fcdg < _dgg; _fcdg++ {
+					_fgbc.Data[_egdgc+_fcdg] |= _fef.Data[_edc+_fcdg]
+				}
+				_egdgc += _fgbc.BytesPerLine
+				_edc += _fef.BytesPerLine
+			}
+		}
+		if _ggbc {
+			for _gbfd = 0; _gbfd < _cdaf; _gbfd++ {
+				_fgbc.Data[_edce] = _aaec(_fgbc.Data[_edce], _fef.Data[_ccgg]|_fgbc.Data[_edce], _ecaac)
+				_edce += _fgbc.BytesPerLine
+				_ccgg += _fef.BytesPerLine
+			}
+		}
+	case PixSrcAndDst:
+		for _gbfd = 0; _gbfd < _cdaf; _gbfd++ {
+			_fgbc.Data[_gbcc] = _aaec(_fgbc.Data[_gbcc], _fef.Data[_fffe]&_fgbc.Data[_gbcc], _cgag)
+			_gbcc += _fgbc.BytesPerLine
+			_fffe += _fef.BytesPerLine
+		}
+		if _dfca {
+			for _gbfd = 0; _gbfd < _cdaf; _gbfd++ {
+				for _fcdg = 0; _fcdg < _dgg; _fcdg++ {
+					_fgbc.Data[_egdgc+_fcdg] &= _fef.Data[_edc+_fcdg]
+				}
+				_egdgc += _fgbc.BytesPerLine
+				_edc += _fef.BytesPerLine
+			}
+		}
+		if _ggbc {
+			for _gbfd = 0; _gbfd < _cdaf; _gbfd++ {
+				_fgbc.Data[_edce] = _aaec(_fgbc.Data[_edce], _fef.Data[_ccgg]&_fgbc.Data[_edce], _ecaac)
+				_edce += _fgbc.BytesPerLine
+				_ccgg += _fef.BytesPerLine
+			}
+		}
+	case PixSrcXorDst:
+		for _gbfd = 0; _gbfd < _cdaf; _gbfd++ {
+			_fgbc.Data[_gbcc] = _aaec(_fgbc.Data[_gbcc], _fef.Data[_fffe]^_fgbc.Data[_gbcc], _cgag)
+			_gbcc += _fgbc.BytesPerLine
+			_fffe += _fef.BytesPerLine
+		}
+		if _dfca {
+			for _gbfd = 0; _gbfd < _cdaf; _gbfd++ {
+				for _fcdg = 0; _fcdg < _dgg; _fcdg++ {
+					_fgbc.Data[_egdgc+_fcdg] ^= _fef.Data[_edc+_fcdg]
+				}
+				_egdgc += _fgbc.BytesPerLine
+				_edc += _fef.BytesPerLine
+			}
+		}
+		if _ggbc {
+			for _gbfd = 0; _gbfd < _cdaf; _gbfd++ {
+				_fgbc.Data[_edce] = _aaec(_fgbc.Data[_edce], _fef.Data[_ccgg]^_fgbc.Data[_edce], _ecaac)
+				_edce += _fgbc.BytesPerLine
+				_ccgg += _fef.BytesPerLine
+			}
+		}
+	case PixNotSrcOrDst:
+		for _gbfd = 0; _gbfd < _cdaf; _gbfd++ {
+			_fgbc.Data[_gbcc] = _aaec(_fgbc.Data[_gbcc], ^(_fef.Data[_fffe])|_fgbc.Data[_gbcc], _cgag)
+			_gbcc += _fgbc.BytesPerLine
+			_fffe += _fef.BytesPerLine
+		}
+		if _dfca {
+			for _gbfd = 0; _gbfd < _cdaf; _gbfd++ {
+				for _fcdg = 0; _fcdg < _dgg; _fcdg++ {
+					_fgbc.Data[_egdgc+_fcdg] |= ^(_fef.Data[_edc+_fcdg])
+				}
+				_egdgc += _fgbc.BytesPerLine
+				_edc += _fef.BytesPerLine
+			}
+		}
+		if _ggbc {
+			for _gbfd = 0; _gbfd < _cdaf; _gbfd++ {
+				_fgbc.Data[_edce] = _aaec(_fgbc.Data[_edce], ^(_fef.Data[_ccgg])|_fgbc.Data[_edce], _ecaac)
+				_edce += _fgbc.BytesPerLine
+				_ccgg += _fef.BytesPerLine
+			}
+		}
+	case PixNotSrcAndDst:
+		for _gbfd = 0; _gbfd < _cdaf; _gbfd++ {
+			_fgbc.Data[_gbcc] = _aaec(_fgbc.Data[_gbcc], ^(_fef.Data[_fffe])&_fgbc.Data[_gbcc], _cgag)
+			_gbcc += _fgbc.BytesPerLine
+			_fffe += _fef.BytesPerLine
+		}
+		if _dfca {
+			for _gbfd = 0; _gbfd < _cdaf; _gbfd++ {
+				for _fcdg = 0; _fcdg < _dgg; _fcdg++ {
+					_fgbc.Data[_egdgc+_fcdg] &= ^_fef.Data[_edc+_fcdg]
+				}
+				_egdgc += _fgbc.BytesPerLine
+				_edc += _fef.BytesPerLine
+			}
+		}
+		if _ggbc {
+			for _gbfd = 0; _gbfd < _cdaf; _gbfd++ {
+				_fgbc.Data[_edce] = _aaec(_fgbc.Data[_edce], ^(_fef.Data[_ccgg])&_fgbc.Data[_edce], _ecaac)
+				_edce += _fgbc.BytesPerLine
+				_ccgg += _fef.BytesPerLine
+			}
+		}
+	case PixSrcOrNotDst:
+		for _gbfd = 0; _gbfd < _cdaf; _gbfd++ {
+			_fgbc.Data[_gbcc] = _aaec(_fgbc.Data[_gbcc], _fef.Data[_fffe]|^(_fgbc.Data[_gbcc]), _cgag)
+			_gbcc += _fgbc.BytesPerLine
+			_fffe += _fef.BytesPerLine
+		}
+		if _dfca {
+			for _gbfd = 0; _gbfd < _cdaf; _gbfd++ {
+				for _fcdg = 0; _fcdg < _dgg; _fcdg++ {
+					_fgbc.Data[_egdgc+_fcdg] = _fef.Data[_edc+_fcdg] | ^(_fgbc.Data[_egdgc+_fcdg])
+				}
+				_egdgc += _fgbc.BytesPerLine
+				_edc += _fef.BytesPerLine
+			}
+		}
+		if _ggbc {
+			for _gbfd = 0; _gbfd < _cdaf; _gbfd++ {
+				_fgbc.Data[_edce] = _aaec(_fgbc.Data[_edce], _fef.Data[_ccgg]|^(_fgbc.Data[_edce]), _ecaac)
+				_edce += _fgbc.BytesPerLine
+				_ccgg += _fef.BytesPerLine
+			}
+		}
+	case PixSrcAndNotDst:
+		for _gbfd = 0; _gbfd < _cdaf; _gbfd++ {
+			_fgbc.Data[_gbcc] = _aaec(_fgbc.Data[_gbcc], _fef.Data[_fffe]&^(_fgbc.Data[_gbcc]), _cgag)
+			_gbcc += _fgbc.BytesPerLine
+			_fffe += _fef.BytesPerLine
+		}
+		if _dfca {
+			for _gbfd = 0; _gbfd < _cdaf; _gbfd++ {
+				for _fcdg = 0; _fcdg < _dgg; _fcdg++ {
+					_fgbc.Data[_egdgc+_fcdg] = _fef.Data[_edc+_fcdg] &^ (_fgbc.Data[_egdgc+_fcdg])
+				}
+				_egdgc += _fgbc.BytesPerLine
+				_edc += _fef.BytesPerLine
+			}
+		}
+		if _ggbc {
+			for _gbfd = 0; _gbfd < _cdaf; _gbfd++ {
+				_fgbc.Data[_edce] = _aaec(_fgbc.Data[_edce], _fef.Data[_ccgg]&^(_fgbc.Data[_edce]), _ecaac)
+				_edce += _fgbc.BytesPerLine
+				_ccgg += _fef.BytesPerLine
+			}
+		}
+	case PixNotPixSrcOrDst:
+		for _gbfd = 0; _gbfd < _cdaf; _gbfd++ {
+			_fgbc.Data[_gbcc] = _aaec(_fgbc.Data[_gbcc], ^(_fef.Data[_fffe] | _fgbc.Data[_gbcc]), _cgag)
+			_gbcc += _fgbc.BytesPerLine
+			_fffe += _fef.BytesPerLine
+		}
+		if _dfca {
+			for _gbfd = 0; _gbfd < _cdaf; _gbfd++ {
+				for _fcdg = 0; _fcdg < _dgg; _fcdg++ {
+					_fgbc.Data[_egdgc+_fcdg] = ^(_fef.Data[_edc+_fcdg] | _fgbc.Data[_egdgc+_fcdg])
+				}
+				_egdgc += _fgbc.BytesPerLine
+				_edc += _fef.BytesPerLine
+			}
+		}
+		if _ggbc {
+			for _gbfd = 0; _gbfd < _cdaf; _gbfd++ {
+				_fgbc.Data[_edce] = _aaec(_fgbc.Data[_edce], ^(_fef.Data[_ccgg] | _fgbc.Data[_edce]), _ecaac)
+				_edce += _fgbc.BytesPerLine
+				_ccgg += _fef.BytesPerLine
+			}
+		}
+	case PixNotPixSrcAndDst:
+		for _gbfd = 0; _gbfd < _cdaf; _gbfd++ {
+			_fgbc.Data[_gbcc] = _aaec(_fgbc.Data[_gbcc], ^(_fef.Data[_fffe] & _fgbc.Data[_gbcc]), _cgag)
+			_gbcc += _fgbc.BytesPerLine
+			_fffe += _fef.BytesPerLine
+		}
+		if _dfca {
+			for _gbfd = 0; _gbfd < _cdaf; _gbfd++ {
+				for _fcdg = 0; _fcdg < _dgg; _fcdg++ {
+					_fgbc.Data[_egdgc+_fcdg] = ^(_fef.Data[_edc+_fcdg] & _fgbc.Data[_egdgc+_fcdg])
+				}
+				_egdgc += _fgbc.BytesPerLine
+				_edc += _fef.BytesPerLine
+			}
+		}
+		if _ggbc {
+			for _gbfd = 0; _gbfd < _cdaf; _gbfd++ {
+				_fgbc.Data[_edce] = _aaec(_fgbc.Data[_edce], ^(_fef.Data[_ccgg] & _fgbc.Data[_edce]), _ecaac)
+				_edce += _fgbc.BytesPerLine
+				_ccgg += _fef.BytesPerLine
+			}
+		}
+	case PixNotPixSrcXorDst:
+		for _gbfd = 0; _gbfd < _cdaf; _gbfd++ {
+			_fgbc.Data[_gbcc] = _aaec(_fgbc.Data[_gbcc], ^(_fef.Data[_fffe] ^ _fgbc.Data[_gbcc]), _cgag)
+			_gbcc += _fgbc.BytesPerLine
+			_fffe += _fef.BytesPerLine
+		}
+		if _dfca {
+			for _gbfd = 0; _gbfd < _cdaf; _gbfd++ {
+				for _fcdg = 0; _fcdg < _dgg; _fcdg++ {
+					_fgbc.Data[_egdgc+_fcdg] = ^(_fef.Data[_edc+_fcdg] ^ _fgbc.Data[_egdgc+_fcdg])
+				}
+				_egdgc += _fgbc.BytesPerLine
+				_edc += _fef.BytesPerLine
+			}
+		}
+		if _ggbc {
+			for _gbfd = 0; _gbfd < _cdaf; _gbfd++ {
+				_fgbc.Data[_edce] = _aaec(_fgbc.Data[_edce], ^(_fef.Data[_ccgg] ^ _fgbc.Data[_edce]), _ecaac)
+				_edce += _fgbc.BytesPerLine
+				_ccgg += _fef.BytesPerLine
+			}
+		}
+	default:
+		_ef.Log.Debug("I\u006e\u0076\u0061\u006c\u0069\u0064 \u0072\u0061\u0073\u0074\u0065\u0072\u0020\u006f\u0070e\u0072\u0061\u0074o\u0072:\u0020\u0025\u0064", _gfaa)
+		return _fc.New("\u0069\u006e\u0076al\u0069\u0064\u0020\u0072\u0061\u0073\u0074\u0065\u0072\u0020\u006f\u0070\u0065\u0072\u0061\u0074\u006f\u0072")
+	}
+	return nil
+}
+
+func (_beacf *NRGBA16) ColorModel() _e.Model { return NRGBA16Model }
+
+func _beagb(_fcfe int, _dbecd int) error {
+	return _c.Errorf("\u0069\u006d\u0061\u0067\u0065\u0020\u0063\u006f\u006f\u0072\u0064\u0069\u006ea\u0074\u0065\u0073\u0020\u006f\u0075t\u0020\u006f\u0066\u0020\u0072\u0061\u006e\u0067\u0065\u0020\u0028\u0025\u0064,\u0020\u0025\u0064\u0029", _fcfe, _dbecd)
+}
+
+func (_dacc *NRGBA16) At(x, y int) _e.Color { _ecacc, _ := _dacc.ColorAt(x, y); return _ecacc }
+
+func (_cfg *Monochrome) setGray(_cagc int, _ffbg _e.Gray, _feac int) {
+	if _ffbg.Y == 0 {
+		_cfg.clearBit(_feac, _cagc)
+	} else {
+		_cfg.setGrayBit(_feac, _cagc)
+	}
+}
+
+func (_bfdc *Monochrome) getBitAt(_cgca, _edeg int) bool {
+	_cfff := _edeg*_bfdc.BytesPerLine + (_cgca >> 3)
+	_ccbf := _cgca & 0x07
+	_gfe := uint(7 - _ccbf)
+	if _cfff > len(_bfdc.Data)-1 {
+		return false
+	}
+	if (_bfdc.Data[_cfff]>>_gfe)&0x01 >= 1 {
+		return true
+	}
+	return false
+}
+
+func InDelta(expected, current, delta float64) bool {
+	_bfaae := expected - current
+	if _bfaae <= -delta || _bfaae >= delta {
+		return false
+	}
+	return true
+}
+
+func (_ada *CMYK32) SetCMYK(x, y int, c _e.CMYK) {
+	_fdc := 4 * (y*_ada.Width + x)
+	if _fdc+3 >= len(_ada.Data) {
+		return
+	}
+	_ada.Data[_fdc] = c.C
+	_ada.Data[_fdc+1] = c.M
+	_ada.Data[_fdc+2] = c.Y
+	_ada.Data[_fdc+3] = c.K
+}
+
+func (_eae *Gray2) GrayAt(x, y int) _e.Gray {
+	_dcfa, _ := ColorAtGray2BPC(x, y, _eae.BytesPerLine, _eae.Data, _eae.Decode)
+	return _dcfa
+}
+
+func _ffgc(_caba *Monochrome, _gbdf, _gfbb, _bgeb, _ccdb int, _dbda RasterOperator, _aeec *Monochrome, _aeg, _edbg int) error {
+	if _caba == nil {
+		return _fc.New("\u006e\u0069\u006c\u0020\u0027\u0064\u0065\u0073\u0074\u0027\u0020\u0042i\u0074\u006d\u0061\u0070")
+	}
+	if _dbda == PixDst {
+		return nil
+	}
+	switch _dbda {
+	case PixClr, PixSet, PixNotDst:
+		_edaf(_caba, _gbdf, _gfbb, _bgeb, _ccdb, _dbda)
+		return nil
+	}
+	if _aeec == nil {
+		_ef.Log.Debug("\u0052a\u0073\u0074e\u0072\u004f\u0070\u0065r\u0061\u0074\u0069o\u006e\u0020\u0073\u006f\u0075\u0072\u0063\u0065\u0020bi\u0074\u006d\u0061p\u0020\u0069s\u0020\u006e\u006f\u0074\u0020\u0064e\u0066\u0069n\u0065\u0064")
+		return _fc.New("\u006e\u0069l\u0020\u0027\u0073r\u0063\u0027\u0020\u0062\u0069\u0074\u006d\u0061\u0070")
+	}
+	if _fffb := _agab(_caba, _gbdf, _gfbb, _bgeb, _ccdb, _dbda, _aeec, _aeg, _edbg); _fffb != nil {
+		return _fffb
+	}
+	return nil
+}
+
+func (_bdee *NRGBA64) Base() *ImageBase { return &_bdee.ImageBase }
+
+func AddDataPadding(width, height, bitsPerComponent, colorComponents int, data []byte) ([]byte, error) {
+	_afcc := BytesPerLine(width, bitsPerComponent, colorComponents)
+	if _afcc == width*colorComponents*bitsPerComponent/8 {
+		return data, nil
+	}
+	_dbge := width * colorComponents * bitsPerComponent
+	_accg := _afcc * 8
+	_daac := 8 - (_accg - _dbge)
+	_gaeg := _ff.NewReader(data)
+	_ccge := _afcc - 1
+	_aca := make([]byte, _ccge)
+	_fdbd := make([]byte, height*_afcc)
+	_adge := _ff.NewWriterMSB(_fdbd)
+	var _ageb uint64
+	var _agac error
+	for _acad := 0; _acad < height; _acad++ {
+		_, _agac = _gaeg.Read(_aca)
+		if _agac != nil {
+			return nil, _agac
+		}
+		_, _agac = _adge.Write(_aca)
+		if _agac != nil {
+			return nil, _agac
+		}
+		_ageb, _agac = _gaeg.ReadBits(byte(_daac))
+		if _agac != nil {
+			return nil, _agac
+		}
+		_, _agac = _adge.WriteBits(_ageb, _daac)
+		if _agac != nil {
+			return nil, _agac
+		}
+		_adge.FinishByte()
+	}
+	return _fdbd, nil
+}
+
+func (_ccbc *Monochrome) AddPadding() (_fadc error) {
+	if _cbgc := ((_ccbc.Width * _ccbc.Height) + 7) >> 3; len(_ccbc.Data) < _cbgc {
+		return _c.Errorf("\u0069\u006e\u0076\u0061\u006c\u0069\u0064\u0020\u0064a\u0074\u0061\u0020\u006c\u0065\u006e\u0067\u0074\u0068\u003a\u0020\u0027\u0025\u0064\u0027\u002e\u0020\u0054\u0068\u0065\u0020\u0064\u0061t\u0061\u0020s\u0068\u006fu\u006c\u0064\u0020\u0063\u006f\u006e\u0074\u0061\u0069\u006e\u0020\u0061\u0074 l\u0065\u0061\u0073\u0074\u003a\u0020\u0027\u0025\u0064'\u0020\u0062\u0079\u0074\u0065\u0073", len(_ccbc.Data), _cbgc)
+	}
+	_gbee := _ccbc.Width % 8
+	if _gbee == 0 {
+		return nil
+	}
+	_ceef := _ccbc.Width / 8
+	_cgdgg := _ff.NewReader(_ccbc.Data)
+	_bcg := make([]byte, _ccbc.Height*_ccbc.BytesPerLine)
+	_dcgc := _ff.NewWriterMSB(_bcg)
+	_ggc := make([]byte, _ceef)
+	var (
+		_afc  int
+		_cgbc uint64
+	)
+	for _afc = 0; _afc < _ccbc.Height; _afc++ {
+		if _, _fadc = _cgdgg.Read(_ggc); _fadc != nil {
+			return _fadc
+		}
+		if _, _fadc = _dcgc.Write(_ggc); _fadc != nil {
+			return _fadc
+		}
+		if _cgbc, _fadc = _cgdgg.ReadBits(byte(_gbee)); _fadc != nil {
+			return _fadc
+		}
+		if _fadc = _dcgc.WriteByte(byte(_cgbc) << uint(8-_gbee)); _fadc != nil {
+			return _fadc
+		}
+	}
+	_ccbc.Data = _dcgc.Data()
+	return nil
+}
+
+func (_ffa *Gray2) Set(x, y int, c _e.Color) {
+	if x >= _ffa.Width || y >= _ffa.Height {
+		return
+	}
+	_adbd := Gray2Model.Convert(c).(_e.Gray)
+	_adbc := y * _ffa.BytesPerLine
+	_dadff := _adbc + (x >> 2)
+	_dfbg := _adbd.Y >> 6
+	_ffa.Data[_dadff] = (_ffa.Data[_dadff] & (^(0xc0 >> uint(2*((x)&3))))) | (_dfbg << uint(6-2*(x&3)))
+}
+
+func (_bbe *Monochrome) copy() *Monochrome {
+	_gdef := _edg(_bbe.Width, _bbe.Height)
+	_gdef.ModelThreshold = _bbe.ModelThreshold
+	_gdef.Data = make([]byte, len(_bbe.Data))
+	copy(_gdef.Data, _bbe.Data)
+	if len(_bbe.Decode) != 0 {
+		_gdef.Decode = make([]float64, len(_bbe.Decode))
+		copy(_gdef.Decode, _bbe.Decode)
+	}
+	if len(_bbe.Alpha) != 0 {
+		_gdef.Alpha = make([]byte, len(_bbe.Alpha))
+		copy(_gdef.Alpha, _bbe.Alpha)
+	}
+	return _gdef
+}
+
+func (_ecfd *ImageBase) HasAlpha() bool {
+	if _ecfd.Alpha == nil {
+		return false
+	}
+	for _eecd := range _ecfd.Alpha {
+		if _ecfd.Alpha[_eecd] != 0xff {
+			return true
+		}
+	}
+	return false
+}
+
+func (_gcebd *RGBA32) RGBAAt(x, y int) _e.RGBA {
+	_dcgca, _ := ColorAtRGBA32(x, y, _gcebd.Width, _gcebd.Data, _gcebd.Alpha, _gcebd.Decode)
+	return _dcgca
+}
+
+func _cbbad(_gdab _e.Color) _e.Color {
+	_bcbd := _e.NRGBAModel.Convert(_gdab).(_e.NRGBA)
+	return _dcfb(_bcbd)
+}
+
+func NewImage(width, height, bitsPerComponent, colorComponents int, data, alpha []byte, decode []float64) (Image, error) {
+	_gedbg := NewImageBase(width, height, bitsPerComponent, colorComponents, data, alpha, decode)
+	var _adbda Image
+	switch colorComponents {
+	case 1:
+		switch bitsPerComponent {
+		case 1:
+			_adbda = &Monochrome{ImageBase: _gedbg, ModelThreshold: 0x0f}
+		case 2:
+			_adbda = &Gray2{ImageBase: _gedbg}
+		case 4:
+			_adbda = &Gray4{ImageBase: _gedbg}
+		case 8:
+			_adbda = &Gray8{ImageBase: _gedbg}
+		case 16:
+			_adbda = &Gray16{ImageBase: _gedbg}
+		}
+	case 3:
+		switch bitsPerComponent {
+		case 4:
+			_adbda = &NRGBA16{ImageBase: _gedbg}
+		case 8:
+			_adbda = &NRGBA32{ImageBase: _gedbg}
+		case 16:
+			_adbda = &NRGBA64{ImageBase: _gedbg}
+		}
+	case 4:
+		_adbda = &CMYK32{ImageBase: _gedbg}
+	}
+	if _adbda == nil {
+		return nil, ErrInvalidImage
+	}
+	return _adbda, nil
+}
+
+func (_bgbe *Gray8) ColorAt(x, y int) (_e.Color, error) {
+	return ColorAtGray8BPC(x, y, _bgbe.BytesPerLine, _bgbe.Data, _bgbe.Decode)
+}
+
+func RasterOperation(dest *Monochrome, dx, dy, dw, dh int, op RasterOperator, src *Monochrome, sx, sy int) error {
+	return _ffgc(dest, dx, dy, dw, dh, op, src, sx, sy)
+}
+
+func (_dgc *NRGBA64) ColorModel() _e.Model { return _e.NRGBA64Model }
+
+func (_dbc *Gray4) Histogram() (_fffcg [256]int) {
+	for _caga := 0; _caga < _dbc.Width; _caga++ {
+		for _fdfc := 0; _fdfc < _dbc.Height; _fdfc++ {
+			_fffcg[_dbc.GrayAt(_caga, _fdfc).Y]++
+		}
+	}
+	return _fffcg
+}
+
+func _cad(_daee Gray, _fdgb NRGBA, _cef _g.Rectangle) {
+	for _ddfa := 0; _ddfa < _cef.Max.X; _ddfa++ {
+		for _cgcca := 0; _cgcca < _cef.Max.Y; _cgcca++ {
+			_bab := _gdee(_fdgb.NRGBAAt(_ddfa, _cgcca))
+			_daee.SetGray(_ddfa, _cgcca, _bab)
+		}
+	}
+}
+
+func (_gdeed *Gray16) ColorAt(x, y int) (_e.Color, error) {
+	return ColorAtGray16BPC(x, y, _gdeed.BytesPerLine, _gdeed.Data, _gdeed.Decode)
+}
+
+func (_fdgge *NRGBA16) SetNRGBA(x, y int, c _e.NRGBA) {
+	_ffe := y*_fdgge.BytesPerLine + x*3/2
+	if _ffe+1 >= len(_fdgge.Data) {
+		return
+	}
+	c = _dcfb(c)
+	_fdgge.setNRGBA(x, y, _ffe, c)
+}
+
+func _bbbd(_dda _e.NYCbCrA) _e.NRGBA {
+	_baf := int32(_dda.Y) * 0x10101
+	_dccc := int32(_dda.Cb) - 128
+	_faag := int32(_dda.Cr) - 128
+	_cffa := _baf + 91881*_faag
+	if uint32(_cffa)&0xff000000 == 0 {
+		_cffa >>= 8
+	} else {
+		_cffa = ^(_cffa >> 31) & 0xffff
+	}
+	_dabg := _baf - 22554*_dccc - 46802*_faag
+	if uint32(_dabg)&0xff000000 == 0 {
+		_dabg >>= 8
+	} else {
+		_dabg = ^(_dabg >> 31) & 0xffff
+	}
+	_eab := _baf + 116130*_dccc
+	if uint32(_eab)&0xff000000 == 0 {
+		_eab >>= 8
+	} else {
+		_eab = ^(_eab >> 31) & 0xffff
+	}
+	return _e.NRGBA{R: uint8(_cffa >> 8), G: uint8(_dabg >> 8), B: uint8(_eab >> 8), A: _dda.A}
+}
+
+func ScaleAlphaToMonochrome(data []byte, width, height int) ([]byte, error) {
+	_ce := BytesPerLine(width, 8, 1)
+	if len(data) < _ce*height {
+		return nil, nil
+	}
+	_a := &Gray8{NewImageBase(width, height, 8, 1, data, nil, nil)}
+	_ca, _bb := MonochromeConverter.Convert(_a)
+	if _bb != nil {
+		return nil, _bb
+	}
+	return _ca.Base().Data, nil
+}
+
+type NRGBA64 struct{ ImageBase }
+
+func ImgToGray(i _g.Image) *_g.Gray {
+	if _cacg, _acef := i.(*_g.Gray); _acef {
+		return _cacg
+	}
+	_geba := i.Bounds()
+	_bddc := _g.NewGray(_geba)
+	for _cabae := 0; _cabae < _geba.Max.X; _cabae++ {
+		for _fgda := 0; _fgda < _geba.Max.Y; _fgda++ {
+			_adcbe := i.At(_cabae, _fgda)
+			_bddc.Set(_cabae, _fgda, _adcbe)
+		}
+	}
+	return _bddc
+}
+
+func _abe(_dcee *Monochrome, _fcb, _dedad int, _dafg, _fcdbc int, _abaa RasterOperator) {
+	var (
+		_fbfd        int
+		_adcf        byte
+		_daef, _gafa int
+		_fcfcd       int
+	)
+	_cbbgc := _dafg >> 3
+	_bdaf := _dafg & 7
+	if _bdaf > 0 {
+		_adcf = _febgc[_bdaf]
+	}
+	_fbfd = _dcee.BytesPerLine*_dedad + (_fcb >> 3)
+	switch _abaa {
+	case PixClr:
+		for _daef = 0; _daef < _fcdbc; _daef++ {
+			_fcfcd = _fbfd + _daef*_dcee.BytesPerLine
+			for _gafa = 0; _gafa < _cbbgc; _gafa++ {
+				_dcee.Data[_fcfcd] = 0x0
+				_fcfcd++
+			}
+			if _bdaf > 0 {
+				_dcee.Data[_fcfcd] = _aaec(_dcee.Data[_fcfcd], 0x0, _adcf)
+			}
+		}
+	case PixSet:
+		for _daef = 0; _daef < _fcdbc; _daef++ {
+			_fcfcd = _fbfd + _daef*_dcee.BytesPerLine
+			for _gafa = 0; _gafa < _cbbgc; _gafa++ {
+				_dcee.Data[_fcfcd] = 0xff
+				_fcfcd++
+			}
+			if _bdaf > 0 {
+				_dcee.Data[_fcfcd] = _aaec(_dcee.Data[_fcfcd], 0xff, _adcf)
+			}
+		}
+	case PixNotDst:
+		for _daef = 0; _daef < _fcdbc; _daef++ {
+			_fcfcd = _fbfd + _daef*_dcee.BytesPerLine
+			for _gafa = 0; _gafa < _cbbgc; _gafa++ {
+				_dcee.Data[_fcfcd] = ^_dcee.Data[_fcfcd]
+				_fcfcd++
+			}
+			if _bdaf > 0 {
+				_dcee.Data[_fcfcd] = _aaec(_dcee.Data[_fcfcd], ^_dcee.Data[_fcfcd], _adcf)
+			}
+		}
+	}
+}
+
+func _efbf(_fadf NRGBA, _agebg RGBA, _fdce _g.Rectangle) {
+	for _ebbc := 0; _ebbc < _fdce.Max.X; _ebbc++ {
+		for _ebeg := 0; _ebeg < _fdce.Max.Y; _ebeg++ {
+			_eeefd := _fadf.NRGBAAt(_ebbc, _ebeg)
+			_agebg.SetRGBA(_ebbc, _ebeg, _fabc(_eeefd))
+		}
+	}
+}
+
+type monochromeThresholdConverter struct{ Threshold uint8 }
+
+func _acfd(_cdaab RGBA, _gecg NRGBA, _ebad _g.Rectangle) {
+	for _bffec := 0; _bffec < _ebad.Max.X; _bffec++ {
+		for _ddbg := 0; _ddbg < _ebad.Max.Y; _ddbg++ {
+			_afbg := _cdaab.RGBAAt(_bffec, _ddbg)
+			_gecg.SetNRGBA(_bffec, _ddbg, _bege(_afbg))
+		}
+	}
+}
+
+func (_dgbe *ImageBase) copy() ImageBase {
+	_cbdc := *_dgbe
+	_cbdc.Data = make([]byte, len(_dgbe.Data))
+	copy(_cbdc.Data, _dgbe.Data)
+	return _cbdc
+}
+
+func _gdee(_fde _e.NRGBA) _e.Gray {
+	var _gfga _e.NRGBA
+	if _fde == _gfga {
+		return _e.Gray{Y: 0xff}
+	}
+	_baa, _cce, _beef, _ := _fde.RGBA()
+	_aac := (19595*_baa + 38470*_cce + 7471*_beef + 1<<15) >> 24
+	return _e.Gray{Y: uint8(_aac)}
+}
+
+func _eg(_dcg, _gb *Monochrome) (_ge error) {
+	_bge := _gb.BytesPerLine
+	_cg := _dcg.BytesPerLine
+	_dd := _gb.BytesPerLine*4 - _dcg.BytesPerLine
+	var (
+		_eb, _ffb                             byte
+		_af                                   uint32
+		_bff, _ffc, _ac, _cb, _dad, _ed, _adb int
+	)
+	for _ac = 0; _ac < _gb.Height; _ac++ {
+		_bff = _ac * _bge
+		_ffc = 4 * _ac * _cg
+		for _cb = 0; _cb < _bge; _cb++ {
+			_eb = _gb.Data[_bff+_cb]
+			_af = _dadf[_eb]
+			_ed = _ffc + _cb*4
+			if _dd != 0 && (_cb+1)*4 > _dcg.BytesPerLine {
+				for _dad = _dd; _dad > 0; _dad-- {
+					_ffb = byte((_af >> uint(_dad*8)) & 0xff)
+					_adb = _ed + (_dd - _dad)
+					if _ge = _dcg.setByte(_adb, _ffb); _ge != nil {
+						return _ge
+					}
+				}
+			} else if _ge = _dcg.setFourBytes(_ed, _af); _ge != nil {
+				return _ge
+			}
+			if _ge = _dcg.setFourBytes(_ffc+_cb*4, _dadf[_gb.Data[_bff+_cb]]); _ge != nil {
+				return _ge
+			}
+		}
+		for _dad = 1; _dad < 4; _dad++ {
+			for _cb = 0; _cb < _cg; _cb++ {
+				if _ge = _dcg.setByte(_ffc+_dad*_cg+_cb, _dcg.Data[_ffc+_cb]); _ge != nil {
+					return _ge
+				}
+			}
+		}
+	}
+	return nil
+}
+
+func _gfeg() {
+	for _aaffg := 0; _aaffg < 256; _aaffg++ {
+		_dbgf[_aaffg] = uint8(_aaffg&0x1) + (uint8(_aaffg>>1) & 0x1) + (uint8(_aaffg>>2) & 0x1) + (uint8(_aaffg>>3) & 0x1) + (uint8(_aaffg>>4) & 0x1) + (uint8(_aaffg>>5) & 0x1) + (uint8(_aaffg>>6) & 0x1) + (uint8(_aaffg>>7) & 0x1)
+	}
+}
+
+func _bgc(_bca int) []uint {
+	var _bfa []uint
+	_fdf := _bca
+	_afd := _fdf / 8
+	if _afd != 0 {
+		for _gcf := 0; _gcf < _afd; _gcf++ {
+			_bfa = append(_bfa, 8)
+		}
+		_ddb := _fdf % 8
+		_fdf = 0
+		if _ddb != 0 {
+			_fdf = _ddb
+		}
+	}
+	_bbb := _fdf / 4
+	if _bbb != 0 {
+		for _fda := 0; _fda < _bbb; _fda++ {
+			_bfa = append(_bfa, 4)
+		}
+		_efaa := _fdf % 4
+		_fdf = 0
+		if _efaa != 0 {
+			_fdf = _efaa
+		}
+	}
+	_faf := _fdf / 2
+	if _faf != 0 {
+		for _egd := 0; _egd < _faf; _egd++ {
+			_bfa = append(_bfa, 2)
+		}
+	}
+	return _bfa
+}
+
+func _gga(_ggec _e.Gray) _e.Gray {
+	_defb := _ggec.Y >> 6
+	_defb |= _defb << 2
+	_ggec.Y = _defb | _defb<<4
+	return _ggec
+}
+
+func _abb(_cfgd _g.Image, _abbg Image, _aege _g.Rectangle) {
+	if _cdgd, _badf := _cfgd.(SMasker); _badf && _cdgd.HasAlpha() {
+		_abbg.(SMasker).MakeAlpha()
+	}
+	_abd(_cfgd, _abbg, _aege)
+}
+
+var (
+	Gray2Model   = _e.ModelFunc(_fdgc)
+	Gray4Model   = _e.ModelFunc(_cfdc)
+	NRGBA16Model = _e.ModelFunc(_cbbad)
+)
+
+func (_cbbg *Gray16) At(x, y int) _e.Color { _cagd, _ := _cbbg.ColorAt(x, y); return _cagd }
+
+var _ Gray = &Gray8{}
+
+func _ccgd(_dff *_g.Gray, _ecbb uint8) *_g.Gray {
+	_dged := _dff.Bounds()
+	_gdcd := _g.NewGray(_dged)
+	for _ecgc := 0; _ecgc < _dged.Dx(); _ecgc++ {
+		for _gefa := 0; _gefa < _dged.Dy(); _gefa++ {
+			_ffeb := _dff.GrayAt(_ecgc, _gefa)
+			_gdcd.SetGray(_ecgc, _gefa, _e.Gray{Y: _dccg(_ffeb.Y, _ecbb)})
+		}
+	}
+	return _gdcd
+}
+
+func _fb(_ga, _caf *Monochrome) (_gc error) {
+	_de := _caf.BytesPerLine
+	_cc := _ga.BytesPerLine
+	var _gec, _cgg, _be, _dag, _ea int
+	for _be = 0; _be < _caf.Height; _be++ {
+		_gec = _be * _de
+		_cgg = 8 * _be * _cc
+		for _dag = 0; _dag < _de; _dag++ {
+			if _gc = _ga.setEightBytes(_cgg+_dag*8, _cbd[_caf.Data[_gec+_dag]]); _gc != nil {
+				return _gc
+			}
+		}
+		for _ea = 1; _ea < 8; _ea++ {
+			for _dag = 0; _dag < _cc; _dag++ {
+				if _gc = _ga.setByte(_cgg+_ea*_cc+_dag, _ga.Data[_cgg+_dag]); _gc != nil {
+					return _gc
+				}
+			}
+		}
+	}
+	return nil
+}
+
+func (_fbg *Monochrome) Copy() Image {
+	return &Monochrome{ImageBase: _fbg.ImageBase.copy(), ModelThreshold: _fbg.ModelThreshold}
+}
+
+func (_gebb *RGBA32) Validate() error {
+	if len(_gebb.Data) != 3*_gebb.Width*_gebb.Height {
+		return _fc.New("i\u006e\u0076\u0061\u006c\u0069\u0064\u0020\u0069\u006da\u0067\u0065\u0020\u0064\u0061\u0074\u0061 s\u0069\u007a\u0065\u0020f\u006f\u0072\u0020\u0070\u0072\u006f\u0076\u0069\u0064ed\u0020\u0064i\u006d\u0065\u006e\u0073\u0069\u006f\u006e\u0073")
+	}
+	return nil
+}
+
+var _ Image = &Gray8{}
+
+func (_fgef *Gray8) At(x, y int) _e.Color { _dfc, _ := _fgef.ColorAt(x, y); return _dfc }
+
+func (_ggfa *NRGBA64) At(x, y int) _e.Color { _ebcb, _ := _ggfa.ColorAt(x, y); return _ebcb }
+
+func ColorAt(x, y, width, bitsPerColor, colorComponents, bytesPerLine int, data, alpha []byte, decode []float64) (_e.Color, error) {
+	switch colorComponents {
+	case 1:
+		return ColorAtGrayscale(x, y, bitsPerColor, bytesPerLine, data, decode)
+	case 3:
+		return ColorAtNRGBA(x, y, width, bytesPerLine, bitsPerColor, data, alpha, decode)
+	case 4:
+		return ColorAtCMYK(x, y, width, data, decode)
+	default:
+		return nil, _c.Errorf("\u0070\u0072\u006f\u0076\u0069\u0064\u0065\u0064\u0020\u0069\u006e\u0076\u0061\u006c\u0069\u0064\u0020\u0063o\u006c\u006f\u0072\u0020\u0063\u006f\u006dp\u006f\u006e\u0065\u006e\u0074\u0020\u0066\u006f\u0072\u0020\u0074h\u0065\u0020\u0069\u006d\u0061\u0067\u0065\u003a\u0020\u0025\u0064", colorComponents)
+	}
+}
+
+func _bfaac(_fcbb *Monochrome, _deab, _bdffb int, _ecfff, _cacf int, _ceefa RasterOperator) {
+	var (
+		_dcce  bool
+		_dbac  bool
+		_efb   int
+		_dfbc  int
+		_adeb  int
+		_dacf  int
+		_fcdfa bool
+		_aaed  byte
+	)
+	_fcbf := 8 - (_deab & 7)
+	_dcge := _dbcf[_fcbf]
+	_dfe := _fcbb.BytesPerLine*_bdffb + (_deab >> 3)
+	if _ecfff < _fcbf {
+		_dcce = true
+		_dcge &= _febgc[8-_fcbf+_ecfff]
+	}
+	if !_dcce {
+		_efb = (_ecfff - _fcbf) >> 3
+		if _efb != 0 {
+			_dbac = true
+			_dfbc = _dfe + 1
+		}
+	}
+	_adeb = (_deab + _ecfff) & 7
+	if !(_dcce || _adeb == 0) {
+		_fcdfa = true
+		_aaed = _febgc[_adeb]
+		_dacf = _dfe + 1 + _efb
+	}
+	var _bgcc, _bcde int
+	switch _ceefa {
+	case PixClr:
+		for _bgcc = 0; _bgcc < _cacf; _bgcc++ {
+			_fcbb.Data[_dfe] = _aaec(_fcbb.Data[_dfe], 0x0, _dcge)
+			_dfe += _fcbb.BytesPerLine
+		}
+		if _dbac {
+			for _bgcc = 0; _bgcc < _cacf; _bgcc++ {
+				for _bcde = 0; _bcde < _efb; _bcde++ {
+					_fcbb.Data[_dfbc+_bcde] = 0x0
+				}
+				_dfbc += _fcbb.BytesPerLine
+			}
+		}
+		if _fcdfa {
+			for _bgcc = 0; _bgcc < _cacf; _bgcc++ {
+				_fcbb.Data[_dacf] = _aaec(_fcbb.Data[_dacf], 0x0, _aaed)
+				_dacf += _fcbb.BytesPerLine
+			}
+		}
+	case PixSet:
+		for _bgcc = 0; _bgcc < _cacf; _bgcc++ {
+			_fcbb.Data[_dfe] = _aaec(_fcbb.Data[_dfe], 0xff, _dcge)
+			_dfe += _fcbb.BytesPerLine
+		}
+		if _dbac {
+			for _bgcc = 0; _bgcc < _cacf; _bgcc++ {
+				for _bcde = 0; _bcde < _efb; _bcde++ {
+					_fcbb.Data[_dfbc+_bcde] = 0xff
+				}
+				_dfbc += _fcbb.BytesPerLine
+			}
+		}
+		if _fcdfa {
+			for _bgcc = 0; _bgcc < _cacf; _bgcc++ {
+				_fcbb.Data[_dacf] = _aaec(_fcbb.Data[_dacf], 0xff, _aaed)
+				_dacf += _fcbb.BytesPerLine
+			}
+		}
+	case PixNotDst:
+		for _bgcc = 0; _bgcc < _cacf; _bgcc++ {
+			_fcbb.Data[_dfe] = _aaec(_fcbb.Data[_dfe], ^_fcbb.Data[_dfe], _dcge)
+			_dfe += _fcbb.BytesPerLine
+		}
+		if _dbac {
+			for _bgcc = 0; _bgcc < _cacf; _bgcc++ {
+				for _bcde = 0; _bcde < _efb; _bcde++ {
+					_fcbb.Data[_dfbc+_bcde] = ^(_fcbb.Data[_dfbc+_bcde])
+				}
+				_dfbc += _fcbb.BytesPerLine
+			}
+		}
+		if _fcdfa {
+			for _bgcc = 0; _bgcc < _cacf; _bgcc++ {
+				_fcbb.Data[_dacf] = _aaec(_fcbb.Data[_dacf], ^_fcbb.Data[_dacf], _aaed)
+				_dacf += _fcbb.BytesPerLine
+			}
+		}
+	}
+}
+
+func (_gdeg *Gray16) SetGray(x, y int, g _e.Gray) {
+	_cagcc := (y*_gdeg.BytesPerLine/2 + x) * 2
+	if _cagcc+1 >= len(_gdeg.Data) {
+		return
+	}
+	_gdeg.Data[_cagcc] = g.Y
+	_gdeg.Data[_cagcc+1] = g.Y
+}
+
+func _abd(_ebd _g.Image, _aef Image, _edf _g.Rectangle) {
+	for _bfgf := 0; _bfgf < _edf.Max.X; _bfgf++ {
+		for _ebe := 0; _ebe < _edf.Max.Y; _ebe++ {
+			_cgdg := _ebd.At(_bfgf, _ebe)
+			_aef.Set(_bfgf, _ebe, _cgdg)
+		}
+	}
+}
+
+func (_dedc *Monochrome) Scale(scale float64) (*Monochrome, error) {
+	var _faef bool
+	_fccf := scale
+	if scale < 1 {
+		_fccf = 1 / scale
+		_faef = true
+	}
+	_fbc := NextPowerOf2(uint(_fccf))
+	if InDelta(float64(_fbc), _fccf, 0.001) {
+		if _faef {
+			return _dedc.ReduceBinary(_fccf)
+		}
+		return _dedc.ExpandBinary(int(_fbc))
+	}
+	_fea := int(_b.RoundToEven(float64(_dedc.Width) * scale))
+	_aefc := int(_b.RoundToEven(float64(_dedc.Height) * scale))
+	return _dedc.ScaleLow(_fea, _aefc)
+}
+
+func (_fcdca *Monochrome) GrayAt(x, y int) _e.Gray {
+	_bffa, _ := ColorAtGray1BPC(x, y, _fcdca.BytesPerLine, _fcdca.Data, _fcdca.Decode)
+	return _bffa
+}
+
+func (_fdgf *Gray8) Set(x, y int, c _e.Color) {
+	_adfa := y*_fdgf.BytesPerLine + x
+	if _adfa > len(_fdgf.Data)-1 {
+		return
+	}
+	_gaca := _e.GrayModel.Convert(c)
+	_fdgf.Data[_adfa] = _gaca.(_e.Gray).Y
+}
+
+func BytesPerLine(width, bitsPerComponent, colorComponents int) int {
+	return ((width*bitsPerComponent)*colorComponents + 7) >> 3
+}
+
+type Gray16 struct{ ImageBase }
+
+func (_bdbd *Gray8) Validate() error {
+	if len(_bdbd.Data) != _bdbd.Height*_bdbd.BytesPerLine {
+		return ErrInvalidImage
+	}
+	return nil
+}
+
+func ColorAtRGBA32(x, y, width int, data, alpha []byte, decode []float64) (_e.RGBA, error) {
+	_cefd := y*width + x
+	_gebe := 3 * _cefd
+	if _gebe+2 >= len(data) {
+		return _e.RGBA{}, _c.Errorf("\u0069\u006d\u0061\u0067\u0065\u0020\u0063\u006f\u006f\u0072\u0064\u0069\u006ea\u0074\u0065\u0073\u0020\u006f\u0075t\u0020\u006f\u0066\u0020\u0072\u0061\u006e\u0067\u0065\u0020\u0028\u0025\u0064,\u0020\u0025\u0064\u0029", x, y)
+	}
+	_gcgc := uint8(0xff)
+	if alpha != nil && len(alpha) > _cefd {
+		_gcgc = alpha[_cefd]
+	}
+	_cccd, _ccga, _gbcbc := data[_gebe], data[_gebe+1], data[_gebe+2]
+	if len(decode) == 6 {
+		_cccd = uint8(uint32(LinearInterpolate(float64(_cccd), 0, 255, decode[0], decode[1])) & 0xff)
+		_ccga = uint8(uint32(LinearInterpolate(float64(_ccga), 0, 255, decode[2], decode[3])) & 0xff)
+		_gbcbc = uint8(uint32(LinearInterpolate(float64(_gbcbc), 0, 255, decode[4], decode[5])) & 0xff)
+	}
+	return _e.RGBA{R: _cccd, G: _ccga, B: _gbcbc, A: _gcgc}, nil
+}
+
+func _gadf(_gdaf _e.NRGBA) _e.Gray {
+	_beec, _cea, _aed, _ := _gdaf.RGBA()
+	_aefg := (19595*_beec + 38470*_cea + 7471*_aed + 1<<15) >> 24
+	return _e.Gray{Y: uint8(_aefg)}
+}
+
+func (_cfea *Gray4) At(x, y int) _e.Color {
+	_ebfg, _ := _cfea.ColorAt(x, y)
+	return _ebfg
+}
+
+type shift int
+
+func _bdcc(_bcfe _g.Image) (Image, error) {
+	if _dddc, _effgc := _bcfe.(*NRGBA32); _effgc {
+		return _dddc.Copy(), nil
+	}
+	_acbe, _cdea, _cegb := _aagf(_bcfe, 1)
+	_dbdb, _eead := NewImage(_acbe.Max.X, _acbe.Max.Y, 8, 3, nil, _cegb, nil)
+	if _eead != nil {
+		return nil, _eead
+	}
+	_ffee(_bcfe, _dbdb, _acbe)
+	if len(_cegb) != 0 && !_cdea {
+		if _gdcf := _bede(_cegb, _dbdb); _gdcf != nil {
+			return nil, _gdcf
+		}
+	}
+	return _dbdb, nil
+}
+
+func MonochromeModel(threshold uint8) _e.Model { return monochromeModel(threshold) }
+
+func _dgb(_ffdf _e.CMYK) _e.RGBA {
+	_fcda, _dee, _adc := _e.CMYKToRGB(_ffdf.C, _ffdf.M, _ffdf.Y, _ffdf.K)
+	return _e.RGBA{R: _fcda, G: _dee, B: _adc, A: 0xff}
+}
+
+func _geddf(_gaff _e.NRGBA64) _e.Gray {
+	var _fdca _e.NRGBA64
+	if _gaff == _fdca {
+		return _e.Gray{Y: 0xff}
+	}
+	_bfbe, _dab, _fadg, _ := _gaff.RGBA()
+	_eaga := (19595*_bfbe + 38470*_dab + 7471*_fadg + 1<<15) >> 24
+	return _e.Gray{Y: uint8(_eaga)}
+}
+
+func (_fade *NRGBA16) ColorAt(x, y int) (_e.Color, error) {
+	return ColorAtNRGBA16(x, y, _fade.Width, _fade.BytesPerLine, _fade.Data, _fade.Alpha, _fade.Decode)
+}
+
+var _ Gray = &Gray2{}
+
+type colorConverter struct {
+	_feb func(_fcca _g.Image) (Image, error)
+}
+
+type RGBA32 struct{ ImageBase }
+
+func _gace(_faff *_g.NYCbCrA, _gdaa RGBA, _cgdb _g.Rectangle) {
+	for _dbdba := 0; _dbdba < _cgdb.Max.X; _dbdba++ {
+		for _cfgda := 0; _cfgda < _cgdb.Max.Y; _cfgda++ {
+			_bebbd := _faff.NYCbCrAAt(_dbdba, _cfgda)
+			_gdaa.SetRGBA(_dbdba, _cfgda, _dbe(_bebbd))
+		}
+	}
+}
+
+func (_bbcf *Gray4) setGray(_gebf int, _fgeb int, _dacd _e.Gray) {
+	_dcga := _fgeb * _bbcf.BytesPerLine
+	_egdag := _dcga + (_gebf >> 1)
+	if _egdag >= len(_bbcf.Data) {
+		return
+	}
+	_fddg := _dacd.Y >> 4
+	_bbcf.Data[_egdag] = (_bbcf.Data[_egdag] & (^(0xf0 >> uint(4*(_gebf&1))))) | (_fddg << uint(4-4*(_gebf&1)))
+}
+
+var _ _g.Image = &Gray4{}
+
+func (_fcdf *ImageBase) setFourBytes(_gfac int, _dea uint32) error {
+	if _gfac+3 > len(_fcdf.Data)-1 {
+		return _c.Errorf("\u0069n\u0064\u0065\u0078\u003a\u0020\u0027\u0025\u0064\u0027\u0020\u006fu\u0074\u0020\u006f\u0066\u0020\u0072\u0061\u006e\u0067\u0065", _gfac)
+	}
+	_fcdf.Data[_gfac] = byte((_dea & 0xff000000) >> 24)
+	_fcdf.Data[_gfac+1] = byte((_dea & 0xff0000) >> 16)
+	_fcdf.Data[_gfac+2] = byte((_dea & 0xff00) >> 8)
+	_fcdf.Data[_gfac+3] = byte(_dea & 0xff)
+	return nil
+}
+
+func _abcd(_bcbc _g.Image) (Image, error) {
+	if _cede, _bea := _bcbc.(*Gray4); _bea {
+		return _cede.Copy(), nil
+	}
+	_fcgd := _bcbc.Bounds()
+	_dbec, _beefa := NewImage(_fcgd.Max.X, _fcgd.Max.Y, 4, 1, nil, nil, nil)
+	if _beefa != nil {
+		return nil, _beefa
+	}
+	_ccda(_bcbc, _dbec, _fcgd)
+	return _dbec, nil
+}
+
+func _dcfb(_cdgg _e.NRGBA) _e.NRGBA {
+	_cdgg.R = _cdgg.R>>4 | (_cdgg.R>>4)<<4
+	_cdgg.G = _cdgg.G>>4 | (_cdgg.G>>4)<<4
+	_cdgg.B = _cdgg.B>>4 | (_cdgg.B>>4)<<4
+	return _cdgg
+}
+
+func (_affd *Monochrome) Validate() error {
+	if len(_affd.Data) != _affd.Height*_affd.BytesPerLine {
+		return ErrInvalidImage
+	}
+	return nil
+}
+
+type NRGBA interface {
+	NRGBAAt(_faga, _geafa int) _e.NRGBA
+	SetNRGBA(_eaff, _ageag int, _afgf _e.NRGBA)
+}
+
+func (_cffac *Gray8) Histogram() (_ddba [256]int) {
+	for _gaeb := 0; _gaeb < len(_cffac.Data); _gaeb++ {
+		_ddba[_cffac.Data[_gaeb]]++
+	}
+	return _ddba
+}
+
+func _ccda(_bfge _g.Image, _ffag Image, _cada _g.Rectangle) {
+	switch _gef := _bfge.(type) {
+	case Gray:
+		_adbf(_gef, _ffag.(Gray), _cada)
+	case NRGBA:
+		_dgee(_gef, _ffag.(Gray), _cada)
+	case CMYK:
+		_cbga(_gef, _ffag.(Gray), _cada)
+	case RGBA:
+		_ebag(_gef, _ffag.(Gray), _cada)
+	default:
+		_abd(_bfge, _ffag, _cada)
+	}
+}
+
+func (_bbca *NRGBA16) Validate() error {
+	if len(_bbca.Data) != 3*_bbca.Width*_bbca.Height/2 {
+		return _fc.New("i\u006e\u0076\u0061\u006c\u0069\u0064\u0020\u0069\u006da\u0067\u0065\u0020\u0064\u0061\u0074\u0061 s\u0069\u007a\u0065\u0020f\u006f\u0072\u0020\u0070\u0072\u006f\u0076\u0069\u0064ed\u0020\u0064i\u006d\u0065\u006e\u0073\u0069\u006f\u006e\u0073")
+	}
+	return nil
+}
+
+func (_cbda *Monochrome) Set(x, y int, c _e.Color) {
+	_geaf := y*_cbda.BytesPerLine + x>>3
+	if _geaf > len(_cbda.Data)-1 {
+		return
+	}
+	_cafe := _cbda.ColorModel().Convert(c).(_e.Gray)
+	_cbda.setGray(x, _cafe, _geaf)
+}
+
+func _geg(_ecg, _ddcb *Monochrome, _ddbc []byte, _fae int) (_ddf error) {
+	var (
+		_acf, _bgf, _cbde, _afg, _abfb, _eff, _ece, _ege int
+		_faa, _ffbb                                      uint32
+		_fed, _fff                                       byte
+		_acg                                             uint16
+	)
+	_gde := make([]byte, 4)
+	_cff := make([]byte, 4)
+	for _cbde = 0; _cbde < _ecg.Height-1; _cbde, _afg = _cbde+2, _afg+1 {
+		_acf = _cbde * _ecg.BytesPerLine
+		_bgf = _afg * _ddcb.BytesPerLine
+		for _abfb, _eff = 0, 0; _abfb < _fae; _abfb, _eff = _abfb+4, _eff+1 {
+			for _ece = 0; _ece < 4; _ece++ {
+				_ege = _acf + _abfb + _ece
+				if _ege <= len(_ecg.Data)-1 && _ege < _acf+_ecg.BytesPerLine {
+					_gde[_ece] = _ecg.Data[_ege]
+				} else {
+					_gde[_ece] = 0x00
+				}
+				_ege = _acf + _ecg.BytesPerLine + _abfb + _ece
+				if _ege <= len(_ecg.Data)-1 && _ege < _acf+(2*_ecg.BytesPerLine) {
+					_cff[_ece] = _ecg.Data[_ege]
+				} else {
+					_cff[_ece] = 0x00
+				}
+			}
+			_faa = _d.BigEndian.Uint32(_gde)
+			_ffbb = _d.BigEndian.Uint32(_cff)
+			_ffbb |= _faa
+			_ffbb |= _ffbb << 1
+			_ffbb &= 0xaaaaaaaa
+			_faa = _ffbb | (_ffbb << 7)
+			_fed = byte(_faa >> 24)
+			_fff = byte((_faa >> 8) & 0xff)
+			_ege = _bgf + _eff
+			if _ege+1 == len(_ddcb.Data)-1 || _ege+1 >= _bgf+_ddcb.BytesPerLine {
+				_ddcb.Data[_ege] = _ddbc[_fed]
+			} else {
+				_acg = (uint16(_ddbc[_fed]) << 8) | uint16(_ddbc[_fff])
+				if _ddf = _ddcb.setTwoBytes(_ege, _acg); _ddf != nil {
+					return _c.Errorf("s\u0065\u0074\u0074\u0069\u006e\u0067 \u0074\u0077\u006f\u0020\u0062\u0079t\u0065\u0073\u0020\u0066\u0061\u0069\u006ce\u0064\u002c\u0020\u0069\u006e\u0064\u0065\u0078\u003a\u0020%\u0064", _ege)
+				}
+				_eff++
+			}
+		}
+	}
+	return nil
+}
+
+func (_ageac *monochromeThresholdConverter) Convert(img _g.Image) (Image, error) {
+	if _cbge, _fcgb := img.(*Monochrome); _fcgb {
+		return _cbge.Copy(), nil
+	}
+	_bdff := img.Bounds()
+	_ceab, _gafg := NewImage(_bdff.Max.X, _bdff.Max.Y, 1, 1, nil, nil, nil)
+	if _gafg != nil {
+		return nil, _gafg
+	}
+	_ceab.(*Monochrome).ModelThreshold = _ageac.Threshold
+	for _cfag := 0; _cfag < _bdff.Max.X; _cfag++ {
+		for _eeea := 0; _eeea < _bdff.Max.Y; _eeea++ {
+			_aaf := img.At(_cfag, _eeea)
+			_ceab.Set(_cfag, _eeea, _aaf)
+		}
+	}
+	return _ceab, nil
+}
+
+func ColorAtGray16BPC(x, y, bytesPerLine int, data []byte, decode []float64) (_e.Gray16, error) {
+	_deg := (y*bytesPerLine/2 + x) * 2
+	if _deg+1 >= len(data) {
+		return _e.Gray16{}, _c.Errorf("\u0069\u006d\u0061\u0067\u0065\u0020\u0063\u006f\u006f\u0072\u0064\u0069\u006ea\u0074\u0065\u0073\u0020\u006f\u0075t\u0020\u006f\u0066\u0020\u0072\u0061\u006e\u0067\u0065\u0020\u0028\u0025\u0064,\u0020\u0025\u0064\u0029", x, y)
+	}
+	_dadfe := uint16(data[_deg])<<8 | uint16(data[_deg+1])
+	if len(decode) == 2 {
+		_dadfe = uint16(uint64(LinearInterpolate(float64(_dadfe), 0, 65535, decode[0], decode[1])))
+	}
+	return _e.Gray16{Y: _dadfe}, nil
+}
+
+func (_acfc *NRGBA32) At(x, y int) _e.Color {
+	_gaegf, _ := _acfc.ColorAt(x, y)
+	return _gaegf
+}
+
+func (_eed *NRGBA32) NRGBAAt(x, y int) _e.NRGBA {
+	_bega, _ := ColorAtNRGBA32(x, y, _eed.Width, _eed.Data, _eed.Alpha, _eed.Decode)
+	return _bega
+}
+
+func _fa(_ee *Monochrome, _dc int) (*Monochrome, error) {
+	if _ee == nil {
+		return nil, _fc.New("\u0073o\u0075r\u0063\u0065\u0020\u006e\u006ft\u0020\u0064e\u0066\u0069\u006e\u0065\u0064")
+	}
+	if _dc == 1 {
+		return _ee.copy(), nil
+	}
+	if !IsPowerOf2(uint(_dc)) {
+		return nil, _c.Errorf("\u0070\u0072\u006fvi\u0064\u0065\u0064\u0020\u0069\u006e\u0076\u0061\u006ci\u0064 \u0065x\u0070a\u006e\u0064\u0020\u0066\u0061\u0063\u0074\u006f\u0072\u003a\u0020\u0025\u0064", _dc)
+	}
+	_fg := _bgc(_dc)
+	return _gg(_ee, _dc, _fg)
+}
+
+func (_ddfg *ImageBase) MakeAlpha() { _ddfg.newAlpha() }
+
+func _da(_fd, _ad *Monochrome) (_eec error) {
+	_fge := _ad.BytesPerLine
+	_dae := _fd.BytesPerLine
+	var (
+		_ba                         byte
+		_df                         uint16
+		_ag, _fga, _cfb, _cfe, _bbg int
+	)
+	for _cfb = 0; _cfb < _ad.Height; _cfb++ {
+		_ag = _cfb * _fge
+		_fga = 2 * _cfb * _dae
+		for _cfe = 0; _cfe < _fge; _cfe++ {
+			_ba = _ad.Data[_ag+_cfe]
+			_df = _ebba[_ba]
+			_bbg = _fga + _cfe*2
+			if _fd.BytesPerLine != _ad.BytesPerLine*2 && (_cfe+1)*2 > _fd.BytesPerLine {
+				_eec = _fd.setByte(_bbg, byte(_df>>8))
+			} else {
+				_eec = _fd.setTwoBytes(_bbg, _df)
+			}
+			if _eec != nil {
+				return _eec
+			}
+		}
+		for _cfe = 0; _cfe < _dae; _cfe++ {
+			_bbg = _fga + _dae + _cfe
+			_ba = _fd.Data[_fga+_cfe]
+			if _eec = _fd.setByte(_bbg, _ba); _eec != nil {
+				return _eec
+			}
+		}
+	}
+	return nil
+}
+
+var _ Image = &Gray2{}
+
+type Image interface {
+	_bg.Image
+	Base() *ImageBase
+	Copy() Image
+	Pix() []byte
+	ColorAt(_cbba, _baebc int) (_e.Color, error)
+	Validate() error
+}
+
+func (_ggba *Gray16) Histogram() (_eagd [256]int) {
+	for _fedd := 0; _fedd < _ggba.Width; _fedd++ {
+		for _fdbe := 0; _fdbe < _ggba.Height; _fdbe++ {
+			_eagd[_ggba.GrayAt(_fedd, _fdbe).Y]++
+		}
+	}
+	return _eagd
+}
+
+func (_fdaae *RGBA32) ColorAt(x, y int) (_e.Color, error) {
+	return ColorAtRGBA32(x, y, _fdaae.Width, _fdaae.Data, _fdaae.Alpha, _fdaae.Decode)
+}
+
+func (_acged *Gray2) Bounds() _g.Rectangle {
+	return _g.Rectangle{Max: _g.Point{X: _acged.Width, Y: _acged.Height}}
+}
+
+func (_eeec *ImageBase) Pix() []byte { return _eeec.Data }
+
+func (_fdfca *NRGBA32) ColorAt(x, y int) (_e.Color, error) {
+	return ColorAtNRGBA32(x, y, _fdfca.Width, _fdfca.Data, _fdfca.Alpha, _fdfca.Decode)
+}
+
+func (_gag *Monochrome) ColorAt(x, y int) (_e.Color, error) {
+	return ColorAtGray1BPC(x, y, _gag.BytesPerLine, _gag.Data, _gag.Decode)
+}
+
+func (_aebb *Gray4) Base() *ImageBase { return &_aebb.ImageBase }
+
+var _ _g.Image = &Gray16{}
+
+func (_acbf *NRGBA64) Copy() Image { return &NRGBA64{ImageBase: _acbf.copy()} }
+
+func (_ggeb *RGBA32) ColorModel() _e.Model { return _e.NRGBAModel }
+
+func (_cdgb *RGBA32) At(x, y int) _e.Color {
+	_decb, _ := _cdgb.ColorAt(x, y)
+	return _decb
+}
+
+func (_defbc *NRGBA64) ColorAt(x, y int) (_e.Color, error) {
+	return ColorAtNRGBA64(x, y, _defbc.Width, _defbc.Data, _defbc.Alpha, _defbc.Decode)
+}
+
+const (
+	PixSrc             RasterOperator = 0xc
+	PixDst             RasterOperator = 0xa
+	PixNotSrc          RasterOperator = 0x3
+	PixNotDst          RasterOperator = 0x5
+	PixClr             RasterOperator = 0x0
+	PixSet             RasterOperator = 0xf
+	PixSrcOrDst        RasterOperator = 0xe
+	PixSrcAndDst       RasterOperator = 0x8
+	PixSrcXorDst       RasterOperator = 0x6
+	PixNotSrcOrDst     RasterOperator = 0xb
+	PixNotSrcAndDst    RasterOperator = 0x2
+	PixSrcOrNotDst     RasterOperator = 0xd
+	PixSrcAndNotDst    RasterOperator = 0x4
+	PixNotPixSrcOrDst  RasterOperator = 0x1
+	PixNotPixSrcAndDst RasterOperator = 0x7
+	PixNotPixSrcXorDst RasterOperator = 0x9
+	PixPaint                          = PixSrcOrDst
+	PixSubtract                       = PixNotSrcAndDst
+	PixMask                           = PixSrcAndDst
+)
+
+func (_ebc *NRGBA32) Validate() error {
+	if len(_ebc.Data) != 3*_ebc.Width*_ebc.Height {
+		return _fc.New("i\u006e\u0076\u0061\u006c\u0069\u0064\u0020\u0069\u006da\u0067\u0065\u0020\u0064\u0061\u0074\u0061 s\u0069\u007a\u0065\u0020f\u006f\u0072\u0020\u0070\u0072\u006f\u0076\u0069\u0064ed\u0020\u0064i\u006d\u0065\u006e\u0073\u0069\u006f\u006e\u0073")
+	}
+	return nil
+}
+
+var _ _g.Image = &Gray2{}
+
+var _ NRGBA = &NRGBA32{}
+
+type NRGBA32 struct{ ImageBase }
+
+func (_aegc *NRGBA32) Copy() Image { return &NRGBA32{ImageBase: _aegc.copy()} }
+
+func (_gagf *NRGBA64) Set(x, y int, c _e.Color) {
+	_bddg := (y*_gagf.Width + x) * 2
+	_dbb := _bddg * 3
+	if _dbb+5 >= len(_gagf.Data) {
+		return
+	}
+	_ecfe := _e.NRGBA64Model.Convert(c).(_e.NRGBA64)
+	_gagf.setNRGBA64(_dbb, _ecfe, _bddg)
+}
+
+func _fdbf(_fdfe _e.CMYK) _e.Gray {
+	_bfdg, _ggg, _cfbeb := _e.CMYKToRGB(_fdfe.C, _fdfe.M, _fdfe.Y, _fdfe.K)
+	_daad := (19595*uint32(_bfdg) + 38470*uint32(_ggg) + 7471*uint32(_cfbeb) + 1<<7) >> 16
+	return _e.Gray{Y: uint8(_daad)}
+}
+
+func GrayHistogram(g Gray) (_bcgea [256]int) {
+	switch _fafd := g.(type) {
+	case Histogramer:
+		return _fafd.Histogram()
+	case _g.Image:
+		_geaa := _fafd.Bounds()
+		for _gbbb := 0; _gbbb < _geaa.Max.X; _gbbb++ {
+			for _bcbdc := 0; _bcbdc < _geaa.Max.Y; _bcbdc++ {
+				_bcgea[g.GrayAt(_gbbb, _bcbdc).Y]++
+			}
+		}
+		return _bcgea
+	default:
+		return [256]int{}
+	}
+}
+
+func AutoThresholdTriangle(histogram [256]int) uint8 {
+	var _dedgf, _dbdc, _dgfd, _bgga int
+	for _fdba := 0; _fdba < len(histogram); _fdba++ {
+		if histogram[_fdba] > 0 {
+			_dedgf = _fdba
+			break
+		}
+	}
+	if _dedgf > 0 {
+		_dedgf--
+	}
+	for _dgefe := 255; _dgefe > 0; _dgefe-- {
+		if histogram[_dgefe] > 0 {
+			_bgga = _dgefe
+			break
+		}
+	}
+	if _bgga < 255 {
+		_bgga++
+	}
+	for _ffdd := 0; _ffdd < 256; _ffdd++ {
+		if histogram[_ffdd] > _dbdc {
+			_dgfd = _ffdd
+			_dbdc = histogram[_ffdd]
+		}
+	}
+	var _aadb bool
+	if (_dgfd - _dedgf) < (_bgga - _dgfd) {
+		_aadb = true
+		var _acaf int
+		_dfgf := 255
+		for _acaf < _dfgf {
+			_eedd := histogram[_acaf]
+			histogram[_acaf] = histogram[_dfgf]
+			histogram[_dfgf] = _eedd
+			_acaf++
+			_dfgf--
+		}
+		_dedgf = 255 - _bgga
+		_dgfd = 255 - _dgfd
+	}
+	if _dedgf == _dgfd {
+		return uint8(_dedgf)
+	}
+	_begeg := float64(histogram[_dgfd])
+	_dgbf := float64(_dedgf - _dgfd)
+	_eefd := _b.Sqrt(_begeg*_begeg + _dgbf*_dgbf)
+	_begeg /= _eefd
+	_dgbf /= _eefd
+	_eefd = _begeg*float64(_dedgf) + _dgbf*float64(histogram[_dedgf])
+	_bdda := _dedgf
+	var _ebdb float64
+	for _bfeg := _dedgf + 1; _bfeg <= _dgfd; _bfeg++ {
+		_gbeg := _begeg*float64(_bfeg) + _dgbf*float64(histogram[_bfeg]) - _eefd
+		if _gbeg > _ebdb {
+			_bdda = _bfeg
+			_ebdb = _gbeg
+		}
+	}
+	_bdda--
+	if _aadb {
+		var _edcef int
+		_cddg := 255
+		for _edcef < _cddg {
+			_aafe := histogram[_edcef]
+			histogram[_edcef] = histogram[_cddg]
+			histogram[_cddg] = _aafe
+			_edcef++
+			_cddg--
+		}
+		return uint8(255 - _bdda)
+	}
+	return uint8(_bdda)
+}
+
+func (_ceed *NRGBA64) Bounds() _g.Rectangle {
+	return _g.Rectangle{Max: _g.Point{X: _ceed.Width, Y: _ceed.Height}}
+}
+
+func (_ggca *Gray16) ColorModel() _e.Model { return _e.Gray16Model }
+
+func (_bbdf *Monochrome) RasterOperation(dx, dy, dw, dh int, op RasterOperator, src *Monochrome, sx, sy int) error {
+	return _ffgc(_bbdf, dx, dy, dw, dh, op, src, sx, sy)
+}
+
+func _gaa(_bcf Gray, _ceb CMYK, _bgg _g.Rectangle) {
+	for _ecff := 0; _ecff < _bgg.Max.X; _ecff++ {
+		for _cgc := 0; _cgc < _bgg.Max.Y; _cgc++ {
+			_gea := _bcf.GrayAt(_ecff, _cgc)
+			_ceb.SetCMYK(_ecff, _cgc, _facg(_gea))
+		}
+	}
+}
+
+func _dgee(_ccbfg NRGBA, _cdgf Gray, _fadd _g.Rectangle) {
+	for _ddcf := 0; _ddcf < _fadd.Max.X; _ddcf++ {
+		for _cfdb := 0; _cfdb < _fadd.Max.Y; _cfdb++ {
+			_baeb := _gadf(_ccbfg.NRGBAAt(_ddcf, _cfdb))
+			_cdgf.SetGray(_ddcf, _cfdb, _baeb)
+		}
+	}
+}
+
+type ImageBase struct {
+	Width, Height                     int
+	BitsPerComponent, ColorComponents int
+	Data, Alpha                       []byte
+	Decode                            []float64
+	BytesPerLine                      int
+}
+
+func _bae(_ab *Monochrome, _gda ...int) (_dde *Monochrome, _cgb error) {
+	if _ab == nil {
+		return nil, _fc.New("\u0073o\u0075\u0072\u0063\u0065 \u0062\u0069\u0074\u006d\u0061p\u0020n\u006ft\u0020\u0064\u0065\u0066\u0069\u006e\u0065d")
+	}
+	if len(_gda) == 0 {
+		return nil, _fc.New("\u0074h\u0065\u0072e\u0020\u006d\u0075s\u0074\u0020\u0062\u0065\u0020\u0061\u0074 \u006c\u0065\u0061\u0073\u0074\u0020o\u006e\u0065\u0020\u006c\u0065\u0076\u0065\u006c\u0020\u006f\u0066 \u0072\u0065\u0064\u0075\u0063\u0074\u0069\u006f\u006e")
+	}
+	_bfb := _fbfc()
+	_dde = _ab
+	for _, _ddc := range _gda {
+		if _ddc <= 0 {
+			break
+		}
+		_dde, _cgb = _cbg(_dde, _ddc, _bfb)
+		if _cgb != nil {
+			return nil, _cgb
+		}
+	}
+	return _dde, nil
+}
+
+func (_fabg *Gray8) Bounds() _g.Rectangle {
+	return _g.Rectangle{Max: _g.Point{X: _fabg.Width, Y: _fabg.Height}}
+}
+
+func (_cbae *Monochrome) Histogram() (_cefg [256]int) {
+	for _, _fagg := range _cbae.Data {
+		_cefg[0xff] += int(_dbgf[_cbae.Data[_fagg]])
+	}
+	return _cefg
+}
+
+func (_bgb *Monochrome) setBit(_efaca, _acb int) {
+	_bgb.Data[_efaca+(_acb>>3)] |= 0x80 >> uint(_acb&7)
+}
+
+func (_egf *CMYK32) ColorModel() _e.Model { return _e.CMYKModel }
+
+func ColorAtNRGBA64(x, y, width int, data, alpha []byte, decode []float64) (_e.NRGBA64, error) {
+	_gceb := (y*width + x) * 2
+	_gcedf := _gceb * 3
+	if _gcedf+5 >= len(data) {
+		return _e.NRGBA64{}, _c.Errorf("\u0069\u006d\u0061\u0067\u0065\u0020\u0063\u006f\u006f\u0072\u0064\u0069\u006ea\u0074\u0065\u0073\u0020\u006f\u0075t\u0020\u006f\u0066\u0020\u0072\u0061\u006e\u0067\u0065\u0020\u0028\u0025\u0064,\u0020\u0025\u0064\u0029", x, y)
+	}
+	const _dgefg = 0xffff
+	_bffg := uint16(_dgefg)
+	if alpha != nil && len(alpha) > _gceb+1 {
+		_bffg = uint16(alpha[_gceb])<<8 | uint16(alpha[_gceb+1])
+	}
+	_cacc := uint16(data[_gcedf])<<8 | uint16(data[_gcedf+1])
+	_fcdfe := uint16(data[_gcedf+2])<<8 | uint16(data[_gcedf+3])
+	_dgbd := uint16(data[_gcedf+4])<<8 | uint16(data[_gcedf+5])
+	if len(decode) == 6 {
+		_cacc = uint16(uint64(LinearInterpolate(float64(_cacc), 0, 65535, decode[0], decode[1])) & _dgefg)
+		_fcdfe = uint16(uint64(LinearInterpolate(float64(_fcdfe), 0, 65535, decode[2], decode[3])) & _dgefg)
+		_dgbd = uint16(uint64(LinearInterpolate(float64(_dgbd), 0, 65535, decode[4], decode[5])) & _dgefg)
+	}
+	return _e.NRGBA64{R: _cacc, G: _fcdfe, B: _dgbd, A: _bffg}, nil
+}
+
+func (_fagd *CMYK32) CMYKAt(x, y int) _e.CMYK {
+	_bcac, _ := ColorAtCMYK(x, y, _fagd.Width, _fagd.Data, _fagd.Decode)
+	return _bcac
+}
+
+func ColorAtGray4BPC(x, y, bytesPerLine int, data []byte, decode []float64) (_e.Gray, error) {
+	_edaa := y*bytesPerLine + x>>1
+	if _edaa >= len(data) {
+		return _e.Gray{}, _c.Errorf("\u0069\u006d\u0061\u0067\u0065\u0020\u0063\u006f\u006f\u0072\u0064\u0069\u006ea\u0074\u0065\u0073\u0020\u006f\u0075t\u0020\u006f\u0066\u0020\u0072\u0061\u006e\u0067\u0065\u0020\u0028\u0025\u0064,\u0020\u0025\u0064\u0029", x, y)
+	}
+	_fbfa := data[_edaa] >> uint(4-(x&1)*4) & 0xf
+	if len(decode) == 2 {
+		_fbfa = uint8(uint32(LinearInterpolate(float64(_fbfa), 0, 15, decode[0], decode[1])) & 0xf)
+	}
+	return _e.Gray{Y: _fbfa * 17 & 0xff}, nil
+}
+
+func ColorAtGrayscale(x, y, bitsPerColor, bytesPerLine int, data []byte, decode []float64) (_e.Color, error) {
+	switch bitsPerColor {
+	case 1:
+		return ColorAtGray1BPC(x, y, bytesPerLine, data, decode)
+	case 2:
+		return ColorAtGray2BPC(x, y, bytesPerLine, data, decode)
+	case 4:
+		return ColorAtGray4BPC(x, y, bytesPerLine, data, decode)
+	case 8:
+		return ColorAtGray8BPC(x, y, bytesPerLine, data, decode)
+	case 16:
+		return ColorAtGray16BPC(x, y, bytesPerLine, data, decode)
+	default:
+		return nil, _c.Errorf("\u0075\u006e\u0073\u0075\u0070\u0070\u006f\u0072\u0074\u0065\u0064\u0020\u0067\u0072\u0061\u0079\u0020\u0073c\u0061\u006c\u0065\u0020\u0062\u0069\u0074s\u0020\u0070\u0065\u0072\u0020\u0063\u006f\u006c\u006f\u0072\u0020a\u006d\u006f\u0075\u006e\u0074\u003a\u0020\u0027\u0025\u0064\u0027", bitsPerColor)
+	}
+}
+
+func _dbe(_faac _e.NYCbCrA) _e.RGBA {
+	_agea, _ddbce, _cffe, _dfa := _bbbd(_faac).RGBA()
+	return _e.RGBA{R: uint8(_agea >> 8), G: uint8(_ddbce >> 8), B: uint8(_cffe >> 8), A: uint8(_dfa >> 8)}
+}
+
+func _gac(_beeg _e.RGBA) _e.Gray {
+	_bdfg := (19595*uint32(_beeg.R) + 38470*uint32(_beeg.G) + 7471*uint32(_beeg.B) + 1<<7) >> 16
+	return _e.Gray{Y: uint8(_bdfg)}
+}
+
+func _adbf(_dbga, _cbbc Gray, _dacb _g.Rectangle) {
+	for _gfb := 0; _gfb < _dacb.Max.X; _gfb++ {
+		for _egcg := 0; _egcg < _dacb.Max.Y; _egcg++ {
+			_cbbc.SetGray(_gfb, _egcg, _dbga.GrayAt(_gfb, _egcg))
+		}
+	}
+}
+
+func _badd(_cdf int, _effe int) int {
+	if _cdf < _effe {
+		return _cdf
+	}
+	return _effe
+}
+
+const (
+	_fcgbf shift = iota
+	_aefb
+)
+
+func (_egfb *CMYK32) Bounds() _g.Rectangle {
+	return _g.Rectangle{Max: _g.Point{X: _egfb.Width, Y: _egfb.Height}}
+}
+
+func _ccagc(_dddd _g.Image, _fcba Image, _abce _g.Rectangle) {
+	if _fbaf, _cedfb := _dddd.(SMasker); _cedfb && _fbaf.HasAlpha() {
+		_fcba.(SMasker).MakeAlpha()
+	}
+	switch _dccf := _dddd.(type) {
+	case Gray:
+		_daefd(_dccf, _fcba.(RGBA), _abce)
+	case NRGBA:
+		_efbf(_dccf, _fcba.(RGBA), _abce)
+	case *_g.NYCbCrA:
+		_gace(_dccf, _fcba.(RGBA), _abce)
+	case CMYK:
+		_fcdgc(_dccf, _fcba.(RGBA), _abce)
+	case RGBA:
+		_cfage(_dccf, _fcba.(RGBA), _abce)
+	case nrgba64:
+		_gagd(_dccf, _fcba.(RGBA), _abce)
+	default:
+		_abd(_dddd, _fcba, _abce)
+	}
+}
+
+func (_bbae *Gray16) GrayAt(x, y int) _e.Gray {
+	_aee, _ := _bbae.ColorAt(x, y)
+	return _e.Gray{Y: uint8(_aee.(_e.Gray16).Y >> 8)}
+}
+
+func (_dbf *Gray2) Copy() Image { return &Gray2{ImageBase: _dbf.copy()} }
+
+func ColorAtNRGBA32(x, y, width int, data, alpha []byte, decode []float64) (_e.NRGBA, error) {
+	_cfbb := y*width + x
+	_gbdfa := 3 * _cfbb
+	if _gbdfa+2 >= len(data) {
+		return _e.NRGBA{}, _c.Errorf("\u0069\u006d\u0061\u0067\u0065\u0020\u0063\u006f\u006f\u0072\u0064\u0069\u006ea\u0074\u0065\u0073\u0020\u006f\u0075t\u0020\u006f\u0066\u0020\u0072\u0061\u006e\u0067\u0065\u0020\u0028\u0025\u0064,\u0020\u0025\u0064\u0029", x, y)
+	}
+	_cgae := uint8(0xff)
+	if alpha != nil && len(alpha) > _cfbb {
+		_cgae = alpha[_cfbb]
+	}
+	_agd, _dgdg, _gcg := data[_gbdfa], data[_gbdfa+1], data[_gbdfa+2]
+	if len(decode) == 6 {
+		_efgg := LinearInterpolate(float64(_agd), 0, 255.0, decode[0], decode[1])
+		_ebgf := LinearInterpolate(float64(_dgdg), 0, 255.0, decode[2], decode[3])
+		_bgec := LinearInterpolate(float64(_gcg), 0, 255.0, decode[4], decode[5])
+		if _efgg <= 1.0 && _ebgf <= 1.0 && _bgec <= 1.0 {
+			_efgg *= 255.0
+			_ebgf *= 255.0
+			_bgec *= 255.0
+		}
+		_agd = uint8(_efgg) & 0xff
+		_dgdg = uint8(_ebgf) & 0xff
+		_gcg = uint8(_bgec) & 0xff
+	}
+	return _e.NRGBA{R: _agd, G: _dgdg, B: _gcg, A: _cgae}, nil
+}
+
+var _ Gray = &Gray4{}
+
+func IsPowerOf2(n uint) bool { return n > 0 && (n&(n-1)) == 0 }
+
+var _ _g.Image = &NRGBA32{}
+
+func NextPowerOf2(n uint) uint {
+	if IsPowerOf2(n) {
+		return n
+	}
+	return 1 << (_agfd(n) + 1)
+}
+
+func (_fddgb *RGBA32) Base() *ImageBase { return &_fddgb.ImageBase }
+
+var _ _g.Image = &RGBA32{}
+
+func (_fdaa *NRGBA64) Validate() error {
+	if len(_fdaa.Data) != 3*2*_fdaa.Width*_fdaa.Height {
+		return _fc.New("i\u006e\u0076\u0061\u006c\u0069\u0064\u0020\u0069\u006da\u0067\u0065\u0020\u0064\u0061\u0074\u0061 s\u0069\u007a\u0065\u0020f\u006f\u0072\u0020\u0070\u0072\u006f\u0076\u0069\u0064ed\u0020\u0064i\u006d\u0065\u006e\u0073\u0069\u006f\u006e\u0073")
+	}
+	return nil
+}
+
+func _edg(_cfbf, _dfb int) *Monochrome {
+	return &Monochrome{ImageBase: NewImageBase(_cfbf, _dfb, 1, 1, nil, nil, nil), ModelThreshold: 0x0f}
+}
+
+func _fdgc(_fdfb _e.Color) _e.Color {
+	_dcfd := _e.GrayModel.Convert(_fdfb).(_e.Gray)
+	return _gga(_dcfd)
+}
+
+func (_babf *Monochrome) ReduceBinary(factor float64) (*Monochrome, error) {
+	_bcge := _agfd(uint(factor))
+	if !IsPowerOf2(uint(factor)) {
+		_bcge++
+	}
+	_deeb := make([]int, _bcge)
+	for _fdbb := range _deeb {
+		_deeb[_fdbb] = 4
+	}
+	_gcae, _cadd := _bae(_babf, _deeb...)
+	if _cadd != nil {
+		return nil, _cadd
+	}
+	return _gcae, nil
+}
+
+func IsGrayImgBlackAndWhite(i *_g.Gray) bool { return _gff(i) }
+
+var _ Image = &NRGBA16{}
+
+var _ Gray = &Gray16{}
+
+func (_aaff *Gray16) Set(x, y int, c _e.Color) {
+	_dcab := (y*_aaff.BytesPerLine/2 + x) * 2
+	if _dcab+1 >= len(_aaff.Data) {
+		return
+	}
+	_bbfg := _e.Gray16Model.Convert(c).(_e.Gray16)
+	_aaff.Data[_dcab], _aaff.Data[_dcab+1] = uint8(_bbfg.Y>>8), uint8(_bbfg.Y&0xff)
+}
+
+func (_edb *Monochrome) SetGray(x, y int, g _e.Gray) {
+	_eda := y*_edb.BytesPerLine + x>>3
+	if _eda > len(_edb.Data)-1 {
+		return
+	}
+	g = _dgd(g, monochromeModel(_edb.ModelThreshold))
+	_edb.setGray(x, g, _eda)
+}
+
+func (_gceg *Gray4) ColorModel() _e.Model { return Gray4Model }
+
+var _ Image = &RGBA32{}
+
+func _daefd(_acfe Gray, _gdac RGBA, _edgg _g.Rectangle) {
+	for _daec := 0; _daec < _edgg.Max.X; _daec++ {
+		for _ebea := 0; _ebea < _edgg.Max.Y; _ebea++ {
+			_bdgf := _acfe.GrayAt(_daec, _ebea)
+			_gdac.SetRGBA(_daec, _ebea, _gecd(_bdgf))
+		}
+	}
+}
+
+func (_dbd *ImageBase) setEightPartlyBytes(_aeee, _ceggb int, _bdd uint64) (_dbgfb error) {
+	var (
+		_bfgb byte
+		_ddfb int
+	)
+	for _fbge := 1; _fbge <= _ceggb; _fbge++ {
+		_ddfb = 64 - _fbge*8
+		_bfgb = byte(_bdd >> uint(_ddfb) & 0xff)
+		if _dbgfb = _dbd.setByte(_aeee+_fbge-1, _bfgb); _dbgfb != nil {
+			return _dbgfb
+		}
+	}
+	_bde := _dbd.BytesPerLine*8 - _dbd.Width
+	if _bde == 0 {
+		return nil
+	}
+	_ddfb -= 8
+	_bfgb = byte(_bdd>>uint(_ddfb)&0xff) << uint(_bde)
+	if _dbgfb = _dbd.setByte(_aeee+_ceggb, _bfgb); _dbgfb != nil {
+		return _dbgfb
+	}
+	return nil
+}
+
+var _ Image = &Monochrome{}
+
+func _cbga(_cdee CMYK, _egeb Gray, _gggd _g.Rectangle) {
+	for _fgad := 0; _fgad < _gggd.Max.X; _fgad++ {
+		for _abcb := 0; _abcb < _gggd.Max.Y; _abcb++ {
+			_baff := _fdbf(_cdee.CMYKAt(_fgad, _abcb))
+			_egeb.SetGray(_fgad, _abcb, _baff)
+		}
+	}
+}
+
+func _ebag(_fbbb RGBA, _eac Gray, _eebe _g.Rectangle) {
+	for _bbbb := 0; _bbbb < _eebe.Max.X; _bbbb++ {
+		for _cgffg := 0; _cgffg < _eebe.Max.Y; _cgffg++ {
+			_gfa := _gac(_fbbb.RGBAAt(_bbbb, _cgffg))
+			_eac.SetGray(_bbbb, _cgffg, _gfa)
+		}
+	}
+}
+
+var _ Image = &CMYK32{}
+
+func _aaec(_afad, _cdce, _bdce byte) byte { return (_afad &^ (_bdce)) | (_cdce & _bdce) }
+
+func (_eggg *NRGBA32) setRGBA(_bcga int, _fca _e.NRGBA) {
+	_fdde := 3 * _bcga
+	_eggg.Data[_fdde] = _fca.R
+	_eggg.Data[_fdde+1] = _fca.G
+	_eggg.Data[_fdde+2] = _fca.B
+	if _bcga < len(_eggg.Alpha) {
+		_eggg.Alpha[_bcga] = _fca.A
+	}
+}
+
+var _ _g.Image = &NRGBA64{}
+
+func (_gdgc *NRGBA32) SetNRGBA(x, y int, c _e.NRGBA) {
+	_gdf := y*_gdgc.Width + x
+	_cbf := 3 * _gdf
+	if _cbf+2 >= len(_gdgc.Data) {
+		return
+	}
+	_gdgc.setRGBA(_gdf, c)
+}
+
+var _dbgf [256]uint8
+
+func (_cde *Gray16) Bounds() _g.Rectangle {
+	return _g.Rectangle{Max: _g.Point{X: _cde.Width, Y: _cde.Height}}
+}
+
+func _ecb(_efg NRGBA, _gab CMYK, _adac _g.Rectangle) {
+	for _ccf := 0; _ccf < _adac.Max.X; _ccf++ {
+		for _gaf := 0; _gaf < _adac.Max.Y; _gaf++ {
+			_bad := _efg.NRGBAAt(_ccf, _gaf)
+			_gab.SetCMYK(_ccf, _gaf, _acge(_bad))
+		}
+	}
+}
+
+func _gg(_bf *Monochrome, _cf int, _ffg []uint) (*Monochrome, error) {
+	_dcf := _cf * _bf.Width
+	_ggd := _cf * _bf.Height
+	_ec := _edg(_dcf, _ggd)
+	for _fad, _gd := range _ffg {
+		var _fcc error
+		switch _gd {
+		case 2:
+			_fcc = _da(_ec, _bf)
+		case 4:
+			_fcc = _eg(_ec, _bf)
+		case 8:
+			_fcc = _fb(_ec, _bf)
+		}
+		if _fcc != nil {
+			return nil, _fcc
+		}
+		if _fad != len(_ffg)-1 {
+			_bf = _ec.copy()
+		}
+	}
+	return _ec, nil
+}
+
+func _bbfc(_fagdf _g.Image, _ffgac uint8) *_g.Gray {
+	_debe := _fagdf.Bounds()
+	_bccd := _g.NewGray(_debe)
+	var (
+		_eafg  _e.Color
+		_bdabg _e.Gray
+	)
+	for _edbd := 0; _edbd < _debe.Max.X; _edbd++ {
+		for _egee := 0; _egee < _debe.Max.Y; _egee++ {
+			_eafg = _fagdf.At(_edbd, _egee)
+			_bccd.Set(_edbd, _egee, _eafg)
+			_bdabg = _bccd.GrayAt(_edbd, _egee)
+			_bccd.SetGray(_edbd, _egee, _e.Gray{Y: _dccg(_bdabg.Y, _ffgac)})
+		}
+	}
+	return _bccd
+}
+
+func (_acee *NRGBA16) Bounds() _g.Rectangle {
+	return _g.Rectangle{Max: _g.Point{X: _acee.Width, Y: _acee.Height}}
+}
+
+func (_dabf *Gray8) Base() *ImageBase { return &_dabf.ImageBase }
+
+func (_beac *Gray8) GrayAt(x, y int) _e.Gray {
+	_defa, _ := ColorAtGray8BPC(x, y, _beac.BytesPerLine, _beac.Data, _beac.Decode)
+	return _defa
+}
+
+func (_dgfe *Gray8) Copy() Image { return &Gray8{ImageBase: _dgfe.copy()} }
+
+func _cbg(_fag *Monochrome, _egc int, _ged []byte) (_abf *Monochrome, _fdb error) {
+	const _cd = "\u0072\u0065d\u0075\u0063\u0065R\u0061\u006e\u006b\u0042\u0069\u006e\u0061\u0072\u0079"
+	if _fag == nil {
+		return nil, _fc.New("\u0073o\u0075\u0072\u0063\u0065 \u0062\u0069\u0074\u006d\u0061p\u0020n\u006ft\u0020\u0064\u0065\u0066\u0069\u006e\u0065d")
+	}
+	if _egc < 1 || _egc > 4 {
+		return nil, _fc.New("\u006c\u0065\u0076\u0065\u006c\u0020\u006d\u0075\u0073\u0074 \u0062\u0065\u0020\u0069\u006e\u0020\u0073e\u0074\u0020\u007b\u0031\u002c\u0032\u002c\u0033\u002c\u0034\u007d")
+	}
+	if _fag.Height <= 1 {
+		return nil, _fc.New("\u0073\u006f\u0075rc\u0065\u0020\u0068\u0065\u0069\u0067\u0068\u0074\u0020m\u0075s\u0074 \u0062e\u0020\u0061\u0074\u0020\u006c\u0065\u0061\u0073\u0074\u0020\u0027\u0032\u0027")
+	}
+	_abf = _edg(_fag.Width/2, _fag.Height/2)
+	if _ged == nil {
+		_ged = _fbfc()
+	}
+	_cdb := _badd(_fag.BytesPerLine, 2*_abf.BytesPerLine)
+	switch _egc {
+	case 1:
+		_fdb = _geg(_fag, _abf, _ged, _cdb)
+	case 2:
+		_fdb = _ced(_fag, _abf, _ged, _cdb)
+	case 3:
+		_fdb = _eea(_fag, _abf, _ged, _cdb)
+	case 4:
+		_fdb = _aba(_fag, _abf, _ged, _cdb)
+	}
+	if _fdb != nil {
+		return nil, _fdb
+	}
+	return _abf, nil
+}
+
+func _fedf(_cdaa, _bceg CMYK, _cgf _g.Rectangle) {
+	for _cegg := 0; _cegg < _cgf.Max.X; _cegg++ {
+		for _dec := 0; _dec < _cgf.Max.Y; _dec++ {
+			_bceg.SetCMYK(_cegg, _dec, _cdaa.CMYKAt(_cegg, _dec))
+		}
+	}
+}
+
+func (_cead *Monochrome) setIndexedBit(_gcac int) { _cead.Data[(_gcac >> 3)] |= 0x80 >> uint(_gcac&7) }
+
+func (_gbfaf *Gray2) Validate() error {
+	if len(_gbfaf.Data) != _gbfaf.Height*_gbfaf.BytesPerLine {
+		return ErrInvalidImage
+	}
+	return nil
+}
+
+func (_cab *Gray2) ColorAt(x, y int) (_e.Color, error) {
+	return ColorAtGray2BPC(x, y, _cab.BytesPerLine, _cab.Data, _cab.Decode)
+}
+
+func (_edgd *NRGBA32) Bounds() _g.Rectangle {
+	return _g.Rectangle{Max: _g.Point{X: _edgd.Width, Y: _edgd.Height}}
+}
+
+var _ RGBA = &RGBA32{}
+
+func _acge(_fdae _e.NRGBA) _e.CMYK {
+	_cceb, _gaae, _febf, _ := _fdae.RGBA()
+	_dge, _eba, _cgcc, _dgbc := _e.RGBToCMYK(uint8(_cceb>>8), uint8(_gaae>>8), uint8(_febf>>8))
+	return _e.CMYK{C: _dge, M: _eba, Y: _cgcc, K: _dgbc}
+}
+
+var _ _g.Image = &Gray8{}
+
+func (_dgbb *NRGBA64) NRGBA64At(x, y int) _e.NRGBA64 {
+	_aeed, _ := ColorAtNRGBA64(x, y, _dgbb.Width, _dgbb.Data, _dgbb.Alpha, _dgbb.Decode)
+	return _aeed
+}
+
+func (_cfda *ImageBase) getByte(_gcdc int) (byte, error) {
+	if _gcdc > len(_cfda.Data)-1 || _gcdc < 0 {
+		return 0, _c.Errorf("\u0069\u006e\u0064\u0065x:\u0020\u0025\u0064\u0020\u006f\u0075\u0074\u0020\u006f\u0066\u0020\u0072\u0061\u006eg\u0065", _gcdc)
+	}
+	return _cfda.Data[_gcdc], nil
+}
+
+var _ _g.Image = &Monochrome{}
+
+func ColorAtGray8BPC(x, y, bytesPerLine int, data []byte, decode []float64) (_e.Gray, error) {
+	_agcg := y*bytesPerLine + x
+	if _agcg >= len(data) {
+		return _e.Gray{}, _c.Errorf("\u0069\u006d\u0061\u0067\u0065\u0020\u0063\u006f\u006f\u0072\u0064\u0069\u006ea\u0074\u0065\u0073\u0020\u006f\u0075t\u0020\u006f\u0066\u0020\u0072\u0061\u006e\u0067\u0065\u0020\u0028\u0025\u0064,\u0020\u0025\u0064\u0029", x, y)
+	}
+	_dbea := data[_agcg]
+	if len(decode) == 2 {
+		_dbea = uint8(uint32(LinearInterpolate(float64(_dbea), 0, 255, decode[0], decode[1])) & 0xff)
+	}
+	return _e.Gray{Y: _dbea}, nil
+}
+
+func ColorAtNRGBA16(x, y, width, bytesPerLine int, data, alpha []byte, decode []float64) (_e.NRGBA, error) {
+	_gebcg := y*bytesPerLine + x*3/2
+	if _gebcg+1 >= len(data) {
+		return _e.NRGBA{}, _beagb(x, y)
+	}
+	const (
+		_ccaa = 0xf
+		_bbcc = uint8(0xff)
+	)
+	_ceae := _bbcc
+	if alpha != nil {
+		_bdba := y * BytesPerLine(width, 4, 1)
+		if _bdba < len(alpha) {
+			if x%2 == 0 {
+				_ceae = (alpha[_bdba] >> uint(4)) & _ccaa
+			} else {
+				_ceae = alpha[_bdba] & _ccaa
+			}
+			_ceae |= _ceae << 4
+		}
+	}
+	var _gfec, _daged, _cfdg uint8
+	if x*3%2 == 0 {
+		_gfec = (data[_gebcg] >> uint(4)) & _ccaa
+		_daged = data[_gebcg] & _ccaa
+		_cfdg = (data[_gebcg+1] >> uint(4)) & _ccaa
+	} else {
+		_gfec = data[_gebcg] & _ccaa
+		_daged = (data[_gebcg+1] >> uint(4)) & _ccaa
+		_cfdg = data[_gebcg+1] & _ccaa
+	}
+	if len(decode) == 6 {
+		_gfec = uint8(uint32(LinearInterpolate(float64(_gfec), 0, 15, decode[0], decode[1])) & 0xf)
+		_daged = uint8(uint32(LinearInterpolate(float64(_daged), 0, 15, decode[2], decode[3])) & 0xf)
+		_cfdg = uint8(uint32(LinearInterpolate(float64(_cfdg), 0, 15, decode[4], decode[5])) & 0xf)
+	}
+	return _e.NRGBA{R: (_gfec << 4) | (_gfec & 0xf), G: (_daged << 4) | (_daged & 0xf), B: (_cfdg << 4) | (_cfdg & 0xf), A: _ceae}, nil
+}
+
+type monochromeModel uint8
+
+func _bdfb(_eeeb *Monochrome, _bfda, _efad, _ffagf, _eccd int, _efeg RasterOperator, _effff *Monochrome, _ccbb, _daeb int) error {
+	var (
+		_gaaae       bool
+		_bedd        bool
+		_afff        byte
+		_bfbg        int
+		_bbafce      int
+		_daca        int
+		_bgag        int
+		_bdga        bool
+		_baaab       int
+		_beae        int
+		_gafgb       int
+		_abaf        bool
+		_becf        byte
+		_dabfb       int
+		_aefa        int
+		_cebe        int
+		_beab        byte
+		_gbga        int
+		_gcff        int
+		_fabgf       uint
+		_geeg        uint
+		_eagag       byte
+		_aabc        shift
+		_cfcc        bool
+		_gbcb        bool
+		_aacg, _cdbc int
+	)
+	if _ccbb&7 != 0 {
+		_gcff = 8 - (_ccbb & 7)
+	}
+	if _bfda&7 != 0 {
+		_bbafce = 8 - (_bfda & 7)
+	}
+	if _gcff == 0 && _bbafce == 0 {
+		_eagag = _dbcf[0]
+	} else {
+		if _bbafce > _gcff {
+			_fabgf = uint(_bbafce - _gcff)
+		} else {
+			_fabgf = uint(8 - (_gcff - _bbafce))
+		}
+		_geeg = 8 - _fabgf
+		_eagag = _dbcf[_fabgf]
+	}
+	if (_bfda & 7) != 0 {
+		_gaaae = true
+		_bfbg = 8 - (_bfda & 7)
+		_afff = _dbcf[_bfbg]
+		_daca = _eeeb.BytesPerLine*_efad + (_bfda >> 3)
+		_bgag = _effff.BytesPerLine*_daeb + (_ccbb >> 3)
+		_gbga = 8 - (_ccbb & 7)
+		if _bfbg > _gbga {
+			_aabc = _fcgbf
+			if _ffagf >= _gcff {
+				_cfcc = true
+			}
+		} else {
+			_aabc = _aefb
+		}
+	}
+	if _ffagf < _bfbg {
+		_bedd = true
+		_afff &= _febgc[8-_bfbg+_ffagf]
+	}
+	if !_bedd {
+		_baaab = (_ffagf - _bfbg) >> 3
+		if _baaab != 0 {
+			_bdga = true
+			_beae = _eeeb.BytesPerLine*_efad + ((_bfda + _bbafce) >> 3)
+			_gafgb = _effff.BytesPerLine*_daeb + ((_ccbb + _bbafce) >> 3)
+		}
+	}
+	_dabfb = (_bfda + _ffagf) & 7
+	if !(_bedd || _dabfb == 0) {
+		_abaf = true
+		_becf = _febgc[_dabfb]
+		_aefa = _eeeb.BytesPerLine*_efad + ((_bfda + _bbafce) >> 3) + _baaab
+		_cebe = _effff.BytesPerLine*_daeb + ((_ccbb + _bbafce) >> 3) + _baaab
+		if _dabfb > int(_geeg) {
+			_gbcb = true
+		}
+	}
+	switch _efeg {
+	case PixSrc:
+		if _gaaae {
+			for _aacg = 0; _aacg < _eccd; _aacg++ {
+				if _aabc == _fcgbf {
+					_beab = _effff.Data[_bgag] << _fabgf
+					if _cfcc {
+						_beab = _aaec(_beab, _effff.Data[_bgag+1]>>_geeg, _eagag)
+					}
+				} else {
+					_beab = _effff.Data[_bgag] >> _geeg
+				}
+				_eeeb.Data[_daca] = _aaec(_eeeb.Data[_daca], _beab, _afff)
+				_daca += _eeeb.BytesPerLine
+				_bgag += _effff.BytesPerLine
+			}
+		}
+		if _bdga {
+			for _aacg = 0; _aacg < _eccd; _aacg++ {
+				for _cdbc = 0; _cdbc < _baaab; _cdbc++ {
+					_beab = _aaec(_effff.Data[_gafgb+_cdbc]<<_fabgf, _effff.Data[_gafgb+_cdbc+1]>>_geeg, _eagag)
+					_eeeb.Data[_beae+_cdbc] = _beab
+				}
+				_beae += _eeeb.BytesPerLine
+				_gafgb += _effff.BytesPerLine
+			}
+		}
+		if _abaf {
+			for _aacg = 0; _aacg < _eccd; _aacg++ {
+				_beab = _effff.Data[_cebe] << _fabgf
+				if _gbcb {
+					_beab = _aaec(_beab, _effff.Data[_cebe+1]>>_geeg, _eagag)
+				}
+				_eeeb.Data[_aefa] = _aaec(_eeeb.Data[_aefa], _beab, _becf)
+				_aefa += _eeeb.BytesPerLine
+				_cebe += _effff.BytesPerLine
+			}
+		}
+	case PixNotSrc:
+		if _gaaae {
+			for _aacg = 0; _aacg < _eccd; _aacg++ {
+				if _aabc == _fcgbf {
+					_beab = _effff.Data[_bgag] << _fabgf
+					if _cfcc {
+						_beab = _aaec(_beab, _effff.Data[_bgag+1]>>_geeg, _eagag)
+					}
+				} else {
+					_beab = _effff.Data[_bgag] >> _geeg
+				}
+				_eeeb.Data[_daca] = _aaec(_eeeb.Data[_daca], ^_beab, _afff)
+				_daca += _eeeb.BytesPerLine
+				_bgag += _effff.BytesPerLine
+			}
+		}
+		if _bdga {
+			for _aacg = 0; _aacg < _eccd; _aacg++ {
+				for _cdbc = 0; _cdbc < _baaab; _cdbc++ {
+					_beab = _aaec(_effff.Data[_gafgb+_cdbc]<<_fabgf, _effff.Data[_gafgb+_cdbc+1]>>_geeg, _eagag)
+					_eeeb.Data[_beae+_cdbc] = ^_beab
+				}
+				_beae += _eeeb.BytesPerLine
+				_gafgb += _effff.BytesPerLine
+			}
+		}
+		if _abaf {
+			for _aacg = 0; _aacg < _eccd; _aacg++ {
+				_beab = _effff.Data[_cebe] << _fabgf
+				if _gbcb {
+					_beab = _aaec(_beab, _effff.Data[_cebe+1]>>_geeg, _eagag)
+				}
+				_eeeb.Data[_aefa] = _aaec(_eeeb.Data[_aefa], ^_beab, _becf)
+				_aefa += _eeeb.BytesPerLine
+				_cebe += _effff.BytesPerLine
+			}
+		}
+	case PixSrcOrDst:
+		if _gaaae {
+			for _aacg = 0; _aacg < _eccd; _aacg++ {
+				if _aabc == _fcgbf {
+					_beab = _effff.Data[_bgag] << _fabgf
+					if _cfcc {
+						_beab = _aaec(_beab, _effff.Data[_bgag+1]>>_geeg, _eagag)
+					}
+				} else {
+					_beab = _effff.Data[_bgag] >> _geeg
+				}
+				_eeeb.Data[_daca] = _aaec(_eeeb.Data[_daca], _beab|_eeeb.Data[_daca], _afff)
+				_daca += _eeeb.BytesPerLine
+				_bgag += _effff.BytesPerLine
+			}
+		}
+		if _bdga {
+			for _aacg = 0; _aacg < _eccd; _aacg++ {
+				for _cdbc = 0; _cdbc < _baaab; _cdbc++ {
+					_beab = _aaec(_effff.Data[_gafgb+_cdbc]<<_fabgf, _effff.Data[_gafgb+_cdbc+1]>>_geeg, _eagag)
+					_eeeb.Data[_beae+_cdbc] |= _beab
+				}
+				_beae += _eeeb.BytesPerLine
+				_gafgb += _effff.BytesPerLine
+			}
+		}
+		if _abaf {
+			for _aacg = 0; _aacg < _eccd; _aacg++ {
+				_beab = _effff.Data[_cebe] << _fabgf
+				if _gbcb {
+					_beab = _aaec(_beab, _effff.Data[_cebe+1]>>_geeg, _eagag)
+				}
+				_eeeb.Data[_aefa] = _aaec(_eeeb.Data[_aefa], _beab|_eeeb.Data[_aefa], _becf)
+				_aefa += _eeeb.BytesPerLine
+				_cebe += _effff.BytesPerLine
+			}
+		}
+	case PixSrcAndDst:
+		if _gaaae {
+			for _aacg = 0; _aacg < _eccd; _aacg++ {
+				if _aabc == _fcgbf {
+					_beab = _effff.Data[_bgag] << _fabgf
+					if _cfcc {
+						_beab = _aaec(_beab, _effff.Data[_bgag+1]>>_geeg, _eagag)
+					}
+				} else {
+					_beab = _effff.Data[_bgag] >> _geeg
+				}
+				_eeeb.Data[_daca] = _aaec(_eeeb.Data[_daca], _beab&_eeeb.Data[_daca], _afff)
+				_daca += _eeeb.BytesPerLine
+				_bgag += _effff.BytesPerLine
+			}
+		}
+		if _bdga {
+			for _aacg = 0; _aacg < _eccd; _aacg++ {
+				for _cdbc = 0; _cdbc < _baaab; _cdbc++ {
+					_beab = _aaec(_effff.Data[_gafgb+_cdbc]<<_fabgf, _effff.Data[_gafgb+_cdbc+1]>>_geeg, _eagag)
+					_eeeb.Data[_beae+_cdbc] &= _beab
+				}
+				_beae += _eeeb.BytesPerLine
+				_gafgb += _effff.BytesPerLine
+			}
+		}
+		if _abaf {
+			for _aacg = 0; _aacg < _eccd; _aacg++ {
+				_beab = _effff.Data[_cebe] << _fabgf
+				if _gbcb {
+					_beab = _aaec(_beab, _effff.Data[_cebe+1]>>_geeg, _eagag)
+				}
+				_eeeb.Data[_aefa] = _aaec(_eeeb.Data[_aefa], _beab&_eeeb.Data[_aefa], _becf)
+				_aefa += _eeeb.BytesPerLine
+				_cebe += _effff.BytesPerLine
+			}
+		}
+	case PixSrcXorDst:
+		if _gaaae {
+			for _aacg = 0; _aacg < _eccd; _aacg++ {
+				if _aabc == _fcgbf {
+					_beab = _effff.Data[_bgag] << _fabgf
+					if _cfcc {
+						_beab = _aaec(_beab, _effff.Data[_bgag+1]>>_geeg, _eagag)
+					}
+				} else {
+					_beab = _effff.Data[_bgag] >> _geeg
+				}
+				_eeeb.Data[_daca] = _aaec(_eeeb.Data[_daca], _beab^_eeeb.Data[_daca], _afff)
+				_daca += _eeeb.BytesPerLine
+				_bgag += _effff.BytesPerLine
+			}
+		}
+		if _bdga {
+			for _aacg = 0; _aacg < _eccd; _aacg++ {
+				for _cdbc = 0; _cdbc < _baaab; _cdbc++ {
+					_beab = _aaec(_effff.Data[_gafgb+_cdbc]<<_fabgf, _effff.Data[_gafgb+_cdbc+1]>>_geeg, _eagag)
+					_eeeb.Data[_beae+_cdbc] ^= _beab
+				}
+				_beae += _eeeb.BytesPerLine
+				_gafgb += _effff.BytesPerLine
+			}
+		}
+		if _abaf {
+			for _aacg = 0; _aacg < _eccd; _aacg++ {
+				_beab = _effff.Data[_cebe] << _fabgf
+				if _gbcb {
+					_beab = _aaec(_beab, _effff.Data[_cebe+1]>>_geeg, _eagag)
+				}
+				_eeeb.Data[_aefa] = _aaec(_eeeb.Data[_aefa], _beab^_eeeb.Data[_aefa], _becf)
+				_aefa += _eeeb.BytesPerLine
+				_cebe += _effff.BytesPerLine
+			}
+		}
+	case PixNotSrcOrDst:
+		if _gaaae {
+			for _aacg = 0; _aacg < _eccd; _aacg++ {
+				if _aabc == _fcgbf {
+					_beab = _effff.Data[_bgag] << _fabgf
+					if _cfcc {
+						_beab = _aaec(_beab, _effff.Data[_bgag+1]>>_geeg, _eagag)
+					}
+				} else {
+					_beab = _effff.Data[_bgag] >> _geeg
+				}
+				_eeeb.Data[_daca] = _aaec(_eeeb.Data[_daca], ^_beab|_eeeb.Data[_daca], _afff)
+				_daca += _eeeb.BytesPerLine
+				_bgag += _effff.BytesPerLine
+			}
+		}
+		if _bdga {
+			for _aacg = 0; _aacg < _eccd; _aacg++ {
+				for _cdbc = 0; _cdbc < _baaab; _cdbc++ {
+					_beab = _aaec(_effff.Data[_gafgb+_cdbc]<<_fabgf, _effff.Data[_gafgb+_cdbc+1]>>_geeg, _eagag)
+					_eeeb.Data[_beae+_cdbc] |= ^_beab
+				}
+				_beae += _eeeb.BytesPerLine
+				_gafgb += _effff.BytesPerLine
+			}
+		}
+		if _abaf {
+			for _aacg = 0; _aacg < _eccd; _aacg++ {
+				_beab = _effff.Data[_cebe] << _fabgf
+				if _gbcb {
+					_beab = _aaec(_beab, _effff.Data[_cebe+1]>>_geeg, _eagag)
+				}
+				_eeeb.Data[_aefa] = _aaec(_eeeb.Data[_aefa], ^_beab|_eeeb.Data[_aefa], _becf)
+				_aefa += _eeeb.BytesPerLine
+				_cebe += _effff.BytesPerLine
+			}
+		}
+	case PixNotSrcAndDst:
+		if _gaaae {
+			for _aacg = 0; _aacg < _eccd; _aacg++ {
+				if _aabc == _fcgbf {
+					_beab = _effff.Data[_bgag] << _fabgf
+					if _cfcc {
+						_beab = _aaec(_beab, _effff.Data[_bgag+1]>>_geeg, _eagag)
+					}
+				} else {
+					_beab = _effff.Data[_bgag] >> _geeg
+				}
+				_eeeb.Data[_daca] = _aaec(_eeeb.Data[_daca], ^_beab&_eeeb.Data[_daca], _afff)
+				_daca += _eeeb.BytesPerLine
+				_bgag += _effff.BytesPerLine
+			}
+		}
+		if _bdga {
+			for _aacg = 0; _aacg < _eccd; _aacg++ {
+				for _cdbc = 0; _cdbc < _baaab; _cdbc++ {
+					_beab = _aaec(_effff.Data[_gafgb+_cdbc]<<_fabgf, _effff.Data[_gafgb+_cdbc+1]>>_geeg, _eagag)
+					_eeeb.Data[_beae+_cdbc] &= ^_beab
+				}
+				_beae += _eeeb.BytesPerLine
+				_gafgb += _effff.BytesPerLine
+			}
+		}
+		if _abaf {
+			for _aacg = 0; _aacg < _eccd; _aacg++ {
+				_beab = _effff.Data[_cebe] << _fabgf
+				if _gbcb {
+					_beab = _aaec(_beab, _effff.Data[_cebe+1]>>_geeg, _eagag)
+				}
+				_eeeb.Data[_aefa] = _aaec(_eeeb.Data[_aefa], ^_beab&_eeeb.Data[_aefa], _becf)
+				_aefa += _eeeb.BytesPerLine
+				_cebe += _effff.BytesPerLine
+			}
+		}
+	case PixSrcOrNotDst:
+		if _gaaae {
+			for _aacg = 0; _aacg < _eccd; _aacg++ {
+				if _aabc == _fcgbf {
+					_beab = _effff.Data[_bgag] << _fabgf
+					if _cfcc {
+						_beab = _aaec(_beab, _effff.Data[_bgag+1]>>_geeg, _eagag)
+					}
+				} else {
+					_beab = _effff.Data[_bgag] >> _geeg
+				}
+				_eeeb.Data[_daca] = _aaec(_eeeb.Data[_daca], _beab|^_eeeb.Data[_daca], _afff)
+				_daca += _eeeb.BytesPerLine
+				_bgag += _effff.BytesPerLine
+			}
+		}
+		if _bdga {
+			for _aacg = 0; _aacg < _eccd; _aacg++ {
+				for _cdbc = 0; _cdbc < _baaab; _cdbc++ {
+					_beab = _aaec(_effff.Data[_gafgb+_cdbc]<<_fabgf, _effff.Data[_gafgb+_cdbc+1]>>_geeg, _eagag)
+					_eeeb.Data[_beae+_cdbc] = _beab | ^_eeeb.Data[_beae+_cdbc]
+				}
+				_beae += _eeeb.BytesPerLine
+				_gafgb += _effff.BytesPerLine
+			}
+		}
+		if _abaf {
+			for _aacg = 0; _aacg < _eccd; _aacg++ {
+				_beab = _effff.Data[_cebe] << _fabgf
+				if _gbcb {
+					_beab = _aaec(_beab, _effff.Data[_cebe+1]>>_geeg, _eagag)
+				}
+				_eeeb.Data[_aefa] = _aaec(_eeeb.Data[_aefa], _beab|^_eeeb.Data[_aefa], _becf)
+				_aefa += _eeeb.BytesPerLine
+				_cebe += _effff.BytesPerLine
+			}
+		}
+	case PixSrcAndNotDst:
+		if _gaaae {
+			for _aacg = 0; _aacg < _eccd; _aacg++ {
+				if _aabc == _fcgbf {
+					_beab = _effff.Data[_bgag] << _fabgf
+					if _cfcc {
+						_beab = _aaec(_beab, _effff.Data[_bgag+1]>>_geeg, _eagag)
+					}
+				} else {
+					_beab = _effff.Data[_bgag] >> _geeg
+				}
+				_eeeb.Data[_daca] = _aaec(_eeeb.Data[_daca], _beab&^_eeeb.Data[_daca], _afff)
+				_daca += _eeeb.BytesPerLine
+				_bgag += _effff.BytesPerLine
+			}
+		}
+		if _bdga {
+			for _aacg = 0; _aacg < _eccd; _aacg++ {
+				for _cdbc = 0; _cdbc < _baaab; _cdbc++ {
+					_beab = _aaec(_effff.Data[_gafgb+_cdbc]<<_fabgf, _effff.Data[_gafgb+_cdbc+1]>>_geeg, _eagag)
+					_eeeb.Data[_beae+_cdbc] = _beab &^ _eeeb.Data[_beae+_cdbc]
+				}
+				_beae += _eeeb.BytesPerLine
+				_gafgb += _effff.BytesPerLine
+			}
+		}
+		if _abaf {
+			for _aacg = 0; _aacg < _eccd; _aacg++ {
+				_beab = _effff.Data[_cebe] << _fabgf
+				if _gbcb {
+					_beab = _aaec(_beab, _effff.Data[_cebe+1]>>_geeg, _eagag)
+				}
+				_eeeb.Data[_aefa] = _aaec(_eeeb.Data[_aefa], _beab&^_eeeb.Data[_aefa], _becf)
+				_aefa += _eeeb.BytesPerLine
+				_cebe += _effff.BytesPerLine
+			}
+		}
+	case PixNotPixSrcOrDst:
+		if _gaaae {
+			for _aacg = 0; _aacg < _eccd; _aacg++ {
+				if _aabc == _fcgbf {
+					_beab = _effff.Data[_bgag] << _fabgf
+					if _cfcc {
+						_beab = _aaec(_beab, _effff.Data[_bgag+1]>>_geeg, _eagag)
+					}
+				} else {
+					_beab = _effff.Data[_bgag] >> _geeg
+				}
+				_eeeb.Data[_daca] = _aaec(_eeeb.Data[_daca], ^(_beab | _eeeb.Data[_daca]), _afff)
+				_daca += _eeeb.BytesPerLine
+				_bgag += _effff.BytesPerLine
+			}
+		}
+		if _bdga {
+			for _aacg = 0; _aacg < _eccd; _aacg++ {
+				for _cdbc = 0; _cdbc < _baaab; _cdbc++ {
+					_beab = _aaec(_effff.Data[_gafgb+_cdbc]<<_fabgf, _effff.Data[_gafgb+_cdbc+1]>>_geeg, _eagag)
+					_eeeb.Data[_beae+_cdbc] = ^(_beab | _eeeb.Data[_beae+_cdbc])
+				}
+				_beae += _eeeb.BytesPerLine
+				_gafgb += _effff.BytesPerLine
+			}
+		}
+		if _abaf {
+			for _aacg = 0; _aacg < _eccd; _aacg++ {
+				_beab = _effff.Data[_cebe] << _fabgf
+				if _gbcb {
+					_beab = _aaec(_beab, _effff.Data[_cebe+1]>>_geeg, _eagag)
+				}
+				_eeeb.Data[_aefa] = _aaec(_eeeb.Data[_aefa], ^(_beab | _eeeb.Data[_aefa]), _becf)
+				_aefa += _eeeb.BytesPerLine
+				_cebe += _effff.BytesPerLine
+			}
+		}
+	case PixNotPixSrcAndDst:
+		if _gaaae {
+			for _aacg = 0; _aacg < _eccd; _aacg++ {
+				if _aabc == _fcgbf {
+					_beab = _effff.Data[_bgag] << _fabgf
+					if _cfcc {
+						_beab = _aaec(_beab, _effff.Data[_bgag+1]>>_geeg, _eagag)
+					}
+				} else {
+					_beab = _effff.Data[_bgag] >> _geeg
+				}
+				_eeeb.Data[_daca] = _aaec(_eeeb.Data[_daca], ^(_beab & _eeeb.Data[_daca]), _afff)
+				_daca += _eeeb.BytesPerLine
+				_bgag += _effff.BytesPerLine
+			}
+		}
+		if _bdga {
+			for _aacg = 0; _aacg < _eccd; _aacg++ {
+				for _cdbc = 0; _cdbc < _baaab; _cdbc++ {
+					_beab = _aaec(_effff.Data[_gafgb+_cdbc]<<_fabgf, _effff.Data[_gafgb+_cdbc+1]>>_geeg, _eagag)
+					_eeeb.Data[_beae+_cdbc] = ^(_beab & _eeeb.Data[_beae+_cdbc])
+				}
+				_beae += _eeeb.BytesPerLine
+				_gafgb += _effff.BytesPerLine
+			}
+		}
+		if _abaf {
+			for _aacg = 0; _aacg < _eccd; _aacg++ {
+				_beab = _effff.Data[_cebe] << _fabgf
+				if _gbcb {
+					_beab = _aaec(_beab, _effff.Data[_cebe+1]>>_geeg, _eagag)
+				}
+				_eeeb.Data[_aefa] = _aaec(_eeeb.Data[_aefa], ^(_beab & _eeeb.Data[_aefa]), _becf)
+				_aefa += _eeeb.BytesPerLine
+				_cebe += _effff.BytesPerLine
+			}
+		}
+	case PixNotPixSrcXorDst:
+		if _gaaae {
+			for _aacg = 0; _aacg < _eccd; _aacg++ {
+				if _aabc == _fcgbf {
+					_beab = _effff.Data[_bgag] << _fabgf
+					if _cfcc {
+						_beab = _aaec(_beab, _effff.Data[_bgag+1]>>_geeg, _eagag)
+					}
+				} else {
+					_beab = _effff.Data[_bgag] >> _geeg
+				}
+				_eeeb.Data[_daca] = _aaec(_eeeb.Data[_daca], ^(_beab ^ _eeeb.Data[_daca]), _afff)
+				_daca += _eeeb.BytesPerLine
+				_bgag += _effff.BytesPerLine
+			}
+		}
+		if _bdga {
+			for _aacg = 0; _aacg < _eccd; _aacg++ {
+				for _cdbc = 0; _cdbc < _baaab; _cdbc++ {
+					_beab = _aaec(_effff.Data[_gafgb+_cdbc]<<_fabgf, _effff.Data[_gafgb+_cdbc+1]>>_geeg, _eagag)
+					_eeeb.Data[_beae+_cdbc] = ^(_beab ^ _eeeb.Data[_beae+_cdbc])
+				}
+				_beae += _eeeb.BytesPerLine
+				_gafgb += _effff.BytesPerLine
+			}
+		}
+		if _abaf {
+			for _aacg = 0; _aacg < _eccd; _aacg++ {
+				_beab = _effff.Data[_cebe] << _fabgf
+				if _gbcb {
+					_beab = _aaec(_beab, _effff.Data[_cebe+1]>>_geeg, _eagag)
+				}
+				_eeeb.Data[_aefa] = _aaec(_eeeb.Data[_aefa], ^(_beab ^ _eeeb.Data[_aefa]), _becf)
+				_aefa += _eeeb.BytesPerLine
+				_cebe += _effff.BytesPerLine
+			}
+		}
+	default:
+		_ef.Log.Debug("\u004f\u0070e\u0072\u0061\u0074\u0069\u006f\u006e\u003a\u0020\u0027\u0025\u0064\u0027\u0020\u006e\u006f\u0074\u0020\u0070\u0065\u0072\u006d\u0069tt\u0065\u0064", _efeg)
+		return _fc.New("\u0072\u0061\u0073\u0074\u0065\u0072\u0020\u006f\u0070\u0065r\u0061\u0074\u0069\u006f\u006e\u0020\u006eo\u0074\u0020\u0070\u0065\u0072\u006d\u0069\u0074\u0074\u0065\u0064")
+	}
+	return nil
+}
+
+func _gecd(_dba _e.Gray) _e.RGBA { return _e.RGBA{R: _dba.Y, G: _dba.Y, B: _dba.Y, A: 0xff} }
+
+type CMYK32 struct{ ImageBase }
+
+func _fbfc() (_aecg []byte) {
+	_aecg = make([]byte, 256)
+	for _fgeg := 0; _fgeg < 256; _fgeg++ {
+		_cfbe := byte(_fgeg)
+		_aecg[_cfbe] = (_cfbe & 0x01) | ((_cfbe & 0x04) >> 1) | ((_cfbe & 0x10) >> 2) | ((_cfbe & 0x40) >> 3) | ((_cfbe & 0x02) << 3) | ((_cfbe & 0x08) << 2) | ((_cfbe & 0x20) << 1) | (_cfbe & 0x80)
+	}
+	return _aecg
+}
+
+var (
+	MonochromeConverter = ConverterFunc(_abcc)
+	Gray2Converter      = ConverterFunc(_fedc)
+	Gray4Converter      = ConverterFunc(_abcd)
+	GrayConverter       = ConverterFunc(_aagc)
+	Gray16Converter     = ConverterFunc(_faagc)
+	NRGBA16Converter    = ConverterFunc(_gdad)
+	NRGBAConverter      = ConverterFunc(_bdcc)
+	NRGBA64Converter    = ConverterFunc(_fbgb)
+	RGBAConverter       = ConverterFunc(_addf)
+	CMYKConverter       = ConverterFunc(_egdc)
+)
+
+func (_bbfe *NRGBA16) Base() *ImageBase { return &_bbfe.ImageBase }
+
+func (_cgdd *Gray2) At(x, y int) _e.Color {
+	_bbaf, _ := _cgdd.ColorAt(x, y)
+	return _bbaf
+}
+
+type Gray2 struct{ ImageBase }
+
+var (
+	_febgc = []byte{0x00, 0x80, 0xC0, 0xE0, 0xF0, 0xF8, 0xFC, 0xFE, 0xFF}
+	_dbcf  = []byte{0x00, 0x01, 0x03, 0x07, 0x0F, 0x1F, 0x3F, 0x7F, 0xFF}
+)
+
+func (_bbge *NRGBA32) ColorModel() _e.Model { return _e.NRGBAModel }
+
+func (_bfce *Gray4) Copy() Image { return &Gray4{ImageBase: _bfce.copy()} }
+
+func _abcc(_gdd _g.Image) (Image, error) {
+	if _ddad, _ggdc := _gdd.(*Monochrome); _ggdc {
+		return _ddad, nil
+	}
+	_dgf := _gdd.Bounds()
+	var _aeac Gray
+	switch _aead := _gdd.(type) {
+	case Gray:
+		_aeac = _aead
+	case NRGBA:
+		_aeac = &Gray8{ImageBase: NewImageBase(_dgf.Max.X, _dgf.Max.Y, 8, 1, nil, nil, nil)}
+		_cad(_aeac, _aead, _dgf)
+	case nrgba64:
+		_aeac = &Gray8{ImageBase: NewImageBase(_dgf.Max.X, _dgf.Max.Y, 8, 1, nil, nil, nil)}
+		_ceaf(_aeac, _aead, _dgf)
+	default:
+		_gedb, _cfbea := GrayConverter.Convert(_gdd)
+		if _cfbea != nil {
+			return nil, _cfbea
+		}
+		_aeac = _gedb.(Gray)
+	}
+	_cfd, _ggdg := NewImage(_dgf.Max.X, _dgf.Max.Y, 1, 1, nil, nil, nil)
+	if _ggdg != nil {
+		return nil, _ggdg
+	}
+	_bcc := _cfd.(*Monochrome)
+	_ebee := AutoThresholdTriangle(GrayHistogram(_aeac))
+	for _acgb := 0; _acgb < _dgf.Max.X; _acgb++ {
+		for _cggf := 0; _cggf < _dgf.Max.Y; _cggf++ {
+			_cba := _dgd(_aeac.GrayAt(_acgb, _cggf), monochromeModel(_ebee))
+			_bcc.SetGray(_acgb, _cggf, _cba)
+		}
+	}
+	return _cfd, nil
+}
+
+func (_acc *Gray4) ColorAt(x, y int) (_e.Color, error) {
+	return ColorAtGray4BPC(x, y, _acc.BytesPerLine, _acc.Data, _acc.Decode)
+}
+
+type ColorConverter interface {
+	Convert(_cec _g.Image) (Image, error)
+}
+
+func _fac(_gedd, _gcd int, _gba []byte) *Monochrome {
+	_ggf := _edg(_gedd, _gcd)
+	_ggf.Data = _gba
+	return _ggf
+}
+
+func (_abg *Gray2) Base() *ImageBase { return &_abg.ImageBase }
+
+func _fabc(_ffgg _e.NRGBA) _e.RGBA {
+	_aff, _bcad, _egef, _eggb := _ffgg.RGBA()
+	return _e.RGBA{R: uint8(_aff >> 8), G: uint8(_bcad >> 8), B: uint8(_egef >> 8), A: uint8(_eggb >> 8)}
+}
+
+func _gcdd(_bdbg _e.Gray) _e.Gray {
+	_bdbg.Y >>= 4
+	_bdbg.Y |= _bdbg.Y << 4
+	return _bdbg
+}
+
+func (_bcag *ImageBase) GetAlpha() []byte { return _bcag.Alpha }
+
+func _aba(_fcfg, _efab *Monochrome, _aeb []byte, _fab int) (_cac error) {
+	var (
+		_fcdc, _gbed, _eee, _dcc, _ace, _effg, _dcef, _daa int
+		_cae, _aag                                         uint32
+		_bffb, _cda                                        byte
+		_bdc                                               uint16
+	)
+	_def := make([]byte, 4)
+	_fgab := make([]byte, 4)
+	for _eee = 0; _eee < _fcfg.Height-1; _eee, _dcc = _eee+2, _dcc+1 {
+		_fcdc = _eee * _fcfg.BytesPerLine
+		_gbed = _dcc * _efab.BytesPerLine
+		for _ace, _effg = 0, 0; _ace < _fab; _ace, _effg = _ace+4, _effg+1 {
+			for _dcef = 0; _dcef < 4; _dcef++ {
+				_daa = _fcdc + _ace + _dcef
+				if _daa <= len(_fcfg.Data)-1 && _daa < _fcdc+_fcfg.BytesPerLine {
+					_def[_dcef] = _fcfg.Data[_daa]
+				} else {
+					_def[_dcef] = 0x00
+				}
+				_daa = _fcdc + _fcfg.BytesPerLine + _ace + _dcef
+				if _daa <= len(_fcfg.Data)-1 && _daa < _fcdc+(2*_fcfg.BytesPerLine) {
+					_fgab[_dcef] = _fcfg.Data[_daa]
+				} else {
+					_fgab[_dcef] = 0x00
+				}
+			}
+			_cae = _d.BigEndian.Uint32(_def)
+			_aag = _d.BigEndian.Uint32(_fgab)
+			_aag &= _cae
+			_aag &= _aag << 1
+			_aag &= 0xaaaaaaaa
+			_cae = _aag | (_aag << 7)
+			_bffb = byte(_cae >> 24)
+			_cda = byte((_cae >> 8) & 0xff)
+			_daa = _gbed + _effg
+			if _daa+1 == len(_efab.Data)-1 || _daa+1 >= _gbed+_efab.BytesPerLine {
+				_efab.Data[_daa] = _aeb[_bffb]
+				if _cac = _efab.setByte(_daa, _aeb[_bffb]); _cac != nil {
+					return _c.Errorf("\u0069n\u0064\u0065\u0078\u003a\u0020\u0025d", _daa)
+				}
+			} else {
+				_bdc = (uint16(_aeb[_bffb]) << 8) | uint16(_aeb[_cda])
+				if _cac = _efab.setTwoBytes(_daa, _bdc); _cac != nil {
+					return _c.Errorf("s\u0065\u0074\u0074\u0069\u006e\u0067 \u0074\u0077\u006f\u0020\u0062\u0079t\u0065\u0073\u0020\u0066\u0061\u0069\u006ce\u0064\u002c\u0020\u0069\u006e\u0064\u0065\u0078\u003a\u0020%\u0064", _daa)
+				}
+				_effg++
+			}
+		}
+	}
+	return nil
+}
+
+func ColorAtGray1BPC(x, y, bytesPerLine int, data []byte, decode []float64) (_e.Gray, error) {
+	_efgd := y*bytesPerLine + x>>3
+	if _efgd >= len(data) {
+		return _e.Gray{}, _c.Errorf("\u0069\u006d\u0061\u0067\u0065\u0020\u0063\u006f\u006f\u0072\u0064\u0069\u006ea\u0074\u0065\u0073\u0020\u006f\u0075t\u0020\u006f\u0066\u0020\u0072\u0061\u006e\u0067\u0065\u0020\u0028\u0025\u0064,\u0020\u0025\u0064\u0029", x, y)
+	}
+	_befb := data[_efgd] >> uint(7-(x&7)) & 1
+	if len(decode) == 2 {
+		_befb = uint8(LinearInterpolate(float64(_befb), 0.0, 1.0, decode[0], decode[1])) & 1
+	}
+	return _e.Gray{Y: _befb * 255}, nil
+}
+
+func _cfdc(_acba _e.Color) _e.Color {
+	_fecf := _e.GrayModel.Convert(_acba).(_e.Gray)
+	return _gcdd(_fecf)
+}
+
+func _cdeed(_cggfg *_g.Gray16, _dfef uint8) *_g.Gray {
+	_fcbbd := _cggfg.Bounds()
+	_fbbbb := _g.NewGray(_fcbbd)
+	for _dgbg := 0; _dgbg < _fcbbd.Dx(); _dgbg++ {
+		for _dfgc := 0; _dfgc < _fcbbd.Dy(); _dfgc++ {
+			_bddf := _cggfg.Gray16At(_dgbg, _dfgc)
+			_fbbbb.SetGray(_dgbg, _dfgc, _e.Gray{Y: _dccg(uint8(_bddf.Y/256), _dfef)})
+		}
+	}
+	return _fbbbb
+}
+
+func _facg(_geed _e.Gray) _e.CMYK { return _e.CMYK{K: 0xff - _geed.Y} }
+
+var (
+	_ebba = _bebb()
+	_dadf = _caa()
+	_cbd  = _gf()
+)
+
+func (_afaa *Monochrome) InverseData() error {
+	return _afaa.RasterOperation(0, 0, _afaa.Width, _afaa.Height, PixNotDst, nil, 0, 0)
+}
+
+func (_ebda *Monochrome) Base() *ImageBase { return &_ebda.ImageBase }
+
+func (_baaa *ImageBase) setByte(_abcf int, _bffd byte) error {
+	if _abcf > len(_baaa.Data)-1 {
+		return _fc.New("\u0069n\u0064e\u0078\u0020\u006f\u0075\u0074 \u006f\u0066 \u0072\u0061\u006e\u0067\u0065")
+	}
+	_baaa.Data[_abcf] = _bffd
+	return nil
+}
+
+type SMasker interface {
+	HasAlpha() bool
+	GetAlpha() []byte
+	MakeAlpha()
+}
+
+func _agab(_gebc *Monochrome, _dbgea, _accgc int, _dgea, _fdgg int, _cfae RasterOperator, _gaaa *Monochrome, _feg, _agca int) error {
+	var _ffcd, _cdcf, _agbb, _gecaf int
+	if _dbgea < 0 {
+		_feg -= _dbgea
+		_dgea += _dbgea
+		_dbgea = 0
+	}
+	if _feg < 0 {
+		_dbgea -= _feg
+		_dgea += _feg
+		_feg = 0
+	}
+	_ffcd = _dbgea + _dgea - _gebc.Width
+	if _ffcd > 0 {
+		_dgea -= _ffcd
+	}
+	_cdcf = _feg + _dgea - _gaaa.Width
+	if _cdcf > 0 {
+		_dgea -= _cdcf
+	}
+	if _accgc < 0 {
+		_agca -= _accgc
+		_fdgg += _accgc
+		_accgc = 0
+	}
+	if _agca < 0 {
+		_accgc -= _agca
+		_fdgg += _agca
+		_agca = 0
+	}
+	_agbb = _accgc + _fdgg - _gebc.Height
+	if _agbb > 0 {
+		_fdgg -= _agbb
+	}
+	_gecaf = _agca + _fdgg - _gaaa.Height
+	if _gecaf > 0 {
+		_fdgg -= _gecaf
+	}
+	if _dgea <= 0 || _fdgg <= 0 {
+		return nil
+	}
+	var _eeef error
+	switch {
+	case _dbgea&7 == 0 && _feg&7 == 0:
+		_eeef = _aaa(_gebc, _dbgea, _accgc, _dgea, _fdgg, _cfae, _gaaa, _feg, _agca)
+	case _dbgea&7 == _feg&7:
+		_eeef = _egge(_gebc, _dbgea, _accgc, _dgea, _fdgg, _cfae, _gaaa, _feg, _agca)
+	default:
+		_eeef = _bdfb(_gebc, _dbgea, _accgc, _dgea, _fdgg, _cfae, _gaaa, _feg, _agca)
+	}
+	if _eeef != nil {
+		return _eeef
+	}
+	return nil
+}
+
+func _fbgb(_dgfbg _g.Image) (Image, error) {
+	if _eeaf, _gecc := _dgfbg.(*NRGBA64); _gecc {
+		return _eeaf.Copy(), nil
+	}
+	_fedb, _acaa, _efega := _aagf(_dgfbg, 2)
+	_ddbaa, _gedad := NewImage(_fedb.Max.X, _fedb.Max.Y, 16, 3, nil, _efega, nil)
+	if _gedad != nil {
+		return nil, _gedad
+	}
+	_abb(_dgfbg, _ddbaa, _fedb)
+	if len(_efega) != 0 && !_acaa {
+		if _gbaf := _bede(_efega, _ddbaa); _gbaf != nil {
+			return nil, _gbaf
+		}
+	}
+	return _ddbaa, nil
+}
+
+type RGBA interface {
+	RGBAAt(_gbdc, _dfaa int) _e.RGBA
+	SetRGBA(_feba, _bgca int, _degb _e.RGBA)
+}
+
+func ConverterFunc(converterFunc func(_fgde _g.Image) (Image, error)) ColorConverter {
+	return colorConverter{_feb: converterFunc}
+}
+
+func _eadfa(_aeba uint8) bool {
+	if _aeba == 0 || _aeba == 255 {
+		return true
+	}
+	return false
+}
+
+var ErrInvalidImage = _fc.New("i\u006e\u0076\u0061\u006c\u0069\u0064\u0020\u0069\u006da\u0067\u0065\u0020\u0064\u0061\u0074\u0061 s\u0069\u007a\u0065\u0020f\u006f\u0072\u0020\u0070\u0072\u006f\u0076\u0069\u0064ed\u0020\u0064i\u006d\u0065\u006e\u0073\u0069\u006f\u006e\u0073")
+
+func (_decfd *Gray2) SetGray(x, y int, gray _e.Gray) {
+	_effb := _gga(gray)
+	_gedbc := y * _decfd.BytesPerLine
+	_ecac := _gedbc + (x >> 2)
+	if _ecac >= len(_decfd.Data) {
+		return
+	}
+	_egb := _effb.Y >> 6
+	_decfd.Data[_ecac] = (_decfd.Data[_ecac] & (^(0xc0 >> uint(2*((x)&3))))) | (_egb << uint(6-2*(x&3)))
+}
+
+func (_gae *Monochrome) getBit(_bfe, _gcca int) uint8 {
+	return _gae.Data[_bfe+(_gcca>>3)] >> uint(7-(_gcca&7)) & 1
+}
+
+var _ _g.Image = &NRGBA16{}
+
+func ColorAtGray2BPC(x, y, bytesPerLine int, data []byte, decode []float64) (_e.Gray, error) {
+	_fgb := y*bytesPerLine + x>>2
+	if _fgb >= len(data) {
+		return _e.Gray{}, _c.Errorf("\u0069\u006d\u0061\u0067\u0065\u0020\u0063\u006f\u006f\u0072\u0064\u0069\u006ea\u0074\u0065\u0073\u0020\u006f\u0075t\u0020\u006f\u0066\u0020\u0072\u0061\u006e\u0067\u0065\u0020\u0028\u0025\u0064,\u0020\u0025\u0064\u0029", x, y)
+	}
+	_bbag := data[_fgb] >> uint(6-(x&3)*2) & 3
+	if len(decode) == 2 {
+		_bbag = uint8(uint32(LinearInterpolate(float64(_bbag), 0, 3.0, decode[0], decode[1])) & 3)
+	}
+	return _e.Gray{Y: _bbag * 85}, nil
+}
+
+func _dbdg(_cccgf CMYK, _ggdge NRGBA, _becfa _g.Rectangle) {
+	for _badb := 0; _badb < _becfa.Max.X; _badb++ {
+		for _edef := 0; _edef < _becfa.Max.Y; _edef++ {
+			_fdaca := _cccgf.CMYKAt(_badb, _edef)
+			_ggdge.SetNRGBA(_badb, _edef, _aadf(_fdaca))
+		}
+	}
+}
+
+func _gff(_dgcg *_g.Gray) bool {
+	for _bdeb := 0; _bdeb < len(_dgcg.Pix); _bdeb++ {
+		if !_eadfa(_dgcg.Pix[_bdeb]) {
+			return false
+		}
+	}
+	return true
+}
+
+type Histogramer interface{ Histogram() [256]int }
+
+func (_fggf *Gray16) Validate() error {
+	if len(_fggf.Data) != _fggf.Height*_fggf.BytesPerLine {
+		return ErrInvalidImage
+	}
+	return nil
+}
+
+var _ Image = &Gray16{}
+
+func (_bagf *Gray16) Base() *ImageBase { return &_bagf.ImageBase }
+
+func _faagc(_add _g.Image) (Image, error) {
+	if _ccad, _acec := _add.(*Gray16); _acec {
+		return _ccad.Copy(), nil
+	}
+	_dece := _add.Bounds()
+	_gbae, _eeee := NewImage(_dece.Max.X, _dece.Max.Y, 16, 1, nil, nil, nil)
+	if _eeee != nil {
+		return nil, _eeee
+	}
+	_ccda(_add, _gbae, _dece)
+	return _gbae, nil
+}
+
+func GetConverter(bitsPerComponent, colorComponents int) (ColorConverter, error) {
+	switch colorComponents {
+	case 1:
+		switch bitsPerComponent {
+		case 1:
+			return MonochromeConverter, nil
+		case 2:
+			return Gray2Converter, nil
+		case 4:
+			return Gray4Converter, nil
+		case 8:
+			return GrayConverter, nil
+		case 16:
+			return Gray16Converter, nil
+		}
+	case 3:
+		switch bitsPerComponent {
+		case 4:
+			return NRGBA16Converter, nil
+		case 8:
+			return NRGBAConverter, nil
+		case 16:
+			return NRGBA64Converter, nil
+		}
+	case 4:
+		return CMYKConverter, nil
+	}
+	return nil, _c.Errorf("\u0070\u0072\u006f\u0076\u0069\u0064\u0065\u0064\u0020\u0069\u006e\u0076\u0061l\u0069\u0064\u0020\u0063\u006f\u006c\u006f\u0072\u0043o\u006e\u0076\u0065\u0072\u0074\u0065\u0072\u0020\u0070\u0061\u0072\u0061\u006d\u0065t\u0065\u0072\u0073\u002e\u0020\u0042\u0069\u0074\u0073\u0050\u0065\u0072\u0043\u006f\u006d\u0070\u006f\u006e\u0065\u006e\u0074\u003a\u0020\u0025\u0064\u002c\u0020\u0043\u006f\u006co\u0072\u0043\u006f\u006d\u0070\u006f\u006e\u0065\u006et\u0073\u003a \u0025\u0064", bitsPerComponent, colorComponents)
+}
+
+func (_gegc *NRGBA16) setNRGBA(_agag, _fdbbc, _bgab int, _eaac _e.NRGBA) {
+	if _agag*3%2 == 0 {
+		_gegc.Data[_bgab] = (_eaac.R>>4)<<4 | (_eaac.G >> 4)
+		_gegc.Data[_bgab+1] = (_eaac.B>>4)<<4 | (_gegc.Data[_bgab+1] & 0xf)
+	} else {
+		_gegc.Data[_bgab] = (_gegc.Data[_bgab] & 0xf0) | (_eaac.R >> 4)
+		_gegc.Data[_bgab+1] = (_eaac.G>>4)<<4 | (_eaac.B >> 4)
+	}
+	if _gegc.Alpha != nil {
+		_bddb := _fdbbc * BytesPerLine(_gegc.Width, 4, 1)
+		if _bddb < len(_gegc.Alpha) {
+			if _agag%2 == 0 {
+				_gegc.Alpha[_bddb] = (_eaac.A>>uint(4))<<uint(4) | (_gegc.Alpha[_bgab] & 0xf)
+			} else {
+				_gegc.Alpha[_bddb] = (_gegc.Alpha[_bddb] & 0xf0) | (_eaac.A >> uint(4))
+			}
+		}
+	}
+}
+
+func _aadf(_ebbg _e.CMYK) _e.NRGBA {
+	_ebg, _fdg, _abfa := _e.CMYKToRGB(_ebbg.C, _ebbg.M, _ebbg.Y, _ebbg.K)
+	return _e.NRGBA{R: _ebg, G: _fdg, B: _abfa, A: 0xff}
+}
+
+func _fedc(_agc _g.Image) (Image, error) {
+	if _efff, _gdefb := _agc.(*Gray2); _gdefb {
+		return _efff.Copy(), nil
+	}
+	_gabe := _agc.Bounds()
+	_fdea, _edee := NewImage(_gabe.Max.X, _gabe.Max.Y, 2, 1, nil, nil, nil)
+	if _edee != nil {
+		return nil, _edee
+	}
+	_ccda(_agc, _fdea, _gabe)
+	return _fdea, nil
+}
+
+func (_bac *RGBA32) Set(x, y int, c _e.Color) {
+	_cbgb := y*_bac.Width + x
+	_bccc := 3 * _cbgb
+	if _bccc+2 >= len(_bac.Data) {
+		return
+	}
+	_gfgd := _e.RGBAModel.Convert(c).(_e.RGBA)
+	_bac.setRGBA(_cbgb, _gfgd)
+}
+
+func _bebb() (_fbb [256]uint16) {
+	for _efa := 0; _efa < 256; _efa++ {
+		if _efa&0x01 != 0 {
+			_fbb[_efa] |= 0x3
+		}
+		if _efa&0x02 != 0 {
+			_fbb[_efa] |= 0xc
+		}
+		if _efa&0x04 != 0 {
+			_fbb[_efa] |= 0x30
+		}
+		if _efa&0x08 != 0 {
+			_fbb[_efa] |= 0xc0
+		}
+		if _efa&0x10 != 0 {
+			_fbb[_efa] |= 0x300
+		}
+		if _efa&0x20 != 0 {
+			_fbb[_efa] |= 0xc00
+		}
+		if _efa&0x40 != 0 {
+			_fbb[_efa] |= 0x3000
+		}
+		if _efa&0x80 != 0 {
+			_fbb[_efa] |= 0xc000
+		}
+	}
+	return _fbb
+}
+
+func _dgd(_decf _e.Gray, _gead monochromeModel) _e.Gray {
+	if _decf.Y > uint8(_gead) {
+		return _e.Gray{Y: _b.MaxUint8}
+	}
+	return _e.Gray{}
+}
+
+func _aagc(_egba _g.Image) (Image, error) {
+	if _cafb, _bcgd := _egba.(*Gray8); _bcgd {
+		return _cafb.Copy(), nil
+	}
+	_bbafc := _egba.Bounds()
+	_bdg, _cbef := NewImage(_bbafc.Max.X, _bbafc.Max.Y, 8, 1, nil, nil, nil)
+	if _cbef != nil {
+		return nil, _cbef
+	}
+	_ccda(_egba, _bdg, _bbafc)
+	return _bdg, nil
+}
+
+func _aaa(_gdeedd *Monochrome, _ecbd, _cgce, _cfbg, _baffa int, _beagg RasterOperator, _gbg *Monochrome, _fdbbb, _bfbb int) error {
+	var (
+		_gbef         byte
+		_bec          int
+		_bfaf         int
+		_cbdaf, _baee int
+		_eeeg, _dcaba int
+	)
+	_dbeb := _cfbg >> 3
+	_daead := _cfbg & 7
+	if _daead > 0 {
+		_gbef = _febgc[_daead]
+	}
+	_bec = _gbg.BytesPerLine*_bfbb + (_fdbbb >> 3)
+	_bfaf = _gdeedd.BytesPerLine*_cgce + (_ecbd >> 3)
+	switch _beagg {
+	case PixSrc:
+		for _eeeg = 0; _eeeg < _baffa; _eeeg++ {
+			_cbdaf = _bec + _eeeg*_gbg.BytesPerLine
+			_baee = _bfaf + _eeeg*_gdeedd.BytesPerLine
+			for _dcaba = 0; _dcaba < _dbeb; _dcaba++ {
+				_gdeedd.Data[_baee] = _gbg.Data[_cbdaf]
+				_baee++
+				_cbdaf++
+			}
+			if _daead > 0 {
+				_gdeedd.Data[_baee] = _aaec(_gdeedd.Data[_baee], _gbg.Data[_cbdaf], _gbef)
+			}
+		}
+	case PixNotSrc:
+		for _eeeg = 0; _eeeg < _baffa; _eeeg++ {
+			_cbdaf = _bec + _eeeg*_gbg.BytesPerLine
+			_baee = _bfaf + _eeeg*_gdeedd.BytesPerLine
+			for _dcaba = 0; _dcaba < _dbeb; _dcaba++ {
+				_gdeedd.Data[_baee] = ^(_gbg.Data[_cbdaf])
+				_baee++
+				_cbdaf++
+			}
+			if _daead > 0 {
+				_gdeedd.Data[_baee] = _aaec(_gdeedd.Data[_baee], ^_gbg.Data[_cbdaf], _gbef)
+			}
+		}
+	case PixSrcOrDst:
+		for _eeeg = 0; _eeeg < _baffa; _eeeg++ {
+			_cbdaf = _bec + _eeeg*_gbg.BytesPerLine
+			_baee = _bfaf + _eeeg*_gdeedd.BytesPerLine
+			for _dcaba = 0; _dcaba < _dbeb; _dcaba++ {
+				_gdeedd.Data[_baee] |= _gbg.Data[_cbdaf]
+				_baee++
+				_cbdaf++
+			}
+			if _daead > 0 {
+				_gdeedd.Data[_baee] = _aaec(_gdeedd.Data[_baee], _gbg.Data[_cbdaf]|_gdeedd.Data[_baee], _gbef)
+			}
+		}
+	case PixSrcAndDst:
+		for _eeeg = 0; _eeeg < _baffa; _eeeg++ {
+			_cbdaf = _bec + _eeeg*_gbg.BytesPerLine
+			_baee = _bfaf + _eeeg*_gdeedd.BytesPerLine
+			for _dcaba = 0; _dcaba < _dbeb; _dcaba++ {
+				_gdeedd.Data[_baee] &= _gbg.Data[_cbdaf]
+				_baee++
+				_cbdaf++
+			}
+			if _daead > 0 {
+				_gdeedd.Data[_baee] = _aaec(_gdeedd.Data[_baee], _gbg.Data[_cbdaf]&_gdeedd.Data[_baee], _gbef)
+			}
+		}
+	case PixSrcXorDst:
+		for _eeeg = 0; _eeeg < _baffa; _eeeg++ {
+			_cbdaf = _bec + _eeeg*_gbg.BytesPerLine
+			_baee = _bfaf + _eeeg*_gdeedd.BytesPerLine
+			for _dcaba = 0; _dcaba < _dbeb; _dcaba++ {
+				_gdeedd.Data[_baee] ^= _gbg.Data[_cbdaf]
+				_baee++
+				_cbdaf++
+			}
+			if _daead > 0 {
+				_gdeedd.Data[_baee] = _aaec(_gdeedd.Data[_baee], _gbg.Data[_cbdaf]^_gdeedd.Data[_baee], _gbef)
+			}
+		}
+	case PixNotSrcOrDst:
+		for _eeeg = 0; _eeeg < _baffa; _eeeg++ {
+			_cbdaf = _bec + _eeeg*_gbg.BytesPerLine
+			_baee = _bfaf + _eeeg*_gdeedd.BytesPerLine
+			for _dcaba = 0; _dcaba < _dbeb; _dcaba++ {
+				_gdeedd.Data[_baee] |= ^(_gbg.Data[_cbdaf])
+				_baee++
+				_cbdaf++
+			}
+			if _daead > 0 {
+				_gdeedd.Data[_baee] = _aaec(_gdeedd.Data[_baee], ^(_gbg.Data[_cbdaf])|_gdeedd.Data[_baee], _gbef)
+			}
+		}
+	case PixNotSrcAndDst:
+		for _eeeg = 0; _eeeg < _baffa; _eeeg++ {
+			_cbdaf = _bec + _eeeg*_gbg.BytesPerLine
+			_baee = _bfaf + _eeeg*_gdeedd.BytesPerLine
+			for _dcaba = 0; _dcaba < _dbeb; _dcaba++ {
+				_gdeedd.Data[_baee] &= ^(_gbg.Data[_cbdaf])
+				_baee++
+				_cbdaf++
+			}
+			if _daead > 0 {
+				_gdeedd.Data[_baee] = _aaec(_gdeedd.Data[_baee], ^(_gbg.Data[_cbdaf])&_gdeedd.Data[_baee], _gbef)
+			}
+		}
+	case PixSrcOrNotDst:
+		for _eeeg = 0; _eeeg < _baffa; _eeeg++ {
+			_cbdaf = _bec + _eeeg*_gbg.BytesPerLine
+			_baee = _bfaf + _eeeg*_gdeedd.BytesPerLine
+			for _dcaba = 0; _dcaba < _dbeb; _dcaba++ {
+				_gdeedd.Data[_baee] = _gbg.Data[_cbdaf] | ^(_gdeedd.Data[_baee])
+				_baee++
+				_cbdaf++
+			}
+			if _daead > 0 {
+				_gdeedd.Data[_baee] = _aaec(_gdeedd.Data[_baee], _gbg.Data[_cbdaf]|^(_gdeedd.Data[_baee]), _gbef)
+			}
+		}
+	case PixSrcAndNotDst:
+		for _eeeg = 0; _eeeg < _baffa; _eeeg++ {
+			_cbdaf = _bec + _eeeg*_gbg.BytesPerLine
+			_baee = _bfaf + _eeeg*_gdeedd.BytesPerLine
+			for _dcaba = 0; _dcaba < _dbeb; _dcaba++ {
+				_gdeedd.Data[_baee] = _gbg.Data[_cbdaf] &^ (_gdeedd.Data[_baee])
+				_baee++
+				_cbdaf++
+			}
+			if _daead > 0 {
+				_gdeedd.Data[_baee] = _aaec(_gdeedd.Data[_baee], _gbg.Data[_cbdaf]&^(_gdeedd.Data[_baee]), _gbef)
+			}
+		}
+	case PixNotPixSrcOrDst:
+		for _eeeg = 0; _eeeg < _baffa; _eeeg++ {
+			_cbdaf = _bec + _eeeg*_gbg.BytesPerLine
+			_baee = _bfaf + _eeeg*_gdeedd.BytesPerLine
+			for _dcaba = 0; _dcaba < _dbeb; _dcaba++ {
+				_gdeedd.Data[_baee] = ^(_gbg.Data[_cbdaf] | _gdeedd.Data[_baee])
+				_baee++
+				_cbdaf++
+			}
+			if _daead > 0 {
+				_gdeedd.Data[_baee] = _aaec(_gdeedd.Data[_baee], ^(_gbg.Data[_cbdaf] | _gdeedd.Data[_baee]), _gbef)
+			}
+		}
+	case PixNotPixSrcAndDst:
+		for _eeeg = 0; _eeeg < _baffa; _eeeg++ {
+			_cbdaf = _bec + _eeeg*_gbg.BytesPerLine
+			_baee = _bfaf + _eeeg*_gdeedd.BytesPerLine
+			for _dcaba = 0; _dcaba < _dbeb; _dcaba++ {
+				_gdeedd.Data[_baee] = ^(_gbg.Data[_cbdaf] & _gdeedd.Data[_baee])
+				_baee++
+				_cbdaf++
+			}
+			if _daead > 0 {
+				_gdeedd.Data[_baee] = _aaec(_gdeedd.Data[_baee], ^(_gbg.Data[_cbdaf] & _gdeedd.Data[_baee]), _gbef)
+			}
+		}
+	case PixNotPixSrcXorDst:
+		for _eeeg = 0; _eeeg < _baffa; _eeeg++ {
+			_cbdaf = _bec + _eeeg*_gbg.BytesPerLine
+			_baee = _bfaf + _eeeg*_gdeedd.BytesPerLine
+			for _dcaba = 0; _dcaba < _dbeb; _dcaba++ {
+				_gdeedd.Data[_baee] = ^(_gbg.Data[_cbdaf] ^ _gdeedd.Data[_baee])
+				_baee++
+				_cbdaf++
+			}
+			if _daead > 0 {
+				_gdeedd.Data[_baee] = _aaec(_gdeedd.Data[_baee], ^(_gbg.Data[_cbdaf] ^ _gdeedd.Data[_baee]), _gbef)
+			}
+		}
+	default:
+		_ef.Log.Debug("\u0050\u0072ov\u0069\u0064\u0065d\u0020\u0069\u006e\u0076ali\u0064 r\u0061\u0073\u0074\u0065\u0072\u0020\u006fpe\u0072\u0061\u0074\u006f\u0072\u003a\u0020%\u0076", _beagg)
+		return _fc.New("\u0069\u006e\u0076al\u0069\u0064\u0020\u0072\u0061\u0073\u0074\u0065\u0072\u0020\u006f\u0070\u0065\u0072\u0061\u0074\u006f\u0072")
+	}
+	return nil
+}
+
+func _agfd(_gbc uint) uint {
+	var _baad uint
+	for _gbc != 0 {
+		_gbc >>= 1
+		_baad++
+	}
+	return _baad - 1
+}
+
+var _ Image = &NRGBA32{}
+
+func ImgToBinary(i _g.Image, threshold uint8) *_g.Gray {
+	switch _acac := i.(type) {
+	case *_g.Gray:
+		if _gff(_acac) {
+			return _acac
+		}
+		return _ccgd(_acac, threshold)
+	case *_g.Gray16:
+		return _cdeed(_acac, threshold)
+	default:
+		return _bbfc(_acac, threshold)
+	}
+}
+
+func (_fgf *Gray2) ColorModel() _e.Model { return Gray2Model }
+
+func (_bgdf *ImageBase) setEightBytes(_cecc int, _eafa uint64) error {
+	_aebc := _bgdf.BytesPerLine - (_cecc % _bgdf.BytesPerLine)
+	if _bgdf.BytesPerLine != _bgdf.Width>>3 {
+		_aebc--
+	}
+	if _aebc >= 8 {
+		return _bgdf.setEightFullBytes(_cecc, _eafa)
+	}
+	return _bgdf.setEightPartlyBytes(_cecc, _aebc, _eafa)
+}
+
+type Monochrome struct {
+	ImageBase
+	ModelThreshold uint8
+}
+
+func (_bdea *NRGBA64) SetNRGBA64(x, y int, c _e.NRGBA64) {
+	_fgca := (y*_bdea.Width + x) * 2
+	_gaaef := _fgca * 3
+	if _gaaef+5 >= len(_bdea.Data) {
+		return
+	}
+	_bdea.setNRGBA64(_gaaef, c, _fgca)
+}
+
+func LinearInterpolate(x, xmin, xmax, ymin, ymax float64) float64 {
+	if _b.Abs(xmax-xmin) < 0.000001 {
+		return ymin
+	}
+	_ecee := ymin + (x-xmin)*(ymax-ymin)/(xmax-xmin)
+	return _ecee
+}
+
+type nrgba64 interface {
+	NRGBA64At(_dcca, _fecfg int) _e.NRGBA64
+	SetNRGBA64(_eacd, _gcdcd int, _ceff _e.NRGBA64)
+}
+
+func (_fabd *NRGBA32) Set(x, y int, c _e.Color) {
+	_acgd := y*_fabd.Width + x
+	_deb := 3 * _acgd
+	if _deb+2 >= len(_fabd.Data) {
+		return
+	}
+	_dfda := _e.NRGBAModel.Convert(c).(_e.NRGBA)
+	_fabd.setRGBA(_acgd, _dfda)
+}
+
+func _gagd(_bgdg nrgba64, _cegda RGBA, _fbda _g.Rectangle) {
+	for _abbge := 0; _abbge < _fbda.Max.X; _abbge++ {
+		for _fgfa := 0; _fgfa < _fbda.Max.Y; _fgfa++ {
+			_abaag := _bgdg.NRGBA64At(_abbge, _fgfa)
+			_cegda.SetRGBA(_abbge, _fgfa, _ccd(_abaag))
+		}
+	}
+}
+
+var _ Gray = &Monochrome{}
+
+func _abee(_cedf Gray, _aecgc NRGBA, _gbde _g.Rectangle) {
+	for _cecga := 0; _cecga < _gbde.Max.X; _cecga++ {
+		for _egcc := 0; _egcc < _gbde.Max.Y; _egcc++ {
+			_abeb := _cedf.GrayAt(_cecga, _egcc)
+			_aecgc.SetNRGBA(_cecga, _egcc, _ccbe(_abeb))
+		}
+	}
+}
+
+func _agaa(_cdbca, _effd NRGBA, _afdb _g.Rectangle) {
+	for _fdac := 0; _fdac < _afdb.Max.X; _fdac++ {
+		for _dbdd := 0; _dbdd < _afdb.Max.Y; _dbdd++ {
+			_effd.SetNRGBA(_fdac, _dbdd, _cdbca.NRGBAAt(_fdac, _dbdd))
+		}
+	}
+}
+
+func (_eggd *RGBA32) SetRGBA(x, y int, c _e.RGBA) {
+	_efaag := y*_eggd.Width + x
+	_cfga := 3 * _efaag
+	if _cfga+2 >= len(_eggd.Data) {
+		return
+	}
+	_eggd.setRGBA(_efaag, c)
+}
+
+type RasterOperator int
+
+func _ccbe(_bcb _e.Gray) _e.NRGBA { return _e.NRGBA{R: _bcb.Y, G: _bcb.Y, B: _bcb.Y, A: 0xff} }
+
+func _dccg(_ffbba, _fgbg uint8) uint8 {
+	if _ffbba < _fgbg {
+		return 255
+	}
+	return 0
+}
+
+func (_bfdgg *RGBA32) setRGBA(_cebc int, _edea _e.RGBA) {
+	_bbde := 3 * _cebc
+	_bfdgg.Data[_bbde] = _edea.R
+	_bfdgg.Data[_bbde+1] = _edea.G
+	_bfdgg.Data[_bbde+2] = _edea.B
+	if _cebc < len(_bfdgg.Alpha) {
+		_bfdgg.Alpha[_cebc] = _edea.A
+	}
+}
+
+func _defg(_bgfc nrgba64, _gfc NRGBA, _afcd _g.Rectangle) {
+	for _bced := 0; _bced < _afcd.Max.X; _bced++ {
+		for _eeag := 0; _eeag < _afcd.Max.Y; _eeag++ {
+			_cggd := _bgfc.NRGBA64At(_bced, _eeag)
+			_gfc.SetNRGBA(_bced, _eeag, _cca(_cggd))
+		}
+	}
+}
+
+func (_bcda *NRGBA64) setNRGBA64(_fedg int, _aadda _e.NRGBA64, _bfea int) {
+	_bcda.Data[_fedg] = uint8(_aadda.R >> 8)
+	_bcda.Data[_fedg+1] = uint8(_aadda.R & 0xff)
+	_bcda.Data[_fedg+2] = uint8(_aadda.G >> 8)
+	_bcda.Data[_fedg+3] = uint8(_aadda.G & 0xff)
+	_bcda.Data[_fedg+4] = uint8(_aadda.B >> 8)
+	_bcda.Data[_fedg+5] = uint8(_aadda.B & 0xff)
+	if _bfea+1 < len(_bcda.Alpha) {
+		_bcda.Alpha[_bfea] = uint8(_aadda.A >> 8)
+		_bcda.Alpha[_bfea+1] = uint8(_aadda.A & 0xff)
+	}
+}

@@ -9,104 +9,815 @@
 // Use of this source code is governed by the UniDoc End User License Agreement
 // terms that can be accessed at https://unidoc.io/eula/
 
-package classer ;import (_ca "github.com/unidoc/unipdf/v4/common";_g "github.com/unidoc/unipdf/v4/internal/jbig2/basic";_a "github.com/unidoc/unipdf/v4/internal/jbig2/bitmap";_e "github.com/unidoc/unipdf/v4/internal/jbig2/errors";_d "image";_f "math";);
-func _fde (_dd *_a .Bitmap ,_ag ,_bg ,_bfa ,_dafg int ,_cf *_a .Bitmap )(_bgc _d .Point ,_cbc error ){const _gb ="\u0066i\u006e\u0061\u006c\u0041l\u0069\u0067\u006e\u006d\u0065n\u0074P\u006fs\u0069\u0074\u0069\u006f\u006e\u0069\u006eg";if _dd ==nil {return _bgc ,_e .Error (_gb ,"\u0073\u006f\u0075\u0072ce\u0020\u006e\u006f\u0074\u0020\u0070\u0072\u006f\u0076\u0069\u0064\u0065\u0064");
-};if _cf ==nil {return _bgc ,_e .Error (_gb ,"t\u0065\u006d\u0070\u006cat\u0065 \u006e\u006f\u0074\u0020\u0070r\u006f\u0076\u0069\u0064\u0065\u0064");};_gfa ,_eed :=_cf .Width ,_cf .Height ;_gee ,_agc :=_ag -_bfa -JbAddedPixels ,_bg -_dafg -JbAddedPixels ;
-_ca .Log .Trace ("\u0078\u003a\u0020\u0027\u0025\u0064\u0027\u002c\u0020\u0079\u003a\u0020\u0027\u0025\u0064'\u002c\u0020\u0077\u003a\u0020\u0027\u0025\u0064\u0027\u002c\u0020\u0068\u003a \u0027\u0025\u0064\u0027\u002c\u0020\u0062\u0078\u003a\u0020\u0027\u0025d'\u002c\u0020\u0062\u0079\u003a\u0020\u0027\u0025\u0064\u0027",_ag ,_bg ,_gfa ,_eed ,_gee ,_agc );
-_cdd ,_cbc :=_a .Rect (_gee ,_agc ,_gfa ,_eed );if _cbc !=nil {return _bgc ,_e .Wrap (_cbc ,_gb ,"");};_abg ,_ ,_cbc :=_dd .ClipRectangle (_cdd );if _cbc !=nil {_ca .Log .Error ("\u0043a\u006e\u0027\u0074\u0020\u0063\u006c\u0069\u0070\u0020\u0072\u0065c\u0074\u0061\u006e\u0067\u006c\u0065\u003a\u0020\u0025\u0076",_cdd );
-return _bgc ,_e .Wrap (_cbc ,_gb ,"");};_fc :=_a .New (_abg .Width ,_abg .Height );_bab :=_f .MaxInt32 ;var _agcg ,_ddb ,_bgd ,_gdc ,_gba int ;for _agcg =-1;_agcg <=1;_agcg ++{for _ddb =-1;_ddb <=1;_ddb ++{if _ ,_cbc =_a .Copy (_fc ,_abg );_cbc !=nil {return _bgc ,_e .Wrap (_cbc ,_gb ,"");
-};if _cbc =_fc .RasterOperation (_ddb ,_agcg ,_gfa ,_eed ,_a .PixSrcXorDst ,_cf ,0,0);_cbc !=nil {return _bgc ,_e .Wrap (_cbc ,_gb ,"");};_bgd =_fc .CountPixels ();if _bgd < _bab {_gdc =_ddb ;_gba =_agcg ;_bab =_bgd ;};};};_bgc .X =_gdc ;_bgc .Y =_gba ;
-return _bgc ,nil ;};func (_ba *Classer )verifyMethod (_abb Method )error {if _abb !=RankHaus &&_abb !=Correlation {return _e .Error ("\u0076\u0065\u0072i\u0066\u0079\u004d\u0065\u0074\u0068\u006f\u0064","\u0069\u006e\u0076\u0061li\u0064\u0020\u0063\u006c\u0061\u0073\u0073\u0065\u0072\u0020\u006d\u0065\u0074\u0068o\u0064");
-};return nil ;};func (_daf *Classer )getULCorners (_dg *_a .Bitmap ,_eaa *_a .Boxes )error {const _ga ="\u0067\u0065\u0074U\u004c\u0043\u006f\u0072\u006e\u0065\u0072\u0073";if _dg ==nil {return _e .Error (_ga ,"\u006e\u0069l\u0020\u0069\u006da\u0067\u0065\u0020\u0062\u0069\u0074\u006d\u0061\u0070");
-};if _eaa ==nil {return _e .Error (_ga ,"\u006e\u0069\u006c\u0020\u0062\u006f\u0075\u006e\u0064\u0073");};if _daf .PtaUL ==nil {_daf .PtaUL =&_a .Points {};};_cbf :=len (*_eaa );var (_caa ,_aeg ,_gcg ,_ee int ;_fdc ,_ged ,_ege ,_ggd float32 ;_df error ;
-_gdd *_d .Rectangle ;_ead *_a .Bitmap ;_ec _d .Point ;);for _gef :=0;_gef < _cbf ;_gef ++{_caa =_daf .BaseIndex +_gef ;if _fdc ,_ged ,_df =_daf .CentroidPoints .GetGeometry (_caa );_df !=nil {return _e .Wrap (_df ,_ga ,"\u0043\u0065\u006e\u0074\u0072\u006f\u0069\u0064\u0050o\u0069\u006e\u0074\u0073");
-};if _aeg ,_df =_daf .ClassIDs .Get (_caa );_df !=nil {return _e .Wrap (_df ,_ga ,"\u0043\u006c\u0061s\u0073\u0049\u0044\u0073\u002e\u0047\u0065\u0074");};if _ege ,_ggd ,_df =_daf .CentroidPointsTemplates .GetGeometry (_aeg );_df !=nil {return _e .Wrap (_df ,_ga ,"\u0043\u0065\u006etr\u006f\u0069\u0064\u0050\u006f\u0069\u006e\u0074\u0073\u0054\u0065\u006d\u0070\u006c\u0061\u0074\u0065\u0073");
-};_dba :=_ege -_fdc ;_bc :=_ggd -_ged ;if _dba >=0{_gcg =int (_dba +0.5);}else {_gcg =int (_dba -0.5);};if _bc >=0{_ee =int (_bc +0.5);}else {_ee =int (_bc -0.5);};if _gdd ,_df =_eaa .Get (_gef );_df !=nil {return _e .Wrap (_df ,_ga ,"");};_fb ,_cg :=_gdd .Min .X ,_gdd .Min .Y ;
-_ead ,_df =_daf .UndilatedTemplates .GetBitmap (_aeg );if _df !=nil {return _e .Wrap (_df ,_ga ,"\u0055\u006e\u0064\u0069\u006c\u0061\u0074\u0065\u0064\u0054e\u006d\u0070\u006c\u0061\u0074\u0065\u0073.\u0047\u0065\u0074\u0028\u0069\u0043\u006c\u0061\u0073\u0073\u0029");
-};_ec ,_df =_fde (_dg ,_fb ,_cg ,_gcg ,_ee ,_ead );if _df !=nil {return _e .Wrap (_df ,_ga ,"");};_daf .PtaUL .AddPoint (float32 (_fb -_gcg +_ec .X ),float32 (_cg -_ee +_ec .Y ));};return nil ;};func (_ebd Settings )Validate ()error {const _dbg ="\u0053\u0065\u0074\u0074\u0069\u006e\u0067\u0073\u002e\u0056\u0061\u006ci\u0064\u0061\u0074\u0065";
-if _ebd .Thresh < 0.4||_ebd .Thresh > 0.98{return _e .Error (_dbg ,"\u006a\u0062i\u0067\u0032\u0020\u0065\u006e\u0063\u006f\u0064\u0065\u0072\u0020\u0074\u0068\u0072\u0065\u0073\u0068\u0020\u006e\u006f\u0074\u0020\u0069\u006e\u0020\u0072\u0061\u006e\u0067\u0065\u0020\u005b\u0030\u002e\u0034\u0020\u002d\u0020\u0030\u002e\u0039\u0038\u005d");
-};if _ebd .WeightFactor < 0.0||_ebd .WeightFactor > 1.0{return _e .Error (_dbg ,"\u006a\u0062i\u0067\u0032\u0020\u0065\u006ec\u006f\u0064\u0065\u0072\u0020w\u0065\u0069\u0067\u0068\u0074\u0020\u0066\u0061\u0063\u0074\u006f\u0072\u0020\u006e\u006f\u0074\u0020\u0069\u006e\u0020\u0072\u0061\u006e\u0067\u0065\u0020\u005b\u0030\u002e\u0030\u0020\u002d\u0020\u0031\u002e\u0030\u005d");
-};if _ebd .RankHaus < 0.5||_ebd .RankHaus > 1.0{return _e .Error (_dbg ,"\u006a\u0062\u0069\u0067\u0032\u0020\u0065\u006e\u0063\u006f\u0064\u0065\u0072\u0020\u0072a\u006e\u006b\u0020\u0068\u0061\u0075\u0073\u0020\u0076\u0061\u006c\u0075\u0065 \u006e\u006f\u0074\u0020\u0069\u006e\u0020\u0072\u0061\u006e\u0067\u0065 [\u0030\u002e\u0035\u0020\u002d\u0020\u0031\u002e\u0030\u005d");
-};if _ebd .SizeHaus < 1||_ebd .SizeHaus > 10{return _e .Error (_dbg ,"\u006a\u0062\u0069\u0067\u0032 \u0065\u006e\u0063\u006f\u0064\u0065\u0072\u0020\u0073\u0069\u007a\u0065\u0020h\u0061\u0075\u0073\u0020\u0076\u0061\u006c\u0075\u0065\u0020\u006e\u006f\u0074\u0020\u0069\u006e\u0020\u0072\u0061\u006e\u0067\u0065\u0020\u005b\u0031\u0020\u002d\u0020\u0031\u0030]");
-};switch _ebd .Components {case _a .ComponentConn ,_a .ComponentCharacters ,_a .ComponentWords :default:return _e .Error (_dbg ,"\u0069n\u0076\u0061\u006c\u0069d\u0020\u0063\u006c\u0061\u0073s\u0065r\u0020c\u006f\u006d\u0070\u006f\u006e\u0065\u006et");
-};return nil ;};const (MaxDiffWidth =2;MaxDiffHeight =2;);func (_gbf *Classer )classifyCorrelation (_gbe *_a .Boxes ,_dfc *_a .Bitmaps ,_bfb int )error {const _cc ="\u0063\u006c\u0061\u0073si\u0066\u0079\u0043\u006f\u0072\u0072\u0065\u006c\u0061\u0074\u0069\u006f\u006e";
-if _gbe ==nil {return _e .Error (_cc ,"\u006e\u0065\u0077\u0043\u006f\u006d\u0070\u006f\u006e\u0065\u006e\u0074\u0073\u0020\u0062\u006f\u0075\u006e\u0064\u0069\u006e\u0067\u0020\u0062o\u0078\u0065\u0073\u0020\u006eo\u0074\u0020f\u006f\u0075\u006e\u0064");
-};if _dfc ==nil {return _e .Error (_cc ,"\u006e\u0065wC\u006f\u006d\u0070o\u006e\u0065\u006e\u0074s b\u0069tm\u0061\u0070\u0020\u0061\u0072\u0072\u0061y \u006e\u006f\u0074\u0020\u0066\u006f\u0075n\u0064");};_ce :=len (_dfc .Values );if _ce ==0{_ca .Log .Debug ("\u0063l\u0061\u0073s\u0069\u0066\u0079C\u006f\u0072\u0072\u0065\u006c\u0061\u0074i\u006f\u006e\u0020\u002d\u0020\u0070r\u006f\u0076\u0069\u0064\u0065\u0064\u0020\u0070\u0069\u0078\u0061s\u0020\u0069\u0073\u0020\u0065\u006d\u0070\u0074\u0079");
-return nil ;};var (_fda ,_gfe *_a .Bitmap ;_dbab error ;);_gfeb :=&_a .Bitmaps {Values :make ([]*_a .Bitmap ,_ce )};for _abc ,_fe :=range _dfc .Values {_gfe ,_dbab =_fe .AddBorderGeneral (JbAddedPixels ,JbAddedPixels ,JbAddedPixels ,JbAddedPixels ,0);if _dbab !=nil {return _e .Wrap (_dbab ,_cc ,"");
-};_gfeb .Values [_abc ]=_gfe ;};_cdb :=_gbf .FgTemplates ;_dde :=_a .MakePixelSumTab8 ();_aba :=_a .MakePixelCentroidTab8 ();_cbb :=make ([]int ,_ce );_dff :=make ([][]int ,_ce );_be :=_a .Points (make ([]_a .Point ,_ce ));_aegf :=&_be ;var (_eeb ,_ecc int ;
-_dbb ,_gbec ,_af int ;_ad ,_dga int ;_ac byte ;);for _dab ,_bea :=range _gfeb .Values {_dff [_dab ]=make ([]int ,_bea .Height );_eeb =0;_ecc =0;_gbec =(_bea .Height -1)*_bea .RowStride ;_dbb =0;for _dga =_bea .Height -1;_dga >=0;_dga ,_gbec =_dga -1,_gbec -_bea .RowStride {_dff [_dab ][_dga ]=_dbb ;
-_af =0;for _ad =0;_ad < _bea .RowStride ;_ad ++{_ac =_bea .Data [_gbec +_ad ];_af +=_dde [_ac ];_eeb +=_aba [_ac ]+_ad *8*_dde [_ac ];};_dbb +=_af ;_ecc +=_af *_dga ;};_cbb [_dab ]=_dbb ;if _dbb > 0{(*_aegf )[_dab ]=_a .Point {X :float32 (_eeb )/float32 (_dbb ),Y :float32 (_ecc )/float32 (_dbb )};
-}else {(*_aegf )[_dab ]=_a .Point {X :float32 (_bea .Width )/float32 (2),Y :float32 (_bea .Height )/float32 (2)};};};if _dbab =_gbf .CentroidPoints .Add (_aegf );_dbab !=nil {return _e .Wrap (_dbab ,_cc ,"\u0063\u0065\u006et\u0072\u006f\u0069\u0064\u0020\u0061\u0064\u0064");
-};var (_bb ,_ccc ,_eaf int ;_abab float64 ;_de ,_cec ,_gbfc ,_eab float32 ;_dgf ,_ffc _a .Point ;_gca bool ;_gfbc *similarTemplatesFinder ;_caaa int ;_bed *_a .Bitmap ;_cdbg *_d .Rectangle ;_gcac *_a .Bitmaps ;);for _caaa ,_gfe =range _gfeb .Values {_ccc =_cbb [_caaa ];
-if _de ,_cec ,_dbab =_aegf .GetGeometry (_caaa );_dbab !=nil {return _e .Wrap (_dbab ,_cc ,"\u0070t\u0061\u0020\u002d\u0020\u0069");};_gca =false ;_bad :=len (_gbf .UndilatedTemplates .Values );_gfbc =_beb (_gbf ,_gfe );for _fea :=_gfbc .Next ();_fea > -1;
-{if _bed ,_dbab =_gbf .UndilatedTemplates .GetBitmap (_fea );_dbab !=nil {return _e .Wrap (_dbab ,_cc ,"\u0075\u006e\u0069dl\u0061\u0074\u0065\u0064\u005b\u0069\u0063\u006c\u0061\u0073\u0073\u005d\u0020\u003d\u0020\u0062\u006d\u0032");};if _eaf ,_dbab =_cdb .GetInt (_fea );
-_dbab !=nil {_ca .Log .Trace ("\u0046\u0047\u0020T\u0065\u006d\u0070\u006ca\u0074\u0065\u0020\u005b\u0069\u0063\u006ca\u0073\u0073\u005d\u0020\u0066\u0061\u0069\u006c\u0065\u0064\u003a\u0020\u0025\u0076",_dbab );};if _gbfc ,_eab ,_dbab =_gbf .CentroidPointsTemplates .GetGeometry (_fea );
-_dbab !=nil {return _e .Wrap (_dbab ,_cc ,"\u0043\u0065\u006e\u0074\u0072\u006f\u0069\u0064\u0050\u006f\u0069\u006e\u0074T\u0065\u006d\u0070\u006c\u0061\u0074e\u0073\u005b\u0069\u0063\u006c\u0061\u0073\u0073\u005d\u0020\u003d\u0020\u00782\u002c\u0079\u0032\u0020");
-};if _gbf .Settings .WeightFactor > 0.0{if _bb ,_dbab =_gbf .TemplateAreas .Get (_fea );_dbab !=nil {_ca .Log .Trace ("\u0054\u0065\u006dp\u006c\u0061\u0074\u0065A\u0072\u0065\u0061\u0073\u005b\u0069\u0063l\u0061\u0073\u0073\u005d\u0020\u003d\u0020\u0061\u0072\u0065\u0061\u0020\u0025\u0076",_dbab );
-};_abab =_gbf .Settings .Thresh +(1.0-_gbf .Settings .Thresh )*_gbf .Settings .WeightFactor *float64 (_eaf )/float64 (_bb );}else {_abab =_gbf .Settings .Thresh ;};_dce ,_cfa :=_a .CorrelationScoreThresholded (_gfe ,_bed ,_ccc ,_eaf ,_dgf .X -_ffc .X ,_dgf .Y -_ffc .Y ,MaxDiffWidth ,MaxDiffHeight ,_dde ,_dff [_caaa ],float32 (_abab ));
-if _cfa !=nil {return _e .Wrap (_cfa ,_cc ,"");};if _cge {var (_cbeg ,_daff float64 ;_gff ,_fa int ;);_cbeg ,_cfa =_a .CorrelationScore (_gfe ,_bed ,_ccc ,_eaf ,_de -_gbfc ,_cec -_eab ,MaxDiffWidth ,MaxDiffHeight ,_dde );if _cfa !=nil {return _e .Wrap (_cfa ,_cc ,"d\u0065\u0062\u0075\u0067Co\u0072r\u0065\u006c\u0061\u0074\u0069o\u006e\u0053\u0063\u006f\u0072\u0065");
-};_daff ,_cfa =_a .CorrelationScoreSimple (_gfe ,_bed ,_ccc ,_eaf ,_de -_gbfc ,_cec -_eab ,MaxDiffWidth ,MaxDiffHeight ,_dde );if _cfa !=nil {return _e .Wrap (_cfa ,_cc ,"d\u0065\u0062\u0075\u0067Co\u0072r\u0065\u006c\u0061\u0074\u0069o\u006e\u0053\u0063\u006f\u0072\u0065");
-};_gff =int (_f .Sqrt (_cbeg *float64 (_ccc )*float64 (_eaf )));_fa =int (_f .Sqrt (_daff *float64 (_ccc )*float64 (_eaf )));if (_cbeg >=_abab )!=(_daff >=_abab ){return _e .Errorf (_cc ,"\u0064\u0065\u0062\u0075\u0067\u0020\u0043\u006f\u0072r\u0065\u006c\u0061\u0074\u0069\u006f\u006e\u0020\u0073\u0063\u006f\u0072\u0065\u0020\u006d\u0069\u0073\u006d\u0061\u0074\u0063\u0068\u0020-\u0020\u0025d\u0028\u00250\u002e\u0034\u0066\u002c\u0020\u0025\u0076\u0029\u0020\u0076\u0073\u0020\u0025d(\u0025\u0030\u002e\u0034\u0066\u002c\u0020\u0025\u0076)\u0020\u0025\u0030\u002e\u0034\u0066",_gff ,_cbeg ,_cbeg >=_abab ,_fa ,_daff ,_daff >=_abab ,_cbeg -_daff );
-};if _cbeg >=_abab !=_dce {return _e .Errorf (_cc ,"\u0064\u0065\u0062\u0075\u0067\u0020\u0043o\u0072\u0072\u0065\u006c\u0061\u0074\u0069\u006f\u006e \u0073\u0063\u006f\u0072\u0065 \u004d\u0069\u0073\u006d\u0061t\u0063\u0068 \u0062\u0065\u0074w\u0065\u0065\u006e\u0020\u0063\u006frr\u0065\u006c\u0061\u0074\u0069\u006f\u006e\u0020/\u0020\u0074\u0068\u0072\u0065s\u0068\u006f\u006c\u0064\u002e\u0020\u0043\u006f\u006dpa\u0072\u0069\u0073\u006f\u006e:\u0020\u0025\u0030\u002e\u0034\u0066\u0028\u0025\u0030\u002e\u0034\u0066\u002c\u0020\u0025\u0064\u0029\u0020\u003e\u003d\u0020\u00250\u002e\u0034\u0066\u0028\u0025\u0030\u002e\u0034\u0066\u0029\u0020\u0076\u0073\u0020\u0025\u0076",_cbeg ,_cbeg *float64 (_ccc )*float64 (_eaf ),_gff ,_abab ,float32 (_abab )*float32 (_ccc )*float32 (_eaf ),_dce );
-};};if _dce {_gca =true ;if _cfa =_gbf .ClassIDs .Add (_fea );_cfa !=nil {return _e .Wrap (_cfa ,_cc ,"\u006f\u0076\u0065\u0072\u0054\u0068\u0072\u0065\u0073\u0068\u006f\u006c\u0064");};if _cfa =_gbf .ComponentPageNumbers .Add (_bfb );_cfa !=nil {return _e .Wrap (_cfa ,_cc ,"\u006f\u0076\u0065\u0072\u0054\u0068\u0072\u0065\u0073\u0068\u006f\u006c\u0064");
-};if _gbf .Settings .KeepClassInstances {if _fda ,_cfa =_dfc .GetBitmap (_caaa );_cfa !=nil {return _e .Wrap (_cfa ,_cc ,"\u004b\u0065\u0065\u0070Cl\u0061\u0073\u0073\u0049\u006e\u0073\u0074\u0061\u006e\u0063\u0065\u0073\u0020\u002d \u0069");};if _gcac ,_cfa =_gbf .ClassInstances .GetBitmaps (_fea );
-_cfa !=nil {return _e .Wrap (_cfa ,_cc ,"K\u0065\u0065\u0070\u0043\u006c\u0061s\u0073\u0049\u006e\u0073\u0074\u0061\u006e\u0063\u0065s\u0020\u002d\u0020i\u0043l\u0061\u0073\u0073");};_gcac .AddBitmap (_fda );if _cdbg ,_cfa =_gbe .Get (_caaa );_cfa !=nil {return _e .Wrap (_cfa ,_cc ,"\u004be\u0065p\u0043\u006c\u0061\u0073\u0073I\u006e\u0073t\u0061\u006e\u0063\u0065\u0073");
-};_gcac .AddBox (_cdbg );};break ;};};if !_gca {if _dbab =_gbf .ClassIDs .Add (_bad );_dbab !=nil {return _e .Wrap (_dbab ,_cc ,"\u0021\u0066\u006f\u0075\u006e\u0064");};if _dbab =_gbf .ComponentPageNumbers .Add (_bfb );_dbab !=nil {return _e .Wrap (_dbab ,_cc ,"\u0021\u0066\u006f\u0075\u006e\u0064");
-};_gcac =&_a .Bitmaps {};if _fda ,_dbab =_dfc .GetBitmap (_caaa );_dbab !=nil {return _e .Wrap (_dbab ,_cc ,"\u0021\u0066\u006f\u0075\u006e\u0064");};_gcac .AddBitmap (_fda );_feg ,_bag :=_fda .Width ,_fda .Height ;_bgdd :=uint64 (_bag )*uint64 (_feg );
-_gbf .TemplatesSize .Add (_bgdd ,_bad );if _cdbg ,_dbab =_gbe .Get (_caaa );_dbab !=nil {return _e .Wrap (_dbab ,_cc ,"\u0021\u0066\u006f\u0075\u006e\u0064");};_gcac .AddBox (_cdbg );_gbf .ClassInstances .AddBitmaps (_gcac );_gbf .CentroidPointsTemplates .AddPoint (_de ,_cec );
-_gbf .FgTemplates .AddInt (_ccc );_gbf .UndilatedTemplates .AddBitmap (_fda );_bb =(_gfe .Width -2*JbAddedPixels )*(_gfe .Height -2*JbAddedPixels );if _dbab =_gbf .TemplateAreas .Add (_bb );_dbab !=nil {return _e .Wrap (_dbab ,_cc ,"\u0021\u0066\u006f\u0075\u006e\u0064");
-};};};_gbf .NumberOfClasses =len (_gbf .UndilatedTemplates .Values );return nil ;};func (_aa *Classer )classifyRankHouseOne (_bge *_a .Boxes ,_gfd ,_eb ,_fcd *_a .Bitmaps ,_bfbg *_a .Points ,_gddf int )(_aff error ){const _gage ="\u0043\u006c\u0061\u0073s\u0065\u0072\u002e\u0063\u006c\u0061\u0073\u0073\u0069\u0066y\u0052a\u006e\u006b\u0048\u006f\u0075\u0073\u0065O\u006e\u0065";
-var (_cda ,_egc ,_ffb ,_aad float32 ;_gbd int ;_bde ,_facc ,_cag ,_ebf ,_cgc *_a .Bitmap ;_gce ,_fag bool ;);for _dfe :=0;_dfe < len (_gfd .Values );_dfe ++{_facc =_eb .Values [_dfe ];_cag =_fcd .Values [_dfe ];_cda ,_egc ,_aff =_bfbg .GetGeometry (_dfe );
-if _aff !=nil {return _e .Wrapf (_aff ,_gage ,"\u0066\u0069\u0072\u0073\u0074\u0020\u0067\u0065\u006fm\u0065\u0074\u0072\u0079");};_gec :=len (_aa .UndilatedTemplates .Values );_gce =false ;_age :=_beb (_aa ,_facc );for _gbd =_age .Next ();_gbd > -1;{_ebf ,_aff =_aa .UndilatedTemplates .GetBitmap (_gbd );
-if _aff !=nil {return _e .Wrap (_aff ,_gage ,"\u0062\u006d\u0033");};_cgc ,_aff =_aa .DilatedTemplates .GetBitmap (_gbd );if _aff !=nil {return _e .Wrap (_aff ,_gage ,"\u0062\u006d\u0034");};_ffb ,_aad ,_aff =_aa .CentroidPointsTemplates .GetGeometry (_gbd );
-if _aff !=nil {return _e .Wrap (_aff ,_gage ,"\u0043\u0065\u006e\u0074\u0072\u006f\u0069\u0064\u0054\u0065\u006d\u0070l\u0061\u0074\u0065\u0073");};_fag ,_aff =_a .HausTest (_facc ,_cag ,_ebf ,_cgc ,_cda -_ffb ,_egc -_aad ,MaxDiffWidth ,MaxDiffHeight );
-if _aff !=nil {return _e .Wrap (_aff ,_gage ,"");};if _fag {_gce =true ;if _aff =_aa .ClassIDs .Add (_gbd );_aff !=nil {return _e .Wrap (_aff ,_gage ,"");};if _aff =_aa .ComponentPageNumbers .Add (_gddf );_aff !=nil {return _e .Wrap (_aff ,_gage ,"");};
-if _aa .Settings .KeepClassInstances {_eeg ,_dfb :=_aa .ClassInstances .GetBitmaps (_gbd );if _dfb !=nil {return _e .Wrap (_dfb ,_gage ,"\u004be\u0065\u0070\u0050\u0069\u0078\u0061a");};_bde ,_dfb =_gfd .GetBitmap (_dfe );if _dfb !=nil {return _e .Wrap (_dfb ,_gage ,"\u004be\u0065\u0070\u0050\u0069\u0078\u0061a");
-};_eeg .AddBitmap (_bde );_bff ,_dfb :=_bge .Get (_dfe );if _dfb !=nil {return _e .Wrap (_dfb ,_gage ,"\u004be\u0065\u0070\u0050\u0069\u0078\u0061a");};_eeg .AddBox (_bff );};break ;};};if !_gce {if _aff =_aa .ClassIDs .Add (_gec );_aff !=nil {return _e .Wrap (_aff ,_gage ,"");
-};if _aff =_aa .ComponentPageNumbers .Add (_gddf );_aff !=nil {return _e .Wrap (_aff ,_gage ,"");};_ade :=&_a .Bitmaps {};_bde ,_aff =_gfd .GetBitmap (_dfe );if _aff !=nil {return _e .Wrap (_aff ,_gage ,"\u0021\u0066\u006f\u0075\u006e\u0064");};_ade .Values =append (_ade .Values ,_bde );
-_bdb ,_bbe :=_bde .Width ,_bde .Height ;_aa .TemplatesSize .Add (uint64 (_bbe )*uint64 (_bdb ),_gec );_bdg ,_bcf :=_bge .Get (_dfe );if _bcf !=nil {return _e .Wrap (_bcf ,_gage ,"\u0021\u0066\u006f\u0075\u006e\u0064");};_ade .AddBox (_bdg );_aa .ClassInstances .AddBitmaps (_ade );
-_aa .CentroidPointsTemplates .AddPoint (_cda ,_egc );_aa .UndilatedTemplates .AddBitmap (_facc );_aa .DilatedTemplates .AddBitmap (_cag );};};return nil ;};func Init (settings Settings )(*Classer ,error ){const _gc ="\u0063\u006c\u0061s\u0073\u0065\u0072\u002e\u0049\u006e\u0069\u0074";
-_ab :=&Classer {Settings :settings ,Widths :map[int ]int {},Heights :map[int ]int {},TemplatesSize :_g .IntsMap {},TemplateAreas :&_g .IntSlice {},ComponentPageNumbers :&_g .IntSlice {},ClassIDs :&_g .IntSlice {},ComponentsNumber :&_g .IntSlice {},CentroidPoints :&_a .Points {},CentroidPointsTemplates :&_a .Points {},UndilatedTemplates :&_a .Bitmaps {},DilatedTemplates :&_a .Bitmaps {},ClassInstances :&_a .BitmapsArray {},FgTemplates :&_g .NumSlice {}};
-if _ae :=_ab .Settings .Validate ();_ae !=nil {return nil ,_e .Wrap (_ae ,_gc ,"");};return _ab ,nil ;};func (_ccg *Classer )classifyRankHouseNonOne (_cgd *_a .Boxes ,_dfef ,_fcb ,_afb *_a .Bitmaps ,_agec *_a .Points ,_ef *_g .NumSlice ,_adc int )(_gffe error ){const _ffa ="\u0043\u006c\u0061\u0073s\u0065\u0072\u002e\u0063\u006c\u0061\u0073\u0073\u0069\u0066y\u0052a\u006e\u006b\u0048\u006f\u0075\u0073\u0065O\u006e\u0065";
-var (_bda ,_bcc ,_egg ,_gfc float32 ;_abgb ,_caad ,_ccf int ;_fdf ,_ace ,_gaga ,_gbc ,_gddd *_a .Bitmap ;_eafd ,_efc bool ;);_eafdg :=_a .MakePixelSumTab8 ();for _cce :=0;_cce < len (_dfef .Values );_cce ++{if _ace ,_gffe =_fcb .GetBitmap (_cce );_gffe !=nil {return _e .Wrap (_gffe ,_ffa ,"b\u006d\u0073\u0031\u002e\u0047\u0065\u0074\u0028\u0069\u0029");
-};if _abgb ,_gffe =_ef .GetInt (_cce );_gffe !=nil {_ca .Log .Trace ("\u0047\u0065t\u0074\u0069\u006e\u0067 \u0046\u0047T\u0065\u006d\u0070\u006c\u0061\u0074\u0065\u0073 \u0061\u0074\u003a\u0020\u0025\u0064\u0020\u0066\u0061\u0069\u006c\u0065d\u003a\u0020\u0025\u0076",_cce ,_gffe );
-};if _gaga ,_gffe =_afb .GetBitmap (_cce );_gffe !=nil {return _e .Wrap (_gffe ,_ffa ,"b\u006d\u0073\u0032\u002e\u0047\u0065\u0074\u0028\u0069\u0029");};if _bda ,_bcc ,_gffe =_agec .GetGeometry (_cce );_gffe !=nil {return _e .Wrapf (_gffe ,_ffa ,"\u0070t\u0061[\u0069\u005d\u002e\u0047\u0065\u006f\u006d\u0065\u0074\u0072\u0079");
-};_fce :=len (_ccg .UndilatedTemplates .Values );_eafd =false ;_cdbad :=_beb (_ccg ,_ace );for _ccf =_cdbad .Next ();_ccf > -1;{if _gbc ,_gffe =_ccg .UndilatedTemplates .GetBitmap (_ccf );_gffe !=nil {return _e .Wrap (_gffe ,_ffa ,"\u0070\u0069\u0078\u0061\u0074\u002e\u005b\u0069\u0043l\u0061\u0073\u0073\u005d");
-};if _caad ,_gffe =_ccg .FgTemplates .GetInt (_ccf );_gffe !=nil {_ca .Log .Trace ("\u0047\u0065\u0074\u0074\u0069\u006eg\u0020\u0046\u0047\u0054\u0065\u006d\u0070\u006c\u0061\u0074\u0065\u005b\u0025d\u005d\u0020\u0066\u0061\u0069\u006c\u0065d\u003a\u0020\u0025\u0076",_ccf ,_gffe );
-};if _gddd ,_gffe =_ccg .DilatedTemplates .GetBitmap (_ccf );_gffe !=nil {return _e .Wrap (_gffe ,_ffa ,"\u0070\u0069\u0078\u0061\u0074\u0064\u005b\u0069\u0043l\u0061\u0073\u0073\u005d");};if _egg ,_gfc ,_gffe =_ccg .CentroidPointsTemplates .GetGeometry (_ccf );
-_gffe !=nil {return _e .Wrap (_gffe ,_ffa ,"\u0043\u0065\u006et\u0072\u006f\u0069\u0064P\u006f\u0069\u006e\u0074\u0073\u0054\u0065m\u0070\u006c\u0061\u0074\u0065\u0073\u005b\u0069\u0043\u006c\u0061\u0073\u0073\u005d");};_efc ,_gffe =_a .RankHausTest (_ace ,_gaga ,_gbc ,_gddd ,_bda -_egg ,_bcc -_gfc ,MaxDiffWidth ,MaxDiffHeight ,_abgb ,_caad ,float32 (_ccg .Settings .RankHaus ),_eafdg );
-if _gffe !=nil {return _e .Wrap (_gffe ,_ffa ,"");};if _efc {_eafd =true ;if _gffe =_ccg .ClassIDs .Add (_ccf );_gffe !=nil {return _e .Wrap (_gffe ,_ffa ,"");};if _gffe =_ccg .ComponentPageNumbers .Add (_adc );_gffe !=nil {return _e .Wrap (_gffe ,_ffa ,"");
-};if _ccg .Settings .KeepClassInstances {_bae ,_aag :=_ccg .ClassInstances .GetBitmaps (_ccf );if _aag !=nil {return _e .Wrap (_aag ,_ffa ,"\u0063\u002e\u0050\u0069\u0078\u0061\u0061\u002e\u0047\u0065\u0074B\u0069\u0074\u006d\u0061\u0070\u0073\u0028\u0069\u0043\u006ca\u0073\u0073\u0029");
-};if _fdf ,_aag =_dfef .GetBitmap (_cce );_aag !=nil {return _e .Wrap (_aag ,_ffa ,"\u0070i\u0078\u0061\u005b\u0069\u005d");};_bae .Values =append (_bae .Values ,_fdf );_cee ,_aag :=_cgd .Get (_cce );if _aag !=nil {return _e .Wrap (_aag ,_ffa ,"b\u006f\u0078\u0061\u002e\u0047\u0065\u0074\u0028\u0069\u0029");
-};_bae .Boxes =append (_bae .Boxes ,_cee );};break ;};};if !_eafd {if _gffe =_ccg .ClassIDs .Add (_fce );_gffe !=nil {return _e .Wrap (_gffe ,_ffa ,"\u0021\u0066\u006f\u0075\u006e\u0064");};if _gffe =_ccg .ComponentPageNumbers .Add (_adc );_gffe !=nil {return _e .Wrap (_gffe ,_ffa ,"\u0021\u0066\u006f\u0075\u006e\u0064");
-};_afe :=&_a .Bitmaps {};_fdf =_dfef .Values [_cce ];_afe .AddBitmap (_fdf );_ffaa ,_fcg :=_fdf .Width ,_fdf .Height ;_ccg .TemplatesSize .Add (uint64 (_ffaa )*uint64 (_fcg ),_fce );_aec ,_abd :=_cgd .Get (_cce );if _abd !=nil {return _e .Wrap (_abd ,_ffa ,"\u0021\u0066\u006f\u0075\u006e\u0064");
-};_afe .AddBox (_aec );_ccg .ClassInstances .AddBitmaps (_afe );_ccg .CentroidPointsTemplates .AddPoint (_bda ,_bcc );_ccg .UndilatedTemplates .AddBitmap (_ace );_ccg .DilatedTemplates .AddBitmap (_gaga );_ccg .FgTemplates .AddInt (_abgb );};};_ccg .NumberOfClasses =len (_ccg .UndilatedTemplates .Values );
-return nil ;};func (_bgca *Settings )SetDefault (){if _bgca .MaxCompWidth ==0{switch _bgca .Components {case _a .ComponentConn :_bgca .MaxCompWidth =MaxConnCompWidth ;case _a .ComponentCharacters :_bgca .MaxCompWidth =MaxCharCompWidth ;case _a .ComponentWords :_bgca .MaxCompWidth =MaxWordCompWidth ;
-};};if _bgca .MaxCompHeight ==0{_bgca .MaxCompHeight =MaxCompHeight ;};if _bgca .Thresh ==0.0{_bgca .Thresh =0.9;};if _bgca .WeightFactor ==0.0{_bgca .WeightFactor =0.75;};if _bgca .RankHaus ==0.0{_bgca .RankHaus =0.97;};if _bgca .SizeHaus ==0{_bgca .SizeHaus =2;
-};};type Classer struct{BaseIndex int ;Settings Settings ;ComponentsNumber *_g .IntSlice ;TemplateAreas *_g .IntSlice ;Widths map[int ]int ;Heights map[int ]int ;NumberOfClasses int ;ClassInstances *_a .BitmapsArray ;UndilatedTemplates *_a .Bitmaps ;DilatedTemplates *_a .Bitmaps ;
-TemplatesSize _g .IntsMap ;FgTemplates *_g .NumSlice ;CentroidPoints *_a .Points ;CentroidPointsTemplates *_a .Points ;ClassIDs *_g .IntSlice ;ComponentPageNumbers *_g .IntSlice ;PtaUL *_a .Points ;PtaLL *_a .Points ;};const (RankHaus Method =iota ;Correlation ;
-);func (_ffd *Classer )ComputeLLCorners ()(_gfb error ){const _cb ="\u0043l\u0061\u0073\u0073\u0065\u0072\u002e\u0043\u006f\u006d\u0070\u0075t\u0065\u004c\u004c\u0043\u006f\u0072\u006e\u0065\u0072\u0073";if _ffd .PtaUL ==nil {return _e .Error (_cb ,"\u0055\u004c\u0020\u0043or\u006e\u0065\u0072\u0073\u0020\u006e\u006f\u0074\u0020\u0064\u0065\u0066\u0069\u006ee\u0064");
-};_eg :=len (*_ffd .PtaUL );_ffd .PtaLL =&_a .Points {};var (_cad ,_ea float32 ;_bf ,_gd int ;_cbe *_a .Bitmap ;);for _da :=0;_da < _eg ;_da ++{_cad ,_ea ,_gfb =_ffd .PtaUL .GetGeometry (_da );if _gfb !=nil {_ca .Log .Debug ("\u0047e\u0074\u0074\u0069\u006e\u0067\u0020\u0050\u0074\u0061\u0055\u004c \u0066\u0061\u0069\u006c\u0065\u0064\u003a\u0020\u0025\u0076",_gfb );
-return _e .Wrap (_gfb ,_cb ,"\u0050\u0074\u0061\u0055\u004c\u0020\u0047\u0065\u006fm\u0065\u0074\u0072\u0079");};_bf ,_gfb =_ffd .ClassIDs .Get (_da );if _gfb !=nil {_ca .Log .Debug ("\u0047\u0065\u0074\u0074\u0069\u006e\u0067\u0020\u0043\u006c\u0061s\u0073\u0049\u0044\u0020\u0066\u0061\u0069\u006c\u0065\u0064:\u0020\u0025\u0076",_gfb );
-return _e .Wrap (_gfb ,_cb ,"\u0043l\u0061\u0073\u0073\u0049\u0044");};_cbe ,_gfb =_ffd .UndilatedTemplates .GetBitmap (_bf );if _gfb !=nil {_ca .Log .Debug ("\u0047\u0065t\u0074\u0069\u006e\u0067 \u0055\u006ed\u0069\u006c\u0061\u0074\u0065\u0064\u0054\u0065m\u0070\u006c\u0061\u0074\u0065\u0073\u0020\u0066\u0061\u0069\u006c\u0065d\u003a\u0020\u0025\u0076",_gfb );
-return _e .Wrap (_gfb ,_cb ,"\u0055\u006e\u0064\u0069la\u0074\u0065\u0064\u0020\u0054\u0065\u006d\u0070\u006c\u0061\u0074\u0065\u0073");};_gd =_cbe .Height ;_ffd .PtaLL .AddPoint (_cad ,_ea +float32 (_gd ));};return nil ;};func (_fed *Classer )classifyRankHaus (_gbee *_a .Boxes ,_dbc *_a .Bitmaps ,_gag int )error {const _babf ="\u0063\u006ca\u0073\u0073\u0069f\u0079\u0052\u0061\u006e\u006b\u0048\u0061\u0075\u0073";
-if _gbee ==nil {return _e .Error (_babf ,"\u0062\u006fx\u0061\u0020\u006eo\u0074\u0020\u0064\u0065\u0066\u0069\u006e\u0065\u0064");};if _dbc ==nil {return _e .Error (_babf ,"\u0070\u0069x\u0061\u0020\u006eo\u0074\u0020\u0064\u0065\u0066\u0069\u006e\u0065\u0064");
-};_fac :=len (_dbc .Values );if _fac ==0{return _e .Error (_babf ,"e\u006dp\u0074\u0079\u0020\u006e\u0065\u0077\u0020\u0063o\u006d\u0070\u006f\u006een\u0074\u0073");};_babe :=_dbc .CountPixels ();_bac :=_fed .Settings .SizeHaus ;_eac :=_a .SelCreateBrick (_bac ,_bac ,_bac /2,_bac /2,_a .SelHit );
-_fgd :=&_a .Bitmaps {Values :make ([]*_a .Bitmap ,_fac )};_gdcg :=&_a .Bitmaps {Values :make ([]*_a .Bitmap ,_fac )};var (_fff ,_eag ,_cdba *_a .Bitmap ;_dgfc error ;);for _ddd :=0;_ddd < _fac ;_ddd ++{_fff ,_dgfc =_dbc .GetBitmap (_ddd );if _dgfc !=nil {return _e .Wrap (_dgfc ,_babf ,"");
-};_eag ,_dgfc =_fff .AddBorderGeneral (JbAddedPixels ,JbAddedPixels ,JbAddedPixels ,JbAddedPixels ,0);if _dgfc !=nil {return _e .Wrap (_dgfc ,_babf ,"");};_cdba ,_dgfc =_a .Dilate (nil ,_eag ,_eac );if _dgfc !=nil {return _e .Wrap (_dgfc ,_babf ,"");};
-_fgd .Values [_fac ]=_eag ;_gdcg .Values [_fac ]=_cdba ;};_ded ,_dgfc :=_a .Centroids (_fgd .Values );if _dgfc !=nil {return _e .Wrap (_dgfc ,_babf ,"");};if _dgfc =_ded .Add (_fed .CentroidPoints );_dgfc !=nil {_ca .Log .Trace ("\u004e\u006f\u0020\u0063en\u0074\u0072\u006f\u0069\u0064\u0073\u0020\u0074\u006f\u0020\u0061\u0064\u0064");
-};if _fed .Settings .RankHaus ==1.0{_dgfc =_fed .classifyRankHouseOne (_gbee ,_dbc ,_fgd ,_gdcg ,_ded ,_gag );}else {_dgfc =_fed .classifyRankHouseNonOne (_gbee ,_dbc ,_fgd ,_gdcg ,_ded ,_babe ,_gag );};if _dgfc !=nil {return _e .Wrap (_dgfc ,_babf ,"");
-};return nil ;};type Settings struct{MaxCompWidth int ;MaxCompHeight int ;SizeHaus int ;RankHaus float64 ;Thresh float64 ;WeightFactor float64 ;KeepClassInstances bool ;Components _a .Component ;Method Method ;};const (MaxConnCompWidth =350;MaxCharCompWidth =350;
-MaxWordCompWidth =1000;MaxCompHeight =120;);func (_ceg *similarTemplatesFinder )Next ()int {var (_edb ,_eaab ,_abf ,_fbe int ;_edbc bool ;_cba *_a .Bitmap ;_aaga error ;);for {if _ceg .Index >=25{return -1;};_eaab =_ceg .Width +TwoByTwoWalk [2*_ceg .Index ];
-_edb =_ceg .Height +TwoByTwoWalk [2*_ceg .Index +1];if _edb < 1||_eaab < 1{_ceg .Index ++;continue ;};if len (_ceg .CurrentNumbers )==0{_ceg .CurrentNumbers ,_edbc =_ceg .Classer .TemplatesSize .GetSlice (uint64 (_eaab )*uint64 (_edb ));if !_edbc {_ceg .Index ++;
-continue ;};_ceg .N =0;};_abf =len (_ceg .CurrentNumbers );for ;_ceg .N < _abf ;_ceg .N ++{_fbe =_ceg .CurrentNumbers [_ceg .N ];_cba ,_aaga =_ceg .Classer .DilatedTemplates .GetBitmap (_fbe );if _aaga !=nil {_ca .Log .Debug ("\u0046\u0069\u006e\u0064\u004e\u0065\u0078\u0074\u0054\u0065\u006d\u0070\u006c\u0061\u0074\u0065\u003a\u0020\u0074\u0065\u006d\u0070\u006c\u0061t\u0065\u0020\u006e\u006f\u0074 \u0066\u006fu\u006e\u0064\u003a\u0020");
-return 0;};if _cba .Width -2*JbAddedPixels ==_eaab &&_cba .Height -2*JbAddedPixels ==_edb {return _fbe ;};};_ceg .Index ++;_ceg .CurrentNumbers =nil ;};};const JbAddedPixels =6;type similarTemplatesFinder struct{Classer *Classer ;Width int ;Height int ;
-Index int ;CurrentNumbers []int ;N int ;};func (_fd *Classer )addPageComponents (_dc *_a .Bitmap ,_gg *_a .Boxes ,_cd *_a .Bitmaps ,_db int ,_ed Method )error {const _gcf ="\u0043l\u0061\u0073\u0073\u0065r\u002e\u0041\u0064\u0064\u0050a\u0067e\u0043o\u006d\u0070\u006f\u006e\u0065\u006e\u0074s";
-if _dc ==nil {return _e .Error (_gcf ,"\u006e\u0069\u006c\u0020\u0069\u006e\u0070\u0075\u0074 \u0070\u0061\u0067\u0065");};if _gg ==nil ||_cd ==nil ||len (*_gg )==0{_ca .Log .Trace ("\u0041\u0064\u0064P\u0061\u0067\u0065\u0043\u006f\u006d\u0070\u006f\u006e\u0065\u006e\u0074\u0073\u003a\u0020\u0025\u0073\u002e\u0020\u004e\u006f\u0020\u0063\u006f\u006d\u0070\u006f\u006e\u0065n\u0074\u0073\u0020\u0066\u006f\u0075\u006e\u0064",_dc );
-return nil ;};var _cbee error ;switch _ed {case RankHaus :_cbee =_fd .classifyRankHaus (_gg ,_cd ,_db );case Correlation :_cbee =_fd .classifyCorrelation (_gg ,_cd ,_db );default:_ca .Log .Debug ("\u0055\u006ek\u006e\u006f\u0077\u006e\u0020\u0063\u006c\u0061\u0073\u0073\u0069\u0066\u0079\u0020\u006d\u0065\u0074\u0068\u006f\u0064\u003a\u0020'%\u0076\u0027",_ed );
-return _e .Error (_gcf ,"\u0075\u006e\u006bno\u0077\u006e\u0020\u0063\u006c\u0061\u0073\u0073\u0069\u0066\u0079\u0020\u006d\u0065\u0074\u0068\u006f\u0064");};if _cbee !=nil {return _e .Wrap (_cbee ,_gcf ,"");};if _cbee =_fd .getULCorners (_dc ,_gg );_cbee !=nil {return _e .Wrap (_cbee ,_gcf ,"");
-};_fg :=len (*_gg );_fd .BaseIndex +=_fg ;if _cbee =_fd .ComponentsNumber .Add (_fg );_cbee !=nil {return _e .Wrap (_cbee ,_gcf ,"");};return nil ;};var _cge bool ;var TwoByTwoWalk =[]int {0,0,0,1,-1,0,0,-1,1,0,-1,1,1,1,-1,-1,1,-1,0,-2,2,0,0,2,-2,0,-1,-2,1,-2,2,-1,2,1,1,2,-1,2,-2,1,-2,-1,-2,-2,2,-2,2,2,-2,2};
-func (_b *Classer )AddPage (inputPage *_a .Bitmap ,pageNumber int ,method Method )(_gf error ){const _ge ="\u0043l\u0061s\u0073\u0065\u0072\u002e\u0041\u0064\u0064\u0050\u0061\u0067\u0065";_b .Widths [pageNumber ]=inputPage .Width ;_b .Heights [pageNumber ]=inputPage .Height ;
-if _gf =_b .verifyMethod (method );_gf !=nil {return _e .Wrap (_gf ,_ge ,"");};_ff ,_gcb ,_gf :=inputPage .GetComponents (_b .Settings .Components ,_b .Settings .MaxCompWidth ,_b .Settings .MaxCompHeight );if _gf !=nil {return _e .Wrap (_gf ,_ge ,"");};
-_ca .Log .Debug ("\u0043\u006f\u006d\u0070\u006f\u006e\u0065\u006e\u0074s\u003a\u0020\u0025\u0076",_ff );if _gf =_b .addPageComponents (inputPage ,_gcb ,_ff ,pageNumber ,method );_gf !=nil {return _e .Wrap (_gf ,_ge ,"");};return nil ;};func DefaultSettings ()Settings {_facb :=&Settings {};
-_facb .SetDefault ();return *_facb };type Method int ;func _beb (_fegg *Classer ,_affg *_a .Bitmap )*similarTemplatesFinder {return &similarTemplatesFinder {Width :_affg .Width ,Height :_affg .Height ,Classer :_fegg };};
+package classer
+
+import (
+	_ca "github.com/szwede/unipdf/v4/common"
+	_g "github.com/szwede/unipdf/v4/internal/jbig2/basic"
+	_a "github.com/szwede/unipdf/v4/internal/jbig2/bitmap"
+	_e "github.com/szwede/unipdf/v4/internal/jbig2/errors"
+	_d "image"
+	_f "math"
+)
+
+func _fde(_dd *_a.Bitmap, _ag, _bg, _bfa, _dafg int, _cf *_a.Bitmap) (_bgc _d.Point, _cbc error) {
+	const _gb = "\u0066i\u006e\u0061\u006c\u0041l\u0069\u0067\u006e\u006d\u0065n\u0074P\u006fs\u0069\u0074\u0069\u006f\u006e\u0069\u006eg"
+	if _dd == nil {
+		return _bgc, _e.Error(_gb, "\u0073\u006f\u0075\u0072ce\u0020\u006e\u006f\u0074\u0020\u0070\u0072\u006f\u0076\u0069\u0064\u0065\u0064")
+	}
+	if _cf == nil {
+		return _bgc, _e.Error(_gb, "t\u0065\u006d\u0070\u006cat\u0065 \u006e\u006f\u0074\u0020\u0070r\u006f\u0076\u0069\u0064\u0065\u0064")
+	}
+	_gfa, _eed := _cf.Width, _cf.Height
+	_gee, _agc := _ag-_bfa-JbAddedPixels, _bg-_dafg-JbAddedPixels
+	_ca.Log.Trace("\u0078\u003a\u0020\u0027\u0025\u0064\u0027\u002c\u0020\u0079\u003a\u0020\u0027\u0025\u0064'\u002c\u0020\u0077\u003a\u0020\u0027\u0025\u0064\u0027\u002c\u0020\u0068\u003a \u0027\u0025\u0064\u0027\u002c\u0020\u0062\u0078\u003a\u0020\u0027\u0025d'\u002c\u0020\u0062\u0079\u003a\u0020\u0027\u0025\u0064\u0027", _ag, _bg, _gfa, _eed, _gee, _agc)
+	_cdd, _cbc := _a.Rect(_gee, _agc, _gfa, _eed)
+	if _cbc != nil {
+		return _bgc, _e.Wrap(_cbc, _gb, "")
+	}
+	_abg, _, _cbc := _dd.ClipRectangle(_cdd)
+	if _cbc != nil {
+		_ca.Log.Error("\u0043a\u006e\u0027\u0074\u0020\u0063\u006c\u0069\u0070\u0020\u0072\u0065c\u0074\u0061\u006e\u0067\u006c\u0065\u003a\u0020\u0025\u0076", _cdd)
+		return _bgc, _e.Wrap(_cbc, _gb, "")
+	}
+	_fc := _a.New(_abg.Width, _abg.Height)
+	_bab := _f.MaxInt32
+	var _agcg, _ddb, _bgd, _gdc, _gba int
+	for _agcg = -1; _agcg <= 1; _agcg++ {
+		for _ddb = -1; _ddb <= 1; _ddb++ {
+			if _, _cbc = _a.Copy(_fc, _abg); _cbc != nil {
+				return _bgc, _e.Wrap(_cbc, _gb, "")
+			}
+			if _cbc = _fc.RasterOperation(_ddb, _agcg, _gfa, _eed, _a.PixSrcXorDst, _cf, 0, 0); _cbc != nil {
+				return _bgc, _e.Wrap(_cbc, _gb, "")
+			}
+			_bgd = _fc.CountPixels()
+			if _bgd < _bab {
+				_gdc = _ddb
+				_gba = _agcg
+				_bab = _bgd
+			}
+		}
+	}
+	_bgc.X = _gdc
+	_bgc.Y = _gba
+	return _bgc, nil
+}
+
+func (_ba *Classer) verifyMethod(_abb Method) error {
+	if _abb != RankHaus && _abb != Correlation {
+		return _e.Error("\u0076\u0065\u0072i\u0066\u0079\u004d\u0065\u0074\u0068\u006f\u0064", "\u0069\u006e\u0076\u0061li\u0064\u0020\u0063\u006c\u0061\u0073\u0073\u0065\u0072\u0020\u006d\u0065\u0074\u0068o\u0064")
+	}
+	return nil
+}
+
+func (_daf *Classer) getULCorners(_dg *_a.Bitmap, _eaa *_a.Boxes) error {
+	const _ga = "\u0067\u0065\u0074U\u004c\u0043\u006f\u0072\u006e\u0065\u0072\u0073"
+	if _dg == nil {
+		return _e.Error(_ga, "\u006e\u0069l\u0020\u0069\u006da\u0067\u0065\u0020\u0062\u0069\u0074\u006d\u0061\u0070")
+	}
+	if _eaa == nil {
+		return _e.Error(_ga, "\u006e\u0069\u006c\u0020\u0062\u006f\u0075\u006e\u0064\u0073")
+	}
+	if _daf.PtaUL == nil {
+		_daf.PtaUL = &_a.Points{}
+	}
+	_cbf := len(*_eaa)
+	var (
+		_caa, _aeg, _gcg, _ee  int
+		_fdc, _ged, _ege, _ggd float32
+		_df                    error
+		_gdd                   *_d.Rectangle
+		_ead                   *_a.Bitmap
+		_ec                    _d.Point
+	)
+	for _gef := 0; _gef < _cbf; _gef++ {
+		_caa = _daf.BaseIndex + _gef
+		if _fdc, _ged, _df = _daf.CentroidPoints.GetGeometry(_caa); _df != nil {
+			return _e.Wrap(_df, _ga, "\u0043\u0065\u006e\u0074\u0072\u006f\u0069\u0064\u0050o\u0069\u006e\u0074\u0073")
+		}
+		if _aeg, _df = _daf.ClassIDs.Get(_caa); _df != nil {
+			return _e.Wrap(_df, _ga, "\u0043\u006c\u0061s\u0073\u0049\u0044\u0073\u002e\u0047\u0065\u0074")
+		}
+		if _ege, _ggd, _df = _daf.CentroidPointsTemplates.GetGeometry(_aeg); _df != nil {
+			return _e.Wrap(_df, _ga, "\u0043\u0065\u006etr\u006f\u0069\u0064\u0050\u006f\u0069\u006e\u0074\u0073\u0054\u0065\u006d\u0070\u006c\u0061\u0074\u0065\u0073")
+		}
+		_dba := _ege - _fdc
+		_bc := _ggd - _ged
+		if _dba >= 0 {
+			_gcg = int(_dba + 0.5)
+		} else {
+			_gcg = int(_dba - 0.5)
+		}
+		if _bc >= 0 {
+			_ee = int(_bc + 0.5)
+		} else {
+			_ee = int(_bc - 0.5)
+		}
+		if _gdd, _df = _eaa.Get(_gef); _df != nil {
+			return _e.Wrap(_df, _ga, "")
+		}
+		_fb, _cg := _gdd.Min.X, _gdd.Min.Y
+		_ead, _df = _daf.UndilatedTemplates.GetBitmap(_aeg)
+		if _df != nil {
+			return _e.Wrap(_df, _ga, "\u0055\u006e\u0064\u0069\u006c\u0061\u0074\u0065\u0064\u0054e\u006d\u0070\u006c\u0061\u0074\u0065\u0073.\u0047\u0065\u0074\u0028\u0069\u0043\u006c\u0061\u0073\u0073\u0029")
+		}
+		_ec, _df = _fde(_dg, _fb, _cg, _gcg, _ee, _ead)
+		if _df != nil {
+			return _e.Wrap(_df, _ga, "")
+		}
+		_daf.PtaUL.AddPoint(float32(_fb-_gcg+_ec.X), float32(_cg-_ee+_ec.Y))
+	}
+	return nil
+}
+
+func (_ebd Settings) Validate() error {
+	const _dbg = "\u0053\u0065\u0074\u0074\u0069\u006e\u0067\u0073\u002e\u0056\u0061\u006ci\u0064\u0061\u0074\u0065"
+	if _ebd.Thresh < 0.4 || _ebd.Thresh > 0.98 {
+		return _e.Error(_dbg, "\u006a\u0062i\u0067\u0032\u0020\u0065\u006e\u0063\u006f\u0064\u0065\u0072\u0020\u0074\u0068\u0072\u0065\u0073\u0068\u0020\u006e\u006f\u0074\u0020\u0069\u006e\u0020\u0072\u0061\u006e\u0067\u0065\u0020\u005b\u0030\u002e\u0034\u0020\u002d\u0020\u0030\u002e\u0039\u0038\u005d")
+	}
+	if _ebd.WeightFactor < 0.0 || _ebd.WeightFactor > 1.0 {
+		return _e.Error(_dbg, "\u006a\u0062i\u0067\u0032\u0020\u0065\u006ec\u006f\u0064\u0065\u0072\u0020w\u0065\u0069\u0067\u0068\u0074\u0020\u0066\u0061\u0063\u0074\u006f\u0072\u0020\u006e\u006f\u0074\u0020\u0069\u006e\u0020\u0072\u0061\u006e\u0067\u0065\u0020\u005b\u0030\u002e\u0030\u0020\u002d\u0020\u0031\u002e\u0030\u005d")
+	}
+	if _ebd.RankHaus < 0.5 || _ebd.RankHaus > 1.0 {
+		return _e.Error(_dbg, "\u006a\u0062\u0069\u0067\u0032\u0020\u0065\u006e\u0063\u006f\u0064\u0065\u0072\u0020\u0072a\u006e\u006b\u0020\u0068\u0061\u0075\u0073\u0020\u0076\u0061\u006c\u0075\u0065 \u006e\u006f\u0074\u0020\u0069\u006e\u0020\u0072\u0061\u006e\u0067\u0065 [\u0030\u002e\u0035\u0020\u002d\u0020\u0031\u002e\u0030\u005d")
+	}
+	if _ebd.SizeHaus < 1 || _ebd.SizeHaus > 10 {
+		return _e.Error(_dbg, "\u006a\u0062\u0069\u0067\u0032 \u0065\u006e\u0063\u006f\u0064\u0065\u0072\u0020\u0073\u0069\u007a\u0065\u0020h\u0061\u0075\u0073\u0020\u0076\u0061\u006c\u0075\u0065\u0020\u006e\u006f\u0074\u0020\u0069\u006e\u0020\u0072\u0061\u006e\u0067\u0065\u0020\u005b\u0031\u0020\u002d\u0020\u0031\u0030]")
+	}
+	switch _ebd.Components {
+	case _a.ComponentConn, _a.ComponentCharacters, _a.ComponentWords:
+	default:
+		return _e.Error(_dbg, "\u0069n\u0076\u0061\u006c\u0069d\u0020\u0063\u006c\u0061\u0073s\u0065r\u0020c\u006f\u006d\u0070\u006f\u006e\u0065\u006et")
+	}
+	return nil
+}
+
+const (
+	MaxDiffWidth  = 2
+	MaxDiffHeight = 2
+)
+
+func (_gbf *Classer) classifyCorrelation(_gbe *_a.Boxes, _dfc *_a.Bitmaps, _bfb int) error {
+	const _cc = "\u0063\u006c\u0061\u0073si\u0066\u0079\u0043\u006f\u0072\u0072\u0065\u006c\u0061\u0074\u0069\u006f\u006e"
+	if _gbe == nil {
+		return _e.Error(_cc, "\u006e\u0065\u0077\u0043\u006f\u006d\u0070\u006f\u006e\u0065\u006e\u0074\u0073\u0020\u0062\u006f\u0075\u006e\u0064\u0069\u006e\u0067\u0020\u0062o\u0078\u0065\u0073\u0020\u006eo\u0074\u0020f\u006f\u0075\u006e\u0064")
+	}
+	if _dfc == nil {
+		return _e.Error(_cc, "\u006e\u0065wC\u006f\u006d\u0070o\u006e\u0065\u006e\u0074s b\u0069tm\u0061\u0070\u0020\u0061\u0072\u0072\u0061y \u006e\u006f\u0074\u0020\u0066\u006f\u0075n\u0064")
+	}
+	_ce := len(_dfc.Values)
+	if _ce == 0 {
+		_ca.Log.Debug("\u0063l\u0061\u0073s\u0069\u0066\u0079C\u006f\u0072\u0072\u0065\u006c\u0061\u0074i\u006f\u006e\u0020\u002d\u0020\u0070r\u006f\u0076\u0069\u0064\u0065\u0064\u0020\u0070\u0069\u0078\u0061s\u0020\u0069\u0073\u0020\u0065\u006d\u0070\u0074\u0079")
+		return nil
+	}
+	var (
+		_fda, _gfe *_a.Bitmap
+		_dbab      error
+	)
+	_gfeb := &_a.Bitmaps{Values: make([]*_a.Bitmap, _ce)}
+	for _abc, _fe := range _dfc.Values {
+		_gfe, _dbab = _fe.AddBorderGeneral(JbAddedPixels, JbAddedPixels, JbAddedPixels, JbAddedPixels, 0)
+		if _dbab != nil {
+			return _e.Wrap(_dbab, _cc, "")
+		}
+		_gfeb.Values[_abc] = _gfe
+	}
+	_cdb := _gbf.FgTemplates
+	_dde := _a.MakePixelSumTab8()
+	_aba := _a.MakePixelCentroidTab8()
+	_cbb := make([]int, _ce)
+	_dff := make([][]int, _ce)
+	_be := _a.Points(make([]_a.Point, _ce))
+	_aegf := &_be
+	var (
+		_eeb, _ecc       int
+		_dbb, _gbec, _af int
+		_ad, _dga        int
+		_ac              byte
+	)
+	for _dab, _bea := range _gfeb.Values {
+		_dff[_dab] = make([]int, _bea.Height)
+		_eeb = 0
+		_ecc = 0
+		_gbec = (_bea.Height - 1) * _bea.RowStride
+		_dbb = 0
+		for _dga = _bea.Height - 1; _dga >= 0; _dga, _gbec = _dga-1, _gbec-_bea.RowStride {
+			_dff[_dab][_dga] = _dbb
+			_af = 0
+			for _ad = 0; _ad < _bea.RowStride; _ad++ {
+				_ac = _bea.Data[_gbec+_ad]
+				_af += _dde[_ac]
+				_eeb += _aba[_ac] + _ad*8*_dde[_ac]
+			}
+			_dbb += _af
+			_ecc += _af * _dga
+		}
+		_cbb[_dab] = _dbb
+		if _dbb > 0 {
+			(*_aegf)[_dab] = _a.Point{X: float32(_eeb) / float32(_dbb), Y: float32(_ecc) / float32(_dbb)}
+		} else {
+			(*_aegf)[_dab] = _a.Point{X: float32(_bea.Width) / float32(2), Y: float32(_bea.Height) / float32(2)}
+		}
+	}
+	if _dbab = _gbf.CentroidPoints.Add(_aegf); _dbab != nil {
+		return _e.Wrap(_dbab, _cc, "\u0063\u0065\u006et\u0072\u006f\u0069\u0064\u0020\u0061\u0064\u0064")
+	}
+	var (
+		_bb, _ccc, _eaf        int
+		_abab                  float64
+		_de, _cec, _gbfc, _eab float32
+		_dgf, _ffc             _a.Point
+		_gca                   bool
+		_gfbc                  *similarTemplatesFinder
+		_caaa                  int
+		_bed                   *_a.Bitmap
+		_cdbg                  *_d.Rectangle
+		_gcac                  *_a.Bitmaps
+	)
+	for _caaa, _gfe = range _gfeb.Values {
+		_ccc = _cbb[_caaa]
+		if _de, _cec, _dbab = _aegf.GetGeometry(_caaa); _dbab != nil {
+			return _e.Wrap(_dbab, _cc, "\u0070t\u0061\u0020\u002d\u0020\u0069")
+		}
+		_gca = false
+		_bad := len(_gbf.UndilatedTemplates.Values)
+		_gfbc = _beb(_gbf, _gfe)
+		for _fea := _gfbc.Next(); _fea > -1; {
+			if _bed, _dbab = _gbf.UndilatedTemplates.GetBitmap(_fea); _dbab != nil {
+				return _e.Wrap(_dbab, _cc, "\u0075\u006e\u0069dl\u0061\u0074\u0065\u0064\u005b\u0069\u0063\u006c\u0061\u0073\u0073\u005d\u0020\u003d\u0020\u0062\u006d\u0032")
+			}
+			if _eaf, _dbab = _cdb.GetInt(_fea); _dbab != nil {
+				_ca.Log.Trace("\u0046\u0047\u0020T\u0065\u006d\u0070\u006ca\u0074\u0065\u0020\u005b\u0069\u0063\u006ca\u0073\u0073\u005d\u0020\u0066\u0061\u0069\u006c\u0065\u0064\u003a\u0020\u0025\u0076", _dbab)
+			}
+			if _gbfc, _eab, _dbab = _gbf.CentroidPointsTemplates.GetGeometry(_fea); _dbab != nil {
+				return _e.Wrap(_dbab, _cc, "\u0043\u0065\u006e\u0074\u0072\u006f\u0069\u0064\u0050\u006f\u0069\u006e\u0074T\u0065\u006d\u0070\u006c\u0061\u0074e\u0073\u005b\u0069\u0063\u006c\u0061\u0073\u0073\u005d\u0020\u003d\u0020\u00782\u002c\u0079\u0032\u0020")
+			}
+			if _gbf.Settings.WeightFactor > 0.0 {
+				if _bb, _dbab = _gbf.TemplateAreas.Get(_fea); _dbab != nil {
+					_ca.Log.Trace("\u0054\u0065\u006dp\u006c\u0061\u0074\u0065A\u0072\u0065\u0061\u0073\u005b\u0069\u0063l\u0061\u0073\u0073\u005d\u0020\u003d\u0020\u0061\u0072\u0065\u0061\u0020\u0025\u0076", _dbab)
+				}
+				_abab = _gbf.Settings.Thresh + (1.0-_gbf.Settings.Thresh)*_gbf.Settings.WeightFactor*float64(_eaf)/float64(_bb)
+			} else {
+				_abab = _gbf.Settings.Thresh
+			}
+			_dce, _cfa := _a.CorrelationScoreThresholded(_gfe, _bed, _ccc, _eaf, _dgf.X-_ffc.X, _dgf.Y-_ffc.Y, MaxDiffWidth, MaxDiffHeight, _dde, _dff[_caaa], float32(_abab))
+			if _cfa != nil {
+				return _e.Wrap(_cfa, _cc, "")
+			}
+			if _cge {
+				var (
+					_cbeg, _daff float64
+					_gff, _fa    int
+				)
+				_cbeg, _cfa = _a.CorrelationScore(_gfe, _bed, _ccc, _eaf, _de-_gbfc, _cec-_eab, MaxDiffWidth, MaxDiffHeight, _dde)
+				if _cfa != nil {
+					return _e.Wrap(_cfa, _cc, "d\u0065\u0062\u0075\u0067Co\u0072r\u0065\u006c\u0061\u0074\u0069o\u006e\u0053\u0063\u006f\u0072\u0065")
+				}
+				_daff, _cfa = _a.CorrelationScoreSimple(_gfe, _bed, _ccc, _eaf, _de-_gbfc, _cec-_eab, MaxDiffWidth, MaxDiffHeight, _dde)
+				if _cfa != nil {
+					return _e.Wrap(_cfa, _cc, "d\u0065\u0062\u0075\u0067Co\u0072r\u0065\u006c\u0061\u0074\u0069o\u006e\u0053\u0063\u006f\u0072\u0065")
+				}
+				_gff = int(_f.Sqrt(_cbeg * float64(_ccc) * float64(_eaf)))
+				_fa = int(_f.Sqrt(_daff * float64(_ccc) * float64(_eaf)))
+				if (_cbeg >= _abab) != (_daff >= _abab) {
+					return _e.Errorf(_cc, "\u0064\u0065\u0062\u0075\u0067\u0020\u0043\u006f\u0072r\u0065\u006c\u0061\u0074\u0069\u006f\u006e\u0020\u0073\u0063\u006f\u0072\u0065\u0020\u006d\u0069\u0073\u006d\u0061\u0074\u0063\u0068\u0020-\u0020\u0025d\u0028\u00250\u002e\u0034\u0066\u002c\u0020\u0025\u0076\u0029\u0020\u0076\u0073\u0020\u0025d(\u0025\u0030\u002e\u0034\u0066\u002c\u0020\u0025\u0076)\u0020\u0025\u0030\u002e\u0034\u0066", _gff, _cbeg, _cbeg >= _abab, _fa, _daff, _daff >= _abab, _cbeg-_daff)
+				}
+				if _cbeg >= _abab != _dce {
+					return _e.Errorf(_cc, "\u0064\u0065\u0062\u0075\u0067\u0020\u0043o\u0072\u0072\u0065\u006c\u0061\u0074\u0069\u006f\u006e \u0073\u0063\u006f\u0072\u0065 \u004d\u0069\u0073\u006d\u0061t\u0063\u0068 \u0062\u0065\u0074w\u0065\u0065\u006e\u0020\u0063\u006frr\u0065\u006c\u0061\u0074\u0069\u006f\u006e\u0020/\u0020\u0074\u0068\u0072\u0065s\u0068\u006f\u006c\u0064\u002e\u0020\u0043\u006f\u006dpa\u0072\u0069\u0073\u006f\u006e:\u0020\u0025\u0030\u002e\u0034\u0066\u0028\u0025\u0030\u002e\u0034\u0066\u002c\u0020\u0025\u0064\u0029\u0020\u003e\u003d\u0020\u00250\u002e\u0034\u0066\u0028\u0025\u0030\u002e\u0034\u0066\u0029\u0020\u0076\u0073\u0020\u0025\u0076", _cbeg, _cbeg*float64(_ccc)*float64(_eaf), _gff, _abab, float32(_abab)*float32(_ccc)*float32(_eaf), _dce)
+				}
+			}
+			if _dce {
+				_gca = true
+				if _cfa = _gbf.ClassIDs.Add(_fea); _cfa != nil {
+					return _e.Wrap(_cfa, _cc, "\u006f\u0076\u0065\u0072\u0054\u0068\u0072\u0065\u0073\u0068\u006f\u006c\u0064")
+				}
+				if _cfa = _gbf.ComponentPageNumbers.Add(_bfb); _cfa != nil {
+					return _e.Wrap(_cfa, _cc, "\u006f\u0076\u0065\u0072\u0054\u0068\u0072\u0065\u0073\u0068\u006f\u006c\u0064")
+				}
+				if _gbf.Settings.KeepClassInstances {
+					if _fda, _cfa = _dfc.GetBitmap(_caaa); _cfa != nil {
+						return _e.Wrap(_cfa, _cc, "\u004b\u0065\u0065\u0070Cl\u0061\u0073\u0073\u0049\u006e\u0073\u0074\u0061\u006e\u0063\u0065\u0073\u0020\u002d \u0069")
+					}
+					if _gcac, _cfa = _gbf.ClassInstances.GetBitmaps(_fea); _cfa != nil {
+						return _e.Wrap(_cfa, _cc, "K\u0065\u0065\u0070\u0043\u006c\u0061s\u0073\u0049\u006e\u0073\u0074\u0061\u006e\u0063\u0065s\u0020\u002d\u0020i\u0043l\u0061\u0073\u0073")
+					}
+					_gcac.AddBitmap(_fda)
+					if _cdbg, _cfa = _gbe.Get(_caaa); _cfa != nil {
+						return _e.Wrap(_cfa, _cc, "\u004be\u0065p\u0043\u006c\u0061\u0073\u0073I\u006e\u0073t\u0061\u006e\u0063\u0065\u0073")
+					}
+					_gcac.AddBox(_cdbg)
+				}
+				break
+			}
+		}
+		if !_gca {
+			if _dbab = _gbf.ClassIDs.Add(_bad); _dbab != nil {
+				return _e.Wrap(_dbab, _cc, "\u0021\u0066\u006f\u0075\u006e\u0064")
+			}
+			if _dbab = _gbf.ComponentPageNumbers.Add(_bfb); _dbab != nil {
+				return _e.Wrap(_dbab, _cc, "\u0021\u0066\u006f\u0075\u006e\u0064")
+			}
+			_gcac = &_a.Bitmaps{}
+			if _fda, _dbab = _dfc.GetBitmap(_caaa); _dbab != nil {
+				return _e.Wrap(_dbab, _cc, "\u0021\u0066\u006f\u0075\u006e\u0064")
+			}
+			_gcac.AddBitmap(_fda)
+			_feg, _bag := _fda.Width, _fda.Height
+			_bgdd := uint64(_bag) * uint64(_feg)
+			_gbf.TemplatesSize.Add(_bgdd, _bad)
+			if _cdbg, _dbab = _gbe.Get(_caaa); _dbab != nil {
+				return _e.Wrap(_dbab, _cc, "\u0021\u0066\u006f\u0075\u006e\u0064")
+			}
+			_gcac.AddBox(_cdbg)
+			_gbf.ClassInstances.AddBitmaps(_gcac)
+			_gbf.CentroidPointsTemplates.AddPoint(_de, _cec)
+			_gbf.FgTemplates.AddInt(_ccc)
+			_gbf.UndilatedTemplates.AddBitmap(_fda)
+			_bb = (_gfe.Width - 2*JbAddedPixels) * (_gfe.Height - 2*JbAddedPixels)
+			if _dbab = _gbf.TemplateAreas.Add(_bb); _dbab != nil {
+				return _e.Wrap(_dbab, _cc, "\u0021\u0066\u006f\u0075\u006e\u0064")
+			}
+		}
+	}
+	_gbf.NumberOfClasses = len(_gbf.UndilatedTemplates.Values)
+	return nil
+}
+
+func (_aa *Classer) classifyRankHouseOne(_bge *_a.Boxes, _gfd, _eb, _fcd *_a.Bitmaps, _bfbg *_a.Points, _gddf int) (_aff error) {
+	const _gage = "\u0043\u006c\u0061\u0073s\u0065\u0072\u002e\u0063\u006c\u0061\u0073\u0073\u0069\u0066y\u0052a\u006e\u006b\u0048\u006f\u0075\u0073\u0065O\u006e\u0065"
+	var (
+		_cda, _egc, _ffb, _aad        float32
+		_gbd                          int
+		_bde, _facc, _cag, _ebf, _cgc *_a.Bitmap
+		_gce, _fag                    bool
+	)
+	for _dfe := 0; _dfe < len(_gfd.Values); _dfe++ {
+		_facc = _eb.Values[_dfe]
+		_cag = _fcd.Values[_dfe]
+		_cda, _egc, _aff = _bfbg.GetGeometry(_dfe)
+		if _aff != nil {
+			return _e.Wrapf(_aff, _gage, "\u0066\u0069\u0072\u0073\u0074\u0020\u0067\u0065\u006fm\u0065\u0074\u0072\u0079")
+		}
+		_gec := len(_aa.UndilatedTemplates.Values)
+		_gce = false
+		_age := _beb(_aa, _facc)
+		for _gbd = _age.Next(); _gbd > -1; {
+			_ebf, _aff = _aa.UndilatedTemplates.GetBitmap(_gbd)
+			if _aff != nil {
+				return _e.Wrap(_aff, _gage, "\u0062\u006d\u0033")
+			}
+			_cgc, _aff = _aa.DilatedTemplates.GetBitmap(_gbd)
+			if _aff != nil {
+				return _e.Wrap(_aff, _gage, "\u0062\u006d\u0034")
+			}
+			_ffb, _aad, _aff = _aa.CentroidPointsTemplates.GetGeometry(_gbd)
+			if _aff != nil {
+				return _e.Wrap(_aff, _gage, "\u0043\u0065\u006e\u0074\u0072\u006f\u0069\u0064\u0054\u0065\u006d\u0070l\u0061\u0074\u0065\u0073")
+			}
+			_fag, _aff = _a.HausTest(_facc, _cag, _ebf, _cgc, _cda-_ffb, _egc-_aad, MaxDiffWidth, MaxDiffHeight)
+			if _aff != nil {
+				return _e.Wrap(_aff, _gage, "")
+			}
+			if _fag {
+				_gce = true
+				if _aff = _aa.ClassIDs.Add(_gbd); _aff != nil {
+					return _e.Wrap(_aff, _gage, "")
+				}
+				if _aff = _aa.ComponentPageNumbers.Add(_gddf); _aff != nil {
+					return _e.Wrap(_aff, _gage, "")
+				}
+				if _aa.Settings.KeepClassInstances {
+					_eeg, _dfb := _aa.ClassInstances.GetBitmaps(_gbd)
+					if _dfb != nil {
+						return _e.Wrap(_dfb, _gage, "\u004be\u0065\u0070\u0050\u0069\u0078\u0061a")
+					}
+					_bde, _dfb = _gfd.GetBitmap(_dfe)
+					if _dfb != nil {
+						return _e.Wrap(_dfb, _gage, "\u004be\u0065\u0070\u0050\u0069\u0078\u0061a")
+					}
+					_eeg.AddBitmap(_bde)
+					_bff, _dfb := _bge.Get(_dfe)
+					if _dfb != nil {
+						return _e.Wrap(_dfb, _gage, "\u004be\u0065\u0070\u0050\u0069\u0078\u0061a")
+					}
+					_eeg.AddBox(_bff)
+				}
+				break
+			}
+		}
+		if !_gce {
+			if _aff = _aa.ClassIDs.Add(_gec); _aff != nil {
+				return _e.Wrap(_aff, _gage, "")
+			}
+			if _aff = _aa.ComponentPageNumbers.Add(_gddf); _aff != nil {
+				return _e.Wrap(_aff, _gage, "")
+			}
+			_ade := &_a.Bitmaps{}
+			_bde, _aff = _gfd.GetBitmap(_dfe)
+			if _aff != nil {
+				return _e.Wrap(_aff, _gage, "\u0021\u0066\u006f\u0075\u006e\u0064")
+			}
+			_ade.Values = append(_ade.Values, _bde)
+			_bdb, _bbe := _bde.Width, _bde.Height
+			_aa.TemplatesSize.Add(uint64(_bbe)*uint64(_bdb), _gec)
+			_bdg, _bcf := _bge.Get(_dfe)
+			if _bcf != nil {
+				return _e.Wrap(_bcf, _gage, "\u0021\u0066\u006f\u0075\u006e\u0064")
+			}
+			_ade.AddBox(_bdg)
+			_aa.ClassInstances.AddBitmaps(_ade)
+			_aa.CentroidPointsTemplates.AddPoint(_cda, _egc)
+			_aa.UndilatedTemplates.AddBitmap(_facc)
+			_aa.DilatedTemplates.AddBitmap(_cag)
+		}
+	}
+	return nil
+}
+
+func Init(settings Settings) (*Classer, error) {
+	const _gc = "\u0063\u006c\u0061s\u0073\u0065\u0072\u002e\u0049\u006e\u0069\u0074"
+	_ab := &Classer{Settings: settings, Widths: map[int]int{}, Heights: map[int]int{}, TemplatesSize: _g.IntsMap{}, TemplateAreas: &_g.IntSlice{}, ComponentPageNumbers: &_g.IntSlice{}, ClassIDs: &_g.IntSlice{}, ComponentsNumber: &_g.IntSlice{}, CentroidPoints: &_a.Points{}, CentroidPointsTemplates: &_a.Points{}, UndilatedTemplates: &_a.Bitmaps{}, DilatedTemplates: &_a.Bitmaps{}, ClassInstances: &_a.BitmapsArray{}, FgTemplates: &_g.NumSlice{}}
+	if _ae := _ab.Settings.Validate(); _ae != nil {
+		return nil, _e.Wrap(_ae, _gc, "")
+	}
+	return _ab, nil
+}
+
+func (_ccg *Classer) classifyRankHouseNonOne(_cgd *_a.Boxes, _dfef, _fcb, _afb *_a.Bitmaps, _agec *_a.Points, _ef *_g.NumSlice, _adc int) (_gffe error) {
+	const _ffa = "\u0043\u006c\u0061\u0073s\u0065\u0072\u002e\u0063\u006c\u0061\u0073\u0073\u0069\u0066y\u0052a\u006e\u006b\u0048\u006f\u0075\u0073\u0065O\u006e\u0065"
+	var (
+		_bda, _bcc, _egg, _gfc         float32
+		_abgb, _caad, _ccf             int
+		_fdf, _ace, _gaga, _gbc, _gddd *_a.Bitmap
+		_eafd, _efc                    bool
+	)
+	_eafdg := _a.MakePixelSumTab8()
+	for _cce := 0; _cce < len(_dfef.Values); _cce++ {
+		if _ace, _gffe = _fcb.GetBitmap(_cce); _gffe != nil {
+			return _e.Wrap(_gffe, _ffa, "b\u006d\u0073\u0031\u002e\u0047\u0065\u0074\u0028\u0069\u0029")
+		}
+		if _abgb, _gffe = _ef.GetInt(_cce); _gffe != nil {
+			_ca.Log.Trace("\u0047\u0065t\u0074\u0069\u006e\u0067 \u0046\u0047T\u0065\u006d\u0070\u006c\u0061\u0074\u0065\u0073 \u0061\u0074\u003a\u0020\u0025\u0064\u0020\u0066\u0061\u0069\u006c\u0065d\u003a\u0020\u0025\u0076", _cce, _gffe)
+		}
+		if _gaga, _gffe = _afb.GetBitmap(_cce); _gffe != nil {
+			return _e.Wrap(_gffe, _ffa, "b\u006d\u0073\u0032\u002e\u0047\u0065\u0074\u0028\u0069\u0029")
+		}
+		if _bda, _bcc, _gffe = _agec.GetGeometry(_cce); _gffe != nil {
+			return _e.Wrapf(_gffe, _ffa, "\u0070t\u0061[\u0069\u005d\u002e\u0047\u0065\u006f\u006d\u0065\u0074\u0072\u0079")
+		}
+		_fce := len(_ccg.UndilatedTemplates.Values)
+		_eafd = false
+		_cdbad := _beb(_ccg, _ace)
+		for _ccf = _cdbad.Next(); _ccf > -1; {
+			if _gbc, _gffe = _ccg.UndilatedTemplates.GetBitmap(_ccf); _gffe != nil {
+				return _e.Wrap(_gffe, _ffa, "\u0070\u0069\u0078\u0061\u0074\u002e\u005b\u0069\u0043l\u0061\u0073\u0073\u005d")
+			}
+			if _caad, _gffe = _ccg.FgTemplates.GetInt(_ccf); _gffe != nil {
+				_ca.Log.Trace("\u0047\u0065\u0074\u0074\u0069\u006eg\u0020\u0046\u0047\u0054\u0065\u006d\u0070\u006c\u0061\u0074\u0065\u005b\u0025d\u005d\u0020\u0066\u0061\u0069\u006c\u0065d\u003a\u0020\u0025\u0076", _ccf, _gffe)
+			}
+			if _gddd, _gffe = _ccg.DilatedTemplates.GetBitmap(_ccf); _gffe != nil {
+				return _e.Wrap(_gffe, _ffa, "\u0070\u0069\u0078\u0061\u0074\u0064\u005b\u0069\u0043l\u0061\u0073\u0073\u005d")
+			}
+			if _egg, _gfc, _gffe = _ccg.CentroidPointsTemplates.GetGeometry(_ccf); _gffe != nil {
+				return _e.Wrap(_gffe, _ffa, "\u0043\u0065\u006et\u0072\u006f\u0069\u0064P\u006f\u0069\u006e\u0074\u0073\u0054\u0065m\u0070\u006c\u0061\u0074\u0065\u0073\u005b\u0069\u0043\u006c\u0061\u0073\u0073\u005d")
+			}
+			_efc, _gffe = _a.RankHausTest(_ace, _gaga, _gbc, _gddd, _bda-_egg, _bcc-_gfc, MaxDiffWidth, MaxDiffHeight, _abgb, _caad, float32(_ccg.Settings.RankHaus), _eafdg)
+			if _gffe != nil {
+				return _e.Wrap(_gffe, _ffa, "")
+			}
+			if _efc {
+				_eafd = true
+				if _gffe = _ccg.ClassIDs.Add(_ccf); _gffe != nil {
+					return _e.Wrap(_gffe, _ffa, "")
+				}
+				if _gffe = _ccg.ComponentPageNumbers.Add(_adc); _gffe != nil {
+					return _e.Wrap(_gffe, _ffa, "")
+				}
+				if _ccg.Settings.KeepClassInstances {
+					_bae, _aag := _ccg.ClassInstances.GetBitmaps(_ccf)
+					if _aag != nil {
+						return _e.Wrap(_aag, _ffa, "\u0063\u002e\u0050\u0069\u0078\u0061\u0061\u002e\u0047\u0065\u0074B\u0069\u0074\u006d\u0061\u0070\u0073\u0028\u0069\u0043\u006ca\u0073\u0073\u0029")
+					}
+					if _fdf, _aag = _dfef.GetBitmap(_cce); _aag != nil {
+						return _e.Wrap(_aag, _ffa, "\u0070i\u0078\u0061\u005b\u0069\u005d")
+					}
+					_bae.Values = append(_bae.Values, _fdf)
+					_cee, _aag := _cgd.Get(_cce)
+					if _aag != nil {
+						return _e.Wrap(_aag, _ffa, "b\u006f\u0078\u0061\u002e\u0047\u0065\u0074\u0028\u0069\u0029")
+					}
+					_bae.Boxes = append(_bae.Boxes, _cee)
+				}
+				break
+			}
+		}
+		if !_eafd {
+			if _gffe = _ccg.ClassIDs.Add(_fce); _gffe != nil {
+				return _e.Wrap(_gffe, _ffa, "\u0021\u0066\u006f\u0075\u006e\u0064")
+			}
+			if _gffe = _ccg.ComponentPageNumbers.Add(_adc); _gffe != nil {
+				return _e.Wrap(_gffe, _ffa, "\u0021\u0066\u006f\u0075\u006e\u0064")
+			}
+			_afe := &_a.Bitmaps{}
+			_fdf = _dfef.Values[_cce]
+			_afe.AddBitmap(_fdf)
+			_ffaa, _fcg := _fdf.Width, _fdf.Height
+			_ccg.TemplatesSize.Add(uint64(_ffaa)*uint64(_fcg), _fce)
+			_aec, _abd := _cgd.Get(_cce)
+			if _abd != nil {
+				return _e.Wrap(_abd, _ffa, "\u0021\u0066\u006f\u0075\u006e\u0064")
+			}
+			_afe.AddBox(_aec)
+			_ccg.ClassInstances.AddBitmaps(_afe)
+			_ccg.CentroidPointsTemplates.AddPoint(_bda, _bcc)
+			_ccg.UndilatedTemplates.AddBitmap(_ace)
+			_ccg.DilatedTemplates.AddBitmap(_gaga)
+			_ccg.FgTemplates.AddInt(_abgb)
+		}
+	}
+	_ccg.NumberOfClasses = len(_ccg.UndilatedTemplates.Values)
+	return nil
+}
+
+func (_bgca *Settings) SetDefault() {
+	if _bgca.MaxCompWidth == 0 {
+		switch _bgca.Components {
+		case _a.ComponentConn:
+			_bgca.MaxCompWidth = MaxConnCompWidth
+		case _a.ComponentCharacters:
+			_bgca.MaxCompWidth = MaxCharCompWidth
+		case _a.ComponentWords:
+			_bgca.MaxCompWidth = MaxWordCompWidth
+		}
+	}
+	if _bgca.MaxCompHeight == 0 {
+		_bgca.MaxCompHeight = MaxCompHeight
+	}
+	if _bgca.Thresh == 0.0 {
+		_bgca.Thresh = 0.9
+	}
+	if _bgca.WeightFactor == 0.0 {
+		_bgca.WeightFactor = 0.75
+	}
+	if _bgca.RankHaus == 0.0 {
+		_bgca.RankHaus = 0.97
+	}
+	if _bgca.SizeHaus == 0 {
+		_bgca.SizeHaus = 2
+	}
+}
+
+type Classer struct {
+	BaseIndex               int
+	Settings                Settings
+	ComponentsNumber        *_g.IntSlice
+	TemplateAreas           *_g.IntSlice
+	Widths                  map[int]int
+	Heights                 map[int]int
+	NumberOfClasses         int
+	ClassInstances          *_a.BitmapsArray
+	UndilatedTemplates      *_a.Bitmaps
+	DilatedTemplates        *_a.Bitmaps
+	TemplatesSize           _g.IntsMap
+	FgTemplates             *_g.NumSlice
+	CentroidPoints          *_a.Points
+	CentroidPointsTemplates *_a.Points
+	ClassIDs                *_g.IntSlice
+	ComponentPageNumbers    *_g.IntSlice
+	PtaUL                   *_a.Points
+	PtaLL                   *_a.Points
+}
+
+const (
+	RankHaus Method = iota
+	Correlation
+)
+
+func (_ffd *Classer) ComputeLLCorners() (_gfb error) {
+	const _cb = "\u0043l\u0061\u0073\u0073\u0065\u0072\u002e\u0043\u006f\u006d\u0070\u0075t\u0065\u004c\u004c\u0043\u006f\u0072\u006e\u0065\u0072\u0073"
+	if _ffd.PtaUL == nil {
+		return _e.Error(_cb, "\u0055\u004c\u0020\u0043or\u006e\u0065\u0072\u0073\u0020\u006e\u006f\u0074\u0020\u0064\u0065\u0066\u0069\u006ee\u0064")
+	}
+	_eg := len(*_ffd.PtaUL)
+	_ffd.PtaLL = &_a.Points{}
+	var (
+		_cad, _ea float32
+		_bf, _gd  int
+		_cbe      *_a.Bitmap
+	)
+	for _da := 0; _da < _eg; _da++ {
+		_cad, _ea, _gfb = _ffd.PtaUL.GetGeometry(_da)
+		if _gfb != nil {
+			_ca.Log.Debug("\u0047e\u0074\u0074\u0069\u006e\u0067\u0020\u0050\u0074\u0061\u0055\u004c \u0066\u0061\u0069\u006c\u0065\u0064\u003a\u0020\u0025\u0076", _gfb)
+			return _e.Wrap(_gfb, _cb, "\u0050\u0074\u0061\u0055\u004c\u0020\u0047\u0065\u006fm\u0065\u0074\u0072\u0079")
+		}
+		_bf, _gfb = _ffd.ClassIDs.Get(_da)
+		if _gfb != nil {
+			_ca.Log.Debug("\u0047\u0065\u0074\u0074\u0069\u006e\u0067\u0020\u0043\u006c\u0061s\u0073\u0049\u0044\u0020\u0066\u0061\u0069\u006c\u0065\u0064:\u0020\u0025\u0076", _gfb)
+			return _e.Wrap(_gfb, _cb, "\u0043l\u0061\u0073\u0073\u0049\u0044")
+		}
+		_cbe, _gfb = _ffd.UndilatedTemplates.GetBitmap(_bf)
+		if _gfb != nil {
+			_ca.Log.Debug("\u0047\u0065t\u0074\u0069\u006e\u0067 \u0055\u006ed\u0069\u006c\u0061\u0074\u0065\u0064\u0054\u0065m\u0070\u006c\u0061\u0074\u0065\u0073\u0020\u0066\u0061\u0069\u006c\u0065d\u003a\u0020\u0025\u0076", _gfb)
+			return _e.Wrap(_gfb, _cb, "\u0055\u006e\u0064\u0069la\u0074\u0065\u0064\u0020\u0054\u0065\u006d\u0070\u006c\u0061\u0074\u0065\u0073")
+		}
+		_gd = _cbe.Height
+		_ffd.PtaLL.AddPoint(_cad, _ea+float32(_gd))
+	}
+	return nil
+}
+
+func (_fed *Classer) classifyRankHaus(_gbee *_a.Boxes, _dbc *_a.Bitmaps, _gag int) error {
+	const _babf = "\u0063\u006ca\u0073\u0073\u0069f\u0079\u0052\u0061\u006e\u006b\u0048\u0061\u0075\u0073"
+	if _gbee == nil {
+		return _e.Error(_babf, "\u0062\u006fx\u0061\u0020\u006eo\u0074\u0020\u0064\u0065\u0066\u0069\u006e\u0065\u0064")
+	}
+	if _dbc == nil {
+		return _e.Error(_babf, "\u0070\u0069x\u0061\u0020\u006eo\u0074\u0020\u0064\u0065\u0066\u0069\u006e\u0065\u0064")
+	}
+	_fac := len(_dbc.Values)
+	if _fac == 0 {
+		return _e.Error(_babf, "e\u006dp\u0074\u0079\u0020\u006e\u0065\u0077\u0020\u0063o\u006d\u0070\u006f\u006een\u0074\u0073")
+	}
+	_babe := _dbc.CountPixels()
+	_bac := _fed.Settings.SizeHaus
+	_eac := _a.SelCreateBrick(_bac, _bac, _bac/2, _bac/2, _a.SelHit)
+	_fgd := &_a.Bitmaps{Values: make([]*_a.Bitmap, _fac)}
+	_gdcg := &_a.Bitmaps{Values: make([]*_a.Bitmap, _fac)}
+	var (
+		_fff, _eag, _cdba *_a.Bitmap
+		_dgfc             error
+	)
+	for _ddd := 0; _ddd < _fac; _ddd++ {
+		_fff, _dgfc = _dbc.GetBitmap(_ddd)
+		if _dgfc != nil {
+			return _e.Wrap(_dgfc, _babf, "")
+		}
+		_eag, _dgfc = _fff.AddBorderGeneral(JbAddedPixels, JbAddedPixels, JbAddedPixels, JbAddedPixels, 0)
+		if _dgfc != nil {
+			return _e.Wrap(_dgfc, _babf, "")
+		}
+		_cdba, _dgfc = _a.Dilate(nil, _eag, _eac)
+		if _dgfc != nil {
+			return _e.Wrap(_dgfc, _babf, "")
+		}
+		_fgd.Values[_fac] = _eag
+		_gdcg.Values[_fac] = _cdba
+	}
+	_ded, _dgfc := _a.Centroids(_fgd.Values)
+	if _dgfc != nil {
+		return _e.Wrap(_dgfc, _babf, "")
+	}
+	if _dgfc = _ded.Add(_fed.CentroidPoints); _dgfc != nil {
+		_ca.Log.Trace("\u004e\u006f\u0020\u0063en\u0074\u0072\u006f\u0069\u0064\u0073\u0020\u0074\u006f\u0020\u0061\u0064\u0064")
+	}
+	if _fed.Settings.RankHaus == 1.0 {
+		_dgfc = _fed.classifyRankHouseOne(_gbee, _dbc, _fgd, _gdcg, _ded, _gag)
+	} else {
+		_dgfc = _fed.classifyRankHouseNonOne(_gbee, _dbc, _fgd, _gdcg, _ded, _babe, _gag)
+	}
+	if _dgfc != nil {
+		return _e.Wrap(_dgfc, _babf, "")
+	}
+	return nil
+}
+
+type Settings struct {
+	MaxCompWidth       int
+	MaxCompHeight      int
+	SizeHaus           int
+	RankHaus           float64
+	Thresh             float64
+	WeightFactor       float64
+	KeepClassInstances bool
+	Components         _a.Component
+	Method             Method
+}
+
+const (
+	MaxConnCompWidth = 350
+	MaxCharCompWidth = 350
+	MaxWordCompWidth = 1000
+	MaxCompHeight    = 120
+)
+
+func (_ceg *similarTemplatesFinder) Next() int {
+	var (
+		_edb, _eaab, _abf, _fbe int
+		_edbc                   bool
+		_cba                    *_a.Bitmap
+		_aaga                   error
+	)
+	for {
+		if _ceg.Index >= 25 {
+			return -1
+		}
+		_eaab = _ceg.Width + TwoByTwoWalk[2*_ceg.Index]
+		_edb = _ceg.Height + TwoByTwoWalk[2*_ceg.Index+1]
+		if _edb < 1 || _eaab < 1 {
+			_ceg.Index++
+			continue
+		}
+		if len(_ceg.CurrentNumbers) == 0 {
+			_ceg.CurrentNumbers, _edbc = _ceg.Classer.TemplatesSize.GetSlice(uint64(_eaab) * uint64(_edb))
+			if !_edbc {
+				_ceg.Index++
+				continue
+			}
+			_ceg.N = 0
+		}
+		_abf = len(_ceg.CurrentNumbers)
+		for ; _ceg.N < _abf; _ceg.N++ {
+			_fbe = _ceg.CurrentNumbers[_ceg.N]
+			_cba, _aaga = _ceg.Classer.DilatedTemplates.GetBitmap(_fbe)
+			if _aaga != nil {
+				_ca.Log.Debug("\u0046\u0069\u006e\u0064\u004e\u0065\u0078\u0074\u0054\u0065\u006d\u0070\u006c\u0061\u0074\u0065\u003a\u0020\u0074\u0065\u006d\u0070\u006c\u0061t\u0065\u0020\u006e\u006f\u0074 \u0066\u006fu\u006e\u0064\u003a\u0020")
+				return 0
+			}
+			if _cba.Width-2*JbAddedPixels == _eaab && _cba.Height-2*JbAddedPixels == _edb {
+				return _fbe
+			}
+		}
+		_ceg.Index++
+		_ceg.CurrentNumbers = nil
+	}
+}
+
+const JbAddedPixels = 6
+
+type similarTemplatesFinder struct {
+	Classer        *Classer
+	Width          int
+	Height         int
+	Index          int
+	CurrentNumbers []int
+	N              int
+}
+
+func (_fd *Classer) addPageComponents(_dc *_a.Bitmap, _gg *_a.Boxes, _cd *_a.Bitmaps, _db int, _ed Method) error {
+	const _gcf = "\u0043l\u0061\u0073\u0073\u0065r\u002e\u0041\u0064\u0064\u0050a\u0067e\u0043o\u006d\u0070\u006f\u006e\u0065\u006e\u0074s"
+	if _dc == nil {
+		return _e.Error(_gcf, "\u006e\u0069\u006c\u0020\u0069\u006e\u0070\u0075\u0074 \u0070\u0061\u0067\u0065")
+	}
+	if _gg == nil || _cd == nil || len(*_gg) == 0 {
+		_ca.Log.Trace("\u0041\u0064\u0064P\u0061\u0067\u0065\u0043\u006f\u006d\u0070\u006f\u006e\u0065\u006e\u0074\u0073\u003a\u0020\u0025\u0073\u002e\u0020\u004e\u006f\u0020\u0063\u006f\u006d\u0070\u006f\u006e\u0065n\u0074\u0073\u0020\u0066\u006f\u0075\u006e\u0064", _dc)
+		return nil
+	}
+	var _cbee error
+	switch _ed {
+	case RankHaus:
+		_cbee = _fd.classifyRankHaus(_gg, _cd, _db)
+	case Correlation:
+		_cbee = _fd.classifyCorrelation(_gg, _cd, _db)
+	default:
+		_ca.Log.Debug("\u0055\u006ek\u006e\u006f\u0077\u006e\u0020\u0063\u006c\u0061\u0073\u0073\u0069\u0066\u0079\u0020\u006d\u0065\u0074\u0068\u006f\u0064\u003a\u0020'%\u0076\u0027", _ed)
+		return _e.Error(_gcf, "\u0075\u006e\u006bno\u0077\u006e\u0020\u0063\u006c\u0061\u0073\u0073\u0069\u0066\u0079\u0020\u006d\u0065\u0074\u0068\u006f\u0064")
+	}
+	if _cbee != nil {
+		return _e.Wrap(_cbee, _gcf, "")
+	}
+	if _cbee = _fd.getULCorners(_dc, _gg); _cbee != nil {
+		return _e.Wrap(_cbee, _gcf, "")
+	}
+	_fg := len(*_gg)
+	_fd.BaseIndex += _fg
+	if _cbee = _fd.ComponentsNumber.Add(_fg); _cbee != nil {
+		return _e.Wrap(_cbee, _gcf, "")
+	}
+	return nil
+}
+
+var _cge bool
+
+var TwoByTwoWalk = []int{0, 0, 0, 1, -1, 0, 0, -1, 1, 0, -1, 1, 1, 1, -1, -1, 1, -1, 0, -2, 2, 0, 0, 2, -2, 0, -1, -2, 1, -2, 2, -1, 2, 1, 1, 2, -1, 2, -2, 1, -2, -1, -2, -2, 2, -2, 2, 2, -2, 2}
+
+func (_b *Classer) AddPage(inputPage *_a.Bitmap, pageNumber int, method Method) (_gf error) {
+	const _ge = "\u0043l\u0061s\u0073\u0065\u0072\u002e\u0041\u0064\u0064\u0050\u0061\u0067\u0065"
+	_b.Widths[pageNumber] = inputPage.Width
+	_b.Heights[pageNumber] = inputPage.Height
+	if _gf = _b.verifyMethod(method); _gf != nil {
+		return _e.Wrap(_gf, _ge, "")
+	}
+	_ff, _gcb, _gf := inputPage.GetComponents(_b.Settings.Components, _b.Settings.MaxCompWidth, _b.Settings.MaxCompHeight)
+	if _gf != nil {
+		return _e.Wrap(_gf, _ge, "")
+	}
+	_ca.Log.Debug("\u0043\u006f\u006d\u0070\u006f\u006e\u0065\u006e\u0074s\u003a\u0020\u0025\u0076", _ff)
+	if _gf = _b.addPageComponents(inputPage, _gcb, _ff, pageNumber, method); _gf != nil {
+		return _e.Wrap(_gf, _ge, "")
+	}
+	return nil
+}
+
+func DefaultSettings() Settings {
+	_facb := &Settings{}
+	_facb.SetDefault()
+	return *_facb
+}
+
+type Method int
+
+func _beb(_fegg *Classer, _affg *_a.Bitmap) *similarTemplatesFinder {
+	return &similarTemplatesFinder{Width: _affg.Width, Height: _affg.Height, Classer: _fegg}
+}

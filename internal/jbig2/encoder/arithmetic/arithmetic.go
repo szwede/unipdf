@@ -9,51 +9,612 @@
 // Use of this source code is governed by the UniDoc End User License Agreement
 // terms that can be accessed at https://unidoc.io/eula/
 
-package arithmetic ;import (_g "bytes";_ac "github.com/unidoc/unipdf/v4/common";_e "github.com/unidoc/unipdf/v4/internal/jbig2/bitmap";_eg "github.com/unidoc/unipdf/v4/internal/jbig2/errors";_aa "io";);func (_fgb *Encoder )encodeBit (_eceb *codingContext ,_abb uint32 ,_db uint8 )error {const _fdf ="\u0045\u006e\u0063\u006f\u0064\u0065\u0072\u002e\u0065\u006e\u0063\u006fd\u0065\u0042\u0069\u0074";
-_fgb ._dd ++;if _abb >=uint32 (len (_eceb ._fd )){return _eg .Errorf (_fdf ,"\u0061r\u0069\u0074h\u006d\u0065\u0074i\u0063\u0020\u0065\u006e\u0063\u006f\u0064e\u0072\u0020\u002d\u0020\u0069\u006ev\u0061\u006c\u0069\u0064\u0020\u0063\u0074\u0078\u0020\u006e\u0075m\u0062\u0065\u0072\u003a\u0020\u0027\u0025\u0064\u0027",_abb );
-};_gaa :=_eceb ._fd [_abb ];_dfe :=_eceb .mps (_abb );_dba :=_dcfd [_gaa ]._bdf ;_ac .Log .Trace ("\u0045\u0043\u003a\u0020\u0025d\u0009\u0020D\u003a\u0020\u0025d\u0009\u0020\u0049\u003a\u0020\u0025d\u0009\u0020\u004dPS\u003a \u0025\u0064\u0009\u0020\u0051\u0045\u003a \u0025\u0030\u0034\u0058\u0009\u0020\u0020\u0041\u003a\u0020\u0025\u0030\u0034\u0058\u0009\u0020\u0043\u003a %\u0030\u0038\u0058\u0009\u0020\u0043\u0054\u003a\u0020\u0025\u0064\u0009\u0020\u0042\u003a\u0020\u0025\u0030\u0032\u0058\u0009\u0020\u0042\u0050\u003a\u0020\u0025\u0064",_fgb ._dd ,_db ,_gaa ,_dfe ,_dba ,_fgb ._dc ,_fgb ._ca ,_fgb ._fc ,_fgb ._fg ,_fgb ._bf );
-if _db ==0{_fgb .code0 (_eceb ,_abb ,_dba ,_gaa );}else {_fgb .code1 (_eceb ,_abb ,_dba ,_gaa );};return nil ;};func (_dgg *Encoder )encodeOOB (_ecf Class )error {_ffe :=_dgg ._abg [_ecf ];_dgf :=_dgg .encodeBit (_ffe ,1,1);if _dgf !=nil {return _dgf ;
-};_dgf =_dgg .encodeBit (_ffe ,3,0);if _dgf !=nil {return _dgf ;};_dgf =_dgg .encodeBit (_ffe ,6,0);if _dgf !=nil {return _dgf ;};_dgf =_dgg .encodeBit (_ffe ,12,0);if _dgf !=nil {return _dgf ;};return nil ;};func (_cbf *Encoder )emit (){if _cbf ._ce ==_gcg {_cbf ._gb =append (_cbf ._gb ,_cbf ._fb );
-_cbf ._fb =make ([]byte ,_gcg );_cbf ._ce =0;};_cbf ._fb [_cbf ._ce ]=_cbf ._fg ;_cbf ._ce ++;};func (_dgd *Encoder )EncodeInteger (proc Class ,value int )(_gdc error ){_ac .Log .Trace ("\u0045\u006eco\u0064\u0065\u0020I\u006e\u0074\u0065\u0067er:\u0027%d\u0027\u0020\u0077\u0069\u0074\u0068\u0020Cl\u0061\u0073\u0073\u003a\u0020\u0027\u0025s\u0027",value ,proc );
-if _gdc =_dgd .encodeInteger (proc ,value );_gdc !=nil {return _eg .Wrap (_gdc ,"\u0045\u006e\u0063\u006f\u0064\u0065\u0049\u006e\u0074\u0065\u0067\u0065\u0072","");};return nil ;};func (_bca *Encoder )codeMPS (_ebf *codingContext ,_afd uint32 ,_ccd uint16 ,_gde byte ){_bca ._dc -=_ccd ;
-if _bca ._dc &0x8000!=0{_bca ._ca +=uint32 (_ccd );return ;};if _bca ._dc < _ccd {_bca ._dc =_ccd ;}else {_bca ._ca +=uint32 (_ccd );};_ebf ._fd [_afd ]=_dcfd [_gde ]._ecea ;_bca .renormalize ();};func (_dg *codingContext )flipMps (_ag uint32 ){_dg ._ge [_ag ]=1-_dg ._ge [_ag ]};
-func (_fce *Encoder )codeLPS (_faa *codingContext ,_cea uint32 ,_gcac uint16 ,_gdb byte ){_fce ._dc -=_gcac ;if _fce ._dc < _gcac {_fce ._ca +=uint32 (_gcac );}else {_fce ._dc =_gcac ;};if _dcfd [_gdb ]._gfd ==1{_faa .flipMps (_cea );};_faa ._fd [_cea ]=_dcfd [_gdb ]._bbbb ;
-_fce .renormalize ();};type Encoder struct{_ca uint32 ;_dc uint16 ;_fc ,_fg uint8 ;_bf int ;_dd int ;_gb [][]byte ;_fb []byte ;_ce int ;_bc *codingContext ;_abg [13]*codingContext ;_bb *codingContext ;};func (_fec *Encoder )Reset (){_fec ._dc =0x8000;_fec ._ca =0;
-_fec ._fc =12;_fec ._bf =-1;_fec ._fg =0;_fec ._bb =nil ;_fec ._bc =_af (_cee );};func New ()*Encoder {_de :=&Encoder {};_de .Init ();return _de };func (_fdb *Encoder )encodeInteger (_fcae Class ,_dbg int )error {const _ad ="E\u006e\u0063\u006f\u0064er\u002ee\u006e\u0063\u006f\u0064\u0065I\u006e\u0074\u0065\u0067\u0065\u0072";
-if _dbg > 2000000000||_dbg < -2000000000{return _eg .Errorf (_ad ,"\u0061\u0072\u0069\u0074\u0068\u006d\u0065\u0074i\u0063\u0020\u0065nc\u006f\u0064\u0065\u0072\u0020\u002d \u0069\u006e\u0076\u0061\u006c\u0069\u0064\u0020\u0069\u006e\u0074\u0065\u0067\u0065\u0072 \u0076\u0061\u006c\u0075\u0065\u003a\u0020\u0027%\u0064\u0027",_dbg );
-};_egd :=_fdb ._abg [_fcae ];_fbb :=uint32 (1);var _ccg int ;for ;;_ccg ++{if _cb [_ccg ]._ef <=_dbg &&_cb [_ccg ]._f >=_dbg {break ;};};if _dbg < 0{_dbg =-_dbg ;};_dbg -=int (_cb [_ccg ]._b );_dcf :=_cb [_ccg ]._c ;for _fdab :=uint8 (0);_fdab < _cb [_ccg ]._ab ;
-_fdab ++{_bee :=_dcf &1;if _fdg :=_fdb .encodeBit (_egd ,_fbb ,_bee );_fdg !=nil {return _eg .Wrap (_fdg ,_ad ,"");};_dcf >>=1;if _fbb &0x100> 0{_fbb =(((_fbb <<1)|uint32 (_bee ))&0x1ff)|0x100;}else {_fbb =(_fbb <<1)|uint32 (_bee );};};_dbg <<=32-_cb [_ccg ]._d ;
-for _dbd :=uint8 (0);_dbd < _cb [_ccg ]._d ;_dbd ++{_egg :=uint8 ((uint32 (_dbg )&0x80000000)>>31);if _ace :=_fdb .encodeBit (_egd ,_fbb ,_egg );_ace !=nil {return _eg .Wrap (_ace ,_ad ,"\u006d\u006f\u0076\u0065 \u0064\u0061\u0074\u0061\u0020\u0074\u006f\u0020\u0074\u0068e\u0020t\u006f\u0070\u0020\u006f\u0066\u0020\u0077o\u0072\u0064");
-};_dbg <<=1;if _fbb &0x100!=0{_fbb =(((_fbb <<1)|uint32 (_egg ))&0x1ff)|0x100;}else {_fbb =(_fbb <<1)|uint32 (_egg );};};return nil ;};func (_fgff *Encoder )WriteTo (w _aa .Writer )(int64 ,error ){const _fbf ="\u0045n\u0063o\u0064\u0065\u0072\u002e\u0057\u0072\u0069\u0074\u0065\u0054\u006f";
-var _gca int64 ;for _ebe ,_cgd :=range _fgff ._gb {_bbeg ,_dcb :=w .Write (_cgd );if _dcb !=nil {return 0,_eg .Wrapf (_dcb ,_fbf ,"\u0066\u0061\u0069\u006c\u0065\u0064\u0020\u0061\u0074\u0020\u0069'\u0074\u0068\u003a\u0020\u0027\u0025\u0064\u0027\u0020\u0063h\u0075\u006e\u006b",_ebe );
-};_gca +=int64 (_bbeg );};_fgff ._fb =_fgff ._fb [:_fgff ._ce ];_fca ,_bce :=w .Write (_fgff ._fb );if _bce !=nil {return 0,_eg .Wrap (_bce ,_fbf ,"\u0062u\u0066f\u0065\u0072\u0065\u0064\u0020\u0063\u0068\u0075\u006e\u006b\u0073");};_gca +=int64 (_fca );
-return _gca ,nil ;};func (_ae *Encoder )code1 (_egc *codingContext ,_cgg uint32 ,_eaa uint16 ,_gbe byte ){if _egc .mps (_cgg )==1{_ae .codeMPS (_egc ,_cgg ,_eaa ,_gbe );}else {_ae .codeLPS (_egc ,_cgg ,_eaa ,_gbe );};};type Class int ;func (_eba *Encoder )lBlock (){if _eba ._bf >=0{_eba .emit ();
-};_eba ._bf ++;_eba ._fg =uint8 (_eba ._ca >>19);_eba ._ca &=0x7ffff;_eba ._fc =8;};func (_fee *Encoder )byteOut (){if _fee ._fg ==0xff{_fee .rBlock ();return ;};if _fee ._ca < 0x8000000{_fee .lBlock ();return ;};_fee ._fg ++;if _fee ._fg !=0xff{_fee .lBlock ();
-return ;};_fee ._ca &=0x7ffffff;_fee .rBlock ();};func (_dce *Encoder )code0 (_dcef *codingContext ,_ffc uint32 ,_edc uint16 ,_ba byte ){if _dcef .mps (_ffc )==0{_dce .codeMPS (_dcef ,_ffc ,_edc ,_ba );}else {_dce .codeLPS (_dcef ,_ffc ,_edc ,_ba );};};
-func _af (_gd int )*codingContext {return &codingContext {_fd :make ([]byte ,_gd ),_ge :make ([]byte ,_gd )};};var _ _aa .WriterTo =&Encoder {};type codingContext struct{_fd []byte ;_ge []byte ;};func (_fgd *Encoder )renormalize (){for {_fgd ._dc <<=1;
-_fgd ._ca <<=1;_fgd ._fc --;if _fgd ._fc ==0{_fgd .byteOut ();};if (_fgd ._dc &0x8000)!=0{break ;};};};func (_edg *Encoder )EncodeIAID (symbolCodeLength ,value int )(_bfb error ){_ac .Log .Trace ("\u0045\u006e\u0063\u006f\u0064\u0065\u0020\u0049A\u0049\u0044\u002e S\u0079\u006d\u0062\u006f\u006c\u0043o\u0064\u0065\u004c\u0065\u006e\u0067\u0074\u0068\u003a\u0020\u0027\u0025\u0064\u0027\u002c \u0056\u0061\u006c\u0075\u0065\u003a\u0020\u0027%\u0064\u0027",symbolCodeLength ,value );
-if _bfb =_edg .encodeIAID (symbolCodeLength ,value );_bfb !=nil {return _eg .Wrap (_bfb ,"\u0045\u006e\u0063\u006f\u0064\u0065\u0049\u0041\u0049\u0044","");};return nil ;};func (_fga *Encoder )DataSize ()int {return _fga .dataSize ()};func (_fgf *Encoder )EncodeBitmap (bm *_e .Bitmap ,duplicateLineRemoval bool )error {_ac .Log .Trace ("\u0045n\u0063\u006f\u0064\u0065 \u0042\u0069\u0074\u006d\u0061p\u0020[\u0025d\u0078\u0025\u0064\u005d\u002c\u0020\u0025s",bm .Width ,bm .Height ,bm );
-var (_bg ,_ea uint8 ;_bbb ,_edb ,_da uint16 ;_cad ,_agd ,_gag byte ;_gagg ,_ceg ,_gc int ;_aca ,_acb []byte ;);for _fa :=0;_fa < bm .Height ;_fa ++{_cad ,_agd =0,0;if _fa >=2{_cad =bm .Data [(_fa -2)*bm .RowStride ];};if _fa >=1{_agd =bm .Data [(_fa -1)*bm .RowStride ];
-if duplicateLineRemoval {_ceg =_fa *bm .RowStride ;_aca =bm .Data [_ceg :_ceg +bm .RowStride ];_gc =(_fa -1)*bm .RowStride ;_acb =bm .Data [_gc :_gc +bm .RowStride ];if _g .Equal (_aca ,_acb ){_ea =_bg ^1;_bg =1;}else {_ea =_bg ;_bg =0;};};};if duplicateLineRemoval {if _gf :=_fgf .encodeBit (_fgf ._bc ,_egb ,_ea );
-_gf !=nil {return _gf ;};if _bg !=0{continue ;};};_gag =bm .Data [_fa *bm .RowStride ];_bbb =uint16 (_cad >>5);_edb =uint16 (_agd >>4);_cad <<=3;_agd <<=4;_da =0;for _gagg =0;_gagg < bm .Width ;_gagg ++{_ec :=uint32 (_bbb <<11|_edb <<4|_da );_ff :=(_gag &0x80)>>7;
-_efc :=_fgf .encodeBit (_fgf ._bc ,_ec ,_ff );if _efc !=nil {return _efc ;};_bbb <<=1;_edb <<=1;_da <<=1;_bbb |=uint16 ((_cad &0x80)>>7);_edb |=uint16 ((_agd &0x80)>>7);_da |=uint16 (_ff );_dcg :=_gagg %8;_ddg :=_gagg /8+1;if _dcg ==4&&_fa >=2{_cad =0;
-if _ddg < bm .RowStride {_cad =bm .Data [(_fa -2)*bm .RowStride +_ddg ];};}else {_cad <<=1;};if _dcg ==3&&_fa >=1{_agd =0;if _ddg < bm .RowStride {_agd =bm .Data [(_fa -1)*bm .RowStride +_ddg ];};}else {_agd <<=1;};if _dcg ==7{_gag =0;if _ddg < bm .RowStride {_gag =bm .Data [_fa *bm .RowStride +_ddg ];
-};}else {_gag <<=1;};_bbb &=31;_edb &=127;_da &=15;};};return nil ;};func (_cgb *Encoder )Flush (){_cgb ._ce =0;_cgb ._gb =nil ;_cgb ._bf =-1};func (_ccgb *Encoder )flush (){_ccgb .setBits ();_ccgb ._ca <<=_ccgb ._fc ;_ccgb .byteOut ();_ccgb ._ca <<=_ccgb ._fc ;
-_ccgb .byteOut ();_ccgb .emit ();if _ccgb ._fg !=0xff{_ccgb ._bf ++;_ccgb ._fg =0xff;_ccgb .emit ();};_ccgb ._bf ++;_ccgb ._fg =0xac;_ccgb ._bf ++;_ccgb .emit ();};var _cb =[]intEncRangeS {{0,3,0,2,0,2},{-1,-1,9,4,0,0},{-3,-2,5,3,2,1},{4,19,2,3,4,4},{-19,-4,3,3,4,4},{20,83,6,4,20,6},{-83,-20,7,4,20,6},{84,339,14,5,84,8},{-339,-84,15,5,84,8},{340,4435,30,6,340,12},{-4435,-340,31,6,340,12},{4436,2000000000,62,6,4436,32},{-2000000000,-4436,63,6,4436,32}};
-const (_cee =65536;_gcg =20*1024;);const _egb =0x9b25;func (_agda *Encoder )dataSize ()int {return _gcg *len (_agda ._gb )+_agda ._ce };func (_fcb *Encoder )Final (){_fcb .flush ()};func (_ed Class )String ()string {switch _ed {case IAAI :return "\u0049\u0041\u0041\u0049";
-case IADH :return "\u0049\u0041\u0044\u0048";case IADS :return "\u0049\u0041\u0044\u0053";case IADT :return "\u0049\u0041\u0044\u0054";case IADW :return "\u0049\u0041\u0044\u0057";case IAEX :return "\u0049\u0041\u0045\u0058";case IAFS :return "\u0049\u0041\u0046\u0053";
-case IAIT :return "\u0049\u0041\u0049\u0054";case IARDH :return "\u0049\u0041\u0052D\u0048";case IARDW :return "\u0049\u0041\u0052D\u0057";case IARDX :return "\u0049\u0041\u0052D\u0058";case IARDY :return "\u0049\u0041\u0052D\u0059";case IARI :return "\u0049\u0041\u0052\u0049";
-default:return "\u0055N\u004b\u004e\u004f\u0057\u004e";};};func (_cgbf *Encoder )encodeIAID (_fad ,_aaf int )error {if _cgbf ._bb ==nil {_cgbf ._bb =_af (1<<uint (_fad ));};_fcba :=uint32 (1<<uint32 (_fad +1))-1;_aaf <<=uint (32-_fad );_cdge :=uint32 (1);
-for _eeg :=0;_eeg < _fad ;_eeg ++{_aef :=_cdge &_fcba ;_bba :=uint8 ((uint32 (_aaf )&0x80000000)>>31);if _dfa :=_cgbf .encodeBit (_cgbf ._bb ,_aef ,_bba );_dfa !=nil {return _dfa ;};_cdge =(_cdge <<1)|uint32 (_bba );_aaf <<=1;};return nil ;};func (_ece *Encoder )Refine (iTemp ,iTarget *_e .Bitmap ,ox ,oy int )error {for _dgde :=0;
-_dgde < iTarget .Height ;_dgde ++{var _efcd int ;_gbd :=_dgde +oy ;var (_bd ,_bbe ,_fab ,_fe ,_aff uint16 ;_cdg ,_df ,_gdd ,_ee ,_be byte ;);if _gbd >=1&&(_gbd -1)< iTemp .Height {_cdg =iTemp .Data [(_gbd -1)*iTemp .RowStride ];};if _gbd >=0&&_gbd < iTemp .Height {_df =iTemp .Data [_gbd *iTemp .RowStride ];
-};if _gbd >=-1&&_gbd +1< iTemp .Height {_gdd =iTemp .Data [(_gbd +1)*iTemp .RowStride ];};if _dgde >=1{_ee =iTarget .Data [(_dgde -1)*iTarget .RowStride ];};_be =iTarget .Data [_dgde *iTarget .RowStride ];_bgf :=uint (6+ox );_bd =uint16 (_cdg >>_bgf );
-_bbe =uint16 (_df >>_bgf );_fab =uint16 (_gdd >>_bgf );_fe =uint16 (_ee >>6);_bfbe :=uint (2-ox );_cdg <<=_bfbe ;_df <<=_bfbe ;_gdd <<=_bfbe ;_ee <<=2;for _efcd =0;_efcd < iTarget .Width ;_efcd ++{_cef :=(_bd <<10)|(_bbe <<7)|(_fab <<4)|(_fe <<1)|_aff ;
-_fda :=_be >>7;_eff :=_ece .encodeBit (_ece ._bc ,uint32 (_cef ),_fda );if _eff !=nil {return _eff ;};_bd <<=1;_bbe <<=1;_fab <<=1;_fe <<=1;_bd |=uint16 (_cdg >>7);_bbe |=uint16 (_df >>7);_fab |=uint16 (_gdd >>7);_fe |=uint16 (_ee >>7);_aff =uint16 (_fda );
-_bfba :=_efcd %8;_cec :=_efcd /8+1;if _bfba ==5+ox {_cdg ,_df ,_gdd =0,0,0;if _cec < iTemp .RowStride &&_gbd >=1&&(_gbd -1)< iTemp .Height {_cdg =iTemp .Data [(_gbd -1)*iTemp .RowStride +_cec ];};if _cec < iTemp .RowStride &&_gbd >=0&&_gbd < iTemp .Height {_df =iTemp .Data [_gbd *iTemp .RowStride +_cec ];
-};if _cec < iTemp .RowStride &&_gbd >=-1&&(_gbd +1)< iTemp .Height {_gdd =iTemp .Data [(_gbd +1)*iTemp .RowStride +_cec ];};}else {_cdg <<=1;_df <<=1;_gdd <<=1;};if _bfba ==5&&_dgde >=1{_ee =0;if _cec < iTarget .RowStride {_ee =iTarget .Data [(_dgde -1)*iTarget .RowStride +_cec ];
-};}else {_ee <<=1;};if _bfba ==7{_be =0;if _cec < iTarget .RowStride {_be =iTarget .Data [_dgde *iTarget .RowStride +_cec ];};}else {_be <<=1;};_bd &=7;_bbe &=7;_fab &=7;_fe &=7;};};return nil ;};var _dcfd =[]state {{0x5601,1,1,1},{0x3401,2,6,0},{0x1801,3,9,0},{0x0AC1,4,12,0},{0x0521,5,29,0},{0x0221,38,33,0},{0x5601,7,6,1},{0x5401,8,14,0},{0x4801,9,14,0},{0x3801,10,14,0},{0x3001,11,17,0},{0x2401,12,18,0},{0x1C01,13,20,0},{0x1601,29,21,0},{0x5601,15,14,1},{0x5401,16,14,0},{0x5101,17,15,0},{0x4801,18,16,0},{0x3801,19,17,0},{0x3401,20,18,0},{0x3001,21,19,0},{0x2801,22,19,0},{0x2401,23,20,0},{0x2201,24,21,0},{0x1C01,25,22,0},{0x1801,26,23,0},{0x1601,27,24,0},{0x1401,28,25,0},{0x1201,29,26,0},{0x1101,30,27,0},{0x0AC1,31,28,0},{0x09C1,32,29,0},{0x08A1,33,30,0},{0x0521,34,31,0},{0x0441,35,32,0},{0x02A1,36,33,0},{0x0221,37,34,0},{0x0141,38,35,0},{0x0111,39,36,0},{0x0085,40,37,0},{0x0049,41,38,0},{0x0025,42,39,0},{0x0015,43,40,0},{0x0009,44,41,0},{0x0005,45,42,0},{0x0001,45,43,0},{0x5601,46,46,0}};
-type intEncRangeS struct{_ef ,_f int ;_c ,_ab uint8 ;_b uint16 ;_d uint8 ;};func (_cc *codingContext )mps (_cd uint32 )int {return int (_cc ._ge [_cd ])};func (_cg *Encoder )EncodeOOB (proc Class )(_ffd error ){_ac .Log .Trace ("E\u006e\u0063\u006f\u0064\u0065\u0020O\u004f\u0042\u0020\u0077\u0069\u0074\u0068\u0020\u0043l\u0061\u0073\u0073:\u0020'\u0025\u0073\u0027",proc );
-if _ffd =_cg .encodeOOB (proc );_ffd !=nil {return _eg .Wrap (_ffd ,"\u0045n\u0063\u006f\u0064\u0065\u004f\u004fB","");};return nil ;};type state struct{_bdf uint16 ;_ecea ,_bbbb uint8 ;_gfd uint8 ;};func (_beg *Encoder )rBlock (){if _beg ._bf >=0{_beg .emit ();
-};_beg ._bf ++;_beg ._fg =uint8 (_beg ._ca >>20);_beg ._ca &=0xfffff;_beg ._fc =7;};func (_fcf *Encoder )setBits (){_dbe :=_fcf ._ca +uint32 (_fcf ._dc );_fcf ._ca |=0xffff;if _fcf ._ca >=_dbe {_fcf ._ca -=0x8000;};};func (_ga *Encoder )Init (){_ga ._bc =_af (_cee );
-_ga ._dc =0x8000;_ga ._ca =0;_ga ._fc =12;_ga ._bf =-1;_ga ._fg =0;_ga ._ce =0;_ga ._fb =make ([]byte ,_gcg );for _eb :=0;_eb < len (_ga ._abg );_eb ++{_ga ._abg [_eb ]=_af (512);};_ga ._bb =nil ;};const (IAAI Class =iota ;IADH ;IADS ;IADT ;IADW ;IAEX ;
-IAFS ;IAIT ;IARDH ;IARDW ;IARDX ;IARDY ;IARI ;);
+package arithmetic
+
+import (
+	_g "bytes"
+	_ac "github.com/szwede/unipdf/v4/common"
+	_e "github.com/szwede/unipdf/v4/internal/jbig2/bitmap"
+	_eg "github.com/szwede/unipdf/v4/internal/jbig2/errors"
+	_aa "io"
+)
+
+func (_fgb *Encoder) encodeBit(_eceb *codingContext, _abb uint32, _db uint8) error {
+	const _fdf = "\u0045\u006e\u0063\u006f\u0064\u0065\u0072\u002e\u0065\u006e\u0063\u006fd\u0065\u0042\u0069\u0074"
+	_fgb._dd++
+	if _abb >= uint32(len(_eceb._fd)) {
+		return _eg.Errorf(_fdf, "\u0061r\u0069\u0074h\u006d\u0065\u0074i\u0063\u0020\u0065\u006e\u0063\u006f\u0064e\u0072\u0020\u002d\u0020\u0069\u006ev\u0061\u006c\u0069\u0064\u0020\u0063\u0074\u0078\u0020\u006e\u0075m\u0062\u0065\u0072\u003a\u0020\u0027\u0025\u0064\u0027", _abb)
+	}
+	_gaa := _eceb._fd[_abb]
+	_dfe := _eceb.mps(_abb)
+	_dba := _dcfd[_gaa]._bdf
+	_ac.Log.Trace("\u0045\u0043\u003a\u0020\u0025d\u0009\u0020D\u003a\u0020\u0025d\u0009\u0020\u0049\u003a\u0020\u0025d\u0009\u0020\u004dPS\u003a \u0025\u0064\u0009\u0020\u0051\u0045\u003a \u0025\u0030\u0034\u0058\u0009\u0020\u0020\u0041\u003a\u0020\u0025\u0030\u0034\u0058\u0009\u0020\u0043\u003a %\u0030\u0038\u0058\u0009\u0020\u0043\u0054\u003a\u0020\u0025\u0064\u0009\u0020\u0042\u003a\u0020\u0025\u0030\u0032\u0058\u0009\u0020\u0042\u0050\u003a\u0020\u0025\u0064", _fgb._dd, _db, _gaa, _dfe, _dba, _fgb._dc, _fgb._ca, _fgb._fc, _fgb._fg, _fgb._bf)
+	if _db == 0 {
+		_fgb.code0(_eceb, _abb, _dba, _gaa)
+	} else {
+		_fgb.code1(_eceb, _abb, _dba, _gaa)
+	}
+	return nil
+}
+
+func (_dgg *Encoder) encodeOOB(_ecf Class) error {
+	_ffe := _dgg._abg[_ecf]
+	_dgf := _dgg.encodeBit(_ffe, 1, 1)
+	if _dgf != nil {
+		return _dgf
+	}
+	_dgf = _dgg.encodeBit(_ffe, 3, 0)
+	if _dgf != nil {
+		return _dgf
+	}
+	_dgf = _dgg.encodeBit(_ffe, 6, 0)
+	if _dgf != nil {
+		return _dgf
+	}
+	_dgf = _dgg.encodeBit(_ffe, 12, 0)
+	if _dgf != nil {
+		return _dgf
+	}
+	return nil
+}
+
+func (_cbf *Encoder) emit() {
+	if _cbf._ce == _gcg {
+		_cbf._gb = append(_cbf._gb, _cbf._fb)
+		_cbf._fb = make([]byte, _gcg)
+		_cbf._ce = 0
+	}
+	_cbf._fb[_cbf._ce] = _cbf._fg
+	_cbf._ce++
+}
+
+func (_dgd *Encoder) EncodeInteger(proc Class, value int) (_gdc error) {
+	_ac.Log.Trace("\u0045\u006eco\u0064\u0065\u0020I\u006e\u0074\u0065\u0067er:\u0027%d\u0027\u0020\u0077\u0069\u0074\u0068\u0020Cl\u0061\u0073\u0073\u003a\u0020\u0027\u0025s\u0027", value, proc)
+	if _gdc = _dgd.encodeInteger(proc, value); _gdc != nil {
+		return _eg.Wrap(_gdc, "\u0045\u006e\u0063\u006f\u0064\u0065\u0049\u006e\u0074\u0065\u0067\u0065\u0072", "")
+	}
+	return nil
+}
+
+func (_bca *Encoder) codeMPS(_ebf *codingContext, _afd uint32, _ccd uint16, _gde byte) {
+	_bca._dc -= _ccd
+	if _bca._dc&0x8000 != 0 {
+		_bca._ca += uint32(_ccd)
+		return
+	}
+	if _bca._dc < _ccd {
+		_bca._dc = _ccd
+	} else {
+		_bca._ca += uint32(_ccd)
+	}
+	_ebf._fd[_afd] = _dcfd[_gde]._ecea
+	_bca.renormalize()
+}
+
+func (_dg *codingContext) flipMps(_ag uint32) { _dg._ge[_ag] = 1 - _dg._ge[_ag] }
+
+func (_fce *Encoder) codeLPS(_faa *codingContext, _cea uint32, _gcac uint16, _gdb byte) {
+	_fce._dc -= _gcac
+	if _fce._dc < _gcac {
+		_fce._ca += uint32(_gcac)
+	} else {
+		_fce._dc = _gcac
+	}
+	if _dcfd[_gdb]._gfd == 1 {
+		_faa.flipMps(_cea)
+	}
+	_faa._fd[_cea] = _dcfd[_gdb]._bbbb
+	_fce.renormalize()
+}
+
+type Encoder struct {
+	_ca      uint32
+	_dc      uint16
+	_fc, _fg uint8
+	_bf      int
+	_dd      int
+	_gb      [][]byte
+	_fb      []byte
+	_ce      int
+	_bc      *codingContext
+	_abg     [13]*codingContext
+	_bb      *codingContext
+}
+
+func (_fec *Encoder) Reset() {
+	_fec._dc = 0x8000
+	_fec._ca = 0
+	_fec._fc = 12
+	_fec._bf = -1
+	_fec._fg = 0
+	_fec._bb = nil
+	_fec._bc = _af(_cee)
+}
+
+func New() *Encoder { _de := &Encoder{}; _de.Init(); return _de }
+
+func (_fdb *Encoder) encodeInteger(_fcae Class, _dbg int) error {
+	const _ad = "E\u006e\u0063\u006f\u0064er\u002ee\u006e\u0063\u006f\u0064\u0065I\u006e\u0074\u0065\u0067\u0065\u0072"
+	if _dbg > 2000000000 || _dbg < -2000000000 {
+		return _eg.Errorf(_ad, "\u0061\u0072\u0069\u0074\u0068\u006d\u0065\u0074i\u0063\u0020\u0065nc\u006f\u0064\u0065\u0072\u0020\u002d \u0069\u006e\u0076\u0061\u006c\u0069\u0064\u0020\u0069\u006e\u0074\u0065\u0067\u0065\u0072 \u0076\u0061\u006c\u0075\u0065\u003a\u0020\u0027%\u0064\u0027", _dbg)
+	}
+	_egd := _fdb._abg[_fcae]
+	_fbb := uint32(1)
+	var _ccg int
+	for ; ; _ccg++ {
+		if _cb[_ccg]._ef <= _dbg && _cb[_ccg]._f >= _dbg {
+			break
+		}
+	}
+	if _dbg < 0 {
+		_dbg = -_dbg
+	}
+	_dbg -= int(_cb[_ccg]._b)
+	_dcf := _cb[_ccg]._c
+	for _fdab := uint8(0); _fdab < _cb[_ccg]._ab; _fdab++ {
+		_bee := _dcf & 1
+		if _fdg := _fdb.encodeBit(_egd, _fbb, _bee); _fdg != nil {
+			return _eg.Wrap(_fdg, _ad, "")
+		}
+		_dcf >>= 1
+		if _fbb&0x100 > 0 {
+			_fbb = (((_fbb << 1) | uint32(_bee)) & 0x1ff) | 0x100
+		} else {
+			_fbb = (_fbb << 1) | uint32(_bee)
+		}
+	}
+	_dbg <<= 32 - _cb[_ccg]._d
+	for _dbd := uint8(0); _dbd < _cb[_ccg]._d; _dbd++ {
+		_egg := uint8((uint32(_dbg) & 0x80000000) >> 31)
+		if _ace := _fdb.encodeBit(_egd, _fbb, _egg); _ace != nil {
+			return _eg.Wrap(_ace, _ad, "\u006d\u006f\u0076\u0065 \u0064\u0061\u0074\u0061\u0020\u0074\u006f\u0020\u0074\u0068e\u0020t\u006f\u0070\u0020\u006f\u0066\u0020\u0077o\u0072\u0064")
+		}
+		_dbg <<= 1
+		if _fbb&0x100 != 0 {
+			_fbb = (((_fbb << 1) | uint32(_egg)) & 0x1ff) | 0x100
+		} else {
+			_fbb = (_fbb << 1) | uint32(_egg)
+		}
+	}
+	return nil
+}
+
+func (_fgff *Encoder) WriteTo(w _aa.Writer) (int64, error) {
+	const _fbf = "\u0045n\u0063o\u0064\u0065\u0072\u002e\u0057\u0072\u0069\u0074\u0065\u0054\u006f"
+	var _gca int64
+	for _ebe, _cgd := range _fgff._gb {
+		_bbeg, _dcb := w.Write(_cgd)
+		if _dcb != nil {
+			return 0, _eg.Wrapf(_dcb, _fbf, "\u0066\u0061\u0069\u006c\u0065\u0064\u0020\u0061\u0074\u0020\u0069'\u0074\u0068\u003a\u0020\u0027\u0025\u0064\u0027\u0020\u0063h\u0075\u006e\u006b", _ebe)
+		}
+		_gca += int64(_bbeg)
+	}
+	_fgff._fb = _fgff._fb[:_fgff._ce]
+	_fca, _bce := w.Write(_fgff._fb)
+	if _bce != nil {
+		return 0, _eg.Wrap(_bce, _fbf, "\u0062u\u0066f\u0065\u0072\u0065\u0064\u0020\u0063\u0068\u0075\u006e\u006b\u0073")
+	}
+	_gca += int64(_fca)
+	return _gca, nil
+}
+
+func (_ae *Encoder) code1(_egc *codingContext, _cgg uint32, _eaa uint16, _gbe byte) {
+	if _egc.mps(_cgg) == 1 {
+		_ae.codeMPS(_egc, _cgg, _eaa, _gbe)
+	} else {
+		_ae.codeLPS(_egc, _cgg, _eaa, _gbe)
+	}
+}
+
+type Class int
+
+func (_eba *Encoder) lBlock() {
+	if _eba._bf >= 0 {
+		_eba.emit()
+	}
+	_eba._bf++
+	_eba._fg = uint8(_eba._ca >> 19)
+	_eba._ca &= 0x7ffff
+	_eba._fc = 8
+}
+
+func (_fee *Encoder) byteOut() {
+	if _fee._fg == 0xff {
+		_fee.rBlock()
+		return
+	}
+	if _fee._ca < 0x8000000 {
+		_fee.lBlock()
+		return
+	}
+	_fee._fg++
+	if _fee._fg != 0xff {
+		_fee.lBlock()
+		return
+	}
+	_fee._ca &= 0x7ffffff
+	_fee.rBlock()
+}
+
+func (_dce *Encoder) code0(_dcef *codingContext, _ffc uint32, _edc uint16, _ba byte) {
+	if _dcef.mps(_ffc) == 0 {
+		_dce.codeMPS(_dcef, _ffc, _edc, _ba)
+	} else {
+		_dce.codeLPS(_dcef, _ffc, _edc, _ba)
+	}
+}
+
+func _af(_gd int) *codingContext {
+	return &codingContext{_fd: make([]byte, _gd), _ge: make([]byte, _gd)}
+}
+
+var _ _aa.WriterTo = &Encoder{}
+
+type codingContext struct {
+	_fd []byte
+	_ge []byte
+}
+
+func (_fgd *Encoder) renormalize() {
+	for {
+		_fgd._dc <<= 1
+		_fgd._ca <<= 1
+		_fgd._fc--
+		if _fgd._fc == 0 {
+			_fgd.byteOut()
+		}
+		if (_fgd._dc & 0x8000) != 0 {
+			break
+		}
+	}
+}
+
+func (_edg *Encoder) EncodeIAID(symbolCodeLength, value int) (_bfb error) {
+	_ac.Log.Trace("\u0045\u006e\u0063\u006f\u0064\u0065\u0020\u0049A\u0049\u0044\u002e S\u0079\u006d\u0062\u006f\u006c\u0043o\u0064\u0065\u004c\u0065\u006e\u0067\u0074\u0068\u003a\u0020\u0027\u0025\u0064\u0027\u002c \u0056\u0061\u006c\u0075\u0065\u003a\u0020\u0027%\u0064\u0027", symbolCodeLength, value)
+	if _bfb = _edg.encodeIAID(symbolCodeLength, value); _bfb != nil {
+		return _eg.Wrap(_bfb, "\u0045\u006e\u0063\u006f\u0064\u0065\u0049\u0041\u0049\u0044", "")
+	}
+	return nil
+}
+
+func (_fga *Encoder) DataSize() int { return _fga.dataSize() }
+
+func (_fgf *Encoder) EncodeBitmap(bm *_e.Bitmap, duplicateLineRemoval bool) error {
+	_ac.Log.Trace("\u0045n\u0063\u006f\u0064\u0065 \u0042\u0069\u0074\u006d\u0061p\u0020[\u0025d\u0078\u0025\u0064\u005d\u002c\u0020\u0025s", bm.Width, bm.Height, bm)
+	var (
+		_bg, _ea         uint8
+		_bbb, _edb, _da  uint16
+		_cad, _agd, _gag byte
+		_gagg, _ceg, _gc int
+		_aca, _acb       []byte
+	)
+	for _fa := 0; _fa < bm.Height; _fa++ {
+		_cad, _agd = 0, 0
+		if _fa >= 2 {
+			_cad = bm.Data[(_fa-2)*bm.RowStride]
+		}
+		if _fa >= 1 {
+			_agd = bm.Data[(_fa-1)*bm.RowStride]
+			if duplicateLineRemoval {
+				_ceg = _fa * bm.RowStride
+				_aca = bm.Data[_ceg : _ceg+bm.RowStride]
+				_gc = (_fa - 1) * bm.RowStride
+				_acb = bm.Data[_gc : _gc+bm.RowStride]
+				if _g.Equal(_aca, _acb) {
+					_ea = _bg ^ 1
+					_bg = 1
+				} else {
+					_ea = _bg
+					_bg = 0
+				}
+			}
+		}
+		if duplicateLineRemoval {
+			if _gf := _fgf.encodeBit(_fgf._bc, _egb, _ea); _gf != nil {
+				return _gf
+			}
+			if _bg != 0 {
+				continue
+			}
+		}
+		_gag = bm.Data[_fa*bm.RowStride]
+		_bbb = uint16(_cad >> 5)
+		_edb = uint16(_agd >> 4)
+		_cad <<= 3
+		_agd <<= 4
+		_da = 0
+		for _gagg = 0; _gagg < bm.Width; _gagg++ {
+			_ec := uint32(_bbb<<11 | _edb<<4 | _da)
+			_ff := (_gag & 0x80) >> 7
+			_efc := _fgf.encodeBit(_fgf._bc, _ec, _ff)
+			if _efc != nil {
+				return _efc
+			}
+			_bbb <<= 1
+			_edb <<= 1
+			_da <<= 1
+			_bbb |= uint16((_cad & 0x80) >> 7)
+			_edb |= uint16((_agd & 0x80) >> 7)
+			_da |= uint16(_ff)
+			_dcg := _gagg % 8
+			_ddg := _gagg/8 + 1
+			if _dcg == 4 && _fa >= 2 {
+				_cad = 0
+				if _ddg < bm.RowStride {
+					_cad = bm.Data[(_fa-2)*bm.RowStride+_ddg]
+				}
+			} else {
+				_cad <<= 1
+			}
+			if _dcg == 3 && _fa >= 1 {
+				_agd = 0
+				if _ddg < bm.RowStride {
+					_agd = bm.Data[(_fa-1)*bm.RowStride+_ddg]
+				}
+			} else {
+				_agd <<= 1
+			}
+			if _dcg == 7 {
+				_gag = 0
+				if _ddg < bm.RowStride {
+					_gag = bm.Data[_fa*bm.RowStride+_ddg]
+				}
+			} else {
+				_gag <<= 1
+			}
+			_bbb &= 31
+			_edb &= 127
+			_da &= 15
+		}
+	}
+	return nil
+}
+
+func (_cgb *Encoder) Flush() { _cgb._ce = 0; _cgb._gb = nil; _cgb._bf = -1 }
+
+func (_ccgb *Encoder) flush() {
+	_ccgb.setBits()
+	_ccgb._ca <<= _ccgb._fc
+	_ccgb.byteOut()
+	_ccgb._ca <<= _ccgb._fc
+	_ccgb.byteOut()
+	_ccgb.emit()
+	if _ccgb._fg != 0xff {
+		_ccgb._bf++
+		_ccgb._fg = 0xff
+		_ccgb.emit()
+	}
+	_ccgb._bf++
+	_ccgb._fg = 0xac
+	_ccgb._bf++
+	_ccgb.emit()
+}
+
+var _cb = []intEncRangeS{{0, 3, 0, 2, 0, 2}, {-1, -1, 9, 4, 0, 0}, {-3, -2, 5, 3, 2, 1}, {4, 19, 2, 3, 4, 4}, {-19, -4, 3, 3, 4, 4}, {20, 83, 6, 4, 20, 6}, {-83, -20, 7, 4, 20, 6}, {84, 339, 14, 5, 84, 8}, {-339, -84, 15, 5, 84, 8}, {340, 4435, 30, 6, 340, 12}, {-4435, -340, 31, 6, 340, 12}, {4436, 2000000000, 62, 6, 4436, 32}, {-2000000000, -4436, 63, 6, 4436, 32}}
+
+const (
+	_cee = 65536
+	_gcg = 20 * 1024
+)
+
+const _egb = 0x9b25
+
+func (_agda *Encoder) dataSize() int { return _gcg*len(_agda._gb) + _agda._ce }
+
+func (_fcb *Encoder) Final() { _fcb.flush() }
+
+func (_ed Class) String() string {
+	switch _ed {
+	case IAAI:
+		return "\u0049\u0041\u0041\u0049"
+	case IADH:
+		return "\u0049\u0041\u0044\u0048"
+	case IADS:
+		return "\u0049\u0041\u0044\u0053"
+	case IADT:
+		return "\u0049\u0041\u0044\u0054"
+	case IADW:
+		return "\u0049\u0041\u0044\u0057"
+	case IAEX:
+		return "\u0049\u0041\u0045\u0058"
+	case IAFS:
+		return "\u0049\u0041\u0046\u0053"
+	case IAIT:
+		return "\u0049\u0041\u0049\u0054"
+	case IARDH:
+		return "\u0049\u0041\u0052D\u0048"
+	case IARDW:
+		return "\u0049\u0041\u0052D\u0057"
+	case IARDX:
+		return "\u0049\u0041\u0052D\u0058"
+	case IARDY:
+		return "\u0049\u0041\u0052D\u0059"
+	case IARI:
+		return "\u0049\u0041\u0052\u0049"
+	default:
+		return "\u0055N\u004b\u004e\u004f\u0057\u004e"
+	}
+}
+
+func (_cgbf *Encoder) encodeIAID(_fad, _aaf int) error {
+	if _cgbf._bb == nil {
+		_cgbf._bb = _af(1 << uint(_fad))
+	}
+	_fcba := uint32(1<<uint32(_fad+1)) - 1
+	_aaf <<= uint(32 - _fad)
+	_cdge := uint32(1)
+	for _eeg := 0; _eeg < _fad; _eeg++ {
+		_aef := _cdge & _fcba
+		_bba := uint8((uint32(_aaf) & 0x80000000) >> 31)
+		if _dfa := _cgbf.encodeBit(_cgbf._bb, _aef, _bba); _dfa != nil {
+			return _dfa
+		}
+		_cdge = (_cdge << 1) | uint32(_bba)
+		_aaf <<= 1
+	}
+	return nil
+}
+
+func (_ece *Encoder) Refine(iTemp, iTarget *_e.Bitmap, ox, oy int) error {
+	for _dgde := 0; _dgde < iTarget.Height; _dgde++ {
+		var _efcd int
+		_gbd := _dgde + oy
+		var (
+			_bd, _bbe, _fab, _fe, _aff uint16
+			_cdg, _df, _gdd, _ee, _be  byte
+		)
+		if _gbd >= 1 && (_gbd-1) < iTemp.Height {
+			_cdg = iTemp.Data[(_gbd-1)*iTemp.RowStride]
+		}
+		if _gbd >= 0 && _gbd < iTemp.Height {
+			_df = iTemp.Data[_gbd*iTemp.RowStride]
+		}
+		if _gbd >= -1 && _gbd+1 < iTemp.Height {
+			_gdd = iTemp.Data[(_gbd+1)*iTemp.RowStride]
+		}
+		if _dgde >= 1 {
+			_ee = iTarget.Data[(_dgde-1)*iTarget.RowStride]
+		}
+		_be = iTarget.Data[_dgde*iTarget.RowStride]
+		_bgf := uint(6 + ox)
+		_bd = uint16(_cdg >> _bgf)
+		_bbe = uint16(_df >> _bgf)
+		_fab = uint16(_gdd >> _bgf)
+		_fe = uint16(_ee >> 6)
+		_bfbe := uint(2 - ox)
+		_cdg <<= _bfbe
+		_df <<= _bfbe
+		_gdd <<= _bfbe
+		_ee <<= 2
+		for _efcd = 0; _efcd < iTarget.Width; _efcd++ {
+			_cef := (_bd << 10) | (_bbe << 7) | (_fab << 4) | (_fe << 1) | _aff
+			_fda := _be >> 7
+			_eff := _ece.encodeBit(_ece._bc, uint32(_cef), _fda)
+			if _eff != nil {
+				return _eff
+			}
+			_bd <<= 1
+			_bbe <<= 1
+			_fab <<= 1
+			_fe <<= 1
+			_bd |= uint16(_cdg >> 7)
+			_bbe |= uint16(_df >> 7)
+			_fab |= uint16(_gdd >> 7)
+			_fe |= uint16(_ee >> 7)
+			_aff = uint16(_fda)
+			_bfba := _efcd % 8
+			_cec := _efcd/8 + 1
+			if _bfba == 5+ox {
+				_cdg, _df, _gdd = 0, 0, 0
+				if _cec < iTemp.RowStride && _gbd >= 1 && (_gbd-1) < iTemp.Height {
+					_cdg = iTemp.Data[(_gbd-1)*iTemp.RowStride+_cec]
+				}
+				if _cec < iTemp.RowStride && _gbd >= 0 && _gbd < iTemp.Height {
+					_df = iTemp.Data[_gbd*iTemp.RowStride+_cec]
+				}
+				if _cec < iTemp.RowStride && _gbd >= -1 && (_gbd+1) < iTemp.Height {
+					_gdd = iTemp.Data[(_gbd+1)*iTemp.RowStride+_cec]
+				}
+			} else {
+				_cdg <<= 1
+				_df <<= 1
+				_gdd <<= 1
+			}
+			if _bfba == 5 && _dgde >= 1 {
+				_ee = 0
+				if _cec < iTarget.RowStride {
+					_ee = iTarget.Data[(_dgde-1)*iTarget.RowStride+_cec]
+				}
+			} else {
+				_ee <<= 1
+			}
+			if _bfba == 7 {
+				_be = 0
+				if _cec < iTarget.RowStride {
+					_be = iTarget.Data[_dgde*iTarget.RowStride+_cec]
+				}
+			} else {
+				_be <<= 1
+			}
+			_bd &= 7
+			_bbe &= 7
+			_fab &= 7
+			_fe &= 7
+		}
+	}
+	return nil
+}
+
+var _dcfd = []state{{0x5601, 1, 1, 1}, {0x3401, 2, 6, 0}, {0x1801, 3, 9, 0}, {0x0AC1, 4, 12, 0}, {0x0521, 5, 29, 0}, {0x0221, 38, 33, 0}, {0x5601, 7, 6, 1}, {0x5401, 8, 14, 0}, {0x4801, 9, 14, 0}, {0x3801, 10, 14, 0}, {0x3001, 11, 17, 0}, {0x2401, 12, 18, 0}, {0x1C01, 13, 20, 0}, {0x1601, 29, 21, 0}, {0x5601, 15, 14, 1}, {0x5401, 16, 14, 0}, {0x5101, 17, 15, 0}, {0x4801, 18, 16, 0}, {0x3801, 19, 17, 0}, {0x3401, 20, 18, 0}, {0x3001, 21, 19, 0}, {0x2801, 22, 19, 0}, {0x2401, 23, 20, 0}, {0x2201, 24, 21, 0}, {0x1C01, 25, 22, 0}, {0x1801, 26, 23, 0}, {0x1601, 27, 24, 0}, {0x1401, 28, 25, 0}, {0x1201, 29, 26, 0}, {0x1101, 30, 27, 0}, {0x0AC1, 31, 28, 0}, {0x09C1, 32, 29, 0}, {0x08A1, 33, 30, 0}, {0x0521, 34, 31, 0}, {0x0441, 35, 32, 0}, {0x02A1, 36, 33, 0}, {0x0221, 37, 34, 0}, {0x0141, 38, 35, 0}, {0x0111, 39, 36, 0}, {0x0085, 40, 37, 0}, {0x0049, 41, 38, 0}, {0x0025, 42, 39, 0}, {0x0015, 43, 40, 0}, {0x0009, 44, 41, 0}, {0x0005, 45, 42, 0}, {0x0001, 45, 43, 0}, {0x5601, 46, 46, 0}}
+
+type intEncRangeS struct {
+	_ef, _f int
+	_c, _ab uint8
+	_b      uint16
+	_d      uint8
+}
+
+func (_cc *codingContext) mps(_cd uint32) int { return int(_cc._ge[_cd]) }
+
+func (_cg *Encoder) EncodeOOB(proc Class) (_ffd error) {
+	_ac.Log.Trace("E\u006e\u0063\u006f\u0064\u0065\u0020O\u004f\u0042\u0020\u0077\u0069\u0074\u0068\u0020\u0043l\u0061\u0073\u0073:\u0020'\u0025\u0073\u0027", proc)
+	if _ffd = _cg.encodeOOB(proc); _ffd != nil {
+		return _eg.Wrap(_ffd, "\u0045n\u0063\u006f\u0064\u0065\u004f\u004fB", "")
+	}
+	return nil
+}
+
+type state struct {
+	_bdf         uint16
+	_ecea, _bbbb uint8
+	_gfd         uint8
+}
+
+func (_beg *Encoder) rBlock() {
+	if _beg._bf >= 0 {
+		_beg.emit()
+	}
+	_beg._bf++
+	_beg._fg = uint8(_beg._ca >> 20)
+	_beg._ca &= 0xfffff
+	_beg._fc = 7
+}
+
+func (_fcf *Encoder) setBits() {
+	_dbe := _fcf._ca + uint32(_fcf._dc)
+	_fcf._ca |= 0xffff
+	if _fcf._ca >= _dbe {
+		_fcf._ca -= 0x8000
+	}
+}
+
+func (_ga *Encoder) Init() {
+	_ga._bc = _af(_cee)
+	_ga._dc = 0x8000
+	_ga._ca = 0
+	_ga._fc = 12
+	_ga._bf = -1
+	_ga._fg = 0
+	_ga._ce = 0
+	_ga._fb = make([]byte, _gcg)
+	for _eb := 0; _eb < len(_ga._abg); _eb++ {
+		_ga._abg[_eb] = _af(512)
+	}
+	_ga._bb = nil
+}
+
+const (
+	IAAI Class = iota
+	IADH
+	IADS
+	IADT
+	IADW
+	IAEX
+	IAFS
+	IAIT
+	IARDH
+	IARDW
+	IARDX
+	IARDY
+	IARI
+)
