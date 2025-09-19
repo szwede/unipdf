@@ -1088,6 +1088,7 @@ func (_aedga *textObject) checkOp(_bcbe *_af.ContentStreamOperation, _bccb int, 
 }
 
 func _feced(_febae *PageText) error {
+	return nil
 	_ddae := _bgf.GetLicenseKey()
 	if _ddae != nil && _ddae.IsLicensed() || _gde {
 		return nil
